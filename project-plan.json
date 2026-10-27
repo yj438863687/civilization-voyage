@@ -1,0 +1,39 @@
+{
+  "title": "文明航程 Civilization Voyage",
+  "repository": "yj438863687/civilization-voyage",
+  "visibility": "PUBLIC",
+  "license": "MIT",
+  "phase": "框架与协作写作",
+  "tasks": [
+    {
+      "role": "A",
+      "title": "玄览玄通与文化驾驶舱",
+      "assignee": null,
+      "status": "待认领"
+    },
+    {
+      "role": "B",
+      "title": "和而不同与文化对话",
+      "assignee": null,
+      "status": "待认领"
+    },
+    {
+      "role": "C",
+      "title": "知行合一与文明重现",
+      "assignee": null,
+      "status": "待认领"
+    },
+    {
+      "role": "D",
+      "title": "整体产品与 3D 航程 Demo",
+      "assignee": null,
+      "status": "待认领"
+    },
+    {
+      "role": "E",
+      "title": "AI 工具 HMT 与商业落地",
+      "assignee": null,
+      "status": "待认领"
+    }
+  ]
+}

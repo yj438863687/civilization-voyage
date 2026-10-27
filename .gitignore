@@ -1,0 +1,10 @@
+# Local credentials and runtime data
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+node_modules/
+dist/
+coverage/
