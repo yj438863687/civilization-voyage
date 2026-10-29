@@ -51,7 +51,7 @@ button { cursor: pointer; }
 .hud-tl { top: calc(var(--cv-hud-edge) + env(safe-area-inset-top)); left: calc(var(--cv-hud-edge) + env(safe-area-inset-left)); max-width: 320px; }
 .hud-tr { top: calc(var(--cv-hud-edge) + env(safe-area-inset-top)); right: calc(var(--cv-hud-edge) + env(safe-area-inset-right)); max-width: 280px; }
 .hud-bl { bottom: calc(var(--cv-hud-edge) + env(safe-area-inset-bottom)); left: calc(var(--cv-hud-edge) + env(safe-area-inset-left)); }
-.hud-br { bottom: calc(var(--cv-hud-edge) + env(safe-area-inset-bottom)); right: calc(var(--cv-hud-edge) + env(safe-area-inset-right)); display: flex; gap: var(--cv-space-2); flex-wrap: wrap; justify-content: flex-end; }
+.hud-br { bottom: calc(var(--cv-hud-edge) + env(safe-area-inset-bottom)); right: calc(var(--cv-hud-edge) + env(safe-area-inset-right)); display: flex; gap: var(--cv-space-2); flex-wrap: wrap; justify-content: flex-end; z-index: calc(var(--cv-z-panel) + 1); }
 .hud-tc {
   top: calc(var(--cv-hud-edge) + env(safe-area-inset-top));
   left: 50%;
