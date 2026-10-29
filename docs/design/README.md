@@ -4,10 +4,11 @@
 
 | 文件 | 内容 |
 | --- | --- |
-| [ART_DIRECTION.md](ART_DIRECTION.md) | 审美方向、理由、材质光照、空间层次、通用与场景分离、各页落实 |
+| [ART_DIRECTION.md](ART_DIRECTION.md) | 审美方向、理由、材质光照、空间层次、通用与场景分离、各页落实、**文明内核如何被看见** |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | 颜色、字体、间距、尺寸、材质、组件、七种状态 |
 | [SCREEN_SPEC.md](SCREEN_SPEC.md) | 七个页面 + 通讯台抽屉，桌面与窄屏，状态总表 |
 | [MOTION.md](MOTION.md) | 必要反馈 / 镜头 / 装饰三类动效，减少动态，性能 |
+| [CULTURAL_VOICE.md](CULTURAL_VOICE.md) | 界面语气、教练口吻、船员双声部、印章文字、可上屏短句、禁止词（AI 推荐待确认） |
 | [SCENE_CANDIDATES.md](SCENE_CANDIDATES.md) | 场景 A/B/C 的视觉与文化候选（AI 推荐，待组员确认）及出处、待核实问题 |
 | [tokens.css](tokens.css) | 唯一设计变量源，前端可直接引用 |
 | [concepts/](concepts/) | 概念设计预览，非最终界面 |
