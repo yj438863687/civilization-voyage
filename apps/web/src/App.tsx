@@ -541,6 +541,7 @@ export function App() {
           <div className="overlay overlay-left">
             <h1 className="display title-hero">文明航程</h1>
             <p className="muted">一艘可以穿行不同文明时空的船。先形成问题，再出海。</p>
+            <p className="faint">船为宝船意象概念设计，不是考古复原，不冒充任何一艘历史原船。</p>
             <div className="field">
               <span className="label">航程名</span>
               <input value={title} onChange={(e) => setTitle(e.target.value)} />

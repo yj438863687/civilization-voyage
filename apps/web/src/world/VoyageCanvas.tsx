@@ -2,7 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { WORLD } from './world.config';
-import { TreasureShip } from './TreasureShip';
+import { SHIP_L, TreasureShip } from './TreasureShip';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -100,7 +100,6 @@ function Rig({
 }: Omit<Props, 'sceneId'>) {
   const ship = useRef<THREE.Group>(null);
   const speed = useRef(0);
-  const orbit = useRef(0);
   const restoredOnce = useRef(false);
   const { camera } = useThree();
   const tmpFwd = useMemo(() => new THREE.Vector3(), []);
@@ -144,38 +143,42 @@ function Rig({
     tmpRight.crossVectors(tmpFwd, UP).normalize();
 
     if (mode === 'embark') {
-      orbit.current += reduceMotion ? 0 : clamped * 0.1;
-      const dist = 34;
-      camera.position.set(
-        g.position.x + Math.sin(orbit.current) * dist,
-        12,
-        g.position.z + Math.cos(orbit.current) * dist,
-      );
-      look.copy(g.position).setY(3.2);
+      const dist = SHIP_L * 1.8;
+      const yaw = (25 * Math.PI) / 180;
+      const pitch = (10 * Math.PI) / 180;
+      camera.position.copy(g.position)
+        .addScaledVector(tmpFwd, dist * Math.cos(yaw) * Math.cos(pitch))
+        .addScaledVector(tmpRight, dist * Math.sin(yaw) * Math.cos(pitch))
+        .addScaledVector(UP, dist * Math.sin(pitch) + 2.2);
+      look.copy(g.position).setY(3.6);
       camera.lookAt(look);
     } else if (mode === 'cockpit') {
       camera.position.copy(g.position).addScaledVector(tmpFwd, WORLD.camera.cockpitForward).addScaledVector(UP, WORLD.camera.cockpitHeight);
       look.copy(g.position).addScaledVector(tmpFwd, 14).setY(3.2);
       camera.lookAt(look);
     } else if (mode === 'route') {
-      camera.position.set(g.position.x, 42, g.position.z + 0.01);
+      camera.position.set(g.position.x, 48, g.position.z + 0.01);
       camera.up.set(0, 0, -1);
       look.copy(g.position);
       camera.lookAt(look);
       camera.up.copy(UP);
     } else if (mode === 'port') {
       const p = WORLD.ports[0];
-      camera.position.set(p.x - 16, 12, p.z + 18);
-      look.set(p.x, 2, p.z);
+      camera.position.set(p.x - 18, 14, p.z + 20);
+      look.set(p.x, 2.5, p.z);
       camera.lookAt(look);
     } else if (mode === 'reflection') {
-      camera.position.copy(g.position).addScaledVector(tmpRight, 0.4).addScaledVector(UP, 4.4).addScaledVector(tmpFwd, -2.2);
-      look.copy(g.position).addScaledVector(tmpFwd, 2).setY(3);
+      camera.position.copy(g.position).addScaledVector(tmpRight, 0.4).addScaledVector(UP, 5.2).addScaledVector(tmpFwd, -2.4);
+      look.copy(g.position).addScaledVector(tmpFwd, 2).setY(3.2);
       camera.lookAt(look);
     } else {
-      const dist = WORLD.camera.followDistance;
-      const height = WORLD.camera.followHeight;
-      const desired = g.position.clone().addScaledVector(tmpFwd, -dist).addScaledVector(UP, height);
+      const dist = SHIP_L * 1.35;
+      const yaw = (35 * Math.PI) / 180;
+      const pitch = (18 * Math.PI) / 180;
+      const desired = g.position.clone()
+        .addScaledVector(tmpFwd, -dist * Math.cos(yaw) * Math.cos(pitch))
+        .addScaledVector(tmpRight, dist * Math.sin(yaw) * Math.cos(pitch))
+        .addScaledVector(UP, dist * Math.sin(pitch) + 2);
       camera.position.lerp(desired, reduceMotion ? 1 : 1 - Math.pow(0.001, clamped));
       look.copy(g.position).setY(3.4);
       camera.lookAt(look);

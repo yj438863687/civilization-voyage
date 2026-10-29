@@ -6,15 +6,15 @@ export const WORLD = {
     maxSpeed: 11,
     reverseSpeed: 4,
     accel: 6,
-    turn: 0.85,
-    radius: 5.2,
+    turn: 0.7,
+    radius: 6,
   },
   spawn: { x: 0, z: 22, yaw: 0 },
   camera: {
-    followDistance: 26,
-    followHeight: 11,
-    cockpitHeight: 4.6,
-    cockpitForward: -3.2,
+    followDistance: 27,
+    followHeight: 9.5,
+    cockpitHeight: 5.2,
+    cockpitForward: -4.2,
   },
   ports: [
     {

@@ -191,6 +191,22 @@
   --cv-ease-in-out: cubic-bezier(0.6, 0, 0.3, 1);
   --cv-ease-swell: cubic-bezier(0.45, 0.05, 0.35, 1); /* 船体起伏、镜头 */
 
+  /* ---------- 语义：通用船（宝船气势，概念设计） ---------- */
+  /* 船是通用容器：结构不随场景变，只允许下面四项按场景微调。 */
+  --cv-ship-hull: #2a211c;          /* 墨木船体 */
+  --cv-ship-hull-light: #3b2f26;    /* 受光面、甲板 */
+  --cv-ship-lacquer: #b6452c;       /* 朱漆楼层与栏杆：材质色，不可用作交互高亮 */
+  --cv-ship-trim: #c9a15a;          /* 铜金配件：护角、灯具框、舵首饰条 */
+  --cv-ship-sail: #e8dcc6;          /* 米色硬帆 */
+  --cv-ship-sail-shade: #cdb994;    /* 帆的折线暗面 */
+  --cv-ship-eye: #f3ebdd;           /* 船眼白 */
+  --cv-ship-eye-pupil: #14100d;     /* 船眼瞳 */
+  --cv-ship-banner: var(--cv-scene-accent); /* 旗帜与帆上的点缀色，默认跟随场景 */
+  /* 比例（仅文档用途，3D 常量需与三处文档一致） */
+  --cv-ship-ratio-length: 4;
+  --cv-ship-ratio-beam: 1;
+  --cv-ship-ratio-mast: 2.5;
+
   /* ---------- 场景皮肤（默认：中性夜海） ---------- */
   --cv-scene-accent: var(--cv-brass-400);
   --cv-scene-sky-top: #0d1a20;
