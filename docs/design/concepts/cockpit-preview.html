@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>驾驶舱概念预览</title>
+<!-- 概念设计：仅示意布局与气氛，不是最终界面。3D 以 CSS 渐变代替。所有数值与场景均为测试或 AI 推荐待确认。 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cv-bg); color: var(--cv-text); font-family: var(--cv-font-body); font-size: var(--cv-text-md); line-height: var(--cv-leading-body); }
+  .concept-banner { position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: var(--cv-z-toast); background: var(--cv-amber-400); color: var(--cv-ink-950); font-size: var(--cv-text-xs); letter-spacing: var(--cv-tracking-label); padding: 2px var(--cv-space-3); border-radius: 0 0 var(--cv-radius-sm) var(--cv-radius-sm); }
+
+  .world { position: fixed; inset: 0; z-index: var(--cv-z-world);
+    background: linear-gradient(to bottom, var(--cv-scene-sky-top), var(--cv-scene-sky-horizon) 55%, var(--cv-scene-water) 55.2%, var(--cv-bg)); }
+  .world::after { content: ""; position: absolute; inset: 0; background: rgb(11 20 24 / 0.55); } /* 面板打开时 3D 压暗 */
+
+  .hud { position: fixed; z-index: var(--cv-z-hud); background: var(--cv-hud-scrim); border-radius: var(--cv-radius-sm); padding: var(--cv-space-2) var(--cv-space-3); font-size: var(--cv-text-sm); }
+  .hud-tl { top: var(--cv-hud-edge); left: var(--cv-hud-edge); max-width: 320px; }
+  .hud-tr { top: var(--cv-hud-edge); right: var(--cv-hud-edge); width: 260px; }
+  .hud-br { bottom: var(--cv-hud-edge); right: var(--cv-hud-edge); display: flex; gap: var(--cv-space-2); background: none; padding: 0; }
+  .hud-tc { top: calc(var(--cv-hud-edge) + 20px); left: 50%; transform: translateX(-50%); color: var(--cv-scene-accent); font-size: var(--cv-text-xs); }
+  .hud-tc::before { content: var(--cv-scene-label); }
+  .voyage-name { font-family: var(--cv-font-display); font-size: var(--cv-text-lg); }
+  .muted { color: var(--cv-text-muted); }
+  .mono { font-family: var(--cv-font-mono); font-variant-numeric: tabular-nums; }
+
+  .ledger { display: grid; gap: var(--cv-space-1); }
+  .ledger + .ledger { border-top: 1px solid var(--cv-line); margin-top: var(--cv-space-2); padding-top: var(--cv-space-2); }
+  .ledger-real.unconnected { border: var(--cv-border-unconnected); border-radius: var(--cv-radius-xs); padding: var(--cv-space-1) var(--cv-space-2); color: var(--cv-state-unconnected); }
+  .ledger-story { color: var(--cv-ledger-story); }
+  .test-hatch { background-image: var(--cv-ledger-test-hatch); border-radius: var(--cv-radius-xs); padding: 0 var(--cv-space-1); }
+
+  .icon-btn { width: var(--cv-control-md); height: var(--cv-control-md); background: var(--cv-hud-scrim); border: 1px solid var(--cv-line-strong); color: var(--cv-text); border-radius: var(--cv-radius-sm); font-size: var(--cv-text-xs); }
+
+  .stamp { display: inline-block; font-size: var(--cv-text-xs); letter-spacing: var(--cv-tracking-label); border: 1px solid currentColor; border-radius: var(--cv-radius-xs); padding: 0 var(--cv-space-1); line-height: 1.6; }
+  .stamp-ai { color: var(--cv-mark-ai-pending); border-style: dashed; }
+  .stamp-test { color: var(--cv-mark-test); background-image: var(--cv-ledger-test-hatch); }
+  .stamp-dissent { color: var(--cv-mark-dissent); border-style: double; border-width: 3px; }
+  .stamp-fact { color: var(--cv-mark-fact); }
+
+  .cockpit { position: relative; z-index: var(--cv-z-panel); display: grid; grid-template-columns: 88px minmax(0, 1fr) var(--cv-panel-side-w); gap: var(--cv-space-4); max-width: 1280px; margin: 0 auto; padding: 96px var(--cv-space-6) 80px; min-height: 100vh; }
+
+  .crew { display: flex; flex-direction: column; gap: var(--cv-space-4); align-items: center; }
+  .seat { width: var(--cv-crew-seat); text-align: center; font-size: var(--cv-text-xs); }
+  .seat-ring { width: var(--cv-crew-seat); height: var(--cv-crew-seat); border-radius: var(--cv-radius-round); border: 2px solid var(--cv-line-strong); background: var(--cv-surface-2); display: grid; place-items: center; font-family: var(--cv-font-display); font-size: var(--cv-text-lg); }
+  .seat.running .seat-ring { border-color: var(--cv-state-running); }
+  .seat.unconnected .seat-ring { border-style: dashed; border-color: var(--cv-state-unconnected); color: var(--cv-state-unconnected); }
+
+  .dialogue { background: var(--cv-surface-1); border: 1px solid var(--cv-line); border-radius: var(--cv-radius-md); box-shadow: var(--cv-shadow-panel); padding: var(--cv-space-6); display: flex; flex-direction: column; gap: var(--cv-space-4); }
+  .msg { max-width: var(--cv-reading-max); }
+  .msg-who { font-size: var(--cv-text-xs); color: var(--cv-text-muted); letter-spacing: var(--cv-tracking-label); }
+  .msg-user { align-self: flex-end; background: var(--cv-surface-paper); color: var(--cv-text-on-paper); padding: var(--cv-space-3) var(--cv-space-4); border-radius: var(--cv-radius-sm); }
+  .dissent { display: grid; grid-template-columns: 1fr 1fr; gap: var(--cv-space-3); border-left: 3px double var(--cv-mark-dissent); padding-left: var(--cv-space-3); }
+  .dissent > div { background: var(--cv-surface-2); padding: var(--cv-space-3); border-radius: var(--cv-radius-sm); font-size: var(--cv-text-sm); }
+  .source { font-size: var(--cv-text-xs); color: var(--cv-text-muted); border-top: 1px solid var(--cv-line); margin-top: var(--cv-space-2); padding-top: var(--cv-space-1); }
+  .event { font-size: var(--cv-text-sm); color: var(--cv-state-running); }
+  .notice-unconnected { border: var(--cv-border-unconnected); color: var(--cv-state-unconnected); border-radius: var(--cv-radius-sm); padding: var(--cv-space-2) var(--cv-space-3); font-size: var(--cv-text-sm); }
+  .composer { margin-top: auto; display: flex; gap: var(--cv-space-2); }
+  .composer input { flex: 1; min-height: var(--cv-control-lg); background: var(--cv-surface-2); border: 1px solid var(--cv-line-strong); color: var(--cv-text); border-radius: var(--cv-radius-sm); padding: 0 var(--cv-space-3); font: inherit; }
+
+  .btn { min-height: var(--cv-control-md); padding: 0 var(--cv-space-4); border-radius: var(--cv-radius-sm); font: inherit; font-weight: var(--cv-weight-medium); cursor: pointer; }
+  .btn-primary { background: var(--cv-action-primary-bg); color: var(--cv-action-primary-text); border: 0; }
+  .btn-secondary { background: transparent; color: var(--cv-action-secondary-text); border: 1px solid var(--cv-action-secondary-border); }
+  .btn:focus-visible, .icon-btn:focus-visible, input:focus-visible { outline: 2px solid var(--cv-focus-ring); outline-offset: 2px; }
+
+  .task-card { background: var(--cv-surface-paper); color: var(--cv-text-on-paper); border-radius: var(--cv-radius-sm); box-shadow: var(--cv-shadow-paper), var(--cv-shadow-lamp); padding: var(--cv-space-6); align-self: start; display: grid; gap: var(--cv-space-4); }
+  .task-card h2 { font-family: var(--cv-font-display); font-size: var(--cv-text-lg); margin: 0; line-height: var(--cv-leading-tight); }
+  .field-label { font-size: var(--cv-text-xs); color: var(--cv-text-on-paper-muted); letter-spacing: var(--cv-tracking-label); }
+  .task-card .stamp-ai { color: #8a5a17; }
+  .task-card .stamp-dissent { color: var(--cv-cinnabar-600); }
+
+  @media (max-width: 1023px) {
+    .cockpit { grid-template-columns: 1fr; padding-top: 140px; }
+    .crew { flex-direction: row; justify-content: center; }
+    .seat, .seat-ring { width: 48px; } .seat-ring { height: 48px; }
+    .task-card { box-shadow: var(--cv-shadow-paper); }
+  }
+  @media (max-width: 639px) {
+    .cockpit { padding: 150px var(--cv-space-4) 80px; }
+    .hud-tr { width: auto; left: var(--cv-hud-edge); top: 72px; }
+    .dialogue { padding: var(--cv-space-4); }
+    .dissent { grid-template-columns: 1fr; }
+    .btn, .icon-btn, .composer input { min-height: var(--cv-touch-min); min-width: var(--cv-touch-min); }
+  }
+</style>
+</head>
+<body data-scene="test">
+  <div class="concept-banner">概念设计 · 非最终界面 · 测试数据</div>
+  <div class="world" aria-hidden="true"></div>
+
+  <div class="hud hud-tl">
+    <div class="voyage-name">未命名航程</div>
+    <div class="muted">驾驶舱 · 等待确认文化问题</div>
+  </div>
+  <div class="hud hud-tc" aria-hidden="true"></div>
+  <div class="hud hud-tr">
+    <div class="ledger">
+      <span class="muted" style="font-size:var(--cv-text-xs)">真实用量</span>
+      <span class="ledger-real unconnected">尚未接入</span>
+    </div>
+    <div class="ledger ledger-story">
+      <span class="muted" style="font-size:var(--cv-text-xs)">剧情资源 <span class="stamp stamp-test">测试</span></span>
+      <span class="mono"><span class="test-hatch">补给 12</span> · <span class="test-hatch">标准箱 3</span></span>
+    </div>
+  </div>
+  <nav class="hud hud-br" aria-label="快捷">
+    <button class="icon-btn">海图</button><button class="icon-btn">日志</button><button class="icon-btn">通讯</button>
+  </nav>
+
+  <main class="cockpit">
+    <aside class="crew" aria-label="船员席位">
+      <div class="seat running"><div class="seat-ring">大</div>大副<br><span class="mono muted">模型：示例</span></div>
+      <div class="seat unconnected"><div class="seat-ring">二</div>二副<br><span class="mono">尚未接入</span></div>
+      <div class="seat"><div class="seat-ring" style="border-style:dashed">+</div>添加</div>
+    </aside>
+
+    <section class="dialogue" aria-label="对话">
+      <div class="msg msg-user">我想知道一座港口怎样让说不同语言的人一起做生意。</div>
+      <div class="msg">
+        <div class="msg-who">大副</div>
+        可以从制度和日常两条线看。下面两种解释并不一致，先都保留。
+      </div>
+      <div class="dissent" role="group" aria-label="分歧">
+        <div><span class="stamp stamp-dissent">分歧 · 解释一</span><br>以官方管理为主线：登记、抽税、居住区划。<div class="source">出处：待补 · <span class="stamp stamp-ai">AI 推荐，待组员确认</span></div></div>
+        <div><span class="stamp stamp-dissent">分歧 · 解释二</span><br>以社群网络为主线：同乡、信仰与担保关系。<div class="source">出处：待补 · <span class="stamp stamp-ai">AI 推荐，待组员确认</span></div></div>
+      </div>
+      <div class="event">● 大副正在查阅材料（第 2 步 / 共 3 步） <button class="btn btn-secondary" style="min-height:28px">停止</button></div>
+      <div class="notice-unconnected">二副：模型服务尚未接入。到通讯台填写你自己的服务配置后再邀请发言。</div>
+      <form class="composer" onsubmit="return false">
+        <input aria-label="对船员说" placeholder="对船员说…">
+        <button class="btn btn-secondary">发送</button>
+      </form>
+    </section>
+
+    <article class="task-card" aria-label="航程任务">
+      <div class="field-label">航程任务 · 草稿</div>
+      <h2>多语言港口如何维持长期合作？</h2>
+      <div><div class="field-label">目标</div>比较两种解释的依据，找到至少三份带出处的材料。</div>
+      <div><div class="field-label">保留的分歧</div><span class="stamp stamp-dissent">官方管理 vs 社群网络</span></div>
+      <div><div class="field-label">性质</div><span class="stamp stamp-ai">AI 推荐，待组员确认</span></div>
+      <button class="btn btn-primary">确认航程</button>
+    </article>
+  </main>
+</body>
+</html>
