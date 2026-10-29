@@ -7,17 +7,10 @@
 ## 启动
 
 ```sh
-# 后端（API worktree 或合并后的 apps/api）
-cd /Users/jacky/work/civilization-voyage-api/apps/api
-VOYAGE_DB=/tmp/voyage-web-dev.sqlite3 .venv/bin/uvicorn voyage.main:app --host 127.0.0.1 --port 8010
-
-# 前端
-cd /Users/jacky/work/civilization-voyage-web/apps/web
-npm install
-npx vite --host 127.0.0.1 --port 5173
+./scripts/dev.sh
 ```
 
-打开 http://127.0.0.1:5173 。本机 8000 被其他服务占用，航程 API 用 8010。
+打开 http://127.0.0.1:5173 。API 默认 8010。船体默认 `hull_id: bao-chuan-01`，商店换船留到后续。
 
 ## 已实现
 

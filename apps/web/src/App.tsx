@@ -7,6 +7,19 @@ import { WORLD } from './world/world.config';
 
 const LAST_KEY = 'cv.lastVoyageId';
 const MOTION_KEY = 'cv.reduceMotion';
+const DEFAULT_HULL = 'bao-chuan-01';
+
+function worldState(
+  voyage: Voyage,
+  snap: ShipSnapshot | null,
+  portId: string,
+): Record<string, unknown> {
+  return {
+    hull_id: typeof voyage.world.hull_id === 'string' ? voyage.world.hull_id : DEFAULT_HULL,
+    port_id: portId,
+    ship: snap ? { x: snap.x, z: snap.z, yaw: snap.yaw } : voyage.world.ship ?? WORLD.spawn,
+  };
+}
 
 const ROUTES: Route[] = [
   {
@@ -205,6 +218,29 @@ export function App() {
     };
   }, []);
 
+  const voyageHold = useRef(voyage);
+  voyageHold.current = voyage;
+  useEffect(() => {
+    if (view !== 'world') return;
+    const handle = window.setInterval(() => {
+      const v = voyageHold.current;
+      const snap = shipRef.current;
+      if (!v || !snap) return;
+      void api
+        .putVoyage(v.id, {
+          stage: 'world',
+          question,
+          shared_task: sharedTask,
+          crew: v.crew,
+          route: v.route,
+          world: worldState(v, snap, nearPort ?? 'at-sea'),
+        })
+        .then(setVoyage)
+        .catch(() => undefined);
+    }, 3000);
+    return () => window.clearInterval(handle);
+  }, [view, question, sharedTask, nearPort]);
+
   const camMode: CamMode = useMemo(() => {
     if (view === 'embark') return 'embark';
     if (view === 'cockpit') return 'cockpit';
@@ -261,7 +297,7 @@ export function App() {
       await persist({
         stage: 'world',
         route,
-        world: { port_id: 'at-sea', ship: snap ? { x: snap.x, z: snap.z, yaw: snap.yaw } : WORLD.spawn },
+        world: worldState(voyage, snap, 'at-sea'),
       });
       setView('world');
     } catch (e) {
@@ -279,7 +315,7 @@ export function App() {
       const snap = shipRef.current;
       await persist({
         stage: 'world',
-        world: { port_id: nearPort, ship: snap ? { x: snap.x, z: snap.z, yaw: snap.yaw } : voyage.world.ship },
+        world: worldState(voyage, snap, nearPort),
       });
       const p = await api.ports(voyage.id);
       setPorts(p);
@@ -518,12 +554,14 @@ export function App() {
                 <div className="mono">
                   航向 {ship ? Math.round((ship.headingDeg + 360) % 360) : '—'}° · 速度 {ship ? ship.speed.toFixed(1) : '0'}
                 </div>
+                <div className="faint">{nearPort ? '已进入港口范围' : '驶向中性测试港（东南方体块）'}</div>
                 <div className="joystick" ref={joystick} aria-label="航行摇杆" />
                 <div className="faint">WASD / 方向键 / 摇杆</div>
               </div>
             )}
           </div>
           <div className="hud hud-br">
+            <button className="btn btn-icon" type="button" onClick={() => setView('embark')} title="启航">港</button>
             <button className="btn btn-icon" type="button" onClick={() => setView('cockpit')} title="驾驶舱">舱</button>
             <button className="btn btn-icon" type="button" onClick={() => setView('route')} title="海图">图</button>
             <button className="btn btn-icon" type="button" onClick={() => setView('world')} title="海域">航</button>
@@ -567,7 +605,7 @@ export function App() {
                 />
               </div>
             )}
-            {bootError && <p className="error">后端未接通：{bootError}。先在 apps/api 启动 Uvicorn :8000。</p>}
+            {bootError && <p className="error">后端未接通：{bootError}。先运行仓库根目录 scripts/dev.sh。</p>}
             {error && <p className="error">{error}</p>}
           </div>
           <div className="overlay overlay-right">
