@@ -55,29 +55,6 @@ void main() {
 }
 `;
 
-const SKY_VERT = /* glsl */ `
-varying vec3 vDir;
-void main() {
-  vDir = position;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-const SKY_FRAG = /* glsl */ `
-uniform vec3 uTop;
-uniform vec3 uHorizon;
-uniform vec3 uNadir;
-varying vec3 vDir;
-void main() {
-  float h = normalize(vDir).y;
-  vec3 col = mix(uHorizon, uTop, smoothstep(0.0, 0.62, h));
-  col = mix(uNadir, col, smoothstep(-0.15, 0.04, h));
-  float moon = pow(max(dot(normalize(vDir), normalize(vec3(-0.25, 0.42, 0.4))), 0.0), 80.0);
-  col += vec3(0.85, 0.9, 1.0) * moon * 0.55;
-  gl_FragColor = vec4(col, 1.0);
-}
-`;
-
 export function Atmosphere({ test, reduceMotion }: { test: boolean; reduceMotion: boolean }) {
   const water = useMemo(() => {
     const deep = hex('--cv-scene-water', '#123039');
@@ -102,14 +79,22 @@ export function Atmosphere({ test, reduceMotion }: { test: boolean; reduceMotion
   }, [reduceMotion]);
 
   const sky = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        uTop: { value: hex('--cv-scene-sky-top', '#0d1a20') },
-        uHorizon: { value: hex('--cv-scene-sky-horizon', '#2b4650') },
-        uNadir: { value: hex('--cv-scene-water', '#123039') },
-      },
-      vertexShader: SKY_VERT,
-      fragmentShader: SKY_FRAG,
+    const c = document.createElement('canvas');
+    c.width = 4;
+    c.height = 64;
+    const g = c.getContext('2d');
+    if (g) {
+      const grad = g.createLinearGradient(0, 0, 0, 64);
+      grad.addColorStop(0, cssVar('--cv-scene-sky-top', '#0d1a20'));
+      grad.addColorStop(0.55, cssVar('--cv-scene-sky-horizon', '#2b4650'));
+      grad.addColorStop(1, cssVar('--cv-scene-water', '#123039'));
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 4, 64);
+    }
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return new THREE.MeshBasicMaterial({
+      map: tex,
       side: THREE.BackSide,
       depthWrite: false,
       fog: false,
@@ -129,7 +114,7 @@ export function Atmosphere({ test, reduceMotion }: { test: boolean; reduceMotion
 
   return (
     <group>
-      <mesh material={sky}>
+      <mesh material={sky} rotation={[0, 0, 0]}>
         <sphereGeometry args={[170, 24, 16]} />
       </mesh>
       <mesh geometry={waterGeo} material={water} />
