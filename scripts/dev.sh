@@ -6,6 +6,12 @@ API_PORT="${VOYAGE_API_PORT:-8010}"
 export VITE_API_BASE="${VITE_API_BASE:-http://127.0.0.1:${API_PORT}}"
 
 cd "$ROOT/apps/api"
+if [[ -f .env ]]; then
+  set -a
+  # Local secrets. File is gitignored; never echo it.
+  source .env
+  set +a
+fi
 if [[ ! -x .venv/bin/uvicorn ]]; then
   python3 -m venv .venv
   .venv/bin/pip install -r requirements.txt
