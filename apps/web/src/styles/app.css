@@ -145,6 +145,18 @@ button { cursor: pointer; }
   overflow: auto;
   padding: var(--cv-space-6);
 }
+.overlay-right .paper,
+.overlay-side .paper {
+  animation: panel-in var(--cv-dur-base) var(--cv-ease-out);
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+html[data-reduce-motion='true'] .overlay-right .paper,
+html[data-reduce-motion='true'] .overlay-side .paper {
+  animation: none;
+}
 
 .overlay-side {
   top: 0; right: 0; bottom: 0;
@@ -165,7 +177,20 @@ button { cursor: pointer; }
 }
 
 .display { font-family: var(--cv-font-display); font-weight: var(--cv-weight-bold); line-height: var(--cv-leading-tight); }
-.title-hero { font-size: var(--cv-text-3xl); margin: 0 0 var(--cv-space-4); }
+.title-hero {
+  font-size: var(--cv-text-3xl);
+  margin: 0 0 var(--cv-space-4);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.55);
+}
+.title-hero::after {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 2px;
+  margin-top: 10px;
+  background: var(--cv-brass-400);
+}
 .title-page { font-size: var(--cv-text-xl); margin: 0 0 var(--cv-space-3); }
 .title-panel { font-size: var(--cv-text-lg); margin: 0 0 var(--cv-space-3); }
 .muted { color: var(--cv-text-muted); }
@@ -312,6 +337,7 @@ button { cursor: pointer; }
   bottom: 18%;
   transform: translateX(-50%);
   z-index: var(--cv-z-hud);
+  animation: panel-in var(--cv-dur-fast) var(--cv-ease-out);
 }
 
 .joystick {
@@ -330,6 +356,38 @@ button { cursor: pointer; }
   position: absolute;
   left: 50%; top: 50%;
   transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px var(--cv-line-brass);
+}
+
+.letterbox::before,
+.letterbox::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 5.5vh;
+  background: var(--cv-cine-bar, #05090b);
+  z-index: calc(var(--cv-z-hud) + 8);
+  pointer-events: none;
+}
+.letterbox::before { top: 0; }
+.letterbox::after { bottom: 0; }
+
+.skip-hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: calc(var(--cv-z-hud) + 9);
+  pointer-events: none;
+  font-size: var(--cv-text-xs);
+  letter-spacing: 0.12em;
+  color: var(--cv-text-muted);
+  background: var(--cv-hud-scrim);
+  border: 1px solid var(--cv-line);
+  padding: 6px 12px;
+  border-radius: var(--cv-radius-xs);
 }
 
 .drawer {

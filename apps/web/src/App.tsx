@@ -50,7 +50,9 @@ function guide(view: View, ctx: { connected: boolean; hasQuestion: boolean; near
     return {
       step: '第 1 步 · 启航港',
       title: '先选海域，再开一条航程',
-      body: '右边先点一个场景：测试海域用来练手；A/B/C 是 AI 推荐，还没经组员确认。起个航程名，点朱砂色「新航程」。有旧航程就点右边卡片继续。模型没接也能玩，船员暂时不会真的回话。',
+      body: ctx.connected
+        ? '右边先点一个场景：测试海域用来练手；A/B/C 是 AI 推荐，还没经组员确认。起个航程名，点朱砂色「新航程」。有旧航程就点右边卡片继续。船员席已接入，进驾驶舱可以真的问话。'
+        : '右边先点一个场景：测试海域用来练手；A/B/C 是 AI 推荐，还没经组员确认。起个航程名，点朱砂色「新航程」。有旧航程就点右边卡片继续。模型没接也能玩，船员暂时不会真的回话。',
       next: ctx.hasVoyages ? '点「新航程」，或点右边一张旧航程卡片' : '点「新航程」进入驾驶舱',
     };
   }
@@ -148,6 +150,7 @@ export function App() {
   const [ship, setShip] = useState<ShipSnapshot | null>(null);
   const [input, setInput] = useState<ControlInput>({ forward: 0, turn: 0 });
   const [busy, setBusy] = useState(false);
+  const [camBlend, setCamBlend] = useState(1);
   const keys = useRef({ w: false, a: false, s: false, d: false });
   const shipRef = useRef<ShipSnapshot | null>(null);
   const poll = useRef<number | null>(null);
@@ -207,11 +210,9 @@ export function App() {
   useEffect(() => {
     (async () => {
       try {
-        const { s, v } = await refreshLists();
+        const { s } = await refreshLists();
         const test = s.find((x) => x.status === 'test') ?? s[0] ?? null;
         setScenePick(test);
-        const last = localStorage.getItem(LAST_KEY);
-        if (last && v.some((x) => x.id === last)) await loadVoyage(last);
       } catch (e) {
         setBootError(errText(e));
       }
@@ -582,6 +583,7 @@ export function App() {
           input={input}
           restored={restored}
           onShip={onShip}
+          onBlend={setCamBlend}
         />
       ) : (
         <div className="webgl-fallback">
@@ -602,7 +604,7 @@ export function App() {
           </div>
           <div className="hud hud-tr scrim">
             <Ledgers
-              connected={usage.length > 0}
+              connected={connected}
               usage={usage}
               balance={voyage?.balance ?? null}
               inventory={voyage?.inventory ?? null}
@@ -623,17 +625,39 @@ export function App() {
                   航向 {ship ? Math.round((ship.headingDeg + 360) % 360) : '—'}° · 速度 {ship ? ship.speed.toFixed(1) : '0'}
                 </div>
                 <div className="faint">{nearPort ? '已进入港口范围' : '驶向中性测试港（东南方体块）'}</div>
-                <div className="joystick" ref={joystick} aria-label="航行摇杆" />
+                <div className="joystick" ref={joystick} aria-label="航行摇杆">
+                  <div
+                    className="joystick-knob"
+                    style={{
+                      transform: `translate(calc(-50% + ${-input.turn * 36}px), calc(-50% + ${-input.forward * 36}px))`,
+                    }}
+                  />
+                </div>
                 <div className="faint">WASD / 方向键 / 摇杆</div>
               </div>
             )}
           </div>
           <div className="hud hud-br">
             <button className="btn btn-icon hud-action" type="button" onClick={() => setView('embark')}>启航</button>
-            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('cockpit')}>驾驶舱</button>
-            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('route')}>航线</button>
-            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('world')}>出海</button>
-            <button className="btn btn-icon hud-action" type="button" onClick={() => void goReflect()}>日志</button>
+            <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => setView('cockpit')}>驾驶舱</button>
+            <button
+              className="btn btn-icon hud-action"
+              type="button"
+              disabled={!voyage || (!voyage.question && voyage.stage === 'cockpit')}
+              onClick={() => setView('route')}
+            >
+              航线
+            </button>
+            <button
+              className="btn btn-icon hud-action"
+              type="button"
+              disabled={!voyage || voyage.stage === 'cockpit'}
+              title={voyage?.stage === 'cockpit' ? '先确认航程并选择航线' : undefined}
+              onClick={() => setView('world')}
+            >
+              出海
+            </button>
+            <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => void goReflect()}>日志</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setReduceMotion((v) => !v)}>
               {reduceMotion ? '减少动态开' : '减少动态'}
@@ -649,6 +673,11 @@ export function App() {
             <div>{tip.next}</div>
           </div>
         </div>
+      )}
+
+      {view === 'embark' && <div className="letterbox" aria-hidden />}
+      {camBlend < 0.98 && !reduceMotion && (
+        <div className="skip-hint">点击或按键跳过镜头</div>
       )}
 
       {view === 'embark' && (
@@ -804,7 +833,7 @@ export function App() {
                 </button>
               ))}
             </div>
-            <Ledgers connected={usage.length > 0} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
+            <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
             <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void launchRoute()}>
               按此航线启航
             </button>
@@ -955,7 +984,7 @@ export function App() {
               </div>
             ))}
             <h3 className="display title-panel">两本账结算</h3>
-            <Ledgers connected={usage.length > 0} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
+            <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
             <h3 className="display title-panel">反思</h3>
             <p className="muted">可以写：我选择了什么？依据是哪条材料？还有什么没核实？下次想把哪条航线走深？</p>
             <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} placeholder="这次选择改变了什么？依据是什么？还有哪一点需要核实？" />

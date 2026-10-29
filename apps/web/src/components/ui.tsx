@@ -35,10 +35,14 @@ export function Ledgers({
     <div className="ledger">
       <div className="ledger-block">
         <div className="label ledger-real">真实用量</div>
-        {connected && usage.length ? (
-          <div className="mono ledger-real">
-            已用 token {tokens || '—'} · 金额未知 · {usage[0]?.settlement === 'not_connected' ? 'HMT 尚未接入' : ''}
-          </div>
+        {connected ? (
+          usage.length ? (
+            <div className="mono ledger-real">
+              已用 token {tokens || '—'} · 金额未知 · {usage[0]?.settlement === 'not_connected' ? 'HMT 尚未接入' : ''}
+            </div>
+          ) : (
+            <div className="mono ledger-real">已接入 · 本航程尚未产生用量</div>
+          )
         ) : (
           <div className="unconnected">尚未接入</div>
         )}

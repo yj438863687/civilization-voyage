@@ -202,6 +202,10 @@
   --cv-ship-eye: #f3ebdd;           /* 船眼白 */
   --cv-ship-eye-pupil: #14100d;     /* 船眼瞳 */
   --cv-ship-banner: var(--cv-scene-accent); /* 旗帜与帆上的点缀色，默认跟随场景 */
+  --cv-ship-lamp-warm: #f0b46a;
+  --cv-ship-lamp-core: #ffd9a0;
+  --cv-ship-lamp-cool: #8fb6c8;
+  --cv-cine-bar: #05090b;
   /* 比例（仅文档用途，3D 常量需与三处文档一致） */
   --cv-ship-ratio-length: 4;
   --cv-ship-ratio-beam: 1;
@@ -256,11 +260,11 @@
 /* 中性测试海域：灰网格，明确不是任何文明 */
 [data-scene="test"] {
   --cv-scene-accent: var(--cv-slate-300);
-  --cv-scene-sky-top: #15191b;
-  --cv-scene-sky-horizon: #3a4246;
-  --cv-scene-fog: #2a3033;
-  --cv-scene-water: #1f2629;
-  --cv-scene-light: #ffffff;
+  --cv-scene-sky-top: #10161c;
+  --cv-scene-sky-horizon: #4d6270;
+  --cv-scene-fog: #24343c;
+  --cv-scene-water: #16343c;
+  --cv-scene-light: #f1d9a8;
   --cv-scene-label: "测试海域 · 虚构数据";
 }
 

@@ -1,12 +1,15 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { WORLD } from './world.config';
+import { cameraDurationMs, desiredPose, easeSwell, type CamMode } from './camera';
+import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
+import { WORLD } from './world.config';
+import { FOLLOW_TAU, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, SHIP_MOTION } from './voyageConstants';
+
+export type { CamMode };
 
 const UP = new THREE.Vector3(0, 1, 0);
-
-export type CamMode = 'embark' | 'cockpit' | 'route' | 'follow' | 'port' | 'reflection';
 
 export interface ShipSnapshot {
   x: number;
@@ -29,6 +32,7 @@ interface Props {
   input: ControlInput;
   restored?: { x: number; z: number; yaw: number } | null;
   onShip: (s: ShipSnapshot, nearPort: string | null, nearFragment: string | null) => void;
+  onBlend?: (t: number) => void;
 }
 
 function cssVar(name: string, fallback: string) {
@@ -39,54 +43,30 @@ function hexColor(name: string, fallback: string) {
   return new THREE.Color(cssVar(name, fallback));
 }
 
-function PortBlocks() {
-  const stone = useMemo(() => new THREE.MeshStandardMaterial({ color: '#6a6e70', roughness: 0.9 }), []);
-  const mark = useMemo(() => new THREE.MeshStandardMaterial({ color: '#b3bdc1', roughness: 0.5 }), []);
-  const paper = useMemo(() => new THREE.MeshStandardMaterial({ color: '#e8dcc6', roughness: 0.8, side: THREE.DoubleSide }), []);
-  return (
-    <group>
-      {WORLD.ports.map((p) => (
-        <group key={p.id} position={[p.x, 0, p.z]}>
-          <mesh position={[0, 0.5, 0]} material={stone}>
-            <boxGeometry args={[16, 1.0, 12]} />
-          </mesh>
-          <mesh position={[0, 2.6, -2.2]} material={stone}>
-            <boxGeometry args={[8, 3.2, 5]} />
-          </mesh>
-          <mesh position={[0, 4.4, -2.2]} material={mark}>
-            <boxGeometry args={[1.6, 0.25, 1.6]} />
-          </mesh>
-        </group>
-      ))}
-      {WORLD.fragments.map((f) => (
-        <group key={f.id} position={[f.x, 0, f.z]}>
-          <mesh position={[0, 1.4, 0]} material={mark}>
-            <boxGeometry args={[0.08, 2.8, 0.08]} />
-          </mesh>
-          <mesh position={[0.4, 2.2, 0]} rotation={[0, 0.4, 0]} material={paper}>
-            <planeGeometry args={[1.4, 0.9]} />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
-}
-
-function Sea({ test }: { test: boolean }) {
-  const water = hexColor('--cv-scene-water', '#123039');
+function Wake({ speedRef, reduceMotion }: { speedRef: React.MutableRefObject<number>; reduceMotion: boolean }) {
+  const mesh = useRef<THREE.Mesh>(null);
   const mat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: water, roughness: 0.95, metalness: 0.05 }),
-    [water],
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#d7e4e8',
+        transparent: true,
+        opacity: 0.18,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
+    [],
   );
+  useFrame(() => {
+    const s = Math.min(1, Math.abs(speedRef.current) / WORLD.ship.maxSpeed);
+    const m = mesh.current;
+    if (!m) return;
+    m.scale.set(0.7 + s * 0.9, 1, 0.45 + s * 1.35);
+    mat.opacity = reduceMotion ? 0.1 : 0.08 + s * 0.32;
+  });
   return (
-    <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow material={mat}>
-        <planeGeometry args={[200, 200]} />
-      </mesh>
-      {test ? (
-        <gridHelper args={[140, 28, '#3a4246', '#2a3033']} position={[0, 0.02, 0]} />
-      ) : null}
-    </group>
+    <mesh ref={mesh} position={[0, 0.05, SHIP_L / 2 + 8.5]} rotation={[-Math.PI / 2, 0, 0]} material={mat}>
+      <planeGeometry args={[2.2, 17]} />
+    </mesh>
   );
 }
 
@@ -97,25 +77,55 @@ function Rig({
   input,
   restored,
   onShip,
+  onBlend,
 }: Omit<Props, 'sceneId'>) {
   const ship = useRef<THREE.Group>(null);
+  const rock = useRef<THREE.Group>(null);
   const speed = useRef(0);
+  const followYaw = useRef(0);
+  const heel = useRef(0);
   const restoredOnce = useRef(false);
-  const { camera } = useThree();
+  const blend = useRef(1);
+  const blendFrom = useRef<THREE.Vector3>(new THREE.Vector3());
+  const lookFrom = useRef<THREE.Vector3>(new THREE.Vector3());
+  const fovFrom = useRef(42);
+  const prevMode = useRef(mode);
+  const skip = useRef(false);
+  const booted = useRef(false);
+  const lastBlendNote = useRef(1);
+  const { camera, gl } = useThree();
   const tmpFwd = useMemo(() => new THREE.Vector3(), []);
   const tmpRight = useMemo(() => new THREE.Vector3(), []);
   const look = useMemo(() => new THREE.Vector3(), []);
+  const laggedFwd = useMemo(() => new THREE.Vector3(), []);
+  const laggedRight = useMemo(() => new THREE.Vector3(), []);
+  const persp = camera as THREE.PerspectiveCamera;
 
   useEffect(() => {
     if (!ship.current || restoredOnce.current) return;
     const s = restored ?? WORLD.spawn;
     ship.current.position.set(s.x, 0, s.z);
     ship.current.rotation.y = s.yaw;
+    followYaw.current = s.yaw;
     restoredOnce.current = true;
   }, [restored]);
 
+  useEffect(() => {
+    const el = gl.domElement;
+    const go = () => {
+      skip.current = true;
+    };
+    el.addEventListener('pointerdown', go);
+    window.addEventListener('keydown', go);
+    return () => {
+      el.removeEventListener('pointerdown', go);
+      window.removeEventListener('keydown', go);
+    };
+  }, [gl]);
+
   useFrame((_, dt) => {
     const g = ship.current;
+    const r = rock.current;
     if (!g) return;
     const clamped = Math.min(dt, 0.05);
 
@@ -131,56 +141,79 @@ function Rig({
       speed.current *= 1 - Math.min(1, 4 * clamped);
     }
 
-    if (!reduceMotion && !canSail && mode === 'embark') {
-      g.rotation.x = Math.sin(performance.now() / 1800) * 0.02;
-      g.rotation.z = Math.sin(performance.now() / 1400) * 0.025;
-    } else {
-      g.rotation.x = 0;
-      g.rotation.z = 0;
+    if (r) {
+      if (!reduceMotion) {
+        const t = performance.now() / 1000;
+        const deg = Math.PI / 180;
+        const pitch = Math.sin((t * Math.PI * 2) / SHIP_MOTION.pitch.t + SHIP_MOTION.pitch.p) * SHIP_MOTION.pitch.a * deg;
+        const roll = Math.sin((t * Math.PI * 2) / SHIP_MOTION.roll.t + SHIP_MOTION.roll.p) * SHIP_MOTION.roll.a * deg;
+        const yawSway = Math.sin((t * Math.PI * 2) / SHIP_MOTION.yaw.t + SHIP_MOTION.yaw.p) * SHIP_MOTION.yaw.a * deg;
+        const heave = Math.sin((t * Math.PI * 2) / SHIP_MOTION.heave.t + SHIP_MOTION.heave.p) * SHIP_MOTION.heave.a;
+        const heelTarget = -Math.max(-1, Math.min(1, input.turn)) * HEEL_MAX;
+        const tau = Math.abs(heelTarget) > Math.abs(heel.current) ? HEEL_TAU : HEEL_RETURN_TAU;
+        heel.current += (heelTarget - heel.current) * (1 - Math.exp(-clamped / tau));
+        r.rotation.x = pitch;
+        r.rotation.z = roll + heel.current;
+        r.rotation.y = yawSway;
+        r.position.y = heave;
+      } else {
+        r.rotation.x = 0;
+        r.rotation.z = 0;
+        r.rotation.y = 0;
+        r.position.y = 0;
+      }
     }
 
     tmpFwd.set(0, 0, -1).applyQuaternion(g.quaternion);
     tmpRight.crossVectors(tmpFwd, UP).normalize();
 
-    if (mode === 'embark') {
-      const dist = SHIP_L * 1.8;
-      const yaw = (25 * Math.PI) / 180;
-      const pitch = (10 * Math.PI) / 180;
-      camera.position.copy(g.position)
-        .addScaledVector(tmpFwd, dist * Math.cos(yaw) * Math.cos(pitch))
-        .addScaledVector(tmpRight, dist * Math.sin(yaw) * Math.cos(pitch))
-        .addScaledVector(UP, dist * Math.sin(pitch) + 2.2);
-      look.copy(g.position).setY(3.6);
-      camera.lookAt(look);
-    } else if (mode === 'cockpit') {
-      camera.position.copy(g.position).addScaledVector(tmpFwd, WORLD.camera.cockpitForward).addScaledVector(UP, WORLD.camera.cockpitHeight);
-      look.copy(g.position).addScaledVector(tmpFwd, 14).setY(3.2);
-      camera.lookAt(look);
-    } else if (mode === 'route') {
-      camera.position.set(g.position.x, 48, g.position.z + 0.01);
-      camera.up.set(0, 0, -1);
-      look.copy(g.position);
-      camera.lookAt(look);
-      camera.up.copy(UP);
-    } else if (mode === 'port') {
-      const p = WORLD.ports[0];
-      camera.position.set(p.x - 18, 14, p.z + 20);
-      look.set(p.x, 2.5, p.z);
-      camera.lookAt(look);
-    } else if (mode === 'reflection') {
-      camera.position.copy(g.position).addScaledVector(tmpRight, 0.4).addScaledVector(UP, 5.2).addScaledVector(tmpFwd, -2.4);
-      look.copy(g.position).addScaledVector(tmpFwd, 2).setY(3.2);
-      camera.lookAt(look);
-    } else {
-      const dist = SHIP_L * 1.35;
-      const yaw = (35 * Math.PI) / 180;
-      const pitch = (18 * Math.PI) / 180;
-      const desired = g.position.clone()
-        .addScaledVector(tmpFwd, -dist * Math.cos(yaw) * Math.cos(pitch))
-        .addScaledVector(tmpRight, dist * Math.sin(yaw) * Math.cos(pitch))
-        .addScaledVector(UP, dist * Math.sin(pitch) + 2);
-      camera.position.lerp(desired, reduceMotion ? 1 : 1 - Math.pow(0.001, clamped));
-      look.copy(g.position).setY(3.4);
+    const tau = reduceMotion ? 0.001 : FOLLOW_TAU.yaw;
+    const yawK = 1 - Math.exp(-clamped / tau);
+    followYaw.current += (g.rotation.y - followYaw.current) * yawK;
+    laggedFwd.set(0, 0, -1).applyAxisAngle(UP, followYaw.current);
+    laggedRight.crossVectors(laggedFwd, UP).normalize();
+
+    const headingFwd = mode === 'follow' ? laggedFwd : tmpFwd;
+    const headingRight = mode === 'follow' ? laggedRight : tmpRight;
+    const pose = desiredPose(mode, g.position, headingFwd, headingRight);
+
+    if (!booted.current) {
+      blendFrom.current.copy(camera.position);
+      lookFrom.current.copy(pose.look);
+      fovFrom.current = persp.fov;
+      blend.current = reduceMotion ? 1 : 0;
+      booted.current = true;
+    }
+
+    if (prevMode.current !== mode) {
+      blendFrom.current.copy(camera.position);
+      lookFrom.current.copy(look);
+      fovFrom.current = persp.fov;
+      blend.current = reduceMotion ? 1 : 0;
+      skip.current = false;
+      prevMode.current = mode;
+    }
+
+    const dur = Math.max(0.001, cameraDurationMs() / 1000);
+    if (skip.current || reduceMotion) blend.current = 1;
+    else blend.current = Math.min(1, blend.current + clamped / dur);
+    const k = easeSwell(blend.current);
+    camera.position.lerpVectors(blendFrom.current, pose.pos, k);
+    look.lerpVectors(lookFrom.current, pose.look, k);
+    camera.up.copy(pose.up);
+    camera.lookAt(look);
+    persp.fov = THREE.MathUtils.lerp(fovFrom.current, pose.fov, k);
+    persp.updateProjectionMatrix();
+    const note = blend.current < 0.98 ? 0 : 1;
+    if (note !== lastBlendNote.current) {
+      lastBlendNote.current = note;
+      onBlend?.(blend.current);
+    }
+
+    if (mode === 'follow' && blend.current >= 1 && !reduceMotion) {
+      const followK = 1 - Math.exp(-clamped / tau);
+      camera.position.lerp(pose.pos, followK);
+      look.lerp(pose.look, followK);
       camera.lookAt(look);
     }
 
@@ -197,14 +230,13 @@ function Rig({
       if (dx * dx + dz * dz < f.pickupRadius * f.pickupRadius) nearFragment = f.id;
     }
 
-    const fwdCheck = tmpFwd;
     onShip(
       {
         x: g.position.x,
         z: g.position.z,
         yaw: g.rotation.y,
         speed: speed.current,
-        headingDeg: (Math.atan2(-fwdCheck.x, -fwdCheck.z) * 180) / Math.PI,
+        headingDeg: (Math.atan2(-tmpFwd.x, -tmpFwd.z) * 180) / Math.PI,
       },
       nearPort,
       nearFragment,
@@ -213,7 +245,10 @@ function Rig({
 
   return (
     <group ref={ship} position={[WORLD.spawn.x, 0, WORLD.spawn.z]}>
-      <TreasureShip />
+      <group ref={rock}>
+        <TreasureShip />
+        <Wake speedRef={speed} reduceMotion={reduceMotion} />
+      </group>
     </group>
   );
 }
@@ -227,26 +262,40 @@ export function VoyageCanvas(props: Props) {
     <div className="world-canvas">
       <Canvas
         shadows
-        camera={{ fov: 42, near: 0.1, far: 280, position: [22, 14, 28] }}
+        dpr={[1, 1.75]}
+        camera={{ fov: 34, near: 0.1, far: 360, position: [28, 5.2, 8] }}
         onCreated={({ gl }) => {
           gl.setClearColor(sky, 1);
           gl.outputColorSpace = THREE.SRGBColorSpace;
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.22;
         }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
       >
         <color attach="background" args={[sky]} />
-        <fog attach="fog" args={[fog, 40, 140]} />
-        <hemisphereLight args={['#8aa0aa', '#1a1410', 0.5]} />
+        <fog attach="fog" args={[fog, 70, 190]} />
+        <ambientLight intensity={0.42} color={'#9aa8b0'} />
+        <hemisphereLight args={['#8aa0aa', '#1a1410', 0.62]} />
         <directionalLight
-          position={[18, 28, 12]}
+          position={[-22, 26, 18]}
+          intensity={0.85}
+          color={'#c5d3de'}
+        />
+        <directionalLight
+          position={[18, 24, 10]}
           intensity={1.35}
           color={lamp}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
+          shadow-camera-near={2}
+          shadow-camera-far={90}
+          shadow-camera-left={-30}
+          shadow-camera-right={30}
+          shadow-camera-top={30}
+          shadow-camera-bottom={-30}
         />
-        <Sea test={props.sceneId === 'neutral-test' || props.sceneId === 'test'} />
-        <PortBlocks />
+        <Atmosphere test={props.sceneId === 'neutral-test' || props.sceneId === 'test'} reduceMotion={props.reduceMotion} />
         <Rig {...props} />
       </Canvas>
     </div>
