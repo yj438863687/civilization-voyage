@@ -50,6 +50,29 @@
 13. **对比度**：正文 ≥ 4.5:1，HUD 叠 3D 必须有 `--cv-hud-scrim` 底板。
 14. **不伪造素材**：没有授权素材时用体块、剪影、海图符号 + “素材待补”标记，不复原具体真实建筑与遗址。
 
+### 2.3 本轮前端必做（不必等素材）
+
+以下每项都能用现有几何体、程序化贴图和变量先做出来，不需要等 glTF 成品。**先在 `apps/web` 里用占位体块跑通，素材到了只换模型不换参数。** 常数统一放一个 `src/world/voyageConstants.ts`，与 `docs/design/tokens.css` 同名，值以本文与 MOTION.md 为准。
+
+| # | 必做 | 常数名 / 变量 | 值 | 验收 |
+| --- | --- | --- | --- | --- |
+| 1 | 水 shader：深色水 + 菲涅尔 + 平面反射近似 + 水线雾带 | `WATER_BASE`、`WATER_FRESNEL`、`WATER_REFLECT_MIX`、`WATER_SWELL_UV` | 基色 `--cv-scene-water`；菲涅尔 3.0；反射混合 0.55；法线 UV 速度 0.03/s | 夜港下能看到灯笼的竖向反射条，水平线处与天空融合 |
+| 2 | 水线雾 | `MIST_HEIGHT`、`MIST_OPACITY`、`MIST_COLOR` | 0.05L、0.35、`--cv-scene-fog` | 船体入水处有软雾，船像从雾里出来 |
+| 3 | 镜头 blend | `CAM_MODES`（表）+ `smootherstep(t)` + `BLEND_SEC` | 见 MOTION.md §B 表；`boot` fov 38 / az −25 / el 10 / 1.80L | 任意两个 mode 间切换连续无跳帧，点击可跳过 |
+| 4 | 跟船弹簧 | `FOLLOW_TAU` | lateral 0.18 / dist 0.30 / height 0.45 / yaw 0.35 / pitch 0.50 | 转舵时镜头略滞后、不过冲 |
+| 5 | 船体起伏 | `SHIP_MOTION` | pitch ±1.4°@5.0s、roll ±2.2°@6.5s、yaw ±0.7°@8.0s、heave ±0.02L@4.5s；相位 0 / π/3 / π / π/2 | 船有起伏但不像整块板在晃；绕重心轴旋转 |
+| 6 | 转向横倾 | `HEEL_MAX`、`HEEL_TAU`、`HEEL_RETURN_TAU` | 4.0°、0.9s、1.6s | 右转右倾，回正比倾斜慢 |
+| 7 | 尾迹 | `WAKE_*` | 长 3.0L+4.0L×speed、宽 1.0→1.8 倍、UV 0.35/s×(0.4+speed)、不透明度 0.42×speed | 静止时尾迹为 0，航行时从艉部展开 |
+| 8 | 帆面鼓风 | `SAIL_BULGE`、`SAIL_ROWS` | 主帆 0.035L、前桅 0.028L；周期 4.2s；逐段位移 | 硬帆折线随鼓风平移，帆面有明暗 |
+| 9 | 艉楼三层 + 挑檐 | `STERN_TOWER` | 三层递退（0.22B/0.20L、缩 0.04B/0.18L、缩 0.04B/0.16L）；挑檐挑出 0.016–0.02L，端部上翘 8° | 纯黑剪影下能认出三层楼船，不像宫殿 |
+| 10 | 舷灯与灯笼 emissive | `LAMP_EMISSIVE`、`LAMP_CORE_EMISSIVE` | warm 1.0、core 2.0、舷灯 0.8；只有主灯允许一张软 Sprite 0.35 | 只有三处亮源，不做全船泛光；船眼不发光 |
+| 11 | 夜港三光源 | `LIGHT_MOON`、`LIGHT_LANTERNS`、`LIGHT_HEMI` | 见 ART_DIRECTION「夜港灯光圣经」 | 暖艉楼 > 冷帆 > 暗海 |
+| 12 | 测试港轮廓 | `PORT_LANDMARK` | 灯杆（3–5 根，高 0.4L，顶部 1 个小 emissive）、突堤（两道平行体块）、一面旗 | 灰盒上能看出可瞄准的轮廓；挂「素材待补」小签 |
+| 13 | HUD 叠 3D | `--cv-hud-scrim`、`--cv-cine-bar` | HUD 每块均有 scrim 底板；letterbox 见 MOTION §B3 | 海面上不直接压字；宽屏启航有电影遮幅 |
+| 14 | 减少动态分支 | `REDUCED_MOTION` | 5–8、11 的装饰项关闭，镜头直切，tau 全 0 | 系统偏好与应用开关都生效，信息不丢 |
+
+不做：Three.js 之外的 3D 库、体积雾、全屏 Bloom 之外的后期链、粒子尾迹、布料模拟。
+
 ## 3. 允许前端按实际运行调整
 
 - 具体像素、面板宽度、HUD 缩放比例（保持变量与层级关系）。

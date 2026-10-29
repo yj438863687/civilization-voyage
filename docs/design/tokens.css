@@ -202,6 +202,15 @@
   --cv-ship-eye: #f3ebdd;           /* 船眼白 */
   --cv-ship-eye-pupil: #14100d;     /* 船眼瞳 */
   --cv-ship-banner: var(--cv-scene-accent); /* 旗帜与帆上的点缀色，默认跟随场景 */
+  /* 灯光（3D 侧读取；色值为渲染用线性近似，非 UI 色） */
+  --cv-ship-lamp-warm: #f0b46a;      /* 灯笼与舷灯的发光色 */
+  --cv-ship-lamp-core: #ffd9a0;      /* emissive 核心，饱和度更高、面积更小 */
+  --cv-ship-lamp-cool: #8fb6c8;      /* 月光 / 环境冷光，只打轮廓不照明 */
+  --cv-ship-lantern-count: 26;       /* 参考：艉楼三层 + 舷侧灯笼总量级，非硬性 */
+
+  /* ---------- 电影化遮幅 ---------- */
+  --cv-cine-bar: #05090b;
+
   /* 比例（仅文档用途，3D 常量需与三处文档一致） */
   --cv-ship-ratio-length: 4;
   --cv-ship-ratio-beam: 1;
