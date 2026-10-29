@@ -1,14 +1,116 @@
-import type { ReactNode } from 'react';
-import type { Usage } from '../api/types';
+import { useRef, useState, type ReactNode } from 'react';
+import type { Classification, Source, Usage } from '../api/types';
+
+export type StampKind =
+  | 'test'
+  | 'pending'
+  | 'fact'
+  | 'counter'
+  | 'creative'
+  | 'dissent'
+  | 'unverified'
+  | 'adopt'
+  | 'confirmed';
+
+const STAMP_TITLE: Record<StampKind, string> = {
+  test: '测试数据，不代表任何文明或真实费用。',
+  pending: 'AI 的建议，组员还没确认。',
+  fact: '有可核对的材料，请连同出处读。',
+  counter: '依据材料推想，结果取决于条件。',
+  creative: '为这段体验创作，不作历史依据。',
+  dissent: '船员意见不同，各自理由都在。',
+  unverified: '这条说法还在核对，先别当定论。',
+  adopt: '你采纳了这个解释，疑点仍留着。',
+  confirmed: '组员已确认此候选。这是审议状态，不是史实。',
+};
 
 export function Stamp({
   kind,
   children,
+  title,
 }: {
-  kind: 'test' | 'pending' | 'fact' | 'counter' | 'creative' | 'dissent';
+  kind: StampKind;
   children: ReactNode;
+  title?: string;
 }) {
-  return <span className={`stamp stamp-${kind}`}>{children}</span>;
+  return (
+    <span className={`stamp stamp-${kind}`} title={title ?? STAMP_TITLE[kind]}>
+      {children}
+    </span>
+  );
+}
+
+/** Never default unknown or unsourced claims to 史实. */
+export function contentStamp(classification: Classification | string, sources: Source[] = []) {
+  if (classification === 'test') return { kind: 'test' as const, label: '测试' };
+  if (classification === 'creative') return { kind: 'creative' as const, label: '创作' };
+  if (classification === 'counterfactual') return { kind: 'counter' as const, label: '推演' };
+  if (classification === 'historical_claim') {
+    const hasSource = sources.some((s) => s.title || s.url);
+    if (!hasSource) return { kind: 'unverified' as const, label: '出处待补' };
+    return { kind: 'fact' as const, label: '史实' };
+  }
+  return { kind: 'unverified' as const, label: String(classification || '性质待补') };
+}
+
+export function SealButton({
+  label,
+  disabled,
+  hint,
+  onSeal,
+}: {
+  label: string;
+  disabled?: boolean;
+  hint?: string;
+  onSeal: () => void;
+}) {
+  const [held, setHeld] = useState(0);
+  const frame = useRef(0);
+  const stop = () => {
+    cancelAnimationFrame(frame.current);
+    setHeld(0);
+  };
+  const start = () => {
+    if (disabled) return;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / 600);
+      setHeld(p);
+      if (p >= 1) {
+        setHeld(0);
+        onSeal();
+        return;
+      }
+      frame.current = requestAnimationFrame(tick);
+    };
+    frame.current = requestAnimationFrame(tick);
+  };
+  return (
+    <div>
+      <button
+        className={`btn btn-primary seal-btn${disabled ? ' seal-empty' : ''}`}
+        type="button"
+        disabled={disabled}
+        aria-disabled={disabled}
+        onPointerDown={start}
+        onPointerUp={stop}
+        onPointerCancel={stop}
+        onPointerLeave={stop}
+        onKeyDown={(e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            start();
+          }
+        }}
+        onKeyUp={stop}
+        onBlur={stop}
+      >
+        <span className="seal-fill" style={{ transform: `scaleX(${held})` }} aria-hidden />
+        {label}
+      </button>
+      {disabled && hint ? <p className="faint">{hint}</p> : null}
+    </div>
+  );
 }
 
 export function Ledgers({

@@ -104,7 +104,10 @@
   --cv-mark-creative: #c9a3d6;                /* 未来创作 / 虚构 */
   --cv-mark-ai-pending: var(--cv-amber-400);  /* AI 推荐，待组员确认 */
   --cv-mark-test: var(--cv-slate-300);        /* 测试数据 */
-  --cv-mark-dissent: var(--cv-cinnabar-400);  /* 分歧 / 不同观点 */
+  --cv-mark-dissent: var(--cv-paper-200);     /* 分歧：纸色双线，不用朱砂 */
+  --cv-mark-unverified: var(--cv-amber-400);  /* 待核实 / 出处待补，不得与史实同时出现 */
+  --cv-mark-adopt: var(--cv-cinnabar-500);    /* 玩家采纳印 */
+  --cv-mark-confirmed: var(--cv-amber-400);   /* 组员已确认：审议层，不是史实 */
 
   /* ---------- 语义：两本账 ---------- */
   --cv-ledger-real: var(--cv-sea-300);        /* 真实模型用量（尚未接入时显示 unconnected） */

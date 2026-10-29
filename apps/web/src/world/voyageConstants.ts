@@ -45,3 +45,14 @@ export function smootherstep(t: number) {
   const x = Math.min(1, Math.max(0, t));
   return x * x * x * (x * (x * 6 - 15) + 10);
 }
+
+/** Warm dots behind a port, 4–7 ship-lengths out. Emissive only, no light, no flash. */
+export const FAR_LAMPS = {
+  count: 4,
+  distMin: 4.2 * SHIP_L,
+  distMax: 6.4 * SHIP_L,
+  radius: 0.006 * SHIP_L,
+  emissive: 0.5,
+};
+
+export const PORT_LAMP_SHAPES: Array<'sphere' | 'box' | 'tube'> = ['sphere', 'box', 'tube', 'sphere'];

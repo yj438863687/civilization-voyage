@@ -2,6 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { WORLD } from './world.config';
+import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
 
 function cssVar(name: string, fallback: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
@@ -137,22 +138,45 @@ export function Atmosphere({ test, reduceMotion }: { test: boolean; reduceMotion
             <boxGeometry args={[6.4, 0.4, 2.2]} />
             <meshStandardMaterial color="#4e5356" roughness={0.9} />
           </mesh>
-          {[ -4, -1, 2, 5 ].map((x) => (
-            <group key={x} position={[x, 0, 4.5]}>
-              <mesh position={[0, 4, 0]}>
-                <cylinderGeometry args={[0.07, 0.09, 8, 6]} />
-                <meshStandardMaterial color="#c9a15a" roughness={0.4} metalness={0.6} />
-              </mesh>
-              <mesh position={[0, 8.1, 0]}>
-                <sphereGeometry args={[0.14, 8, 8]} />
+          {[-4, -1, 2, 5].map((x, i) => {
+            const shape = PORT_LAMP_SHAPES[i] ?? 'sphere';
+            const lamp = cssVar('--cv-ship-lamp-warm', '#f0b46a');
+            const core = cssVar('--cv-ship-lamp-core', '#ffd9a0');
+            return (
+              <group key={x} position={[x, 0, 4.5]}>
+                <mesh position={[0, 4, 0]}>
+                  <cylinderGeometry args={[0.07, 0.09, 8, 6]} />
+                  <meshStandardMaterial color="#c9a15a" roughness={0.4} metalness={0.6} />
+                </mesh>
+                <mesh position={[0, 8.1, 0]}>
+                  {shape === 'box' ? (
+                    <boxGeometry args={[0.22, 0.22, 0.22]} />
+                  ) : shape === 'tube' ? (
+                    <cylinderGeometry args={[0.08, 0.08, 0.38, 8]} />
+                  ) : (
+                    <sphereGeometry args={[0.14, 8, 8]} />
+                  )}
+                  <meshStandardMaterial color={core} emissive={lamp} emissiveIntensity={1.4} />
+                </mesh>
+              </group>
+            );
+          })}
+          {Array.from({ length: FAR_LAMPS.count }, (_, i) => {
+            const t = FAR_LAMPS.count === 1 ? 0.5 : i / (FAR_LAMPS.count - 1);
+            const dist = FAR_LAMPS.distMin + (FAR_LAMPS.distMax - FAR_LAMPS.distMin) * t;
+            const side = (i - (FAR_LAMPS.count - 1) / 2) * 6;
+            return (
+              <mesh key={`far-${i}`} position={[side, 2.4, -dist]}>
+                <sphereGeometry args={[FAR_LAMPS.radius, 8, 8]} />
                 <meshStandardMaterial
-                  color={cssVar('--cv-ship-lamp-core', '#ffd9a0')}
+                  color={cssVar('--cv-ship-lamp-warm', '#f0b46a')}
                   emissive={cssVar('--cv-ship-lamp-warm', '#f0b46a')}
-                  emissiveIntensity={1.4}
+                  emissiveIntensity={FAR_LAMPS.emissive}
+                  toneMapped={false}
                 />
               </mesh>
-            </group>
-          ))}
+            );
+          })}
           <mesh position={[0.8, 7.5, -2.2]}>
             <planeGeometry args={[1.6, 1.1]} />
             <meshStandardMaterial color="#c9a15a" side={THREE.DoubleSide} roughness={0.7} />

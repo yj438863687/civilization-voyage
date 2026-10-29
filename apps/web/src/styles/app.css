@@ -249,7 +249,30 @@ html[data-reduce-motion='true'] .overlay-side .paper {
 .stamp-fact { color: var(--cv-mark-fact); }
 .stamp-counter { color: var(--cv-mark-counterfactual); }
 .stamp-creative { color: var(--cv-mark-creative); }
-.stamp-dissent { color: var(--cv-mark-dissent); box-shadow: inset 0 0 0 1px currentColor; }
+.stamp-dissent {
+  color: var(--cv-ink-900, #1a1c1e);
+  border-color: var(--cv-mark-dissent);
+  box-shadow: inset 0 0 0 1px var(--cv-mark-dissent);
+  background: transparent;
+}
+.stamp-unverified { color: var(--cv-mark-unverified); border-style: dashed; }
+.stamp-adopt { color: var(--cv-mark-adopt); }
+.stamp-confirmed { color: var(--cv-mark-confirmed); }
+
+.seal-btn { position: relative; overflow: hidden; }
+.seal-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  transform-origin: left center;
+  background: color-mix(in srgb, var(--cv-mark-adopt) 35%, transparent);
+  pointer-events: none;
+}
+.seal-empty {
+  background: transparent;
+  color: var(--cv-mark-adopt);
+  border: 1px dashed var(--cv-mark-adopt);
+}
 
 .btn {
   min-height: var(--cv-touch-min);

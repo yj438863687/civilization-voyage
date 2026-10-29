@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, newRequestId } from './api/client';
 import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Task, type TaskEvent, type Trade, type Usage, type Voyage, type VoyageRecord } from './api/types';
-import { Coach, Ledgers, StageBar, Stamp, StatusBanner } from './components/ui';
+import { Coach, Ledgers, SealButton, StageBar, Stamp, StatusBanner, contentStamp } from './components/ui';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
 import { WORLD } from './world/world.config';
 
@@ -45,49 +45,59 @@ const DEFAULT_CREW: Crew[] = [
 
 type View = 'embark' | Stage | 'port' | 'collaborate';
 
-function guide(view: View, ctx: { connected: boolean; hasQuestion: boolean; nearPort: boolean; hasVoyages: boolean }) {
+type GuideCtx = {
+  connected: boolean;
+  hasQuestion: boolean;
+  hasReason: boolean;
+  nearPort: boolean;
+  hasVoyages: boolean;
+  unusedFragments: number;
+  crewReplies: number;
+};
+
+function guide(view: View, ctx: GuideCtx) {
   if (view === 'embark') {
     return {
       step: '第 1 步 · 启航港',
       title: '先选海域，再开一条航程',
       body: ctx.connected
-        ? '右边先点一个场景：测试海域用来练手；A/B/C 是 AI 推荐，还没经组员确认。起个航程名，点朱砂色「新航程」。有旧航程就点右边卡片继续。船员席已接入，进驾驶舱可以真的问话。'
-        : '右边先点一个场景：测试海域用来练手；A/B/C 是 AI 推荐，还没经组员确认。起个航程名，点朱砂色「新航程」。有旧航程就点右边卡片继续。模型没接也能玩，船员暂时不会真的回话。',
-      next: ctx.hasVoyages ? '点「新航程」，或点右边一张旧航程卡片' : '点「新航程」进入驾驶舱',
+        ? '右边先点一个场景。测试海域用来练手；A/B/C 仍是 AI 推荐，组员还没确认。起个名字，开一条航程。船员席已接入，进驾驶舱可以真的问话。'
+        : '右边先点一个场景。测试海域用来练手；A/B/C 仍是 AI 推荐，组员还没确认。起个名字，开一条航程。模型没接也能走完，船员不会假装回话。',
+      next: ctx.hasVoyages ? '点「新航程」，或点右边一张旧航程卡片' : '先起个名字，开一条。',
     };
   }
   if (view === 'cockpit') {
     return {
       step: '第 2 步 · 驾驶舱',
-      title: '写下你想弄清的文化问题',
-      body: '左边是船员席。中间输入框用来提问。右边任务卡会记下问题和共同任务。没有接模型时不会出现假回复。问题写好后才能点「确认航程」出海。',
-      next: ctx.hasQuestion ? '检查右边任务卡，点「确认航程」' : '在输入框或右边写下文化问题，再点「确认航程」',
+      title: '灯已点亮。你想弄清什么？',
+      body: '左边是船员席。中间问一件你想理解的事。右边记下问题和共同任务，分歧可以留着。没接模型时不会出现假回复。问题和一句理由都有了，按住落印。',
+      next: !ctx.hasQuestion ? '先写下你想弄清的一件事。' : ctx.hasReason ? '写下理由，由你落印。' : '写下问题和一句理由，才能落印。',
     };
   }
   if (view === 'route') {
     return {
       step: '第 3 步 · 海图',
-      title: '选一条探索方式，再出海',
-      body: '上面一条步骤少、不一定调用模型；下面一条步骤多，接了模型才会真的查阅。费用高不代表更正确。真实用量没接入时显示「尚未接入」，右边两本账上面是真实费用、下面是剧情测试补给。',
-      next: '点中一条航线，再点「按此航线启航」',
+      title: '查得多一些，或先查关键处',
+      body: '两条路线粗细颜色一样。步骤多不等于更对，费用高也不等于更文明。没接入计价时显示「尚未接入」。',
+      next: '看清两条路线各查什么，再选。',
     };
   }
   if (view === 'world') {
     return {
       step: '第 4 步 · 海域',
-      title: ctx.nearPort ? '已经靠近港口' : '把船开到测试港',
+      title: ctx.nearPort ? '已经靠近港口' : '朝海图上的目的港航行',
       body: ctx.nearPort
-        ? '你进入了港口范围。点中央「靠港」才会停船、打开港口面板，才能买卖测试货物。'
-        : 'W 前进、S 后退、A/D 转向，或用左下摇杆。东南方那组灰色体块是中性测试港。看见纸签可以靠近，把碎片收入货舱。右下「志」打开日志。',
-      next: ctx.nearPort ? '点「靠港」' : '朝东南方体块开过去，进入范围后点「靠港」',
+        ? '靠港后，用你带的材料做一件事。买卖不是这一步的主事。'
+        : 'W 前进、S 后退、A/D 转向，或用左下摇杆。东南方体块是中性测试港。看见纸签可以靠近，收入货舱。',
+      next: ctx.nearPort ? '点「靠港」' : '朝海图上的目的港航行。',
     };
   }
   if (view === 'port') {
     return {
       step: '靠港 · 测试港',
-      title: '这里只是测试买卖和碎片',
-      body: '货物带「测试」印章，数字是虚构补给，不是 HMT、也不是真钱。买入/卖出由服务器记账。可以把测试碎片收入货舱，或请船员解释（没接模型会明确说尚未接入）。',
-      next: '试一次买入，或点「打开航海日志」结束本轮',
+      title: '用材料做一件事',
+      body: '货物带「测试」印章，数字是虚构补给。先打开材料看它从哪里来；收入货舱还不算完成。',
+      next: ctx.unusedFragments > 0 ? '选一份材料，用它说明你的安排。' : '打开这份材料，先看它从哪里来。',
     };
   }
   if (view === 'collaborate') {
@@ -95,18 +105,43 @@ function guide(view: View, ctx: { connected: boolean; hasQuestion: boolean; near
       step: '协作 · 解释与选择',
       title: '过程要看得见，选择由你来定',
       body: ctx.connected
-        ? '船员查阅时，下面会列出可观察事件（开始、结果、失败），不会展示隐藏推理。你也可以自己写一段解释，点「采纳此解释」记入航程。'
-        : '模型尚未接入，不会编造船员发言。你可以自己写解释并采纳，或先回港口、去日志。',
-      next: ctx.connected ? '看事件，或写下解释后点「采纳此解释」' : '自己写一段解释并采纳，或点右下「志」去日志',
+        ? '船员查阅时只列出可观察事件。大副问依据，二副问谁被看见。你可以都不采纳。'
+        : '模型尚未接入，不会编造船员发言。你可以自己写解释，按住落印。',
+      next: ctx.crewReplies >= 2 ? '先看来源，再听他们各自的理由。' : '写下理由，由你落印。',
     };
   }
   return {
     step: '反思 · 航海日志',
-    title: '看看你改了什么，再决定要不要再走一趟',
-    body: '上面是这次收集的材料和出处。两本账分开：真实用量没接入就是「尚未接入」；剧情补给是测试数。下面三个问题帮你回想。写完点「写入日志」。还可以带着这次航程再回驾驶舱。',
-    next: '回答下面的问题并「写入日志」，或点「带着这次航程再次出发」',
+    title: '你相信了什么？又凭什么相信？',
+    body: '材料与出处在上面。两本账分开。下面三问帮你回看：信了什么、求快时漏了什么、后来的人还能不能改。',
+    next: '带上没解决的问题，再走一程。',
   };
 }
+
+function notesOf(world: Record<string, unknown> | undefined) {
+  const raw = world && typeof world.notes === 'object' && world.notes ? (world.notes as Record<string, unknown>) : {};
+  return {
+    dissent: typeof raw.dissent === 'string' ? raw.dissent : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+function parseCrewVoices(out: string): { role: string; text: string }[] {
+  const first = out.match(/【大副】([\s\S]*?)(?=【二副】|$)/);
+  const second = out.match(/【二副】([\s\S]*?)$/);
+  if (first || second) {
+    return [
+      first ? { role: '大副', text: first[1].trim() } : null,
+      second ? { role: '二副', text: second[1].trim() } : null,
+    ].filter((x): x is { role: string; text: string } => !!x && !!x.text);
+  }
+  return [{ role: '大副', text: out.trim() }];
+}
+
+const CREW_PROMPT = `请用两段、各自不超过三句回答，不要合并成一段。不要写「知行合一」「和而不同」「仁义」这些词。
+【大副】关注依据：这句话有没有出处，能证明到哪一步。不要替玩家下结论。缺出处就明说先保留。
+【二副】关注义利：这件事落在谁身上，谁还没开口。用问句，不训斥，不自称更有良心。
+未查清就写还没查清。`;
 
 function sceneAttr(voyage: Voyage | null, pick?: Scene | null) {
   const id = voyage?.scene_id ?? pick?.id ?? 'test';
@@ -144,6 +179,9 @@ export function App() {
   const [sharedTask, setSharedTask] = useState('');
   const [chat, setChat] = useState<{ who: 'user' | 'crew' | 'sys'; text: string; role?: string }[]>([]);
   const [draft, setDraft] = useState('');
+  const [reason, setReason] = useState('');
+  const [dissent, setDissent] = useState('');
+  const [arrangement, setArrangement] = useState('');
   const [routeId, setRouteId] = useState('simple');
   const [nearPort, setNearPort] = useState<string | null>(null);
   const [nearFragment, setNearFragment] = useState<string | null>(null);
@@ -190,6 +228,9 @@ export function App() {
     setVoyage(v);
     setQuestion(v.question);
     setSharedTask(v.shared_task);
+    const notes = notesOf(v.world);
+    setReason(notes.reason);
+    setDissent(notes.dissent);
     if (v.route) setRouteId(v.route.id);
     localStorage.setItem(LAST_KEY, id);
     const [rec, p, t, tk, u] = await Promise.all([
@@ -228,13 +269,16 @@ export function App() {
         shared_task: patch.shared_task ?? sharedTask,
         crew: patch.crew ?? voyage.crew,
         route: patch.route === undefined ? voyage.route : patch.route,
-        world: patch.world ?? voyage.world,
+        world: patch.world ?? {
+          ...voyage.world,
+          notes: { dissent, reason },
+        },
       };
       const next = await api.putVoyage(voyage.id, body);
       setVoyage(next);
       return next;
     },
-    [voyage, question, sharedTask],
+    [voyage, question, sharedTask, dissent, reason],
   );
 
   const nearRef = useRef({ t: 0, port: '', frag: '' });
@@ -336,11 +380,16 @@ export function App() {
   }
 
   async function confirmCockpit() {
-    if (!voyage || !question.trim()) return;
+    if (!voyage || !question.trim() || !reason.trim()) return;
     setBusy(true);
     setError(null);
     try {
-      await persist({ stage: 'route', question, shared_task: sharedTask || `围绕「${question}」完成一次探索。` });
+      await persist({
+        stage: 'route',
+        question,
+        shared_task: sharedTask || `围绕「${question}」完成一次探索。`,
+        world: { ...voyage.world, notes: { dissent, reason } },
+      });
       setView('route');
     } catch (e) {
       setError(errText(e));
@@ -453,7 +502,7 @@ export function App() {
     try {
       const task = await api.createTask(voyage.id, {
         request_id: newRequestId('task'),
-        prompt: `文化问题：${question || text}\n船员职务：大副\n用户说：${text}\n请给出简短建议，并保留不确定处。`,
+        prompt: `文化问题：${question || text}\n用户说：${text}\n${CREW_PROMPT}`,
         model_id: modelId,
       });
       setTasks((t) => [...t, task]);
@@ -465,7 +514,8 @@ export function App() {
           setEvents(ev);
           if (latest.status === 'succeeded') {
             const out = ev.find((e) => e.kind === 'succeeded')?.data.output;
-            setChat((c) => [...c, { who: 'crew', role: '大副', text: typeof out === 'string' ? out : '已完成，见事件记录。' }]);
+            const voices = parseCrewVoices(typeof out === 'string' ? out : '已完成，见事件记录。');
+            setChat((c) => [...c, ...voices.map((v) => ({ who: 'crew' as const, role: v.role, text: v.text }))]);
             setUsage(await api.usage(voyage.id));
             setRecords(await api.records(voyage.id));
             if (poll.current) window.clearInterval(poll.current);
@@ -564,11 +614,16 @@ export function App() {
             ? { kind: 'waiting' as const, text: `接近 ${WORLD.ports.find((p) => p.id === nearPort)?.name ?? nearPort}。点「靠港」。` }
             : { kind: 'idle' as const, text: voyage.question || '航程进行中' };
 
+  const unusedFragments = records.filter((r) => r.kind === 'fragment' || r.kind === 'material').length;
+  const crewReplies = chat.filter((m) => m.who === 'crew').length;
   const tip = guide(view, {
     connected,
     hasQuestion: Boolean(question.trim()),
+    hasReason: Boolean(reason.trim()),
     nearPort: Boolean(nearPort),
     hasVoyages: voyages.length > 0,
+    unusedFragments,
+    crewReplies,
   });
 
   return (
@@ -612,7 +667,7 @@ export function App() {
             />
           </div>
           <div className="hud hud-tc">
-            <Stamp kind={voyage?.scene_track === 'candidate' || scenePick?.status === 'pending' ? 'pending' : voyage?.scene_track === 'test' ? 'test' : 'fact'}>
+            <Stamp kind={voyage?.scene_track === 'candidate' || scenePick?.status === 'pending' ? 'pending' : voyage?.scene_track === 'test' || scenePick?.status === 'test' ? 'test' : 'confirmed'}>
               {voyage?.scene_snapshot && typeof voyage.scene_snapshot.label === 'string'
                 ? voyage.scene_snapshot.label
                 : scenePick?.label ?? '测试海域'}
@@ -710,8 +765,11 @@ export function App() {
         <>
           <div className="overlay overlay-left">
             <h1 className="display title-hero">文明航程</h1>
+            <p className="muted">带一个问题出海。船员查证，你定航向。</p>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <p className="faint">船为宝船意象概念设计，不是考古复原，不冒充任何一艘历史原船。</p>
+            <p className="faint" title="概念设计，不是考古复原，不冒充任何一艘历史上的具体船只。">
+              概念宝船，非考古复原。
+            </p>
             <div className="field">
               <span className="label">航程名</span>
               <input value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -755,7 +813,7 @@ export function App() {
                     <div className="row">
                       {s.status === 'pending' && <Stamp kind="pending">AI 推荐，待组员确认</Stamp>}
                       {s.status === 'test' && <Stamp kind="test">测试</Stamp>}
-                      {s.status === 'confirmed' && <Stamp kind="fact">已确认</Stamp>}
+                      {s.status === 'confirmed' && <Stamp kind="confirmed">已确认</Stamp>}
                     </div>
                     <strong>{s.label}</strong>
                     <div className="muted">{s.background}</div>
@@ -765,7 +823,7 @@ export function App() {
               <h3 className="display title-panel" style={{ marginTop: 24 }}>继续航程</h3>
               <p className="muted">点一张卡片会回到你上次停的地方（驾驶舱、航线、海域或日志）。</p>
               {voyages.length === 0 ? (
-                <StatusBanner kind="idle" text="还没有航程。先在左边起名，点「新航程」。" />
+                <StatusBanner kind="idle" text="还没有航程。先起个名字，开一条。" />
               ) : (
                 <div className="list">
                   {voyages.map((v) => (
@@ -787,6 +845,7 @@ export function App() {
             {voyage.crew.map((c) => (
               <div key={c.id} className={`seat ${connected ? '' : 'seat-off'}`}>
                 {c.role}
+                <span className="faint">{c.role === '二副' ? '问谁被看见' : '问有没有依据'}</span>
                 <span className="faint">{connected ? (c.model_id || models[0]?.id) : '尚未接入'}</span>
               </div>
             ))}
@@ -794,9 +853,7 @@ export function App() {
           <div className="cockpit-window">
             <div className="chat">
               {chat.length === 0 && (
-                <div className="bubble bubble-sys">
-                  还没有对话。在下面输入框写你想探索的问题，例如「这座港口为什么能让不同语言的人做生意？」点发送。没接模型时我们只会告诉你尚未接入，不会假装船员在说话。
-                </div>
+                <div className="bubble bubble-sys">灯已点亮。你想弄清什么？</div>
               )}
               {chat.map((m, i) => (
                 <div key={i} className={`bubble bubble-${m.who === 'user' ? 'user' : m.who === 'crew' ? 'crew' : 'sys'}`}>
@@ -814,7 +871,7 @@ export function App() {
               ))}
             </div>
             <div className="row">
-              <input style={{ flex: 1 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="向船员提出文化问题" />
+              <input style={{ flex: 1 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="写一件你想理解的事" />
               <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void askCrew()}>
                 发送
               </button>
@@ -822,7 +879,7 @@ export function App() {
           </div>
           <div className="paper">
             <h2 className="display title-panel">航程任务</h2>
-            <p className="muted">文化问题是这次出海要弄清的事。共同任务是你和船员一起做的事。都填好再落印。</p>
+            <p className="muted">问题是这次要弄清的事；分歧留在下面，不必先吵出结果。</p>
             <div className="field">
               <span className="label">文化问题</span>
               <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
@@ -831,12 +888,23 @@ export function App() {
               <span className="label">共同任务</span>
               <textarea value={sharedTask} onChange={(e) => setSharedTask(e.target.value)} rows={3} />
             </div>
+            <div className="field">
+              <span className="label">保留的分歧</span>
+              <textarea value={dissent} onChange={(e) => setDissent(e.target.value)} rows={2} placeholder="可以先不统一。写下一处还没谈拢的地方。" />
+            </div>
+            <div className="field">
+              <span className="label">落印理由</span>
+              <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} placeholder="你为什么确认这个问题值得出海。" />
+            </div>
             <Stamp kind="pending">草稿</Stamp>
+            {dissent.trim() ? <Stamp kind="dissent">分歧</Stamp> : null}
             <div style={{ marginTop: 16 }}>
-              <button className="btn btn-primary" type="button" disabled={busy || !question.trim()} onClick={() => void confirmCockpit()}>
-                确认航程
-              </button>
-              {!question.trim() && <p className="faint">未形成文化问题时不能落印。</p>}
+              <SealButton
+                label="确认此行的问题"
+                disabled={busy || !question.trim() || !reason.trim()}
+                hint="写下问题和一句理由，才能落印。"
+                onSeal={() => void confirmCockpit()}
+              />
             </div>
             {error && <p className="error">{error}</p>}
           </div>
@@ -848,6 +916,7 @@ export function App() {
           <div className="paper">
             <h2 className="display title-panel">航线与资源</h2>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
+            <p className="muted">查得多一些，或先查关键处。</p>
             <div className="list">
               {ROUTES.map((r) => (
                 <button key={r.id} className="card" type="button" onClick={() => setRouteId(r.id)} style={{ boxShadow: routeId === r.id ? 'var(--cv-shadow-lamp)' : undefined }}>
@@ -858,6 +927,7 @@ export function App() {
                 </button>
               ))}
             </div>
+            <p className="faint">路线不同，留下的问题也不同。查得多，不等于更对。没走的这条，也记在海图上。</p>
             <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
             <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void launchRoute()}>
               按此航线启航
@@ -873,7 +943,7 @@ export function App() {
             接近 {WORLD.ports.find((p) => p.id === nearPort)?.name}
             <Stamp kind="test">测试</Stamp>
           </div>
-          <p className="muted">点「靠港」才会停船并打开港口买卖。不点可以继续开。</p>
+          <p className="muted">接近 {WORLD.ports.find((p) => p.id === nearPort)?.name}。靠港后，用你带的材料做一件事。不点可以继续开。</p>
           <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void dock()}>
             靠港
           </button>
@@ -883,7 +953,7 @@ export function App() {
       {view === 'world' && nearFragment && (
         <div className="prompt-center scrim" style={{ bottom: '28%' }}>
           <div>{WORLD.fragments.find((f) => f.id === nearFragment)?.title}</div>
-          <p className="muted">这是测试碎片。点「收入货舱」会记入本航程材料，可在日志里看到出处。</p>
+          <p className="muted">打开这份材料，先看它从哪里来。收入货舱以后还没用上。</p>
           <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void collectFragment()}>
             收入货舱
           </button>
@@ -897,6 +967,9 @@ export function App() {
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <Stamp kind="test">测试数据 · 素材待补</Stamp>
             <p>{ports[0]?.name ?? '中性测试港'}。体块与剪影，不代表真实港口。</p>
+            {records.filter((r) => r.kind === 'fragment' || r.kind === 'material').length > 0 && (
+              <p className="muted">已收入货舱，还没用上。货物到了，理解也到了吗？</p>
+            )}
             {ports[0] &&
               Object.entries(ports[0].goods).map(([id, g]) => (
                 <div key={id} className="card card-test">
@@ -912,6 +985,35 @@ export function App() {
                 发现测试碎片
               </button>
             )}
+            <div className="field" style={{ marginTop: 16 }}>
+              <span className="label">港口安排（推演）</span>
+              <textarea
+                value={arrangement}
+                onChange={(e) => setArrangement(e.target.value)}
+                rows={3}
+                placeholder="选一份材料，用它说明你的安排。这是推演，不是史实。"
+              />
+              <SealButton
+                label="用材料说明安排"
+                disabled={busy || !arrangement.trim()}
+                hint="选一份材料，用它说明你的安排。"
+                onSeal={() => {
+                  if (!voyage || !arrangement.trim()) return;
+                  void api.addRecord(voyage.id, {
+                    kind: 'choice',
+                    text: arrangement.trim(),
+                    classification: 'counterfactual',
+                    sources: [],
+                    material_ids: records.filter((r) => r.kind === 'fragment' || r.kind === 'material').map((r) => r.id),
+                    version: 1,
+                    access: 'private',
+                  }).then(async () => {
+                    setArrangement('');
+                    setRecords(await api.records(voyage.id));
+                  }).catch((e) => setError(errText(e)));
+                }}
+              />
+            </div>
             <div className="row" style={{ marginTop: 16 }}>
               <button className="btn btn-secondary" type="button" onClick={() => setView('collaborate')}>请船员解释</button>
               <button className="btn btn-ghost" type="button" onClick={() => setView('world')}>回到海域</button>
@@ -946,32 +1048,33 @@ export function App() {
                   <div>{typeof e.data.output === 'string' ? e.data.output : JSON.stringify(e.data)}</div>
                 </div>
               ))}
-              {records.filter((r) => r.kind === 'fragment' || r.kind === 'artifact').map((r) => (
-                <div key={r.id} className="card">
-                  <Stamp kind={r.classification === 'test' ? 'test' : r.classification === 'creative' ? 'creative' : 'fact'}>
-                    {r.classification}
-                  </Stamp>
-                  <div>{r.text}</div>
-                  {r.sources.map((s) => (
-                    <div key={s.id} className="muted">
-                      出处 {s.title} · {s.license}
-                    </div>
-                  ))}
-                </div>
-              ))}
+              {records.filter((r) => r.kind === 'fragment' || r.kind === 'artifact').map((r) => {
+                const stamp = contentStamp(r.classification, r.sources);
+                return (
+                  <div key={r.id} className="card">
+                    <Stamp kind={stamp.kind}>{stamp.label}</Stamp>
+                    <div>{r.text}</div>
+                    {r.sources.map((s) => (
+                      <div key={s.id} className="muted">
+                        出处 {s.title} · {s.license}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
-            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} placeholder="补充你的解释" />
+            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} placeholder="你的解释和理由" />
             <div className="row">
               <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void askCrew()}>请船员解释</button>
-              <button
-                className="btn btn-primary"
-                type="button"
+              <SealButton
+                label="采纳"
                 disabled={busy || !draft.trim()}
-                onClick={() => {
+                hint="写下理由，由你落印。"
+                onSeal={() => {
                   void api.addRecord(voyage.id, {
                     kind: 'choice',
                     text: draft.trim(),
-                    classification: 'creative',
+                    classification: 'counterfactual',
                     sources: [],
                     material_ids: [],
                     version: 1,
@@ -981,9 +1084,7 @@ export function App() {
                     setRecords(await api.records(voyage.id));
                   }).catch((e) => setError(errText(e)));
                 }}
-              >
-                采纳此解释
-              </button>
+              />
             </div>
             {error && <p className="error">{error}</p>}
           </div>
@@ -1011,12 +1112,14 @@ export function App() {
             <h3 className="display title-panel">两本账结算</h3>
             <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
             <h3 className="display title-panel">反思</h3>
-            <p className="muted">可以写：我选择了什么？依据是哪条材料？还有什么没核实？下次想把哪条航线走深？</p>
-            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} placeholder="这次选择改变了什么？依据是什么？还有哪一点需要核实？" />
+            <p className="muted">你相信了什么？又凭什么相信？</p>
+            <p className="muted">这次求快时，有没有漏查什么？</p>
+            <p className="muted">后来的人，还能改这份安排吗？</p>
+            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} placeholder="回看来源，修订解释" />
             <div className="row">
               <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void saveReflection()}>写入日志</button>
               <button className="btn btn-primary" type="button" onClick={() => { setView('cockpit'); void persist({ stage: 'cockpit' }); }}>
-                带着这次航程再次出发
+                带上没解决的问题，再走一程
               </button>
             </div>
           </div>
