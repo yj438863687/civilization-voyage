@@ -98,7 +98,7 @@ export function TreasureShip() {
       side: THREE.DoubleSide,
       metalness: 0,
       emissive: cssColor('--cv-ship-sail', '#e8dcc6'),
-      emissiveIntensity: 0.16,
+      emissiveIntensity: 0.28,
     });
     const shade = mat(cssColor('--cv-ship-sail-shade', '#cdb994'), { roughness: 0.85 });
     const eye = mat(cssColor('--cv-ship-eye', '#f3ebdd'), { roughness: 0.4, metalness: 0.15, side: THREE.DoubleSide });

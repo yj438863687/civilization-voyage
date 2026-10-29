@@ -279,6 +279,7 @@ html[data-reduce-motion='true'] .overlay-side .paper {
   width: 100%;
 }
 .card-test { background-image: var(--cv-ledger-test-hatch); }
+.card-on { box-shadow: var(--cv-shadow-lamp); outline: 1px solid var(--cv-line-brass); }
 
 .ledger { display: flex; flex-direction: column; gap: var(--cv-space-2); }
 .ledger-block { padding-bottom: var(--cv-space-2); border-bottom: 1px solid var(--cv-line); }

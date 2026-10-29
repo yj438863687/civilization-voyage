@@ -716,27 +716,13 @@ export function App() {
           </div>
           <div className="overlay overlay-right">
             <div className="paper">
-              <h2 className="display title-panel">继续航程</h2>
-              <p className="muted">点一张卡片会回到你上次停的地方（驾驶舱、航线、海域或日志）。</p>
-              {voyages.length === 0 ? (
-                <StatusBanner kind="idle" text="还没有航程。先在左边起名，点「新航程」。" />
-              ) : (
-                <div className="list">
-                  {voyages.map((v) => (
-                    <button key={v.id} className="card" type="button" onClick={() => void loadVoyage(v.id)}>
-                      <strong>{v.title}</strong>
-                      <div className="muted">{v.stage} · {String(v.scene_snapshot.label ?? v.scene_id)}</div>
-                    </button>
-                  ))}
-                </div>
-              )}
-              <h3 className="display title-panel" style={{ marginTop: 24 }}>场景入口</h3>
+              <h2 className="display title-panel">场景入口</h2>
               <p className="muted">先点选一个，再点左边「新航程」。选中的卡片会作为这次出海的海域。</p>
               <div className="list">
                 {scenes.map((s) => (
                   <button
                     key={`${s.id}-${s.version}-${s.status}`}
-                    className={`card ${s.status === 'test' ? 'card-test' : ''}`}
+                    className={`card ${s.status === 'test' ? 'card-test' : ''} ${scenePick?.id === s.id && scenePick.status === s.status ? 'card-on' : ''}`}
                     type="button"
                     onClick={() => setScenePick(s)}
                   >
@@ -750,6 +736,20 @@ export function App() {
                   </button>
                 ))}
               </div>
+              <h3 className="display title-panel" style={{ marginTop: 24 }}>继续航程</h3>
+              <p className="muted">点一张卡片会回到你上次停的地方（驾驶舱、航线、海域或日志）。</p>
+              {voyages.length === 0 ? (
+                <StatusBanner kind="idle" text="还没有航程。先在左边起名，点「新航程」。" />
+              ) : (
+                <div className="list">
+                  {voyages.map((v) => (
+                    <button key={v.id} className="card" type="button" onClick={() => void loadVoyage(v.id)}>
+                      <strong>{v.title}</strong>
+                      <div className="muted">{v.stage} · {String(v.scene_snapshot.label ?? v.scene_id)}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </>
