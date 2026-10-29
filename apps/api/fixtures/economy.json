@@ -1,0 +1,1 @@
+{"label":"虚构测试资源，不是真实 HMT 或费用","balance":100,"capacity":20,"ports":{"test-port":{"name":"中性测试港","goods":{"test-cargo":{"buy":5,"sell":3,"stock":50}}}}}

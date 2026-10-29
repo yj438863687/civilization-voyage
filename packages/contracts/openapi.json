@@ -1,0 +1,1813 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Civilization Voyage API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models": {
+      "get": {
+        "summary": "Models",
+        "operationId": "models_models_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelInfo"
+                  },
+                  "type": "array",
+                  "title": "Response Models Models Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scenes": {
+      "get": {
+        "summary": "Scenes",
+        "operationId": "scenes_scenes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Scene"
+                  },
+                  "type": "array",
+                  "title": "Response Scenes Scenes Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scenes/candidates": {
+      "put": {
+        "summary": "Edit Scene",
+        "operationId": "edit_scene_scenes_candidates_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Scene"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scene"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scenes/{sid}/{version}/confirm": {
+      "post": {
+        "summary": "Confirm Scene",
+        "operationId": "confirm_scene_scenes__sid___version__confirm_post",
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Confirmation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scene"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages": {
+      "get": {
+        "summary": "List Voyages",
+        "operationId": "list_voyages_voyages_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Voyage"
+                  },
+                  "type": "array",
+                  "title": "Response List Voyages Voyages Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Voyage",
+        "operationId": "create_voyage_voyages_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoyageCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Voyage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}": {
+      "get": {
+        "summary": "Get Voyage",
+        "operationId": "get_voyage_voyages__vid__get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Voyage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Voyage",
+        "operationId": "update_voyage_voyages__vid__put",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoyageUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Voyage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/records": {
+      "post": {
+        "summary": "Add Record",
+        "operationId": "add_record_voyages__vid__records_post",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Record"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Records",
+        "operationId": "records_voyages__vid__records_get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Record"
+                  },
+                  "title": "Response Records Voyages  Vid  Records Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/ports": {
+      "get": {
+        "summary": "Ports",
+        "operationId": "ports_voyages__vid__ports_get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Port"
+                  },
+                  "title": "Response Ports Voyages  Vid  Ports Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/trades": {
+      "post": {
+        "summary": "Trade",
+        "operationId": "trade_voyages__vid__trades_post",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradeCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trade"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Trades",
+        "operationId": "trades_voyages__vid__trades_get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Trade"
+                  },
+                  "title": "Response Trades Voyages  Vid  Trades Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/tasks": {
+      "post": {
+        "summary": "Create Task",
+        "operationId": "create_task_voyages__vid__tasks_post",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Tasks",
+        "operationId": "tasks_voyages__vid__tasks_get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Task"
+                  },
+                  "title": "Response Tasks Voyages  Vid  Tasks Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/tasks/{tid}": {
+      "get": {
+        "summary": "Get Task",
+        "operationId": "get_task_voyages__vid__tasks__tid__get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/tasks/{tid}/cancel": {
+      "post": {
+        "summary": "Cancel Task",
+        "operationId": "cancel_task_voyages__vid__tasks__tid__cancel_post",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/tasks/{tid}/events": {
+      "get": {
+        "summary": "Events",
+        "operationId": "events_voyages__vid__tasks__tid__events_get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tid"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "After"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  },
+                  "title": "Response Events Voyages  Vid  Tasks  Tid  Events Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voyages/{vid}/usage": {
+      "get": {
+        "summary": "Usage",
+        "operationId": "usage_voyages__vid__usage_get",
+        "parameters": [
+          {
+            "name": "vid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Vid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Usage"
+                  },
+                  "title": "Response Usage Voyages  Vid  Usage Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Confirmation": {
+        "properties": {
+          "reviewer": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Reviewer"
+          },
+          "decision_note": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Decision Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reviewer",
+          "decision_note"
+        ],
+        "title": "Confirmation"
+      },
+      "Crew": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "confirmation": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed"
+            ],
+            "title": "Confirmation",
+            "default": "pending"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "role"
+        ],
+        "title": "Crew"
+      },
+      "Event": {
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "title": "Seq"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seq",
+          "task_id",
+          "kind",
+          "data"
+        ],
+        "title": "Event"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ModelInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Capabilities"
+          },
+          "credential_source": {
+            "type": "string",
+            "const": "server_environment",
+            "title": "Credential Source",
+            "default": "server_environment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "model",
+          "capabilities"
+        ],
+        "title": "ModelInfo"
+      },
+      "Port": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "goods": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Goods"
+          },
+          "resource_kind": {
+            "type": "string",
+            "const": "fictional_test_resource",
+            "title": "Resource Kind",
+            "default": "fictional_test_resource"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "goods"
+        ],
+        "title": "Port"
+      },
+      "Record": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "material",
+              "fragment",
+              "choice",
+              "artifact",
+              "log",
+              "reflection"
+            ],
+            "title": "Kind"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Text"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "historical_claim",
+              "counterfactual",
+              "creative",
+              "test"
+            ],
+            "title": "Classification"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "material_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Material Ids"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version",
+            "default": 1
+          },
+          "access": {
+            "type": "string",
+            "const": "private",
+            "title": "Access",
+            "default": "private"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "voyage_id": {
+            "type": "string",
+            "title": "Voyage Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "text",
+          "classification",
+          "id",
+          "voyage_id"
+        ],
+        "title": "Record"
+      },
+      "RecordCreate": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "material",
+              "fragment",
+              "choice",
+              "artifact",
+              "log",
+              "reflection"
+            ],
+            "title": "Kind"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Text"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "historical_claim",
+              "counterfactual",
+              "creative",
+              "test"
+            ],
+            "title": "Classification"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "material_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Material Ids"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version",
+            "default": 1
+          },
+          "access": {
+            "type": "string",
+            "const": "private",
+            "title": "Access",
+            "default": "private"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "text",
+          "classification"
+        ],
+        "title": "RecordCreate"
+      },
+      "Route": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "steps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "rationale": {
+            "type": "string",
+            "title": "Rationale"
+          },
+          "budget": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Budget"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "steps",
+          "rationale",
+          "budget",
+          "currency"
+        ],
+        "title": "Route"
+      },
+      "Scene": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "test",
+              "pending",
+              "confirmed"
+            ],
+            "title": "Status"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "background": {
+            "type": "string",
+            "title": "Background"
+          },
+          "cultural_core": {
+            "type": "string",
+            "title": "Cultural Core"
+          },
+          "questions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Questions"
+          },
+          "fragments": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Fragments"
+          },
+          "interactions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Interactions"
+          },
+          "economy": {
+            "type": "string",
+            "title": "Economy"
+          },
+          "educational_value": {
+            "type": "string",
+            "title": "Educational Value"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "needs_verification": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Needs Verification"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "status",
+          "label",
+          "background",
+          "cultural_core",
+          "questions",
+          "fragments",
+          "interactions",
+          "economy",
+          "educational_value",
+          "sources",
+          "needs_verification"
+        ],
+        "title": "Scene"
+      },
+      "Source": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "license": {
+            "type": "string",
+            "title": "License"
+          },
+          "verification": {
+            "type": "string",
+            "enum": [
+              "unverified",
+              "verified"
+            ],
+            "title": "Verification",
+            "default": "unverified"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "url",
+          "license"
+        ],
+        "title": "Source"
+      },
+      "Task": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "prompt": {
+            "type": "string",
+            "maxLength": 32000,
+            "minLength": 1,
+            "title": "Prompt"
+          },
+          "model_id": {
+            "type": "string",
+            "title": "Model Id"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "voyage_id": {
+            "type": "string",
+            "title": "Voyage Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "cancel_requested": {
+            "type": "boolean",
+            "title": "Cancel Requested",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "prompt",
+          "model_id",
+          "id",
+          "voyage_id",
+          "status"
+        ],
+        "title": "Task"
+      },
+      "TaskCreate": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "prompt": {
+            "type": "string",
+            "maxLength": 32000,
+            "minLength": 1,
+            "title": "Prompt"
+          },
+          "model_id": {
+            "type": "string",
+            "title": "Model Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "prompt",
+          "model_id"
+        ],
+        "title": "TaskCreate"
+      },
+      "Trade": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "port_id": {
+            "type": "string",
+            "title": "Port Id"
+          },
+          "good_id": {
+            "type": "string",
+            "title": "Good Id"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "buy",
+              "sell"
+            ],
+            "title": "Side"
+          },
+          "quantity": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "delta_balance": {
+            "type": "integer",
+            "title": "Delta Balance"
+          },
+          "delta_inventory": {
+            "type": "integer",
+            "title": "Delta Inventory"
+          },
+          "balance_after": {
+            "type": "integer",
+            "title": "Balance After"
+          },
+          "inventory_after": {
+            "type": "integer",
+            "title": "Inventory After"
+          },
+          "resource_kind": {
+            "type": "string",
+            "const": "fictional_test_resource",
+            "title": "Resource Kind",
+            "default": "fictional_test_resource"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "port_id",
+          "good_id",
+          "side",
+          "quantity",
+          "id",
+          "delta_balance",
+          "delta_inventory",
+          "balance_after",
+          "inventory_after"
+        ],
+        "title": "Trade"
+      },
+      "TradeCreate": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "port_id": {
+            "type": "string",
+            "title": "Port Id"
+          },
+          "good_id": {
+            "type": "string",
+            "title": "Good Id"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "buy",
+              "sell"
+            ],
+            "title": "Side"
+          },
+          "quantity": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "port_id",
+          "good_id",
+          "side",
+          "quantity"
+        ],
+        "title": "TradeCreate"
+      },
+      "Usage": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "elapsed_ms": {
+            "type": "integer",
+            "title": "Elapsed Ms"
+          },
+          "usage": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Usage"
+          },
+          "settlement": {
+            "type": "string",
+            "const": "not_connected",
+            "title": "Settlement",
+            "default": "not_connected"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "model",
+          "elapsed_ms",
+          "usage"
+        ],
+        "title": "Usage"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "Voyage": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "scene_id": {
+            "type": "string",
+            "title": "Scene Id",
+            "default": "neutral-test"
+          },
+          "scene_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Scene Version",
+            "default": 1
+          },
+          "scene_track": {
+            "type": "string",
+            "enum": [
+              "test",
+              "candidate",
+              "confirmed"
+            ],
+            "title": "Scene Track",
+            "default": "test"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question",
+            "default": ""
+          },
+          "shared_task": {
+            "type": "string",
+            "title": "Shared Task",
+            "default": ""
+          },
+          "crew": {
+            "items": {
+              "$ref": "#/components/schemas/Crew"
+            },
+            "type": "array",
+            "title": "Crew"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Route"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "scene_snapshot": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scene Snapshot"
+          },
+          "owner": {
+            "type": "string",
+            "const": "local",
+            "title": "Owner",
+            "default": "local"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "cockpit",
+              "route",
+              "world",
+              "reflection"
+            ],
+            "title": "Stage",
+            "default": "cockpit"
+          },
+          "world": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "World"
+          },
+          "balance": {
+            "type": "integer",
+            "title": "Balance"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "inventory": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Inventory"
+          },
+          "resource_kind": {
+            "type": "string",
+            "const": "fictional_test_resource",
+            "title": "Resource Kind",
+            "default": "fictional_test_resource"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "id",
+          "scene_snapshot",
+          "balance",
+          "capacity",
+          "inventory"
+        ],
+        "title": "Voyage"
+      },
+      "VoyageCreate": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "scene_id": {
+            "type": "string",
+            "title": "Scene Id",
+            "default": "neutral-test"
+          },
+          "scene_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Scene Version",
+            "default": 1
+          },
+          "scene_track": {
+            "type": "string",
+            "enum": [
+              "test",
+              "candidate",
+              "confirmed"
+            ],
+            "title": "Scene Track",
+            "default": "test"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question",
+            "default": ""
+          },
+          "shared_task": {
+            "type": "string",
+            "title": "Shared Task",
+            "default": ""
+          },
+          "crew": {
+            "items": {
+              "$ref": "#/components/schemas/Crew"
+            },
+            "type": "array",
+            "title": "Crew"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Route"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "VoyageCreate"
+      },
+      "VoyageUpdate": {
+        "properties": {
+          "stage": {
+            "type": "string",
+            "enum": [
+              "cockpit",
+              "route",
+              "world",
+              "reflection"
+            ],
+            "title": "Stage"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "shared_task": {
+            "type": "string",
+            "title": "Shared Task"
+          },
+          "crew": {
+            "items": {
+              "$ref": "#/components/schemas/Crew"
+            },
+            "type": "array",
+            "title": "Crew"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Route"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "world": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "World"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "stage",
+          "question",
+          "shared_task",
+          "crew",
+          "world"
+        ],
+        "title": "VoyageUpdate"
+      }
+    }
+  }
+}
