@@ -1,0 +1,269 @@
+/*
+ * 文明航程 Civilization Voyage · 设计变量
+ * 审美方向：墨海铜灯（Ink Sea & Brass Lamp），见 ART_DIRECTION.md
+ *
+ * 用法：前端直接 import 本文件，或复制到 apps/web/src/styles/tokens.css 后保持同步。
+ * 规则：组件只引用语义变量（--cv-surface-*、--cv-text-*、--cv-state-* 等），
+ *       不直接引用原始色阶（--cv-ink-*、--cv-paper-* 等）。
+ * 场景皮肤：在根节点设置 data-scene="A|B|C|test"，只覆盖 --cv-scene-* 变量。
+ */
+
+:root {
+  /* ---------- 原始色阶 ---------- */
+  /* 墨海：夜海、舱壁、底层表面 */
+  --cv-ink-950: #0b1418;
+  --cv-ink-900: #102027;
+  --cv-ink-850: #142830;
+  --cv-ink-800: #18303a;
+  --cv-ink-700: #24434f;
+  --cv-ink-600: #345966;
+  --cv-ink-500: #4b7280;
+
+  /* 纸：海图、日志、文化材料 */
+  --cv-paper-50: #f3ebdd;
+  --cv-paper-100: #e8dcc6;
+  --cv-paper-200: #dccaa9;
+  --cv-paper-300: #cdb994;
+  --cv-paper-ink: #2a2620; /* 纸面上的墨字 */
+  --cv-paper-ink-muted: #5d5446;
+
+  /* 铜：仪器、刻度、可操作的物理控件 */
+  --cv-brass-300: #dcbd84;
+  --cv-brass-400: #c9a15a;
+  --cv-brass-500: #ad8443;
+  --cv-brass-600: #8e6b32;
+
+  /* 海：航行、运行中 */
+  --cv-sea-300: #8cc4ca;
+  --cv-sea-400: #5fa6ae;
+  --cv-sea-500: #3e7c86;
+
+  /* 朱砂：用户的印、确认、失败 */
+  --cv-cinnabar-400: #d9694c;
+  --cv-cinnabar-500: #b6452c;
+  --cv-cinnabar-600: #9e3a26;
+
+  /* 玉：完成、成果 */
+  --cv-jade-300: #9bcbae;
+  --cv-jade-400: #6faf8a;
+  --cv-jade-500: #4e8c69;
+
+  /* 琥珀：资源不足、注意 */
+  --cv-amber-400: #d9973f;
+
+  /* 石板：未接入、禁用、测试 */
+  --cv-slate-300: #b3bdc1;
+  --cv-slate-400: #8a979c;
+  --cv-slate-600: #56636a;
+
+  /* ---------- 语义：表面 ---------- */
+  --cv-bg: var(--cv-ink-950);
+  --cv-surface-1: var(--cv-ink-900);       /* 舱内面板 */
+  --cv-surface-2: var(--cv-ink-850);       /* 面板内分组 */
+  --cv-surface-3: var(--cv-ink-800);       /* 悬停、选中行 */
+  --cv-surface-paper: var(--cv-paper-50);  /* 海图、日志、材料卡 */
+  --cv-surface-paper-2: var(--cv-paper-100);
+  --cv-hud-scrim: rgb(11 20 24 / 0.72);    /* 3D 之上的 HUD 底，非玻璃拟态，不加模糊 */
+  --cv-overlay-scrim: rgb(5 10 12 / 0.6);  /* 模态背后 */
+
+  /* ---------- 语义：文字 ---------- */
+  --cv-text: var(--cv-paper-50);
+  --cv-text-muted: #b9b0a0;
+  --cv-text-faint: #857e72;
+  --cv-text-on-paper: var(--cv-paper-ink);
+  --cv-text-on-paper-muted: var(--cv-paper-ink-muted);
+  --cv-text-accent: var(--cv-brass-400);
+
+  /* ---------- 语义：线 ---------- */
+  --cv-line: rgb(232 220 198 / 0.14);
+  --cv-line-strong: rgb(232 220 198 / 0.28);
+  --cv-line-brass: var(--cv-brass-600);
+  --cv-line-on-paper: rgb(42 38 32 / 0.18);
+  --cv-focus-ring: var(--cv-brass-300);
+
+  /* ---------- 语义：操作 ---------- */
+  --cv-action-primary-bg: var(--cv-cinnabar-500);   /* 用户落印：确认航程、启航 */
+  --cv-action-primary-text: var(--cv-paper-50);
+  --cv-action-primary-hover: var(--cv-cinnabar-400);
+  --cv-action-secondary-border: var(--cv-brass-500);
+  --cv-action-secondary-text: var(--cv-brass-300);
+  --cv-action-ghost-text: var(--cv-text-muted);
+
+  /* ---------- 语义：状态（每个状态都配图标与文字，颜色不单独承载含义） ---------- */
+  --cv-state-idle: var(--cv-slate-400);          /* 尚无航程 */
+  --cv-state-running: var(--cv-sea-400);         /* 正在执行 */
+  --cv-state-waiting: var(--cv-brass-400);       /* 等待用户选择 */
+  --cv-state-unconnected: var(--cv-slate-400);   /* 模型服务尚未接入（虚线边） */
+  --cv-state-failed: var(--cv-cinnabar-400);     /* 任务失败 */
+  --cv-state-insufficient: var(--cv-amber-400);  /* 资源不足 */
+  --cv-state-done: var(--cv-jade-400);           /* 成果已生成 */
+
+  /* ---------- 语义：内容性质标记 ---------- */
+  --cv-mark-fact: var(--cv-sea-300);          /* 史实（附出处） */
+  --cv-mark-counterfactual: var(--cv-brass-300); /* 反事实推演 */
+  --cv-mark-creative: #c9a3d6;                /* 未来创作 / 虚构 */
+  --cv-mark-ai-pending: var(--cv-amber-400);  /* AI 推荐，待组员确认 */
+  --cv-mark-test: var(--cv-slate-300);        /* 测试数据 */
+  --cv-mark-dissent: var(--cv-cinnabar-400);  /* 分歧 / 不同观点 */
+
+  /* ---------- 语义：两本账 ---------- */
+  --cv-ledger-real: var(--cv-sea-300);        /* 真实模型用量（尚未接入时显示 unconnected） */
+  --cv-ledger-story: var(--cv-brass-400);     /* 剧情资源 */
+  --cv-ledger-test-hatch: repeating-linear-gradient(
+    -45deg,
+    rgb(179 189 193 / 0.16) 0 6px,
+    transparent 6px 12px
+  );
+
+  /* ---------- 字体 ---------- */
+  --cv-font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  --cv-font-body: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", system-ui, sans-serif;
+  --cv-font-mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+
+  --cv-text-xs: 0.75rem;    /* 12 标签、刻度 */
+  --cv-text-sm: 0.875rem;   /* 14 次要正文、HUD */
+  --cv-text-md: 1rem;       /* 16 正文 */
+  --cv-text-lg: 1.25rem;    /* 20 面板标题 */
+  --cv-text-xl: 1.625rem;   /* 26 页面标题 */
+  --cv-text-2xl: 2.25rem;   /* 36 航程名、章节 */
+  --cv-text-3xl: 3.25rem;   /* 52 首屏标题，仅启航页 */
+
+  --cv-leading-tight: 1.25;
+  --cv-leading-body: 1.7;   /* 中文正文偏松 */
+  --cv-tracking-label: 0.08em;
+
+  --cv-weight-regular: 400;
+  --cv-weight-medium: 500;
+  --cv-weight-bold: 600;
+
+  /* ---------- 间距（4 基准） ---------- */
+  --cv-space-1: 4px;
+  --cv-space-2: 8px;
+  --cv-space-3: 12px;
+  --cv-space-4: 16px;
+  --cv-space-5: 20px;
+  --cv-space-6: 24px;
+  --cv-space-8: 32px;
+  --cv-space-10: 40px;
+  --cv-space-12: 48px;
+  --cv-space-16: 64px;
+
+  /* ---------- 尺寸 ---------- */
+  --cv-touch-min: 44px;
+  --cv-control-sm: 32px;
+  --cv-control-md: 40px;
+  --cv-control-lg: 48px;
+  --cv-hud-edge: 16px;             /* HUD 距视口边缘，手机加 safe-area */
+  --cv-panel-side-w: 360px;        /* 侧栏面板 */
+  --cv-panel-wide-w: 480px;        /* 任务 / 材料面板 */
+  --cv-reading-max: 68ch;          /* 日志与材料阅读宽度 */
+  --cv-crew-seat: 64px;            /* 船员席位头像 */
+
+  /* ---------- 圆角：海图纸与铜件，不用大圆角 ---------- */
+  --cv-radius-xs: 2px;
+  --cv-radius-sm: 4px;
+  --cv-radius-md: 8px;
+  --cv-radius-round: 999px;        /* 仅限状态点与船员席位 */
+
+  /* ---------- 材质与阴影 ---------- */
+  --cv-shadow-paper: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 8px 24px rgb(0 0 0 / 0.35);
+  --cv-shadow-panel: 0 12px 32px rgb(0 0 0 / 0.45);
+  --cv-shadow-lamp: 0 0 0 1px rgb(201 161 90 / 0.25), 0 0 24px rgb(201 161 90 / 0.12); /* 仅焦点对象，单屏最多一处 */
+  --cv-border-brass: 1px solid var(--cv-line-brass);
+  --cv-border-unconnected: 1px dashed var(--cv-state-unconnected);
+
+  /* ---------- 层级 ---------- */
+  --cv-z-world: 0;        /* 3D 画布 */
+  --cv-z-world-label: 10; /* 港口名、碎片标记（随 3D 投影） */
+  --cv-z-hud: 20;
+  --cv-z-panel: 30;
+  --cv-z-drawer: 40;
+  --cv-z-modal: 50;
+  --cv-z-toast: 60;
+
+  /* ---------- 动效 ---------- */
+  --cv-dur-instant: 80ms;   /* 按下反馈 */
+  --cv-dur-fast: 160ms;     /* 悬停、切换 */
+  --cv-dur-base: 240ms;     /* 面板进出 */
+  --cv-dur-slow: 480ms;     /* 页面过渡 */
+  --cv-dur-camera: 1200ms;  /* 镜头切换 */
+  --cv-ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --cv-ease-in-out: cubic-bezier(0.6, 0, 0.3, 1);
+  --cv-ease-swell: cubic-bezier(0.45, 0.05, 0.35, 1); /* 船体起伏、镜头 */
+
+  /* ---------- 场景皮肤（默认：中性夜海） ---------- */
+  --cv-scene-accent: var(--cv-brass-400);
+  --cv-scene-sky-top: #0d1a20;
+  --cv-scene-sky-horizon: #2b4650;
+  --cv-scene-fog: #1c3139;
+  --cv-scene-water: #123039;
+  --cv-scene-light: #f1d9a8;        /* 主光色温 */
+  --cv-scene-display-font: var(--cv-font-display);
+  --cv-scene-label: "";
+}
+
+/* ---------- 场景皮肤：只覆盖 --cv-scene-*，均为 AI 推荐待确认 ---------- */
+
+/* A 候选：宋元泉州港 · 古风 */
+[data-scene="A"] {
+  --cv-scene-accent: #c58b4b;       /* 瓷土与船木 */
+  --cv-scene-sky-top: #1b2430;
+  --cv-scene-sky-horizon: #b98a5e;  /* 黄昏港湾 */
+  --cv-scene-fog: #6d6253;
+  --cv-scene-water: #23413f;
+  --cv-scene-light: #f3c98b;
+  --cv-scene-label: "场景 A · AI 推荐，待组员确认";
+}
+
+/* B 候选：集装箱化港口 · 现代 */
+[data-scene="B"] {
+  --cv-scene-accent: #d27a3a;       /* 安全橙 */
+  --cv-scene-sky-top: #1a2229;
+  --cv-scene-sky-horizon: #5c6f7a;
+  --cv-scene-fog: #4a565d;
+  --cv-scene-water: #1e3340;
+  --cv-scene-light: #e6eef2;        /* 钠灯与日光混合，偏冷 */
+  --cv-scene-label: "场景 B · AI 推荐，待组员确认";
+}
+
+/* C 候选：海平面上升后的漂浮港 · 未来 */
+[data-scene="C"] {
+  --cv-scene-accent: #7fd1c2;
+  --cv-scene-sky-top: #0c1420;
+  --cv-scene-sky-horizon: #3d5a6e;
+  --cv-scene-fog: #2a3d4c;
+  --cv-scene-water: #0f2e3a;
+  --cv-scene-light: #cfe7ff;
+  --cv-scene-label: "场景 C · AI 推荐，待组员确认";
+}
+
+/* 中性测试海域：灰网格，明确不是任何文明 */
+[data-scene="test"] {
+  --cv-scene-accent: var(--cv-slate-300);
+  --cv-scene-sky-top: #15191b;
+  --cv-scene-sky-horizon: #3a4246;
+  --cv-scene-fog: #2a3033;
+  --cv-scene-water: #1f2629;
+  --cv-scene-light: #ffffff;
+  --cv-scene-label: "测试海域 · 虚构数据";
+}
+
+/* ---------- 偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cv-dur-fast: 0ms;
+    --cv-dur-base: 120ms;   /* 保留淡入淡出，去掉位移 */
+    --cv-dur-slow: 160ms;
+    --cv-dur-camera: 0ms;   /* 镜头直切 */
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --cv-text-muted: #ddd3c2;
+    --cv-text-faint: #b9b0a0;
+    --cv-line: rgb(232 220 198 / 0.4);
+    --cv-line-strong: rgb(232 220 198 / 0.7);
+    --cv-hud-scrim: rgb(11 20 24 / 0.92);
+  }
+}
