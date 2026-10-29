@@ -95,6 +95,27 @@ export function StatusBanner({
   );
 }
 
+export function Coach({
+  step,
+  title,
+  body,
+  next,
+}: {
+  step: string;
+  title: string;
+  body: string;
+  next: string;
+}) {
+  return (
+    <div className="coach">
+      <div className="label">{step}</div>
+      <div className="coach-title">{title}</div>
+      <p className="coach-body">{body}</p>
+      <p className="coach-next">下一步：{next}</p>
+    </div>
+  );
+}
+
 export function StageBar({ stage }: { stage: string }) {
   const items = [
     ['cockpit', '驾驶舱'],

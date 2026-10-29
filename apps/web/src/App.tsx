@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, newRequestId } from './api/client';
 import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Task, type TaskEvent, type Trade, type Usage, type Voyage, type VoyageRecord } from './api/types';
-import { Ledgers, StageBar, Stamp, StatusBanner } from './components/ui';
+import { Coach, Ledgers, StageBar, Stamp, StatusBanner } from './components/ui';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
 import { WORLD } from './world/world.config';
 
@@ -44,6 +44,67 @@ const DEFAULT_CREW: Crew[] = [
 ];
 
 type View = 'embark' | Stage | 'port' | 'collaborate';
+
+function guide(view: View, ctx: { connected: boolean; hasQuestion: boolean; nearPort: boolean; hasVoyages: boolean }) {
+  if (view === 'embark') {
+    return {
+      step: '第 1 步 · 启航港',
+      title: '先选海域，再开一条航程',
+      body: '右边先点一个场景：测试海域用来练手；A/B/C 是 AI 推荐，还没经组员确认。起个航程名，点朱砂色「新航程」。有旧航程就点右边卡片继续。模型没接也能玩，船员暂时不会真的回话。',
+      next: ctx.hasVoyages ? '点「新航程」，或点右边一张旧航程卡片' : '点「新航程」进入驾驶舱',
+    };
+  }
+  if (view === 'cockpit') {
+    return {
+      step: '第 2 步 · 驾驶舱',
+      title: '写下你想弄清的文化问题',
+      body: '左边是船员席。中间输入框用来提问。右边任务卡会记下问题和共同任务。没有接模型时不会出现假回复。问题写好后才能点「确认航程」出海。',
+      next: ctx.hasQuestion ? '检查右边任务卡，点「确认航程」' : '在输入框或右边写下文化问题，再点「确认航程」',
+    };
+  }
+  if (view === 'route') {
+    return {
+      step: '第 3 步 · 海图',
+      title: '选一条探索方式，再出海',
+      body: '上面一条步骤少、不一定调用模型；下面一条步骤多，接了模型才会真的查阅。费用高不代表更正确。真实用量没接入时显示「尚未接入」，右边两本账上面是真实费用、下面是剧情测试补给。',
+      next: '点中一条航线，再点「按此航线启航」',
+    };
+  }
+  if (view === 'world') {
+    return {
+      step: '第 4 步 · 海域',
+      title: ctx.nearPort ? '已经靠近港口' : '把船开到测试港',
+      body: ctx.nearPort
+        ? '你进入了港口范围。点中央「靠港」才会停船、打开港口面板，才能买卖测试货物。'
+        : 'W 前进、S 后退、A/D 转向，或用左下摇杆。东南方那组灰色体块是中性测试港。看见纸签可以靠近，把碎片收入货舱。右下「志」打开日志。',
+      next: ctx.nearPort ? '点「靠港」' : '朝东南方体块开过去，进入范围后点「靠港」',
+    };
+  }
+  if (view === 'port') {
+    return {
+      step: '靠港 · 测试港',
+      title: '这里只是测试买卖和碎片',
+      body: '货物带「测试」印章，数字是虚构补给，不是 HMT、也不是真钱。买入/卖出由服务器记账。可以把测试碎片收入货舱，或请船员解释（没接模型会明确说尚未接入）。',
+      next: '试一次买入，或点「打开航海日志」结束本轮',
+    };
+  }
+  if (view === 'collaborate') {
+    return {
+      step: '协作 · 解释与选择',
+      title: '过程要看得见，选择由你来定',
+      body: ctx.connected
+        ? '船员查阅时，下面会列出可观察事件（开始、结果、失败），不会展示隐藏推理。你也可以自己写一段解释，点「采纳此解释」记入航程。'
+        : '模型尚未接入，不会编造船员发言。你可以自己写解释并采纳，或先回港口、去日志。',
+      next: ctx.connected ? '看事件，或写下解释后点「采纳此解释」' : '自己写一段解释并采纳，或点右下「志」去日志',
+    };
+  }
+  return {
+    step: '反思 · 航海日志',
+    title: '看看你改了什么，再决定要不要再走一趟',
+    body: '上面是这次收集的材料和出处。两本账分开：真实用量没接入就是「尚未接入」；剧情补给是测试数。下面三个问题帮你回想。写完点「写入日志」。还可以带着这次航程再回驾驶舱。',
+    next: '回答下面的问题并「写入日志」，或点「带着这次航程再次出发」',
+  };
+}
 
 function sceneAttr(voyage: Voyage | null, pick?: Scene | null) {
   const id = voyage?.scene_id ?? pick?.id ?? 'test';
@@ -499,8 +560,15 @@ export function App() {
         : busy
           ? { kind: 'running' as const, text: '正在执行…' }
           : view === 'world' && nearPort
-            ? { kind: 'waiting' as const, text: `接近 ${WORLD.ports.find((p) => p.id === nearPort)?.name ?? nearPort}` }
+            ? { kind: 'waiting' as const, text: `接近 ${WORLD.ports.find((p) => p.id === nearPort)?.name ?? nearPort}。点「靠港」。` }
             : { kind: 'idle' as const, text: voyage.question || '航程进行中' };
+
+  const tip = guide(view, {
+    connected,
+    hasQuestion: Boolean(question.trim()),
+    nearPort: Boolean(nearPort),
+    hasVoyages: voyages.length > 0,
+  });
 
   return (
     <>
@@ -561,24 +629,33 @@ export function App() {
             )}
           </div>
           <div className="hud hud-br">
-            <button className="btn btn-icon" type="button" onClick={() => setView('embark')} title="启航">港</button>
-            <button className="btn btn-icon" type="button" onClick={() => setView('cockpit')} title="驾驶舱">舱</button>
-            <button className="btn btn-icon" type="button" onClick={() => setView('route')} title="海图">图</button>
-            <button className="btn btn-icon" type="button" onClick={() => setView('world')} title="海域">航</button>
-            <button className="btn btn-icon" type="button" onClick={() => void goReflect()} title="日志">志</button>
-            <button className="btn btn-icon" type="button" onClick={() => setComms(true)} title="通讯台">讯</button>
-            <button className="btn btn-icon" type="button" onClick={() => setReduceMotion((v) => !v)} title="减少动态">
-              {reduceMotion ? '静' : '动'}
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('embark')}>启航</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('cockpit')}>驾驶舱</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('route')}>航线</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('world')}>出海</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => void goReflect()}>日志</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setReduceMotion((v) => !v)}>
+              {reduceMotion ? '减少动态开' : '减少动态'}
             </button>
           </div>
         </>
+      )}
+
+      {view !== 'embark' && (
+        <div className={`coach-bar ${view === 'world' ? 'coach-bar-top' : ''}`}>
+          <div className="scrim">
+            <div className="label">{tip.step}</div>
+            <div>{tip.next}</div>
+          </div>
+        </div>
       )}
 
       {view === 'embark' && (
         <>
           <div className="overlay overlay-left">
             <h1 className="display title-hero">文明航程</h1>
-            <p className="muted">一艘可以穿行不同文明时空的船。先形成问题，再出海。</p>
+            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <p className="faint">船为宝船意象概念设计，不是考古复原，不冒充任何一艘历史原船。</p>
             <div className="field">
               <span className="label">航程名</span>
@@ -611,8 +688,9 @@ export function App() {
           <div className="overlay overlay-right">
             <div className="paper">
               <h2 className="display title-panel">继续航程</h2>
+              <p className="muted">点一张卡片会回到你上次停的地方（驾驶舱、航线、海域或日志）。</p>
               {voyages.length === 0 ? (
-                <StatusBanner kind="idle" text="还没有航程。" />
+                <StatusBanner kind="idle" text="还没有航程。先在左边起名，点「新航程」。" />
               ) : (
                 <div className="list">
                   {voyages.map((v) => (
@@ -624,6 +702,7 @@ export function App() {
                 </div>
               )}
               <h3 className="display title-panel" style={{ marginTop: 24 }}>场景入口</h3>
+              <p className="muted">先点选一个，再点左边「新航程」。选中的卡片会作为这次出海的海域。</p>
               <div className="list">
                 {scenes.map((s) => (
                   <button
@@ -658,7 +737,13 @@ export function App() {
             ))}
           </div>
           <div className="panel" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <div className="chat">
+              {chat.length === 0 && (
+                <div className="bubble bubble-sys">
+                  还没有对话。在下面输入框写你想探索的问题，例如「这座港口为什么能让不同语言的人做生意？」点发送。没接模型时我们只会告诉你尚未接入，不会假装船员在说话。
+                </div>
+              )}
               {chat.map((m, i) => (
                 <div key={i} className={`bubble bubble-${m.who === 'user' ? 'user' : m.who === 'crew' ? 'crew' : 'sys'}`}>
                   {m.role && <div className="label">{m.role}</div>}
@@ -683,6 +768,7 @@ export function App() {
           </div>
           <div className="paper">
             <h2 className="display title-panel">航程任务</h2>
+            <p className="muted">文化问题是这次出海要弄清的事。共同任务是你和船员一起做的事。都填好再落印。</p>
             <div className="field">
               <span className="label">文化问题</span>
               <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
@@ -707,7 +793,7 @@ export function App() {
         <div className="overlay overlay-right">
           <div className="paper">
             <h2 className="display title-panel">航线与资源</h2>
-            <p className="muted">步骤多、成本高不代表结论更正确。</p>
+            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <div className="list">
               {ROUTES.map((r) => (
                 <button key={r.id} className="card" type="button" onClick={() => setRouteId(r.id)} style={{ boxShadow: routeId === r.id ? 'var(--cv-shadow-lamp)' : undefined }}>
@@ -733,6 +819,7 @@ export function App() {
             接近 {WORLD.ports.find((p) => p.id === nearPort)?.name}
             <Stamp kind="test">测试</Stamp>
           </div>
+          <p className="muted">点「靠港」才会停船并打开港口买卖。不点可以继续开。</p>
           <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void dock()}>
             靠港
           </button>
@@ -742,6 +829,7 @@ export function App() {
       {view === 'world' && nearFragment && (
         <div className="prompt-center scrim" style={{ bottom: '28%' }}>
           <div>{WORLD.fragments.find((f) => f.id === nearFragment)?.title}</div>
+          <p className="muted">这是测试碎片。点「收入货舱」会记入本航程材料，可在日志里看到出处。</p>
           <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void collectFragment()}>
             收入货舱
           </button>
@@ -752,6 +840,7 @@ export function App() {
         <div className="overlay overlay-right">
           <div className="paper">
             <h2 className="display title-panel">测试港</h2>
+            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <Stamp kind="test">测试数据 · 素材待补</Stamp>
             <p>{ports[0]?.name ?? '中性测试港'}。体块与剪影，不代表真实港口。</p>
             {ports[0] &&
@@ -788,6 +877,7 @@ export function App() {
         <div className="overlay overlay-right">
           <div className="paper">
             <h2 className="display title-panel">与 Agents 协作</h2>
+            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <StatusBanner
               kind={connected ? (busy ? 'running' : 'waiting') : 'unconnected'}
               text={connected ? '可观察事件见下方。选择或补充解释。' : '模型服务尚未接入，不能生成假解释。'}
@@ -850,6 +940,7 @@ export function App() {
         <div className="overlay" style={{ inset: 0, display: 'grid', placeItems: 'center', padding: 24 }}>
           <div className="paper" style={{ maxWidth: '68ch', width: 'min(720px, 100%)', maxHeight: '90vh', overflow: 'auto' }}>
             <h2 className="display title-page">{voyage.title}</h2>
+            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <Stamp kind="creative">概念创作</Stamp>
             <p>{voyage.shared_task || '尚未形成共同任务。'}</p>
             <h3 className="display title-panel">材料与出处</h3>
@@ -866,7 +957,8 @@ export function App() {
             <h3 className="display title-panel">两本账结算</h3>
             <Ledgers connected={usage.length > 0} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
             <h3 className="display title-panel">反思</h3>
-            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} placeholder="这次选择改变了什么？" />
+            <p className="muted">可以写：我选择了什么？依据是哪条材料？还有什么没核实？下次想把哪条航线走深？</p>
+            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} placeholder="这次选择改变了什么？依据是什么？还有哪一点需要核实？" />
             <div className="row">
               <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void saveReflection()}>写入日志</button>
               <button className="btn btn-primary" type="button" onClick={() => { setView('cockpit'); void persist({ stage: 'cockpit' }); }}>
@@ -880,7 +972,7 @@ export function App() {
       {comms && (
         <div className="drawer">
           <h2 className="display title-panel">通讯台</h2>
-          <p className="muted">凭据只通过服务端环境变量提供，前端不收集密钥。</p>
+          <p className="muted">这里只查看模型是否已接入。本基础版不在网页里填密钥，避免写进浏览器。要接模型，请到 apps/api 按 .env.example 配置后重启后端。没接也能把测试航程走完。</p>
           <div className={connected ? '' : 'unconnected'}>
             {connected
               ? models.map((m) => (
