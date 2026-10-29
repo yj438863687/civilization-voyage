@@ -157,6 +157,18 @@ export function Atmosphere({ test, reduceMotion }: { test: boolean; reduceMotion
             <planeGeometry args={[1.6, 1.1]} />
             <meshStandardMaterial color="#c9a15a" side={THREE.DoubleSide} roughness={0.7} />
           </mesh>
+          <mesh position={[0, 9, 0]}>
+            <cylinderGeometry args={[0.04, 0.18, 18, 6]} />
+            <meshBasicMaterial color={cssVar('--cv-ship-lamp-warm', '#f0b46a')} transparent opacity={0.22} depthWrite={false} />
+          </mesh>
+          <mesh position={[0, 18.2, 0]} rotation={[0, 0.6, 0]}>
+            <coneGeometry args={[0.9, 1.6, 4]} />
+            <meshStandardMaterial
+              color={cssVar('--cv-ship-trim', '#c9a15a')}
+              emissive={cssVar('--cv-ship-lamp-warm', '#f0b46a')}
+              emissiveIntensity={0.55}
+            />
+          </mesh>
         </group>
       ))}
       {WORLD.fragments.map((f) => (

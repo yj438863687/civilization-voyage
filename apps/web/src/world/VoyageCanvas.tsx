@@ -1,11 +1,12 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { cameraDurationMs, desiredPose, easeSwell, type CamMode } from './camera';
+import { bootPushPose, desiredPose, easeSwell, type CamMode } from './camera';
+import { Cabin } from './Cabin';
 import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
 import { WORLD } from './world.config';
-import { FOLLOW_TAU, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, SHIP_MOTION } from './voyageConstants';
+import { BLEND_SEC, FOLLOW_TAU, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, SHIP_MOTION } from './voyageConstants';
 
 export type { CamMode };
 
@@ -70,6 +71,39 @@ function Wake({ speedRef, reduceMotion }: { speedRef: React.MutableRefObject<num
   );
 }
 
+function DestLine({
+  ship,
+  visible,
+}: {
+  ship: React.RefObject<THREE.Group | null>;
+  visible: boolean;
+}) {
+  const obj = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+    const mat = new THREE.LineBasicMaterial({
+      color: '#c9a15a',
+      transparent: true,
+      opacity: 0.42,
+      depthWrite: false,
+    });
+    const line = new THREE.Line(geo, mat);
+    line.frustumCulled = false;
+    return line;
+  }, []);
+  useFrame(() => {
+    obj.visible = visible;
+    const g = ship.current;
+    if (!g || !visible) return;
+    const p = WORLD.ports[0];
+    const arr = obj.geometry.getAttribute('position') as THREE.BufferAttribute;
+    arr.setXYZ(0, g.position.x, 0.25, g.position.z);
+    arr.setXYZ(1, p.x, 1.2, p.z);
+    arr.needsUpdate = true;
+  });
+  return <primitive object={obj} />;
+}
+
 function Rig({
   mode,
   reduceMotion,
@@ -84,12 +118,14 @@ function Rig({
   const speed = useRef(0);
   const followYaw = useRef(0);
   const heel = useRef(0);
+  const followOff = useRef({ back: SHIP_L * 1.1, right: SHIP_L * 0.55, height: 8.2, lookY: 3.4 });
   const restoredOnce = useRef(false);
   const blend = useRef(1);
   const blendFrom = useRef<THREE.Vector3>(new THREE.Vector3());
   const lookFrom = useRef<THREE.Vector3>(new THREE.Vector3());
   const fovFrom = useRef(42);
   const prevMode = useRef(mode);
+  const fromMode = useRef(mode);
   const skip = useRef(false);
   const booted = useRef(false);
   const lastBlendNote = useRef(1);
@@ -186,6 +222,7 @@ function Rig({
     }
 
     if (prevMode.current !== mode) {
+      fromMode.current = prevMode.current;
       blendFrom.current.copy(camera.position);
       lookFrom.current.copy(look);
       fovFrom.current = persp.fov;
@@ -194,27 +231,59 @@ function Rig({
       prevMode.current = mode;
     }
 
-    const dur = Math.max(0.001, cameraDurationMs() / 1000);
+    const dur = Math.max(0.001, reduceMotion ? 0.001 : BLEND_SEC[mode] ?? 1.2);
     if (skip.current || reduceMotion) blend.current = 1;
     else blend.current = Math.min(1, blend.current + clamped / dur);
     const k = easeSwell(blend.current);
-    camera.position.lerpVectors(blendFrom.current, pose.pos, k);
-    look.lerpVectors(lookFrom.current, pose.look, k);
-    camera.up.copy(pose.up);
-    camera.lookAt(look);
-    persp.fov = THREE.MathUtils.lerp(fovFrom.current, pose.fov, k);
-    persp.updateProjectionMatrix();
+
+    const useBoot =
+      mode === 'cockpit' && fromMode.current === 'embark' && blend.current < 1 && !reduceMotion && !skip.current;
+
+    if (useBoot) {
+      const boot = bootPushPose(blend.current, g.position, tmpFwd, tmpRight);
+      camera.position.copy(boot.pos);
+      look.copy(boot.look);
+      camera.up.copy(UP);
+      camera.lookAt(look);
+      persp.fov = boot.fov;
+      persp.updateProjectionMatrix();
+    } else if (mode === 'follow' && blend.current >= 1) {
+      const dist = SHIP_L * 1.35;
+      const az = (35 * Math.PI) / 180;
+      const el = (18 * Math.PI) / 180;
+      const dBack = dist * Math.cos(az) * Math.cos(el);
+      const dRight = dist * Math.sin(az) * Math.cos(el);
+      const dHeight = dist * Math.sin(el) + 2;
+      const turnRate = input.turn * WORLD.ship.turn;
+      const extra = Math.min(Math.abs(turnRate) / ((60 * Math.PI) / 180), 1) * 0.12 * SHIP_L * Math.sign(turnRate || 1);
+      const damp = (cur: number, target: number, t: number) =>
+        reduceMotion ? target : target + (cur - target) * Math.exp(-clamped / t);
+      followOff.current.back = damp(followOff.current.back, dBack, FOLLOW_TAU.dist);
+      followOff.current.right = damp(followOff.current.right, dRight + extra, FOLLOW_TAU.lateral);
+      followOff.current.height = damp(followOff.current.height, dHeight, FOLLOW_TAU.height);
+      followOff.current.lookY = damp(followOff.current.lookY, 3.4, FOLLOW_TAU.pitch);
+      camera.position
+        .copy(g.position)
+        .addScaledVector(laggedFwd, -followOff.current.back)
+        .addScaledVector(laggedRight, followOff.current.right)
+        .addScaledVector(UP, followOff.current.height);
+      look.copy(g.position).addScaledVector(laggedFwd, 0.6 * SHIP_L).setY(followOff.current.lookY);
+      camera.up.copy(UP);
+      camera.lookAt(look);
+      persp.fov = pose.fov;
+      persp.updateProjectionMatrix();
+    } else {
+      camera.position.lerpVectors(blendFrom.current, pose.pos, k);
+      look.lerpVectors(lookFrom.current, pose.look, k);
+      camera.up.copy(pose.up);
+      camera.lookAt(look);
+      persp.fov = THREE.MathUtils.lerp(fovFrom.current, pose.fov, k);
+      persp.updateProjectionMatrix();
+    }
     const note = blend.current < 0.98 ? 0 : 1;
     if (note !== lastBlendNote.current) {
       lastBlendNote.current = note;
       onBlend?.(blend.current);
-    }
-
-    if (mode === 'follow' && blend.current >= 1 && !reduceMotion) {
-      const followK = 1 - Math.exp(-clamped / tau);
-      camera.position.lerp(pose.pos, followK);
-      look.lerp(pose.look, followK);
-      camera.lookAt(look);
     }
 
     let nearPort: string | null = null;
@@ -244,12 +313,16 @@ function Rig({
   });
 
   return (
-    <group ref={ship} position={[WORLD.spawn.x, 0, WORLD.spawn.z]}>
-      <group ref={rock}>
-        <TreasureShip />
-        <Wake speedRef={speed} reduceMotion={reduceMotion} />
+    <>
+      <group ref={ship} position={[WORLD.spawn.x, 0, WORLD.spawn.z]}>
+        <group ref={rock}>
+          <TreasureShip />
+          <Cabin />
+          <Wake speedRef={speed} reduceMotion={reduceMotion} />
+        </group>
       </group>
-    </group>
+      <DestLine ship={ship} visible={mode === 'follow' || mode === 'route'} />
+    </>
   );
 }
 
@@ -302,12 +375,4 @@ export function VoyageCanvas(props: Props) {
   );
 }
 
-export function attachControlSelfTest(getShip: () => THREE.Object3D | null) {
-  (window as unknown as { __selfTestControls?: () => string }).__selfTestControls = () => {
-    const ship = getShip();
-    if (!ship) return 'no-ship';
-    const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(ship.quaternion);
-    const right = new THREE.Vector3().crossVectors(fwd, UP);
-    return `fwd=${fwd.toArray().map((n) => n.toFixed(2)).join(',')} right=${right.toArray().map((n) => n.toFixed(2)).join(',')}`;
-  };
-}
+

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { bentSail, buildHullGeometry, DECK_Y, SHIP_B, SHIP_L } from './hull';
+import { bentSail, buildHullGeometry, DECK_Y, SHIP_B, SHIP_L, STERN_HALL } from './hull';
 
 export { SHIP_L, SHIP_B };
 
@@ -57,6 +57,45 @@ function Mast({
           </mesh>
         </>
       )}
+    </group>
+  );
+}
+
+function WallBox({
+  pos,
+  size,
+  material,
+}: {
+  pos: [number, number, number];
+  size: [number, number, number];
+  material: THREE.Material;
+}) {
+  return (
+    <mesh position={pos} material={material} castShadow receiveShadow>
+      <boxGeometry args={size} />
+    </mesh>
+  );
+}
+
+function SternHall({ lacquer }: { lacquer: THREE.Material }) {
+  const { w, d, h, z, wall, winW, winH, winY } = STERN_HALL;
+  const yMid = DECK_Y + h / 2;
+  const y0 = DECK_Y;
+  const y1 = DECK_Y + h;
+  const frontZ = z - d / 2 + wall / 2;
+  const backZ = z + d / 2 - wall / 2;
+  const side = (w - winW) / 2;
+  const winBot = winY - winH / 2;
+  const winTop = winY + winH / 2;
+  return (
+    <group>
+      <WallBox pos={[-(winW / 2 + side / 2), yMid, frontZ]} size={[side, h, wall]} material={lacquer} />
+      <WallBox pos={[winW / 2 + side / 2, yMid, frontZ]} size={[side, h, wall]} material={lacquer} />
+      <WallBox pos={[0, (y0 + winBot) / 2, frontZ]} size={[winW, Math.max(0.08, winBot - y0), wall]} material={lacquer} />
+      <WallBox pos={[0, (winTop + y1) / 2, frontZ]} size={[winW, Math.max(0.08, y1 - winTop), wall]} material={lacquer} />
+      <WallBox pos={[0, yMid, backZ]} size={[w, h, wall]} material={lacquer} />
+      <WallBox pos={[-w / 2 + wall / 2, yMid, z]} size={[wall, h, d]} material={lacquer} />
+      <WallBox pos={[w / 2 - wall / 2, yMid, z]} size={[wall, h, d]} material={lacquer} />
     </group>
   );
 }
@@ -162,9 +201,7 @@ export function TreasureShip() {
       <mesh position={[-SHIP_B * 0.362, 1.42, -half + 1.15]} rotation={[0, -Math.PI / 2, 0]} material={M.pupil}>
         <circleGeometry args={[0.12, 12]} />
       </mesh>
-      <mesh position={[0, DECK_Y + 1.2, half - SHIP_L * 0.145]} material={M.lacquer} castShadow>
-        <boxGeometry args={[SHIP_B * 0.92, 2.4, SHIP_L * 0.24]} />
-      </mesh>
+      <SternHall lacquer={M.lacquer} />
       <Roof w={SHIP_B * 0.92} d={SHIP_L * 0.24} y={DECK_Y + 2.45} z={half - SHIP_L * 0.145} trim={M.trim} />
       <mesh position={[0, DECK_Y + 2.85, half - SHIP_L * 0.12]} material={M.lacquer} castShadow>
         <boxGeometry args={[SHIP_B * 0.74, 1.45, SHIP_L * 0.17]} />

@@ -624,7 +624,33 @@ export function App() {
                 <div className="mono">
                   航向 {ship ? Math.round((ship.headingDeg + 360) % 360) : '—'}° · 速度 {ship ? ship.speed.toFixed(1) : '0'}
                 </div>
-                <div className="faint">{nearPort ? '已进入港口范围' : '驶向中性测试港（东南方体块）'}</div>
+                <div className="compass" aria-label="罗盘">
+                  <div
+                    className="compass-disk"
+                    style={{ transform: `rotate(${-((ship?.headingDeg ?? 0) + 360) % 360}deg)` }}
+                  >
+                    <span className="compass-n">N</span>
+                  </div>
+                  <div
+                    className="compass-port"
+                    style={{
+                      transform: `rotate(${(() => {
+                        if (!ship) return 0;
+                        const p = WORLD.ports[0];
+                        const bearing = (Math.atan2(p.x - ship.x, -(p.z - ship.z)) * 180) / Math.PI;
+                        return bearing - ship.headingDeg;
+                      })()}deg)`,
+                    }}
+                  />
+                  <div className="compass-needle" />
+                </div>
+                <div className="faint">
+                  {nearPort
+                    ? '已进入港口范围'
+                    : ship
+                      ? `测试港 ${Math.hypot(WORLD.ports[0].x - ship.x, WORLD.ports[0].z - ship.z).toFixed(0)} 丈 · 铜针指向港口`
+                      : '驶向中性测试港（东南方灯杆）'}
+                </div>
                 <div className="joystick" ref={joystick} aria-label="航行摇杆">
                   <div
                     className="joystick-knob"
@@ -765,8 +791,7 @@ export function App() {
               </div>
             ))}
           </div>
-          <div className="panel" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
+          <div className="cockpit-window">
             <div className="chat">
               {chat.length === 0 && (
                 <div className="bubble bubble-sys">

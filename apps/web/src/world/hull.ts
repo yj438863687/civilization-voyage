@@ -4,6 +4,18 @@ export const SHIP_L = 20;
 export const SHIP_B = 5;
 export const DECK_Y = 1.85;
 
+/** First stern-castle storey, hollowed as the cockpit hall. Outer size matches the old solid box. */
+export const STERN_HALL = {
+  z: SHIP_L / 2 - SHIP_L * 0.145,
+  w: SHIP_B * 0.92,
+  d: SHIP_L * 0.24,
+  h: 2.4,
+  wall: 0.12,
+  winW: 2.55,
+  winH: 1.28,
+  winY: DECK_Y + 1.52,
+};
+
 /** Conceptual hull. Bow = local −z, square transom = +z. */
 export function buildHullGeometry() {
   const L = SHIP_L;

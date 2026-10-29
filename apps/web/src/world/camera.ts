@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SHIP_L } from './hull';
+import { DECK_Y, SHIP_L, STERN_HALL } from './hull';
 import { WORLD } from './world.config';
 import { smootherstep } from './voyageConstants';
 
@@ -48,7 +48,7 @@ export function desiredPose(
     fov = 34;
   } else if (mode === 'cockpit') {
     pos.copy(shipPos).addScaledVector(fwd, WORLD.camera.cockpitForward).addScaledVector(UP, WORLD.camera.cockpitHeight);
-    look.copy(shipPos).addScaledVector(fwd, 14).setY(3.2);
+    look.copy(shipPos).addScaledVector(fwd, 2.4).setY(STERN_HALL.winY - 0.18);
     fov = 55;
   } else if (mode === 'route') {
     pos.set(shipPos.x, 48, shipPos.z + 0.01);
@@ -73,8 +73,60 @@ export function desiredPose(
       .addScaledVector(fwd, -dist * Math.cos(yaw) * Math.cos(pitch))
       .addScaledVector(right, dist * Math.sin(yaw) * Math.cos(pitch))
       .addScaledVector(UP, dist * Math.sin(pitch) + 2);
-    look.copy(shipPos).setY(3.4);
-    fov = 42;
+    look.copy(shipPos).addScaledVector(fwd, 0.6 * SHIP_L).setY(3.4);
+    fov = 50;
   }
   return { pos, look, fov, up };
+}
+
+function putLocal(
+  out: THREE.Vector3,
+  shipPos: THREE.Vector3,
+  fwd: THREE.Vector3,
+  right: THREE.Vector3,
+  x: number,
+  y: number,
+  z: number,
+) {
+  out.copy(shipPos).addScaledVector(right, x).addScaledVector(UP, y).addScaledVector(fwd, -z);
+}
+
+/** MOTION.md `boot.push`: 3/4 → cabin door → seat. s in 0..1. */
+export function bootPushPose(
+  s: number,
+  shipPos: THREE.Vector3,
+  fwd: THREE.Vector3,
+  right: THREE.Vector3,
+): CamPose {
+  const embark = desiredPose('embark', shipPos, fwd, right);
+  const p1 = new THREE.Vector3();
+  const l1 = new THREE.Vector3();
+  const p2 = new THREE.Vector3();
+  const l2 = new THREE.Vector3();
+  const doorZ = STERN_HALL.z + STERN_HALL.d / 2 + 0.55;
+  putLocal(p1, shipPos, fwd, right, 0.85, DECK_Y + 1.15, doorZ);
+  putLocal(l1, shipPos, fwd, right, 0.15, STERN_HALL.winY - 0.1, STERN_HALL.z - 0.2);
+  putLocal(p2, shipPos, fwd, right, 0, STERN_HALL.winY, STERN_HALL.z + STERN_HALL.d * 0.22);
+  putLocal(l2, shipPos, fwd, right, 0, STERN_HALL.winY - 0.25, -2);
+
+  const pos = new THREE.Vector3();
+  const look = new THREE.Vector3();
+  let fov = 55;
+  if (s <= 0.42) {
+    const u = smootherstep(s / 0.42);
+    pos.lerpVectors(embark.pos, p1, u);
+    look.lerpVectors(embark.look, l1, u);
+    fov = THREE.MathUtils.lerp(embark.fov, 48, u);
+  } else if (s <= 0.72) {
+    const u = smootherstep((s - 0.42) / 0.3);
+    pos.lerpVectors(p1, p2, u);
+    look.lerpVectors(l1, l2, u);
+    fov = THREE.MathUtils.lerp(48, 52, u);
+  } else {
+    const u = smootherstep((s - 0.72) / 0.28);
+    pos.copy(p2);
+    look.copy(l2);
+    fov = THREE.MathUtils.lerp(52, 55, u);
+  }
+  return { pos, look, fov, up: UP.clone() };
 }

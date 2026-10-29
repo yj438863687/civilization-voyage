@@ -1,5 +1,7 @@
 /** World data is configuration, not render code. Test sea only. */
 
+import { STERN_HALL } from './hull';
+
 export const WORLD = {
   bounds: { minX: -70, maxX: 70, minZ: -70, maxZ: 70 },
   ship: {
@@ -13,8 +15,8 @@ export const WORLD = {
   camera: {
     followDistance: 27,
     followHeight: 9.5,
-    cockpitHeight: 5.2,
-    cockpitForward: -4.2,
+    cockpitHeight: STERN_HALL.winY,
+    cockpitForward: -(STERN_HALL.z + STERN_HALL.d * 0.22),
   },
   ports: [
     {

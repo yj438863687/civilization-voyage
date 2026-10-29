@@ -3,7 +3,7 @@ import { SHIP_L } from './hull';
 /** Matches docs/design/MOTION.md + claude-to-grok.md §2.3. */
 
 export const BLEND_SEC: Record<string, number> = {
-  boot: 0,
+  embark: 1.2,
   cockpit: 1.2,
   route: 1.0,
   follow: 1.8,
