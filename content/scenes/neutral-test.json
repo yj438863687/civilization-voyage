@@ -1,0 +1,19 @@
+{
+  "id": "neutral-test",
+  "version": 1,
+  "status": "test",
+  "label": "中性测试场景：虚构海域、港口、货物和数值",
+  "background": "纯测试，不代表任何文明史实",
+  "cultural_core": "测试",
+  "questions": [
+    "能否保存并继续航程？"
+  ],
+  "fragments": [],
+  "interactions": [
+    "测试航行与交易"
+  ],
+  "economy": "fixtures/economy.json 的虚构测试资源，与真实费用完全隔离",
+  "educational_value": "仅验证软件，无教学效果声明",
+  "sources": [],
+  "needs_verification": []
+}

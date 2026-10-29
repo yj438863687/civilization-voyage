@@ -8,3 +8,7 @@
 node_modules/
 dist/
 coverage/
+.venv/
+__pycache__/
+.pytest_cache/
+*.sqlite3*

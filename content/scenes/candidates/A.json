@@ -1,0 +1,34 @@
+{
+  "id": "A",
+  "version": 1,
+  "status": "pending",
+  "label": "AI 推荐，待组员确认：丝路交流网络",
+  "background": "以丝路城市间的物质与知识交流为研究背景，具体港口与年代待确认。",
+  "cultural_core": "交流与多元解释",
+  "questions": [
+    "物品流动如何改变人们的知识？"
+  ],
+  "fragments": [
+    "旅行记录与器物描述"
+  ],
+  "interactions": [
+    "比较两种来源的解释"
+  ],
+  "economy": "以虚构运输选择讨论交流成本，不推定历史价格",
+  "educational_value": "区分交流证据与单一文明叙事",
+  "sources": [
+    {
+      "id": "A-source",
+      "title": "UNESCO About the Silk Roads",
+      "url": "https://www.unesco.org/en/silk-roads/about-silk-roads",
+      "license": "仅链接与原创概述；原文及图像授权待核实，不随项目 MIT 自动授权",
+      "verification": "unverified"
+    }
+  ],
+  "needs_verification": [
+    "具体年代、地点与可用一手材料",
+    "不同观点及翻译准确性",
+    "素材复制、图像及教学使用授权",
+    "交互为创作方案，教育效果未验证"
+  ]
+}

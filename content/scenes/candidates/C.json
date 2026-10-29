@@ -1,0 +1,34 @@
+{
+  "id": "C",
+  "version": 1,
+  "status": "pending",
+  "label": "AI 推荐，待组员确认：威尼斯与潟湖",
+  "background": "以威尼斯及潟湖的文化遗产为背景，历史阶段待组员选择。",
+  "cultural_core": "城市与水域的相互塑造",
+  "questions": [
+    "港口交流与遗产保护如何协调？"
+  ],
+  "fragments": [
+    "城市遗产与水域空间资料"
+  ],
+  "interactions": [
+    "提出并比较港口规划方案（创作）"
+  ],
+  "economy": "测试贸易与保护选择，所有数值虚构",
+  "educational_value": "理解文化遗产、经济选择与不同立场",
+  "sources": [
+    {
+      "id": "C-source",
+      "title": "UNESCO Venice and its Lagoon",
+      "url": "https://whc.unesco.org/en/list/394/",
+      "license": "仅链接与原创概述；原文及图像授权待核实，不随项目 MIT 自动授权",
+      "verification": "unverified"
+    }
+  ],
+  "needs_verification": [
+    "具体年代、地点与可用一手材料",
+    "不同观点及翻译准确性",
+    "素材复制、图像及教学使用授权",
+    "交互为创作方案，教育效果未验证"
+  ]
+}
