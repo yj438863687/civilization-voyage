@@ -1,0 +1,8 @@
+{
+  "name": "@civilization-voyage/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "types": "./index.d.ts",
+  "scripts": {"generate": "openapi-typescript openapi.json -o index.d.ts"},
+  "devDependencies": {"openapi-typescript": "7.10.1"}
+}
