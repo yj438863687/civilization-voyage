@@ -730,9 +730,9 @@ export function App() {
         <div className="cockpit">
           <div className="panel stack">
             {voyage.crew.map((c) => (
-              <div key={c.id} className={`seat ${c.model_id && connected ? '' : 'seat-off'}`}>
+              <div key={c.id} className={`seat ${connected ? '' : 'seat-off'}`}>
                 {c.role}
-                <span className="faint">{c.model_id && connected ? c.model_id : '尚未接入'}</span>
+                <span className="faint">{connected ? (c.model_id || models[0]?.id) : '尚未接入'}</span>
               </div>
             ))}
           </div>
