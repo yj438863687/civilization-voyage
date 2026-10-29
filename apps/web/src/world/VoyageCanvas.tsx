@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { WORLD } from './world.config';
+import { TreasureShip } from './TreasureShip';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -38,31 +39,6 @@ function hexColor(name: string, fallback: string) {
   return new THREE.Color(cssVar(name, fallback));
 }
 
-function ShipBody() {
-  const wood = useMemo(() => new THREE.MeshStandardMaterial({ color: '#3a2a1c', roughness: 0.85, metalness: 0.05 }), []);
-  const brass = useMemo(() => new THREE.MeshStandardMaterial({ color: '#ad8443', roughness: 0.45, metalness: 0.6 }), []);
-  const cabin = useMemo(() => new THREE.MeshStandardMaterial({ color: '#1a2830', roughness: 0.7, metalness: 0.1 }), []);
-  return (
-    <group>
-      <mesh position={[0, 0.45, 0]} material={wood} castShadow>
-        <boxGeometry args={[2.2, 0.7, 5.4]} />
-      </mesh>
-      <mesh position={[0, 0.35, 2.4]} material={wood} rotation={[0.35, 0, 0]}>
-        <boxGeometry args={[1.8, 0.5, 1.4]} />
-      </mesh>
-      <mesh position={[0, 1.15, 0.4]} material={cabin}>
-        <boxGeometry args={[1.6, 1.0, 2.2]} />
-      </mesh>
-      <mesh position={[0, 2.3, 0.2]} material={brass}>
-        <cylinderGeometry args={[0.08, 0.08, 2.4, 8]} />
-      </mesh>
-      <mesh position={[0, 0.15, -2.4]} material={brass}>
-        <boxGeometry args={[0.2, 0.2, 0.6]} />
-      </mesh>
-    </group>
-  );
-}
-
 function PortBlocks() {
   const stone = useMemo(() => new THREE.MeshStandardMaterial({ color: '#6a6e70', roughness: 0.9 }), []);
   const mark = useMemo(() => new THREE.MeshStandardMaterial({ color: '#b3bdc1', roughness: 0.5 }), []);
@@ -71,14 +47,14 @@ function PortBlocks() {
     <group>
       {WORLD.ports.map((p) => (
         <group key={p.id} position={[p.x, 0, p.z]}>
-          <mesh position={[0, 0.4, 0]} material={stone}>
-            <boxGeometry args={[8, 0.8, 6]} />
+          <mesh position={[0, 0.5, 0]} material={stone}>
+            <boxGeometry args={[16, 1.0, 12]} />
           </mesh>
-          <mesh position={[0, 1.6, -1.4]} material={stone}>
-            <boxGeometry args={[5, 2.2, 3]} />
+          <mesh position={[0, 2.6, -2.2]} material={stone}>
+            <boxGeometry args={[8, 3.2, 5]} />
           </mesh>
-          <mesh position={[0, 3.1, -1.4]} material={mark}>
-            <boxGeometry args={[1.2, 0.2, 1.2]} />
+          <mesh position={[0, 4.4, -2.2]} material={mark}>
+            <boxGeometry args={[1.6, 0.25, 1.6]} />
           </mesh>
         </group>
       ))}
@@ -168,40 +144,40 @@ function Rig({
     tmpRight.crossVectors(tmpFwd, UP).normalize();
 
     if (mode === 'embark') {
-      orbit.current += reduceMotion ? 0 : clamped * 0.12;
-      const dist = 18;
+      orbit.current += reduceMotion ? 0 : clamped * 0.1;
+      const dist = 34;
       camera.position.set(
         g.position.x + Math.sin(orbit.current) * dist,
-        7,
+        12,
         g.position.z + Math.cos(orbit.current) * dist,
       );
-      look.copy(g.position).setY(1);
+      look.copy(g.position).setY(3.2);
       camera.lookAt(look);
     } else if (mode === 'cockpit') {
       camera.position.copy(g.position).addScaledVector(tmpFwd, WORLD.camera.cockpitForward).addScaledVector(UP, WORLD.camera.cockpitHeight);
-      look.copy(g.position).addScaledVector(tmpFwd, 8).setY(1.4);
+      look.copy(g.position).addScaledVector(tmpFwd, 14).setY(3.2);
       camera.lookAt(look);
     } else if (mode === 'route') {
-      camera.position.set(g.position.x, 28, g.position.z + 0.01);
+      camera.position.set(g.position.x, 42, g.position.z + 0.01);
       camera.up.set(0, 0, -1);
       look.copy(g.position);
       camera.lookAt(look);
       camera.up.copy(UP);
     } else if (mode === 'port') {
       const p = WORLD.ports[0];
-      camera.position.set(p.x - 10, 8, p.z + 12);
-      look.set(p.x, 1, p.z);
+      camera.position.set(p.x - 16, 12, p.z + 18);
+      look.set(p.x, 2, p.z);
       camera.lookAt(look);
     } else if (mode === 'reflection') {
-      camera.position.copy(g.position).addScaledVector(tmpRight, 0.2).addScaledVector(UP, 1.5).addScaledVector(tmpFwd, 1.2);
-      look.copy(g.position).addScaledVector(tmpFwd, 0.2).setY(1.1);
+      camera.position.copy(g.position).addScaledVector(tmpRight, 0.4).addScaledVector(UP, 4.4).addScaledVector(tmpFwd, -2.2);
+      look.copy(g.position).addScaledVector(tmpFwd, 2).setY(3);
       camera.lookAt(look);
     } else {
       const dist = WORLD.camera.followDistance;
       const height = WORLD.camera.followHeight;
       const desired = g.position.clone().addScaledVector(tmpFwd, -dist).addScaledVector(UP, height);
       camera.position.lerp(desired, reduceMotion ? 1 : 1 - Math.pow(0.001, clamped));
-      look.copy(g.position).setY(1.2);
+      look.copy(g.position).setY(3.4);
       camera.lookAt(look);
     }
 
@@ -234,7 +210,7 @@ function Rig({
 
   return (
     <group ref={ship} position={[WORLD.spawn.x, 0, WORLD.spawn.z]}>
-      <ShipBody />
+      <TreasureShip />
     </group>
   );
 }
@@ -248,7 +224,7 @@ export function VoyageCanvas(props: Props) {
     <div className="world-canvas">
       <Canvas
         shadows
-        camera={{ fov: 50, near: 0.1, far: 250, position: [12, 8, 18] }}
+        camera={{ fov: 42, near: 0.1, far: 280, position: [22, 14, 28] }}
         onCreated={({ gl }) => {
           gl.setClearColor(sky, 1);
           gl.outputColorSpace = THREE.SRGBColorSpace;
@@ -256,15 +232,15 @@ export function VoyageCanvas(props: Props) {
         gl={{ antialias: true, powerPreference: 'high-performance' }}
       >
         <color attach="background" args={[sky]} />
-        <fog attach="fog" args={[fog, 28, 110]} />
-        <hemisphereLight args={['#8aa0aa', '#1a1410', 0.45]} />
+        <fog attach="fog" args={[fog, 40, 140]} />
+        <hemisphereLight args={['#8aa0aa', '#1a1410', 0.5]} />
         <directionalLight
-          position={[12, 18, 8]}
-          intensity={1.15}
+          position={[18, 28, 12]}
+          intensity={1.35}
           color={lamp}
           castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
         />
         <Sea test={props.sceneId === 'neutral-test' || props.sceneId === 'test'} />
         <PortBlocks />

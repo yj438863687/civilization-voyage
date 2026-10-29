@@ -3,18 +3,18 @@
 export const WORLD = {
   bounds: { minX: -70, maxX: 70, minZ: -70, maxZ: 70 },
   ship: {
-    maxSpeed: 14,
-    reverseSpeed: 5,
-    accel: 8,
-    turn: 1.35,
-    radius: 2.2,
+    maxSpeed: 11,
+    reverseSpeed: 4,
+    accel: 6,
+    turn: 0.85,
+    radius: 5.2,
   },
   spawn: { x: 0, z: 22, yaw: 0 },
   camera: {
-    followDistance: 14,
-    followHeight: 6.5,
-    cockpitHeight: 1.6,
-    cockpitForward: -0.4,
+    followDistance: 26,
+    followHeight: 11,
+    cockpitHeight: 4.6,
+    cockpitForward: -3.2,
   },
   ports: [
     {
