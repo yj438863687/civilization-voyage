@@ -58,8 +58,8 @@ export function Cabin() {
   const topY = floorY + h;
   const frontZ = z - d / 2;
   const backZ = z + d / 2;
-  const tableTop = floorY + 0.56;
-  const tableZ = z - 1.15;
+  const tableTop = floorY + 0.46;
+  const tableZ = z - 1.55;
   const sideW = (w - winW) / 2;
 
   return (
@@ -132,19 +132,19 @@ export function Cabin() {
 
       {/* 海图桌 */}
       <mesh position={[0, tableTop, tableZ]} material={M.wood} receiveShadow castShadow>
-        <boxGeometry args={[w * 0.56, 0.09, d * 0.42]} />
+        <boxGeometry args={[w * 0.46, 0.08, d * 0.34]} />
       </mesh>
       <mesh position={[0, tableTop + 0.055, tableZ]} material={M.brass}>
-        <boxGeometry args={[w * 0.56 + 0.06, 0.02, d * 0.42 + 0.06]} />
+        <boxGeometry args={[w * 0.46 + 0.06, 0.02, d * 0.34 + 0.06]} />
       </mesh>
       {[-1, 1].map((sx) => (
         <mesh key={sx} position={[(sx * w * 0.62) / 2 - sx * 0.08, (floorY + tableTop) / 2, tableZ]} material={M.wood}>
-          <boxGeometry args={[0.08, tableTop - floorY, d * 0.44]} />
+          <boxGeometry args={[0.08, tableTop - floorY, d * 0.3]} />
         </mesh>
       ))}
       {/* 摊开的海图 */}
       <mesh position={[0, tableTop + 0.07, tableZ - 0.1]} rotation={[-Math.PI / 2, 0, 0.02]} material={M.paper}>
-        <planeGeometry args={[w * 0.46, d * 0.36]} />
+        <planeGeometry args={[w * 0.38, d * 0.26]} />
       </mesh>
       {/* 罗盘 */}
       <mesh position={[w * 0.19, tableTop + 0.08, tableZ + 0.35]} material={M.brass}>
