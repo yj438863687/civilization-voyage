@@ -101,14 +101,14 @@ export function Cabin() {
         <cylinderGeometry args={[0.13, 0.13, 0.035, 16]} />
       </mesh>
 
-      <mesh position={[-0.58, tableY + 0.4, tableZ + 0.55]} material={M.lamp}>
-        <sphereGeometry args={[0.08, 10, 10]} />
+      <mesh position={[-0.62, tableY + 0.38, tableZ + 0.82]} material={M.lamp}>
+        <sphereGeometry args={[0.055, 10, 10]} />
       </mesh>
-      <mesh position={[-0.58, tableY + 0.22, tableZ + 0.55]} material={M.brass}>
-        <cylinderGeometry args={[0.035, 0.06, 0.28, 8]} />
+      <mesh position={[-0.62, tableY + 0.2, tableZ + 0.82]} material={M.brass}>
+        <cylinderGeometry args={[0.028, 0.045, 0.22, 8]} />
       </mesh>
       <pointLight
-        position={[-0.35, tableY + 0.62, tableZ + 0.2]}
+        position={[-0.4, tableY + 0.55, tableZ + 0.5]}
         color={cssColor('--cv-ship-lamp-warm', '#f0b46a')}
         intensity={1.35}
         distance={6.5}

@@ -48,6 +48,8 @@ export function contentStamp(classification: Classification | string, sources: S
   if (classification === 'historical_claim') {
     const hasSource = sources.some((s) => s.title || s.url);
     if (!hasSource) return { kind: 'unverified' as const, label: '出处待补' };
+    const verified = sources.some((s) => s.verification === 'verified');
+    if (!verified) return { kind: 'unverified' as const, label: '史实候选·待核实' };
     return { kind: 'fact' as const, label: '史实' };
   }
   return { kind: 'unverified' as const, label: String(classification || '性质待补') };
@@ -95,7 +97,6 @@ export function SealButton({
         onPointerDown={start}
         onPointerUp={stop}
         onPointerCancel={stop}
-        onPointerLeave={stop}
         onKeyDown={(e) => {
           if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
@@ -119,12 +120,14 @@ export function Ledgers({
   balance,
   inventory,
   capacity,
+  materials = 0,
 }: {
   connected: boolean;
   usage: Usage[];
   balance: number | null;
   inventory: Record<string, number> | null;
   capacity: number | null;
+  materials?: number;
 }) {
   const tokens = usage.reduce((n, u) => {
     const raw = u.usage;
@@ -151,13 +154,14 @@ export function Ledgers({
       </div>
       <div className="ledger-block">
         <div className="label ledger-story">剧情资源</div>
+        <div className="mono ledger-story">材料 {materials}</div>
         {balance == null ? (
           <div className="muted">无航程</div>
         ) : (
           <div className="card-test" style={{ padding: 8, borderRadius: 2 }}>
             <Stamp kind="test">测试</Stamp>
             <div className="mono ledger-story">
-              补给 {balance} · 货舱 {held}/{capacity}
+              补给 {balance} · 测试货舱 {held}/{capacity}
             </div>
             {inventory &&
               Object.entries(inventory).map(([k, v]) => (
@@ -222,23 +226,38 @@ export function Coach({
   );
 }
 
-export function StageBar({ stage }: { stage: string }) {
+export function StageBar({
+  current,
+  reached,
+}: {
+  current: string;
+  reached: string[];
+}) {
   const items = [
-    ['cockpit', '驾驶舱'],
-    ['route', '航线'],
-    ['world', '世界'],
-    ['reflection', '反思'],
-  ];
-  const order = items.map((i) => i[0]);
-  const idx = order.indexOf(stage);
+    ['ask', '问'],
+    ['seek', '查'],
+    ['seal', '印'],
+    ['act', '行'],
+    ['reflect', '省'],
+  ] as const;
+  const caption: Record<string, string> = {
+    ask: '提出一件要弄清的事',
+    seek: '对照依据与谁被看见',
+    seal: '由你落印，船员不代判',
+    act: '拾取、靠港、做一件安排',
+    reflect: '回看你信了什么',
+  };
   return (
-    <div className="stage-bar">
-      {items.map(([id, label], i) => (
-        <span key={id} data-on={String(i <= idx || stage === id)}>
-          {label}
-          {i < items.length - 1 ? ' →' : ''}
-        </span>
-      ))}
+    <div className="stage-bar-wrap">
+      <div className="stage-bar">
+        {items.map(([id, label], i) => (
+          <span key={id} data-on={String(reached.includes(id))} data-now={String(current === id)}>
+            {label}
+            {i < items.length - 1 ? ' ·' : ''}
+          </span>
+        ))}
+      </div>
+      <div className="stage-caption">{caption[current]}</div>
     </div>
   );
 }

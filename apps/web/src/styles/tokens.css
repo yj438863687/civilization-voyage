@@ -260,15 +260,15 @@
   --cv-scene-label: "场景 C · AI 推荐，待组员确认";
 }
 
-/* 中性测试海域：灰网格，明确不是任何文明 */
+/* 启航港 · 玄览内海：夜港创作，不是灰网格测试场 */
 [data-scene="test"] {
-  --cv-scene-accent: var(--cv-slate-300);
-  --cv-scene-sky-top: #10161c;
-  --cv-scene-sky-horizon: #4d6270;
-  --cv-scene-fog: #24343c;
-  --cv-scene-water: #16343c;
-  --cv-scene-light: #f1d9a8;
-  --cv-scene-label: "测试海域 · 虚构数据";
+  --cv-scene-accent: #c9a15a;
+  --cv-scene-sky-top: #0c141c;
+  --cv-scene-sky-horizon: #3a4f5c;
+  --cv-scene-fog: #1c2c34;
+  --cv-scene-water: #102830;
+  --cv-scene-light: #f0c48a;
+  --cv-scene-label: "启航港 · 玄览内海（创作）";
 }
 
 /* ---------- 偏好 ---------- */

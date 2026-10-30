@@ -56,3 +56,36 @@ export const FAR_LAMPS = {
 };
 
 export const PORT_LAMP_SHAPES: Array<'sphere' | 'box' | 'tube'> = ['sphere', 'box', 'tube', 'sphere'];
+
+/** Harbor approach bands, as radius multipliers. Caps keep F reachable at treasure-ship speed. */
+export const HARBOR_APPROACH = {
+  outer: 4.0,
+  mid: 2.4,
+  exit: 2.6,
+  inner: 1.35,
+  outerCap: 0.62,
+  midCap: 0.34,
+  innerCap: 0.18,
+  alignDeg: 32,
+  alignHardDeg: 90,
+  misalignCap: 0.32,
+};
+
+export const DEST_TRAIL = {
+  count: 9,
+  radius: 0.028 * SHIP_L,
+  y: 0.16,
+  bowGap: 0.55 * SHIP_L,
+  pulseSec: 1.2,
+  periodSec: 2.0,
+  emitFar: 0.6,
+  emitNear: 0.9,
+};
+
+export const PORT_BEACON = {
+  height: 1.2 * SHIP_L,
+  radius: 0.006 * SHIP_L,
+  baseY: 8,
+  bottomAlpha: 0.55,
+  innerFade: 0.15,
+};

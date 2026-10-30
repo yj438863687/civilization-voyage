@@ -36,9 +36,9 @@ export function desiredPose(
   let fov = 42;
 
   if (mode === 'embark') {
-    const dist = SHIP_L * 2.25;
-    const yaw = (58 * Math.PI) / 180;
-    const pitch = (5 * Math.PI) / 180;
+    const dist = SHIP_L * 1.82;
+    const yaw = (52 * Math.PI) / 180;
+    const pitch = (8 * Math.PI) / 180;
     pos
       .copy(shipPos)
       .addScaledVector(fwd, dist * Math.cos(yaw) * Math.cos(pitch))
@@ -47,9 +47,11 @@ export function desiredPose(
     look.copy(shipPos).setY(2.7);
     fov = 34;
   } else if (mode === 'cockpit') {
-    pos.copy(shipPos).addScaledVector(fwd, WORLD.camera.cockpitForward).addScaledVector(UP, WORLD.camera.cockpitHeight);
-    look.copy(shipPos).addScaledVector(fwd, 2.4).setY(STERN_HALL.winY - 0.18);
-    fov = 55;
+    const camZ = STERN_HALL.z + STERN_HALL.d * 0.34;
+    const lookZ = STERN_HALL.z - STERN_HALL.d * 0.36;
+    pos.copy(shipPos).addScaledVector(fwd, -camZ).addScaledVector(UP, DECK_Y + 1.32);
+    look.copy(shipPos).addScaledVector(fwd, -lookZ).setY(DECK_Y + 1.38);
+    fov = 46;
   } else if (mode === 'route') {
     pos.set(shipPos.x, 48, shipPos.z + 0.01);
     look.copy(shipPos);

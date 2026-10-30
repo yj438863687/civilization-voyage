@@ -1,34 +1,44 @@
 {
   "id": "B",
-  "version": 1,
+  "version": 2,
   "status": "pending",
-  "label": "AI 推荐，待组员确认：尼罗河与日常生活",
-  "background": "以古埃及人与河流环境的关系为候选方向，具体时代待确认。",
-  "cultural_core": "环境与生活组织",
+  "label": "AI 推荐，待组员确认：集装箱作为当代「礼 / 标准」",
+  "background": "20 世纪中叶起，标准化集装箱改变了装卸、港口布局和全球分工。本场景把「盒子」当作一种当代的礼与标准：它让交换变快，也改写了谁被看见、谁承担代价。几何体堆场不含真实船公司标志。",
+  "cultural_core": "标准如何塑造文明：一个看似简单的盒子改变城市、劳动和日常商品。",
   "questions": [
-    "河流环境如何影响生活选择？"
+    "标准化带来的效率由谁获益、谁承担代价？港口城市和码头工人的生活如何改变？"
   ],
   "fragments": [
-    "日常生活材料与环境记录"
+    "标准箱尺寸摘录（史实候选·待核实）",
+    "装卸时间对照（测试数值）",
+    "工人口述残句（创作）"
   ],
   "interactions": [
-    "比较环境约束下的资源分配方案"
+    "对照散货装卸与集装箱装卸的时间与人力（测试数值）",
+    "用一份材料说明：效率落在谁身上"
   ],
-  "economy": "仅使用中性测试物资模拟分配，不重建真实税制",
-  "educational_value": "理解环境与社会解释之间的证据边界",
+  "economy": "泊位、吊机、工人、运价均为虚构测试资源，不引用未核年份的真实运价。",
+  "educational_value": "理解基础设施与制度标准对全球化的影响；讨论技术变革中的分配，而不是把效率写成进步颂。",
   "sources": [
     {
-      "id": "B-source",
-      "title": "British Museum Life in ancient Egypt",
-      "url": "https://www.britishmuseum.org/sites/default/files/2025-08/Life_in_ancient_Egypt_Visit_Resource.pdf",
-      "license": "仅链接与原创概述；原文及图像授权待核实，不随项目 MIT 自动授权",
+      "id": "B-iso-668",
+      "title": "ISO 668 系列集装箱尺寸标准（公开摘要）",
+      "url": "https://www.iso.org/standard/83558.html",
+      "license": "仅链接与原创概述；标准全文需购买，不随项目 MIT 自动授权",
+      "verification": "unverified"
+    },
+    {
+      "id": "B-levinson-box",
+      "title": "Marc Levinson, The Box（Princeton University Press）书目线索",
+      "url": "https://press.princeton.edu/books/paperback/9780691170817/the-box",
+      "license": "仅书目与原创概述；正文引用待核实授权",
       "verification": "unverified"
     }
   ],
   "needs_verification": [
-    "具体年代、地点与可用一手材料",
-    "不同观点及翻译准确性",
-    "素材复制、图像及教学使用授权",
-    "交互为创作方案，教育效果未验证"
+    "首次集装箱航运的日期、船名与航线需与原始档案对照",
+    "不同国家港口转型时间差异大，演示港口尚未由组员选定",
+    "工人口述材料的授权与隐私；本场景口述为创作，不作口述史",
+    "运价与效率数据的年份口径"
   ]
 }

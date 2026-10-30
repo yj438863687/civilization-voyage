@@ -1,5 +1,8 @@
-import { useMemo } from 'react';
+import { useTexture } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { DeckCrew } from './CrewFigures';
 import { bentSail, buildHullGeometry, DECK_Y, SHIP_B, SHIP_L, STERN_HALL } from './hull';
 
 export { SHIP_L, SHIP_B };
@@ -23,6 +26,7 @@ function Mast({
   trim,
   hull,
   sailGeo,
+  reduceMotion,
 }: {
   z: number;
   h: number;
@@ -33,9 +37,24 @@ function Mast({
   trim: THREE.Material;
   hull: THREE.Material;
   sailGeo: THREE.BufferGeometry;
+  reduceMotion: boolean;
 }) {
   const sailY = DECK_Y + h * 0.52;
   const battens = [0.1, 0.28, 0.46, 0.64, 0.82];
+  const cloth = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    const g = cloth.current;
+    if (!g) return;
+    if (reduceMotion) {
+      g.position.z = 0;
+      g.rotation.y = 0;
+      return;
+    }
+    const t = clock.elapsedTime;
+    const bulge = 0.035 * SHIP_L * 0.5 * Math.sin((Math.PI * 2 * t) / 4.2 + z * 0.12);
+    g.position.z = bulge * 0.08;
+    g.rotation.y = Math.sin(t * 0.7 + z) * 0.03;
+  });
   return (
     <group position={[0, 0, z]}>
       <mesh position={[0, DECK_Y + h / 2, 0]} material={hull} castShadow>
@@ -45,7 +64,7 @@ function Mast({
         <sphereGeometry args={[0.12, 8, 8]} />
       </mesh>
       {sailW > 0 && (
-        <>
+        <group ref={cloth}>
           <mesh position={[0, sailY, -0.08]} rotation={[0, Math.PI, 0]} material={sail} geometry={sailGeo} />
           {battens.map((t) => (
             <mesh key={t} position={[0, sailY - sailH / 2 + sailH * t, 0.02]} material={shade}>
@@ -55,7 +74,7 @@ function Mast({
           <mesh position={[0, sailY + sailH / 2 + 0.06, 0.02]} material={trim}>
             <boxGeometry args={[sailW + 0.16, 0.06, 0.06]} />
           </mesh>
-        </>
+        </group>
       )}
     </group>
   );
@@ -113,7 +132,13 @@ function Roof({ w, d, y, z, trim }: { w: number; d: number; y: number; z: number
   );
 }
 
-function Lantern({ position, trim, glow }: { position: [number, number, number]; trim: THREE.Material; glow: THREE.Material }) {
+function Lantern({ position, trim, glow }: { position: [number, number, number]; trim: THREE.Material; glow: THREE.MeshStandardMaterial }) {
+  const mat = useRef(glow);
+  useFrame(() => {
+    const m = mat.current;
+    if (!m) return;
+    m.emissiveIntensity = 1.85;
+  });
   return (
     <group position={position}>
       <mesh material={glow}>
@@ -122,22 +147,59 @@ function Lantern({ position, trim, glow }: { position: [number, number, number];
       <mesh position={[0, 0.14, 0]} material={trim}>
         <boxGeometry args={[0.16, 0.05, 0.16]} />
       </mesh>
+      <mesh position={[0, 0, 0]} renderOrder={3}>
+        <sphereGeometry args={[0.42, 8, 8]} />
+        <meshBasicMaterial color={cssColor('--cv-ship-lamp-warm', '#f0b46a')} transparent opacity={0.12} depthWrite={false} />
+      </mesh>
     </group>
   );
 }
 
-export function TreasureShip() {
+function Rigging({ masts }: { masts: { z: number; h: number }[] }) {
+  const geo = useMemo(() => {
+    const pts: number[] = [];
+    const add = (ax: number, ay: number, az: number, bx: number, by: number, bz: number) => {
+      pts.push(ax, ay, az, bx, by, bz);
+    };
+    const tops = masts.map((m) => [0, DECK_Y + m.h, m.z] as const);
+    for (let i = 0; i < tops.length - 1; i++) add(...tops[i], ...tops[i + 1]);
+    add(0, DECK_Y + 1.35, -SHIP_L / 2 + 0.35, ...tops[0]);
+    add(0, DECK_Y + 2.35, SHIP_L / 2 - 2.15, ...tops[tops.length - 1]);
+    for (const t of tops) {
+      add(SHIP_B * 0.48, DECK_Y + 0.18, t[2] + 0.35, t[0], t[1] - 0.08, t[2]);
+      add(-SHIP_B * 0.48, DECK_Y + 0.18, t[2] + 0.35, t[0], t[1] - 0.08, t[2]);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pts), 3));
+    return g;
+  }, [masts]);
+  return (
+    <lineSegments geometry={geo}>
+      <lineBasicMaterial color="#1a1410" transparent opacity={0.72} />
+    </lineSegments>
+  );
+}
+
+export function TreasureShip({ reduceMotion = false }: { reduceMotion?: boolean }) {
+  const sailMap = useTexture('/textures/sail-canvas.jpg');
+  useLayoutEffect(() => {
+    sailMap.colorSpace = THREE.SRGBColorSpace;
+    sailMap.wrapS = THREE.RepeatWrapping;
+    sailMap.wrapT = THREE.RepeatWrapping;
+    sailMap.repeat.set(1.4, 1.8);
+    sailMap.anisotropy = 8;
+  }, [sailMap]);
   const M = useMemo(() => {
     const hull = mat(cssColor('--cv-ship-hull', '#2a211c'), { roughness: 0.78 });
     const deck = mat(cssColor('--cv-ship-hull-light', '#3b2f26'), { roughness: 0.85 });
     const lacquer = mat(cssColor('--cv-ship-lacquer', '#b6452c'), { roughness: 0.52, metalness: 0.1 });
     const trim = mat(cssColor('--cv-ship-trim', '#c9a15a'), { roughness: 0.32, metalness: 0.7 });
-    const sail = mat(cssColor('--cv-ship-sail', '#e8dcc6'), {
-      roughness: 1,
-      side: THREE.DoubleSide,
+    const sail = new THREE.MeshStandardMaterial({
+      map: sailMap,
+      color: '#c4b08c',
+      roughness: 0.94,
       metalness: 0,
-      emissive: cssColor('--cv-ship-sail', '#e8dcc6'),
-      emissiveIntensity: 0.28,
+      side: THREE.DoubleSide,
     });
     const shade = mat(cssColor('--cv-ship-sail-shade', '#cdb994'), { roughness: 0.85 });
     const eye = mat(cssColor('--cv-ship-eye', '#f3ebdd'), { roughness: 0.4, metalness: 0.15, side: THREE.DoubleSide });
@@ -150,7 +212,7 @@ export function TreasureShip() {
       roughness: 0.35,
     });
     return { hull, deck, lacquer, trim, sail, shade, eye, pupil, banner, glow };
-  }, []);
+  }, [sailMap]);
 
   const hullGeo = useMemo(() => buildHullGeometry(), []);
   const half = SHIP_L / 2;
@@ -224,8 +286,10 @@ export function TreasureShip() {
         <cylinderGeometry args={[0.07, 0.07, 2.3, 8]} />
       </mesh>
       {masts.map((m, i) => (
-        <Mast key={m.z} {...m} sail={M.sail} shade={M.shade} trim={M.trim} hull={M.hull} sailGeo={sailGeos[i]} />
+        <Mast key={m.z} {...m} sail={M.sail} shade={M.shade} trim={M.trim} hull={M.hull} sailGeo={sailGeos[i]} reduceMotion={reduceMotion} />
       ))}
+      <Rigging masts={masts} />
+      <DeckCrew />
       <mesh position={[0.9, DECK_Y + mainH - 0.5, -0.9]} material={M.banner}>
         <planeGeometry args={[1.15, 2.1]} />
       </mesh>

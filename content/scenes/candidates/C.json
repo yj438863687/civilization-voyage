@@ -1,34 +1,43 @@
 {
   "id": "C",
-  "version": 1,
+  "version": 2,
   "status": "pending",
-  "label": "AI 推荐，待组员确认：威尼斯与潟湖",
-  "background": "以威尼斯及潟湖的文化遗产为背景，历史阶段待组员选择。",
-  "cultural_core": "城市与水域的相互塑造",
+  "label": "AI 推荐，待组员确认：漂浮港——对未出生者的涟漪",
+  "background": "以当代气候科学对海平面上升的评估为起点，创作一座未来的漂浮港口社区。这是未来创作，以科学评估为依据，不是预测，也不把真实社区写成故事主角。",
+  "cultural_core": "迁徙与延续：当土地改变，文化如何被携带、改写和传承。",
   "questions": [
-    "港口交流与遗产保护如何协调？"
+    "一个社区在迁往海上时，应该保留什么、放弃什么、由谁决定？"
   ],
   "fragments": [
-    "城市遗产与水域空间资料"
+    "海平面情景摘录（史实候选·待核实）",
+    "应携带的记忆（创作）",
+    "谁来决定（推演）"
   ],
   "interactions": [
-    "提出并比较港口规划方案（创作）"
+    "在有限浮力下决定携带哪些文化物件",
+    "写下安排，并问后来的人还能不能改"
   ],
-  "economy": "测试贸易与保护选择，所有数值虚构",
-  "educational_value": "理解文化遗产、经济选择与不同立场",
+  "economy": "浮力模块、能源、淡水为虚构测试资源；分配影响满意度的数字不代表真实社区。",
+  "educational_value": "区分科学依据、推演与创作；讨论气候适应中的公平与可修订性。",
   "sources": [
     {
-      "id": "C-source",
-      "title": "UNESCO Venice and its Lagoon",
-      "url": "https://whc.unesco.org/en/list/394/",
-      "license": "仅链接与原创概述；原文及图像授权待核实，不随项目 MIT 自动授权",
+      "id": "C-ipcc-ar6-wg1",
+      "title": "IPCC AR6 WGI Chapter 9 / SPM: sea level",
+      "url": "https://www.ipcc.ch/report/ar6/wg1/",
+      "license": "仅链接与原创概述；引用哪一组情景与年份待组员确认",
+      "verification": "unverified"
+    },
+    {
+      "id": "C-srocc",
+      "title": "IPCC SROCC (2019) 海洋和冰冻圈特别报告",
+      "url": "https://www.ipcc.ch/srocc/",
+      "license": "仅链接与原创概述",
       "verification": "unverified"
     }
   ],
   "needs_verification": [
-    "具体年代、地点与可用一手材料",
-    "不同观点及翻译准确性",
-    "素材复制、图像及教学使用授权",
-    "交互为创作方案，教育效果未验证"
+    "引用哪一组情景和年份，如何在界面中表达不确定性范围",
+    "漂浮城市原型的当前状态（是否仍在推进）",
+    "若以某个真实地区为灵感，需避免把真实社区写成虚构故事的主角"
   ]
 }

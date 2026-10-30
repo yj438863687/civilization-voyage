@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, newRequestId } from './api/client';
 import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Task, type TaskEvent, type Trade, type Usage, type Voyage, type VoyageRecord } from './api/types';
 import { Coach, Ledgers, SealButton, StageBar, Stamp, StatusBanner, contentStamp } from './components/ui';
+import { crewArt, kernelBeat } from './crew';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
-import { WORLD } from './world/world.config';
+import { worldFor, type WorldConfig } from './world/world.config';
 
 const LAST_KEY = 'cv.lastVoyageId';
 const MOTION_KEY = 'cv.reduceMotion';
@@ -13,18 +14,68 @@ function worldState(
   voyage: Voyage,
   snap: ShipSnapshot | null,
   portId: string,
+  sea: WorldConfig,
 ): Record<string, unknown> {
   return {
     hull_id: typeof voyage.world.hull_id === 'string' ? voyage.world.hull_id : DEFAULT_HULL,
     port_id: portId,
-    ship: snap ? { x: snap.x, z: snap.z, yaw: snap.yaw } : voyage.world.ship ?? WORLD.spawn,
+    ship: snap ? { x: snap.x, z: snap.z, yaw: snap.yaw } : voyage.world.ship ?? sea.spawn,
   };
+}
+
+const TITLE_PRESETS: Record<string, string> = {
+  A: '刺桐一问',
+  B: '标准之问',
+  C: '漂浮港一问',
+  'neutral-test': '玄览一问',
+};
+
+function latestScenes(list: Scene[]): Scene[] {
+  const map = new Map<string, Scene>();
+  for (const s of list) {
+    const prev = map.get(s.id);
+    if (!prev || s.version > prev.version) map.set(s.id, s);
+  }
+  const order = ['neutral-test', 'A', 'B', 'C'];
+  return [...map.values()].sort((a, b) => {
+    const ia = order.indexOf(a.id);
+    const ib = order.indexOf(b.id);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  });
+}
+
+function sceneShort(s: Scene) {
+  if (s.id === 'A') return '宋元泉州港';
+  if (s.id === 'B') return '集装箱与标准';
+  if (s.id === 'C') return '漂浮港';
+  if (s.id === 'neutral-test') return '启航港 · 玄览内海';
+  return s.label.replace(/^AI 推荐，待组员确认：/, '');
+}
+
+function voyageSceneLabel(v: Voyage) {
+  const raw = String(v.scene_snapshot.label ?? v.scene_id);
+  if (raw.includes('中性测试') || raw.includes('测试海域')) return '启航港 · 玄览内海（创作）';
+  return raw.replace(/^AI 推荐，待组员确认：/, '');
+}
+
+function snapshotQuestion(voyage: Voyage | null) {
+  const q = voyage?.scene_snapshot?.questions;
+  return Array.isArray(q) && typeof q[0] === 'string' ? q[0] : '';
+}
+
+function wrapDeg(deg: number) {
+  return ((((deg + 180) % 360) + 360) % 360) - 180;
+}
+
+function portRelDeg(ship: { x: number; z: number; headingDeg: number }, port: { x: number; z: number }) {
+  const bearing = (Math.atan2(port.x - ship.x, -(port.z - ship.z)) * 180) / Math.PI;
+  return wrapDeg(bearing - ship.headingDeg);
 }
 
 const ROUTES: Route[] = [
   {
     id: 'simple',
-    steps: ['查阅已有材料', '靠港观察测试标记', '记录发现'],
+    steps: ['带着已有材料出海', '靠港对照纸签', '记下发现'],
     rationale: '步骤少、不调用模型也能走完。步骤多、成本高不代表结论更正确。',
     budget: 0,
     currency: 'unknown',
@@ -50,59 +101,77 @@ type GuideCtx = {
   hasQuestion: boolean;
   hasReason: boolean;
   nearPort: boolean;
+  nearFragment: boolean;
   hasVoyages: boolean;
   unusedFragments: number;
   crewReplies: number;
+  portName: string;
+  seaHint: string;
+  nearHint: string;
+  portTitle: string;
+  portBody: string;
+  relDeg: number | null;
+  portDist: number | null;
+  portRadius: number;
 };
 
 function guide(view: View, ctx: GuideCtx) {
   if (view === 'embark') {
     return {
-      step: '第 1 步 · 启航港',
+      step: '第 1 拍 · 问',
       title: '先选海域，再开一条航程',
       body: ctx.connected
-        ? '右边先点一个场景。测试海域用来练手；A/B/C 仍是 AI 推荐，组员还没确认。起个名字，开一条航程。船员席已接入，进驾驶舱可以真的问话。'
-        : '右边先点一个场景。测试海域用来练手；A/B/C 仍是 AI 推荐，组员还没确认。起个名字，开一条航程。模型没接也能走完，船员不会假装回话。',
+        ? '右边每张卡片只问一件事。启航港是练习的第一程；泉州、集装箱、漂浮港仍待组员确认。起个名字，开一条。大副和二副已在席。'
+        : '右边每张卡片只问一件事。启航港是练习的第一程。模型没接也能走完，船员不会假装回话。',
       next: ctx.hasVoyages ? '点「新航程」，或点右边一张旧航程卡片' : '先起个名字，开一条。',
     };
   }
   if (view === 'cockpit') {
     return {
-      step: '第 2 步 · 驾驶舱',
-      title: '灯已点亮。你想弄清什么？',
-      body: '左边是船员席。中间问一件你想理解的事。右边记下问题和共同任务，分歧可以留着。没接模型时不会出现假回复。问题和一句理由都有了，按住落印。',
-      next: !ctx.hasQuestion ? '先写下你想弄清的一件事。' : ctx.hasReason ? '写下理由，由你落印。' : '写下问题和一句理由，才能落印。',
+      step: ctx.crewReplies > 0 ? '第 2 拍 · 查' : '第 1 拍 · 问',
+      title: '你想弄清什么？',
+      body: '左边是大副与二副。中间问一件你想理解的事。大副查依据，二副问谁还没开口。他们只对照，不替你下结论。问题和一句理由齐了，按住落印。',
+      next: !ctx.hasQuestion ? '先写下你想弄清的一件事。' : !ctx.hasReason ? '写下问题和一句理由，才能落印。' : '按住落印，确认此行的问题。',
     };
   }
   if (view === 'route') {
     return {
-      step: '第 3 步 · 海图',
-      title: '查得多一些，或先查关键处',
-      body: '两条路线粗细颜色一样。步骤多不等于更对，费用高也不等于更文明。没接入计价时显示「尚未接入」。',
-      next: '看清两条路线各查什么，再选。',
+      step: '第 4 拍 · 行',
+      title: '选一条路，去港口做事',
+      body: '问题已经落下。两条路线粗细颜色一样。步骤多不等于更对，费用高也不等于更文明。没接入计价时显示「尚未接入」。',
+      next: '选一条，按「按此航线启航」。出海后按 E 拾取、F 靠港。',
     };
   }
   if (view === 'world') {
+    const misaligned = ctx.relDeg != null && Math.abs(ctx.relDeg) > 32;
+    const approaching = ctx.portDist != null && ctx.portDist < ctx.portRadius * 2.4;
+    const next = ctx.nearPort
+      ? '按 F 靠港'
+      : ctx.nearFragment
+        ? '按 E 拾取纸签。'
+        : misaligned
+          ? '铜针对准船头再加速。'
+          : approaching
+            ? `接近 ${ctx.portName}。靠港后，用你带的材料做一件事。`
+            : '朝海图上的目的港航行。';
     return {
-      step: '第 4 步 · 海域',
+      step: '第 4 拍 · 行',
       title: ctx.nearPort ? '已经靠近港口' : '朝海图上的目的港航行',
-      body: ctx.nearPort
-        ? '靠港后，用你带的材料做一件事。买卖不是这一步的主事。'
-        : 'W 前进、S 后退、A/D 转向，或用左下摇杆。东南方体块是中性测试港。看见纸签可以靠近，收入货舱。',
-      next: ctx.nearPort ? '点「靠港」' : '朝海图上的目的港航行。',
+      body: ctx.nearPort ? ctx.nearHint : ctx.seaHint,
+      next,
     };
   }
   if (view === 'port') {
     return {
-      step: '靠港 · 测试港',
+      step: `第 4 拍 · 行 · ${ctx.portTitle}`,
       title: '用材料做一件事',
-      body: '货物带「测试」印章，数字是虚构补给。先打开材料看它从哪里来；收入货舱还不算完成。',
-      next: ctx.unusedFragments > 0 ? '选一份材料，用它说明你的安排。' : '打开这份材料，先看它从哪里来。',
+      body: ctx.portBody,
+      next: ctx.unusedFragments > 0 ? '选一份材料，用它说明你的安排。' : '打开一份材料，先看它从哪里来。',
     };
   }
   if (view === 'collaborate') {
     return {
-      step: '协作 · 解释与选择',
+      step: '第 2 拍 · 查',
       title: '过程要看得见，选择由你来定',
       body: ctx.connected
         ? '船员查阅时只列出可观察事件。大副问依据，二副问谁被看见。你可以都不采纳。'
@@ -111,7 +180,7 @@ function guide(view: View, ctx: GuideCtx) {
     };
   }
   return {
-    step: '反思 · 航海日志',
+    step: '第 5 拍 · 省',
     title: '你相信了什么？又凭什么相信？',
     body: '材料与出处在上面。两本账分开。下面三问帮你回看：信了什么、求快时漏了什么、后来的人还能不能改。',
     next: '带上没解决的问题，再走一程。',
@@ -173,7 +242,7 @@ export function App() {
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem(MOTION_KEY) === '1' || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [comms, setComms] = useState(false);
   const [webgl, setWebgl] = useState(true);
-  const [title, setTitle] = useState('测试航程');
+  const [title, setTitle] = useState('玄览一问');
   const [scenePick, setScenePick] = useState<Scene | null>(null);
   const [question, setQuestion] = useState('');
   const [sharedTask, setSharedTask] = useState('');
@@ -189,11 +258,18 @@ export function App() {
   const [input, setInput] = useState<ControlInput>({ forward: 0, turn: 0 });
   const [busy, setBusy] = useState(false);
   const [camBlend, setCamBlend] = useState(1);
+  const [cine, setCine] = useState(false);
+  const [pickupFlash, setPickupFlash] = useState<string | null>(null);
   const keys = useRef({ w: false, a: false, s: false, d: false });
   const shipRef = useRef<ShipSnapshot | null>(null);
   const poll = useRef<number | null>(null);
 
   const connected = models.length > 0;
+  const sea = useMemo(
+    () => worldFor(voyage?.scene_id ?? scenePick?.id),
+    [voyage?.scene_id, scenePick?.id],
+  );
+  const portPlace = sea.ports[0];
 
   useEffect(() => {
     try {
@@ -214,13 +290,25 @@ export function App() {
     document.documentElement.dataset.scene = sceneAttr(voyage, scenePick);
   }, [voyage, scenePick]);
 
+  useEffect(() => {
+    if (scenePick || scenes.length === 0) return;
+    setScenePick(scenes.find((s) => s.id === 'neutral-test') ?? scenes[0]);
+  }, [scenes, scenePick]);
+
+  useEffect(() => {
+    if (!scenePick) return;
+    const preset = TITLE_PRESETS[scenePick.id] ?? '未命名航程';
+    const stock = new Set([...Object.values(TITLE_PRESETS), '测试航程', '未命名航程']);
+    setTitle((cur) => (stock.has(cur) ? preset : cur));
+  }, [scenePick]);
+
   const refreshLists = useCallback(async () => {
     const [h, m, s, v] = await Promise.all([api.health(), api.models(), api.scenes(), api.listVoyages()]);
     setHealth(h);
     setModels(m);
-    setScenes(s);
+    setScenes(latestScenes(s));
     setVoyages(v);
-    return { h, m, s, v };
+    return { h, m, s: latestScenes(s), v };
   }, []);
 
   const loadVoyage = useCallback(async (id: string, nextView?: View) => {
@@ -251,9 +339,10 @@ export function App() {
   useEffect(() => {
     (async () => {
       try {
-        const { s } = await refreshLists();
-        const test = s.find((x) => x.status === 'test') ?? s[0] ?? null;
-        setScenePick(test);
+        const { s, v } = await refreshLists();
+        setScenePick(s.find((x) => x.id === 'neutral-test') ?? s.find((x) => x.status === 'test') ?? s[0] ?? null);
+        const last = localStorage.getItem(LAST_KEY);
+        if (last && v.some((item) => item.id === last)) await loadVoyage(last);
       } catch (e) {
         setBootError(errText(e));
       }
@@ -314,14 +403,51 @@ export function App() {
     window.addEventListener('keyup', up);
     const id = window.setInterval(() => {
       const forward = (keys.current.w ? 1 : 0) + (keys.current.s ? -1 : 0);
+      // Three.js +yaw turns bow west; A (port) is +yaw, D (starboard) is −yaw.
       const turn = (keys.current.a ? 1 : 0) + (keys.current.d ? -1 : 0);
       setInput((prev) => (prev.forward === forward && prev.turn === turn ? prev : { forward, turn }));
-    }, 50);
+    }, 48);
     return () => {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
       window.clearInterval(id);
     };
+  }, []);
+
+  const actRef = useRef({
+    view: 'embark' as View,
+    busy: false,
+    nearPort: null as string | null,
+    nearFragment: null as string | null,
+    collected: new Set<string>(),
+    dock: () => {},
+    collect: () => {},
+  });
+  actRef.current.view = view;
+  actRef.current.busy = busy;
+  actRef.current.nearPort = nearPort;
+  actRef.current.nearFragment = nearFragment;
+  actRef.current.collected = new Set(records.flatMap((r) => r.material_ids));
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat) return;
+      const t = e.target;
+      if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) return;
+      const a = actRef.current;
+      if (a.view !== 'world' || a.busy) return;
+      const k = e.key.toLowerCase();
+      if (k === 'e' && a.nearFragment && !a.collected.has(a.nearFragment)) {
+        e.preventDefault();
+        a.collect();
+      }
+      if (k === 'f' && a.nearPort) {
+        e.preventDefault();
+        a.dock();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   const voyageHold = useRef(voyage);
@@ -339,7 +465,7 @@ export function App() {
           shared_task: sharedTask,
           crew: v.crew,
           route: v.route,
-          world: worldState(v, snap, nearPort ?? 'at-sea'),
+          world: worldState(v, snap, nearPort ?? 'at-sea', worldFor(v.scene_id)),
         })
         .then(setVoyage)
         .catch(() => undefined);
@@ -363,13 +489,15 @@ export function App() {
       const scene = scenePick ?? scenes.find((s) => s.status === 'test');
       if (!scene) throw new Error('没有可用场景');
       const created = await api.createVoyage({
-        title: title.trim() || '未命名航程',
+        title: title.trim() || TITLE_PRESETS[scene.id] || '未命名航程',
         scene_id: scene.id,
         scene_version: scene.version,
         scene_track: scene.status === 'pending' ? 'candidate' : scene.status === 'confirmed' ? 'confirmed' : 'test',
+        question: '',
+        shared_task: scene.interactions[0] ?? '',
         crew: DEFAULT_CREW.map((c) => ({ ...c, model_id: models[0]?.id ?? null })),
       });
-      setChat([{ who: 'sys', text: connected ? '船员席位已就绪。' : '模型服务尚未接入。船员暂时不能回复，仍可浏览海域与材料。' }]);
+      setChat([]);
       await loadVoyage(created.id, 'cockpit');
       await refreshLists();
     } catch (e) {
@@ -408,9 +536,11 @@ export function App() {
       await persist({
         stage: 'world',
         route,
-        world: worldState(voyage, snap, 'at-sea'),
+        world: worldState(voyage, snap, 'at-sea', sea),
       });
       setView('world');
+      setCine(true);
+      window.setTimeout(() => setCine(false), 1400);
     } catch (e) {
       setError(errText(e));
     } finally {
@@ -426,7 +556,7 @@ export function App() {
       const snap = shipRef.current;
       await persist({
         stage: 'world',
-        world: worldState(voyage, snap, nearPort),
+        world: worldState(voyage, snap, nearPort, sea),
       });
       const p = await api.ports(voyage.id);
       setPorts(p);
@@ -440,27 +570,37 @@ export function App() {
 
   async function collectFragment() {
     if (!voyage || !nearFragment) return;
-    const frag = WORLD.fragments.find((f) => f.id === nearFragment);
+    const frag = sea.fragments.find((f) => f.id === nearFragment);
     if (!frag) return;
+    if (records.some((r) => r.material_ids.includes(frag.id))) return;
     setBusy(true);
     setError(null);
     try {
       await api.addRecord(voyage.id, {
         kind: 'fragment',
         text: `${frag.title}\n${frag.text}`,
-        classification: 'test',
+        classification: frag.classification,
         sources: frag.sources,
         material_ids: [frag.id],
         version: 1,
         access: 'private',
       });
       setRecords(await api.records(voyage.id));
+      setPickupFlash(frag.title);
+      window.setTimeout(() => setPickupFlash(null), 1600);
     } catch (e) {
       setError(errText(e));
     } finally {
       setBusy(false);
     }
   }
+
+  actRef.current.dock = () => {
+    void dock();
+  };
+  actRef.current.collect = () => {
+    void collectFragment();
+  };
 
   async function doTrade(side: 'buy' | 'sell') {
     if (!voyage) return;
@@ -599,8 +739,8 @@ export function App() {
   const restored = useMemo(() => {
     const w = voyage?.world?.ship as { x?: number; z?: number; yaw?: number } | undefined;
     if (w && typeof w.x === 'number') return { x: w.x, z: w.z ?? 0, yaw: w.yaw ?? 0 };
-    return WORLD.spawn;
-  }, [voyage?.id]);
+    return sea.spawn;
+  }, [voyage?.id, sea.spawn]);
 
   const status = !voyage
     ? { kind: 'idle' as const, text: '还没有航程。和船员聊聊你想了解的文化问题。' }
@@ -611,19 +751,38 @@ export function App() {
         : busy
           ? { kind: 'running' as const, text: '正在执行…' }
           : view === 'world' && nearPort
-            ? { kind: 'waiting' as const, text: `接近 ${WORLD.ports.find((p) => p.id === nearPort)?.name ?? nearPort}。点「靠港」。` }
+            ? { kind: 'waiting' as const, text: `接近 ${sea.ports.find((p) => p.id === nearPort)?.name ?? nearPort}。按 F 靠港。` }
             : { kind: 'idle' as const, text: voyage.question || '航程进行中' };
 
   const unusedFragments = records.filter((r) => r.kind === 'fragment' || r.kind === 'material').length;
   const crewReplies = chat.filter((m) => m.who === 'crew').length;
+  const collectedIds = new Set(records.flatMap((r) => r.material_ids));
+  const nearFrag = sea.fragments.find((f) => f.id === nearFragment);
+  const nearFragCollected = nearFrag ? collectedIds.has(nearFrag.id) : false;
+  const beat = kernelBeat(view, {
+    hasQuestion: Boolean(question.trim()),
+    crewReplies,
+    sealed: Boolean(voyage?.question),
+  });
+  const relNow = ship && portPlace ? portRelDeg(ship, portPlace) : null;
+  const portDistNow = ship && portPlace ? Math.hypot(portPlace.x - ship.x, portPlace.z - ship.z) : null;
   const tip = guide(view, {
     connected,
     hasQuestion: Boolean(question.trim()),
     hasReason: Boolean(reason.trim()),
     nearPort: Boolean(nearPort),
+    nearFragment: Boolean(nearFragment && nearFrag && !nearFragCollected),
     hasVoyages: voyages.length > 0,
     unusedFragments,
     crewReplies,
+    portName: portPlace?.name ?? '港口',
+    seaHint: sea.coach.sea,
+    nearHint: sea.coach.near,
+    portTitle: sea.coach.portTitle,
+    portBody: sea.coach.portBody,
+    relDeg: relNow,
+    portDist: portDistNow,
+    portRadius: portPlace?.radius ?? 12,
   });
 
   return (
@@ -635,6 +794,9 @@ export function App() {
           reduceMotion={reduceMotion}
           canSail={view === 'world'}
           sceneId={voyage?.scene_id ?? scenePick?.id ?? 'test'}
+          world={sea}
+          collectedIds={[...collectedIds]}
+          nearFragmentId={nearFragment}
           input={input}
           restored={restored}
           onShip={onShip}
@@ -654,7 +816,7 @@ export function App() {
           <div className="hud hud-tl scrim">
             <div className="label">{voyage?.title ?? '文明航程'}</div>
             <div>{voyage?.question || '未形成文化问题'}</div>
-            <StageBar stage={voyage?.stage ?? 'cockpit'} />
+            <StageBar current={beat.current} reached={beat.reached} />
             <StatusBanner kind={status.kind} text={status.text} />
           </div>
           <div className="hud hud-tr scrim">
@@ -664,13 +826,24 @@ export function App() {
               balance={voyage?.balance ?? null}
               inventory={voyage?.inventory ?? null}
               capacity={voyage?.capacity ?? null}
+              materials={unusedFragments}
             />
           </div>
           <div className="hud hud-tc">
-            <Stamp kind={voyage?.scene_track === 'candidate' || scenePick?.status === 'pending' ? 'pending' : voyage?.scene_track === 'test' || scenePick?.status === 'test' ? 'test' : 'confirmed'}>
+            <Stamp
+              kind={
+                voyage?.scene_id === 'neutral-test' || scenePick?.id === 'neutral-test'
+                  ? 'creative'
+                  : voyage?.scene_track === 'candidate' || scenePick?.status === 'pending'
+                    ? 'pending'
+                    : voyage?.scene_track === 'test' || scenePick?.status === 'test'
+                      ? 'test'
+                      : 'confirmed'
+              }
+            >
               {voyage?.scene_snapshot && typeof voyage.scene_snapshot.label === 'string'
                 ? voyage.scene_snapshot.label
-                : scenePick?.label ?? '测试海域'}
+                : scenePick?.label ?? '启航港'}
             </Stamp>
           </div>
           <div className="hud hud-bl">
@@ -686,25 +859,16 @@ export function App() {
                   >
                     <span className="compass-n">N</span>
                   </div>
+                  <div className={`compass-bow${relNow != null && Math.abs(relNow) <= 12 ? ' is-aligned' : ''}`} />
                   <div
                     className="compass-port"
                     style={{
-                      transform: `rotate(${(() => {
-                        if (!ship) return 0;
-                        const p = WORLD.ports[0];
-                        const bearing = (Math.atan2(p.x - ship.x, -(p.z - ship.z)) * 180) / Math.PI;
-                        return bearing - ship.headingDeg;
-                      })()}deg)`,
+                      transform: `rotate(${relNow ?? 0}deg)`,
                     }}
                   />
                   <div className="compass-needle" />
-                </div>
-                <div className="faint">
-                  {nearPort
-                    ? '已进入港口范围'
-                    : ship
-                      ? `测试港 ${Math.hypot(WORLD.ports[0].x - ship.x, WORLD.ports[0].z - ship.z).toFixed(0)} 丈 · 铜针指向港口`
-                      : '驶向中性测试港（东南方灯杆）'}
+                  <span className={`compass-key compass-key-a${relNow != null && relNow < -32 ? ' is-on' : ''}`}>A</span>
+                  <span className={`compass-key compass-key-d${relNow != null && relNow > 32 ? ' is-on' : ''}`}>D</span>
                 </div>
                 <div className="joystick" ref={joystick} aria-label="航行摇杆">
                   <div
@@ -714,7 +878,7 @@ export function App() {
                     }}
                   />
                 </div>
-                <div className="faint">WASD / 方向键 / 摇杆</div>
+                <div className="faint">WASD 航行 · E 拾取 · F 靠港</div>
               </div>
             )}
           </div>
@@ -747,7 +911,7 @@ export function App() {
         </>
       )}
 
-      {view !== 'embark' && (
+      {view !== 'embark' && view !== 'reflection' && (
         <div className={`coach-bar ${view === 'world' ? 'coach-bar-top' : ''}`}>
           <div className="scrim">
             <div className="label">{tip.step}</div>
@@ -756,7 +920,12 @@ export function App() {
         </div>
       )}
 
-      {view === 'embark' && <div className="letterbox" aria-hidden />}
+      {(view === 'embark' || cine) && <div className="letterbox" aria-hidden />}
+      {pickupFlash && (
+        <div className="pickup-flash" aria-live="polite">
+          已收入货舱 · {pickupFlash}
+        </div>
+      )}
       {camBlend < 0.98 && !reduceMotion && (
         <div className="skip-hint">点击或按键跳过镜头</div>
       )}
@@ -765,7 +934,7 @@ export function App() {
         <>
           <div className="overlay overlay-left">
             <h1 className="display title-hero">文明航程</h1>
-            <p className="muted">带一个问题出海。船员查证，你定航向。</p>
+            <p className="muted">问一件事，对照两种看法，由你落印，再靠港去做。航向由你决定。</p>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <p className="faint" title="概念设计，不是考古复原，不冒充任何一艘历史上的具体船只。">
               概念宝船，非考古复原。
@@ -801,22 +970,22 @@ export function App() {
           <div className="overlay overlay-right">
             <div className="paper">
               <h2 className="display title-panel">场景入口</h2>
-              <p className="muted">先点选一个，再点左边「新航程」。选中的卡片会作为这次出海的海域。</p>
+              <p className="muted">先点选一个，再点左边「新航程」。每张卡片只问一件事。</p>
               <div className="list">
                 {scenes.map((s) => (
                   <button
                     key={`${s.id}-${s.version}-${s.status}`}
-                    className={`card ${s.status === 'test' ? 'card-test' : ''} ${scenePick?.id === s.id && scenePick.status === s.status ? 'card-on' : ''}`}
+                    className={`card ${scenePick?.id === s.id && scenePick.status === s.status ? 'card-on' : ''}`}
                     type="button"
                     onClick={() => setScenePick(s)}
                   >
                     <div className="row">
                       {s.status === 'pending' && <Stamp kind="pending">AI 推荐，待组员确认</Stamp>}
-                      {s.status === 'test' && <Stamp kind="test">测试</Stamp>}
+                      {s.id === 'neutral-test' && <Stamp kind="creative">创作</Stamp>}
                       {s.status === 'confirmed' && <Stamp kind="confirmed">已确认</Stamp>}
                     </div>
-                    <strong>{s.label}</strong>
-                    <div className="muted">{s.background}</div>
+                    <strong>{sceneShort(s)}</strong>
+                    <div>{s.questions[0]}</div>
                   </button>
                 ))}
               </div>
@@ -829,7 +998,7 @@ export function App() {
                   {voyages.map((v) => (
                     <button key={v.id} className="card" type="button" onClick={() => void loadVoyage(v.id)}>
                       <strong>{v.title}</strong>
-                      <div className="muted">{v.stage} · {String(v.scene_snapshot.label ?? v.scene_id)}</div>
+                      <div className="muted">{voyageSceneLabel(v)}</div>
                     </button>
                   ))}
                 </div>
@@ -841,34 +1010,46 @@ export function App() {
 
       {view === 'cockpit' && voyage && (
         <div className="cockpit">
-          <div className="panel stack">
-            {voyage.crew.map((c) => (
-              <div key={c.id} className={`seat ${connected ? '' : 'seat-off'}`}>
-                {c.role}
-                <span className="faint">{c.role === '二副' ? '问谁被看见' : '问有没有依据'}</span>
-                <span className="faint">{connected ? (c.model_id || models[0]?.id) : '尚未接入'}</span>
-              </div>
-            ))}
+          <div className="crew-rail">
+            {voyage.crew.map((c) => {
+              const art = crewArt(c.id);
+              return (
+                <div key={c.id} className={`crew-card ${connected ? '' : 'seat-off'}`}>
+                  <img src={art.bust} alt="" width={140} height={140} />
+                  <div className="crew-role">{c.role} · {art.voice}</div>
+                  <span className="faint">{art.duty}</span>
+                </div>
+              );
+            })}
           </div>
           <div className="cockpit-window">
             <div className="chat">
               {chat.length === 0 && (
-                <div className="bubble bubble-sys">灯已点亮。你想弄清什么？</div>
+                <div className="bubble bubble-sys">灯已点亮。先问一件你想弄清的事。大副查依据，二副问谁被看见。</div>
               )}
-              {chat.map((m, i) => (
-                <div key={i} className={`bubble bubble-${m.who === 'user' ? 'user' : m.who === 'crew' ? 'crew' : 'sys'}`}>
-                  {m.role && <div className="label">{m.role}</div>}
+              {chat.filter((m) => m.who !== 'crew').map((m, i) => (
+                <div key={`m-${i}`} className={`bubble bubble-${m.who === 'user' ? 'user' : 'sys'}`}>
                   {m.text}
                 </div>
               ))}
-              {events.map((e) => (
-                <div key={e.seq} className="bubble bubble-sys faint">
-                  事件 {e.kind}
-                  {typeof e.data.input === 'string' ? ` · 输入已记录` : ''}
-                  {typeof e.data.output === 'string' ? ` · 产出已记录` : ''}
-                  {typeof e.data.message === 'string' ? ` · ${e.data.message}` : ''}
+              {(['大副', '二副'] as const).some((role) => chat.some((m) => m.who === 'crew' && m.role === role)) && (
+                <div className="voice-pair">
+                  {(['大副', '二副'] as const).map((role) => {
+                    const last = [...chat].reverse().find((m) => m.who === 'crew' && m.role === role);
+                    if (!last) return null;
+                    const art = crewArt(role);
+                    return (
+                      <div key={role} className="voice-card">
+                        <img src={art.bust} alt="" width={56} height={56} />
+                        <div>
+                          <div className="label">{role} · {art.duty}</div>
+                          <div>{last.text}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
+              )}
             </div>
             <div className="row">
               <input style={{ flex: 1 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="写一件你想理解的事" />
@@ -878,8 +1059,23 @@ export function App() {
             </div>
           </div>
           <div className="paper">
-            <h2 className="display title-panel">航程任务</h2>
-            <p className="muted">问题是这次要弄清的事；分歧留在下面，不必先吵出结果。</p>
+            <h2 className="display title-panel">这一拍要落下的问题</h2>
+            <p className="muted">问题是这次要弄清的事。大副和二副只对照，结论由你落印。</p>
+            <div className="row" style={{ marginBottom: 8 }}>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => {
+                  const q = snapshotQuestion(voyage);
+                  if (q) setQuestion(q);
+                }}
+              >
+                用场景给出的问题
+              </button>
+              <button className="btn btn-ghost" type="button" onClick={() => setReason('我想亲眼对照材料，不先下结论。')}>
+                先带着疑问出海
+              </button>
+            </div>
             <div className="field">
               <span className="label">文化问题</span>
               <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
@@ -928,7 +1124,7 @@ export function App() {
               ))}
             </div>
             <p className="faint">路线不同，留下的问题也不同。查得多，不等于更对。没走的这条，也记在海图上。</p>
-            <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
+            <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} materials={unusedFragments} />
             <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void launchRoute()}>
               按此航线启航
             </button>
@@ -937,61 +1133,68 @@ export function App() {
         </div>
       )}
 
-      {view === 'world' && nearPort && (
-        <div className="prompt-center scrim">
-          <div>
-            接近 {WORLD.ports.find((p) => p.id === nearPort)?.name}
-            <Stamp kind="test">测试</Stamp>
-          </div>
-          <p className="muted">接近 {WORLD.ports.find((p) => p.id === nearPort)?.name}。靠港后，用你带的材料做一件事。不点可以继续开。</p>
-          <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void dock()}>
-            靠港
-          </button>
-        </div>
+      {view === 'world' && nearFragment && nearFrag && !nearFragCollected && (
+        <button className={`interact-prompt${nearPort ? ' interact-prompt-with-port' : ''}`} type="button" disabled={busy} onClick={() => void collectFragment()}>
+          <span className="interact-key">E</span>
+          <span className="interact-copy">
+            <strong>收入货舱 · {nearFrag.title}</strong>
+            <Stamp kind={contentStamp(nearFrag.classification, nearFrag.sources).kind}>
+              {contentStamp(nearFrag.classification, nearFrag.sources).label}
+            </Stamp>
+            <span className="faint">{nearFrag.text}</span>
+          </span>
+        </button>
       )}
 
-      {view === 'world' && nearFragment && (
-        <div className="prompt-center scrim" style={{ bottom: '28%' }}>
-          <div>{WORLD.fragments.find((f) => f.id === nearFragment)?.title}</div>
-          <p className="muted">打开这份材料，先看它从哪里来。收入货舱以后还没用上。</p>
-          <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void collectFragment()}>
-            收入货舱
-          </button>
-        </div>
+      {view === 'world' && nearPort && (
+        <button className="interact-prompt interact-prompt-port" type="button" disabled={busy} onClick={() => void dock()}>
+          <span className="interact-key">F</span>
+          <span className="interact-copy">
+            <strong>靠港 · {sea.ports.find((p) => p.id === nearPort)?.name}</strong>
+            <Stamp kind={portPlace?.mark === 'creative' ? 'creative' : portPlace?.mark === 'test' ? 'test' : 'pending'}>
+              {portPlace?.mark === 'creative' ? '创作' : portPlace?.mark === 'test' ? '测试' : 'AI 推荐，待组员确认'}
+            </Stamp>
+            <span className="faint">{sea.coach.near}</span>
+          </span>
+        </button>
       )}
 
       {view === 'port' && voyage && (
         <div className="overlay overlay-right">
           <div className="paper">
-            <h2 className="display title-panel">测试港</h2>
+            <h2 className="display title-panel">{sea.coach.portTitle}</h2>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <Stamp kind="test">测试数据 · 素材待补</Stamp>
-            <p>{ports[0]?.name ?? '中性测试港'}。体块与剪影，不代表真实港口。</p>
-            {records.filter((r) => r.kind === 'fragment' || r.kind === 'material').length > 0 && (
-              <p className="muted">已收入货舱，还没用上。货物到了，理解也到了吗？</p>
-            )}
-            {ports[0] &&
-              Object.entries(ports[0].goods).map(([id, g]) => (
-                <div key={id} className="card card-test">
-                  <div className="mono">{id} 买 {g.buy} / 卖 {g.sell} · 市场库存 {g.stock}</div>
-                  <div className="row">
-                    <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void doTrade('buy')}>买入 1</button>
-                    <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void doTrade('sell')}>卖出 1</button>
-                  </div>
-                </div>
-              ))}
-            {nearFragment && (
-              <button className="btn btn-secondary" type="button" onClick={() => void collectFragment()}>
-                发现测试碎片
-              </button>
+            <Stamp kind={portPlace?.mark === 'creative' ? 'creative' : portPlace?.mark === 'test' ? 'test' : 'pending'}>
+              {portPlace?.mark === 'creative' ? '创作' : portPlace?.mark === 'test' ? '测试数据' : 'AI 推荐，待组员确认'}
+            </Stamp>
+            <p>{portPlace?.name ?? ports[0]?.name}。体块与剪影，不代表真实港口。</p>
+            <p className="muted">{sea.coach.portBody}</p>
+            {records.filter((r) => r.kind === 'fragment' || r.kind === 'material').length > 0 ? (
+              <div className="list" style={{ marginTop: 12 }}>
+                <p className="muted">已收入货舱，还没用上。货物到了，理解也到了吗？</p>
+                {records.filter((r) => r.kind === 'fragment' || r.kind === 'material').map((r) => {
+                  const stamp = contentStamp(r.classification, r.sources);
+                  return (
+                    <div key={r.id} className="card">
+                      <Stamp kind={stamp.kind}>{stamp.label}</Stamp>
+                      <div>{r.text}</div>
+                      {r.sources.map((s) => (
+                        <div key={s.id} className="muted">出处 {s.title} · {s.verification}</div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <StatusBanner kind="idle" text="货舱还空。回到海域，靠近纸签，先看来源再收。" />
             )}
             <div className="field" style={{ marginTop: 16 }}>
-              <span className="label">港口安排（推演）</span>
+              <span className="label">{sea.arrangement.label}</span>
               <textarea
                 value={arrangement}
                 onChange={(e) => setArrangement(e.target.value)}
                 rows={3}
-                placeholder="选一份材料，用它说明你的安排。这是推演，不是史实。"
+                placeholder={sea.arrangement.placeholder}
               />
               <SealButton
                 label="用材料说明安排"
@@ -1002,7 +1205,7 @@ export function App() {
                   void api.addRecord(voyage.id, {
                     kind: 'choice',
                     text: arrangement.trim(),
-                    classification: 'counterfactual',
+                    classification: voyage.scene_id === 'C' ? 'creative' : 'counterfactual',
                     sources: [],
                     material_ids: records.filter((r) => r.kind === 'fragment' || r.kind === 'material').map((r) => r.id),
                     version: 1,
@@ -1014,17 +1217,29 @@ export function App() {
                 }}
               />
             </div>
+            {ports[0] && (
+              <details className="ledger-fold">
+                <summary>测试补给（虚构数字，不是这一步的主事）</summary>
+                {Object.entries(ports[0].goods).map(([id, g]) => (
+                  <div key={id} className="card card-test">
+                    <div className="mono">{id} 买 {g.buy} / 卖 {g.sell} · 市场库存 {g.stock}</div>
+                    <div className="row">
+                      <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void doTrade('buy')}>买入 1</button>
+                      <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void doTrade('sell')}>卖出 1</button>
+                    </div>
+                  </div>
+                ))}
+                {trades.length > 0 && (
+                  <div className="muted">最近交易 Δ补给 {trades.at(-1)?.delta_balance} · 现有 {voyage.balance}</div>
+                )}
+              </details>
+            )}
             <div className="row" style={{ marginTop: 16 }}>
               <button className="btn btn-secondary" type="button" onClick={() => setView('collaborate')}>请船员解释</button>
               <button className="btn btn-ghost" type="button" onClick={() => setView('world')}>回到海域</button>
               <button className="btn btn-primary" type="button" onClick={() => void goReflect()}>打开航海日志</button>
             </div>
             {error && <p className="error">{error}</p>}
-            {trades.length > 0 && (
-              <div className="muted">
-                最近交易 Δ补给 {trades.at(-1)?.delta_balance} · 现有 {voyage.balance}
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -1032,7 +1247,7 @@ export function App() {
       {view === 'collaborate' && voyage && (
         <div className="overlay overlay-right">
           <div className="paper">
-            <h2 className="display title-panel">与 Agents 协作</h2>
+            <h2 className="display title-panel">大副求证 · 二副义利</h2>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <StatusBanner
               kind={connected ? (busy ? 'running' : 'waiting') : 'unconnected'}
@@ -1093,24 +1308,28 @@ export function App() {
 
       {view === 'reflection' && voyage && (
         <div className="overlay" style={{ inset: 0, display: 'grid', placeItems: 'center', padding: 24 }}>
-          <div className="paper" style={{ maxWidth: '68ch', width: 'min(720px, 100%)', maxHeight: '90vh', overflow: 'auto' }}>
+          <div className="paper" style={{ maxWidth: '68ch', width: 'min(720px, 100%)', maxHeight: '90vh', overflow: 'auto', paddingBottom: 120 }}>
             <h2 className="display title-page">{voyage.title}</h2>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <Stamp kind="creative">概念创作</Stamp>
             <p>{voyage.shared_task || '尚未形成共同任务。'}</p>
             <h3 className="display title-panel">材料与出处</h3>
             {records.length === 0 && <p className="muted">还没有记录。</p>}
-            {records.map((r) => (
-              <div key={r.id} className="card" style={{ marginBottom: 8 }}>
-                <span className="label">{r.kind}</span>
-                <div>{r.text}</div>
-                {r.sources.map((s) => (
-                  <div key={s.id} className="muted">{s.title} · {s.license} · {s.verification}</div>
-                ))}
-              </div>
-            ))}
+            {records.map((r) => {
+              const stamp = contentStamp(r.classification, r.sources);
+              return (
+                <div key={r.id} className="card" style={{ marginBottom: 8 }}>
+                  <span className="label">{r.kind}</span>
+                  <Stamp kind={stamp.kind}>{stamp.label}</Stamp>
+                  <div>{r.text}</div>
+                  {r.sources.map((s) => (
+                    <div key={s.id} className="muted">{s.title} · {s.license} · {s.verification}</div>
+                  ))}
+                </div>
+              );
+            })}
             <h3 className="display title-panel">两本账结算</h3>
-            <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} />
+            <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} materials={unusedFragments} />
             <h3 className="display title-panel">反思</h3>
             <p className="muted">你相信了什么？又凭什么相信？</p>
             <p className="muted">这次求快时，有没有漏查什么？</p>
