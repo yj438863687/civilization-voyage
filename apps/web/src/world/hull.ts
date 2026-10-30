@@ -6,15 +6,25 @@ export const SHIP_B = 5.5;
 export const DECK_Y = 2.05;
 
 /** 「霸气」主要来自艉楼：占船长后 1/4，三层递退，逐层挑檐。 */
+/**
+ * 驾驶舱：艉楼第一层的内部空间。相机坐在桌后向前看，前窗三扇朝船头。
+ * 尺寸与算术在 docs/design/ART_DIRECTION.md 的驾驶舱体块里；这里按 L=22 缩放。
+ */
 export const STERN_HALL = {
-  z: SHIP_L / 2 - SHIP_L * 0.145,
-  w: SHIP_B * 0.94,
-  d: SHIP_L * 0.235,
-  h: 1.55,
-  wall: 0.12,
-  winW: SHIP_B * 0.52,
-  winH: 0.92,
-  winY: DECK_Y + 0.98,
+  z: SHIP_L / 2 - SHIP_L * 0.135,
+  w: SHIP_B * 0.9,
+  d: SHIP_L * 0.225,
+  h: 1.62,
+  wall: 0.11,
+  winW: SHIP_B * 0.5,
+  winH: 0.8,
+  /** 窗台高于桌面，坐下后视线不被桌沿切断 */
+  winY: DECK_Y + 1.28,
+  floorY: DECK_Y + 0.06,
+  /** 座位靠后壁，离开前窗约 3.9 个单位，镜头才不会贴墙 */
+  seatZ: SHIP_L / 2 - SHIP_L * 0.09,
+  /** 眼位高度：地板以上 1.12 */
+  eyeY: DECK_Y + 1.18,
 };
 
 /** 干舷与吃水。船头抬高、船尾微抬，中段最深。 */

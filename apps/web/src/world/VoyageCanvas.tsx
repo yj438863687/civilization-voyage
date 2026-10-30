@@ -372,6 +372,7 @@ function Rig({
 }: Omit<Props, 'sceneId'>) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
+  const exterior = useRef<THREE.Group>(null);
   const speed = useRef(0);
   const followYaw = useRef(0);
   const heel = useRef(0);
@@ -619,12 +620,17 @@ function Rig({
     <>
       <group ref={ship} position={[world.spawn.x, 0, world.spawn.z]}>
         <group ref={rock}>
+          {/* 驾驶舱是独立舱室：此时隐藏船体外壳，否则桅杆与桅座会穿进镜头 */}
+          <group ref={exterior} visible={mode !== 'cockpit'}>
+            <Suspense fallback={null}>
+              <TreasureShip reduceMotion={reduceMotion} />
+            </Suspense>
+            <Wake speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
+            <BowSpray speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
+          </group>
           <Suspense fallback={null}>
-            <TreasureShip reduceMotion={reduceMotion} />
             <Cabin />
           </Suspense>
-          <Wake speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
-          <BowSpray speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
         </group>
       </group>
       <DestTrail ship={ship} visible={mode === 'follow' || mode === 'route'} world={world} reduceMotion={reduceMotion} />

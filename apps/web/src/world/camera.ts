@@ -47,11 +47,10 @@ export function desiredPose(
     look.copy(shipPos).setY(2.7);
     fov = 34;
   } else if (mode === 'cockpit') {
-    const camZ = STERN_HALL.z + STERN_HALL.d * 0.34;
-    const lookZ = STERN_HALL.z - STERN_HALL.d * 0.36;
-    pos.copy(shipPos).addScaledVector(fwd, -camZ).addScaledVector(UP, DECK_Y + 1.32);
-    look.copy(shipPos).addScaledVector(fwd, -lookZ).setY(DECK_Y + 1.38);
-    fov = 46;
+    // 座位在舱室后部，眼位比桌面高一个头；视线穿过前窗落到船头外的海面
+    pos.copy(shipPos).addScaledVector(fwd, -STERN_HALL.seatZ).addScaledVector(UP, STERN_HALL.eyeY);
+    look.copy(shipPos).addScaledVector(fwd, SHIP_L * 0.6).addScaledVector(UP, STERN_HALL.eyeY - 0.5);
+    fov = 55;
   } else if (mode === 'route') {
     pos.set(shipPos.x, 48, shipPos.z + 0.01);
     look.copy(shipPos);
@@ -106,10 +105,10 @@ export function bootPushPose(
   const p2 = new THREE.Vector3();
   const l2 = new THREE.Vector3();
   const doorZ = STERN_HALL.z + STERN_HALL.d / 2 + 0.55;
-  putLocal(p1, shipPos, fwd, right, 0.85, DECK_Y + 1.15, doorZ);
-  putLocal(l1, shipPos, fwd, right, 0.15, STERN_HALL.winY - 0.1, STERN_HALL.z - 0.2);
-  putLocal(p2, shipPos, fwd, right, 0, STERN_HALL.winY, STERN_HALL.z + STERN_HALL.d * 0.22);
-  putLocal(l2, shipPos, fwd, right, 0, STERN_HALL.winY - 0.25, -2);
+  putLocal(p1, shipPos, fwd, right, 0.9, DECK_Y + 1.25, doorZ);
+  putLocal(l1, shipPos, fwd, right, 0.15, STERN_HALL.winY - 0.05, STERN_HALL.z - 0.4);
+  putLocal(p2, shipPos, fwd, right, 0, STERN_HALL.eyeY, STERN_HALL.seatZ);
+  putLocal(l2, shipPos, fwd, right, 0, STERN_HALL.eyeY - 0.5, -SHIP_L * 0.6);
 
   const pos = new THREE.Vector3();
   const look = new THREE.Vector3();
