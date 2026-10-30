@@ -57,10 +57,25 @@ export function desiredPose(
     up.set(0, 0, -1);
     fov = 50;
   } else if (mode === 'port') {
+    // 靠港：船头与码头同框。机位在船的斜后上方，看向「船头与港口的中间点」，
+    // 参数取 MOTION §B approach：az 60、el 12、0.90L、lookAt 船头到港 35%。
     const p = WORLD.ports[0];
-    pos.set(p.x - 18, 14, p.z + 20);
-    look.set(p.x, 2.5, p.z);
-    fov = 40;
+    const az = (60 * Math.PI) / 180;
+    const el = (12 * Math.PI) / 180;
+    const dist = SHIP_L * 0.9;
+    const bow = new THREE.Vector3().copy(shipPos).addScaledVector(fwd, SHIP_L * 0.42);
+    const aim = new THREE.Vector3(
+      THREE.MathUtils.lerp(bow.x, p.x, 0.35),
+      2.2,
+      THREE.MathUtils.lerp(bow.z, p.z, 0.35),
+    );
+    pos
+      .copy(aim)
+      .addScaledVector(fwd, -dist * Math.cos(az) * Math.cos(el))
+      .addScaledVector(right, dist * Math.sin(az) * Math.cos(el))
+      .addScaledVector(UP, dist * Math.sin(el) + 3.2);
+    look.copy(aim);
+    fov = 42;
   } else if (mode === 'reflection') {
     pos.copy(shipPos).addScaledVector(right, 0.4).addScaledVector(UP, 5.2).addScaledVector(fwd, -2.4);
     look.copy(shipPos).addScaledVector(fwd, 2).setY(3.2);

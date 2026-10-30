@@ -799,3 +799,18 @@ html[data-reduce-motion='true'] .btn:active { transform: none; }
 }
 .seal-dock .seal-btn { width: 100%; }
 .seal-dock .faint { margin: 6px 0 0; font-size: var(--cv-text-xs); }
+
+/* 落印按钮：按下前先给可见的按住提示 */
+.seal-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(255 255 255 / 0.28);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--cv-dur-fast) var(--cv-ease-out);
+}
+.seal-btn:hover:not(:disabled)::before { opacity: 1; }
+.seal-btn:hover:not(:disabled) { filter: brightness(1.06); }
+.seal-empty:hover { filter: none; }
