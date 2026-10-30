@@ -3,7 +3,16 @@
 import { STERN_HALL } from './hull';
 import type { Classification, Source } from '../api/types';
 
-export type PortSilhouette = 'harbor' | 'quanzhou' | 'container' | 'float';
+export type PortSilhouette =
+  | 'harbor'
+  | 'riverbank'
+  | 'steam'
+  | 'signal'
+  | 'starlight'
+  /* 保留旧剪影，便于以后复用 */
+  | 'quanzhou'
+  | 'container'
+  | 'float';
 
 export type PortPlace = {
   id: string;
@@ -58,22 +67,6 @@ const UNESCO_Q: Source = {
   verification: 'unverified',
 };
 
-const ISO_BOX: Source = {
-  id: 'B-iso-668',
-  title: 'ISO 668 系列集装箱尺寸标准（公开摘要）',
-  url: 'https://www.iso.org/standard/83558.html',
-  license: '仅链接与原创概述；标准全文需购买',
-  verification: 'unverified',
-};
-
-const IPCC: Source = {
-  id: 'C-ipcc-ar6-wg1',
-  title: 'IPCC AR6 WGI Chapter 9 / SPM: sea level',
-  url: 'https://www.ipcc.ch/report/ar6/wg1/',
-  license: '仅链接与原创概述；引用哪一组情景待组员确认',
-  verification: 'unverified',
-};
-
 const TEST_SRC: Source = {
   id: 'fixture',
   title: 'content/scenes/neutral-test.json',
@@ -82,7 +75,7 @@ const TEST_SRC: Source = {
   verification: 'unverified',
 };
 
-const WORLDS: Record<'test' | 'A' | 'B' | 'C', WorldConfig> = {
+const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   test: {
     ...SHARED,
     ports: [
@@ -145,180 +138,238 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C', WorldConfig> = {
     ...SHARED,
     ports: [
       {
-        id: 'quanzhou-port',
-        name: '刺桐港（候选）',
+        id: 'riverbank-port',
+        name: '河岸港（候选）',
         x: 26,
         z: -16,
         radius: 12,
         pierLength: 10,
         mark: 'pending',
-        silhouette: 'quanzhou',
+        silhouette: 'riverbank',
       },
     ],
     fragments: [
       {
-        id: 'A-shibo',
-        title: '市舶抽解残页',
-        x: 10,
-        z: 8,
-        pickupRadius: 5.2,
+        id: 'A-seed',
+        title: '第一粒种子',
+        x: 4,
+        z: 6,
+        pickupRadius: 7.5,
+        classification: 'creative',
+        text: '把种子埋进土里，意味着你要在这里等一季。等不等得起，是这一程真正的问题。这一条为体验而写，不作农业起源的考古结论。',
+        sources: [TEST_SRC],
+      },
+      {
+        id: 'A-stake',
+        title: '河岸泥板',
+        x: 12,
+        z: -6,
+        pickupRadius: 6.5,
         classification: 'historical_claim',
-        text: '市舶司对进出港货物登记、抽解。具体税率随时期而变，本条只作制度线索，不作税率结论。待核实。',
+        text: '定居要划界：哪块地先种，谁的地界。具体记号形式随地区而变，本条只作制度线索，待核实。',
         sources: [UNESCO_Q],
       },
       {
-        id: 'A-stele',
-        title: '多语宗教石刻说明',
-        x: 22,
-        z: -4,
-        pickupRadius: 5.2,
-        classification: 'historical_claim',
-        text: '泉州港遗存中有多种文字与宗教石刻。它们证明长期共处，但不能单独证明「和谐」或「冲突」的单一叙事。待核实。',
-        sources: [UNESCO_Q],
-      },
-      {
-        id: 'A-bulkhead',
-        title: '水密隔舱笔记',
-        x: 18,
-        z: -12,
-        pickupRadius: 5,
-        classification: 'historical_claim',
-        text: '海船以隔舱限制进水。本条只说明结构原理，不把任何一艘现代复原船当成宋元原船。待核实。',
-        sources: [UNESCO_Q],
+        id: 'A-granary',
+        title: '粮仓记号',
+        x: 20,
+        z: -14,
+        pickupRadius: 6,
+        classification: 'counterfactual',
+        text: '若第一年就有余粮：谁负责存，谁有权开仓？这是推演，不是任何一处遗址的记载。',
+        sources: [],
       },
     ],
     coach: {
-      sea: '朝海图上的灯航行。靠近纸签按 E 收入货舱，靠近港口按 F 靠港。',
-      near: '靠港后，用市舶或石刻材料说明：这座港如何让不同习惯的人一起做事。',
-      portTitle: '刺桐港（候选）',
-      portBody: '体块与剪影，不复原建筑。先看来源，再写安排。货物到了，理解也到了吗？',
-      compass: '铜针指向刺桐港灯',
+      sea: '朝河口的灯航行。靠岸之前按 E 收下纸签，靠港按 F。',
+      near: '靠港后，用种子或泥板说明：这块地能养几年，留下的人谁说了算。',
+      portTitle: '河岸港（候选）',
+      portBody: '岸、粮仓、桩界都是体块与剪影，不代表任何真实遗址。先看来源，再写安排。',
+      compass: '铜针指向河口',
     },
     arrangement: {
-      label: '港口安排（推演）',
-      placeholder: '选一份材料，说明这座港如何让不同习惯的人一起做事。这是推演，不是史实。',
+      label: '河岸安排（推演）',
+      placeholder: '选一份材料，说明你为什么留下、留到什么时候。这是推演，不是史实。',
     },
   },
   B: {
     ...SHARED,
     ports: [
       {
-        id: 'box-port',
-        name: '标准港（候选）',
+        id: 'steam-port',
+        name: '蒸汽港（候选）',
         x: 26,
         z: -16,
         radius: 12,
         pierLength: 12,
         mark: 'pending',
-        silhouette: 'container',
+        silhouette: 'steam',
       },
     ],
     fragments: [
       {
-        id: 'B-iso',
-        title: '标准箱尺寸摘录',
-        x: 10,
-        z: 8,
-        pickupRadius: 5.2,
-        classification: 'historical_claim',
-        text: '国际标准把箱子的长宽高写成可互换的尺寸。标准本身是公开制度，不是某家公司的发明故事。待核实具体条款。',
-        sources: [ISO_BOX],
-      },
-      {
-        id: 'B-time',
-        title: '装卸时间对照',
-        x: 22,
-        z: -4,
-        pickupRadius: 5.2,
-        classification: 'test',
-        text: '散货：测试 5 个工班。集装箱：测试 1 个工班。这些数字是虚构对照，用来问效率落在谁身上，不是历史统计。',
+        id: 'B-gauge',
+        title: '汽压表',
+        x: 4,
+        z: 6,
+        pickupRadius: 7.5,
+        classification: 'creative',
+        text: '汽压高一点，船快一点，炉子也更烫。快与稳在这里是同一根指针的两端。这一条为体验而写。',
         sources: [TEST_SRC],
       },
       {
-        id: 'B-voice',
-        title: '工人口述残句',
-        x: 18,
-        z: -12,
-        pickupRadius: 5,
-        classification: 'creative',
-        text: '「箱子来了以后，手活少了，人也少了。」这是为体验写的句子，不是某位工人的真实口述，不作口述史。',
+        id: 'B-shift',
+        title: '锅炉工班次',
+        x: 12,
+        z: -6,
+        pickupRadius: 6.5,
+        classification: 'counterfactual',
+        text: '若把航程缩短一半：省下的是煤，还是一班人的睡眠？这是推演，不是某家船公司的档案。',
         sources: [],
+      },
+      {
+        id: 'B-rail',
+        title: '铁轨测量桩',
+        x: 20,
+        z: -14,
+        pickupRadius: 6,
+        classification: 'historical_claim',
+        text: '铁轨先铺到哪里，哪座镇就被连上。选线与设站的具体史料待核实，本条只作空间线索。',
+        sources: [UNESCO_Q],
       },
     ],
     coach: {
-      sea: '朝堆场的钠灯航行。靠近纸签按 E 收入货舱，靠近港口按 F 靠港。',
-      near: '靠港后，用标准或口述材料说明：效率落在谁身上。',
-      portTitle: '标准港（候选）',
-      portBody: '集装箱是几何体，没有船公司标志。标准带来效率，也改写劳动。先看来源。',
-      compass: '铜针指向标准港吊机',
+      sea: '朝烟囱的灯航行。按 E 收纸签，靠港按 F。',
+      near: '靠港后，用汽压或班次说明：这份动力烧的是谁的煤、谁的时间。',
+      portTitle: '蒸汽港（候选）',
+      portBody: '吊机与锅炉是几何体，不出现任何公司标志。效率与代价要写在同一张纸上。',
+      compass: '铜针指向烟囱',
     },
     arrangement: {
-      label: '港口安排（推演）',
-      placeholder: '选一份材料，说明效率落在谁身上。这是推演，数字是测试。',
+      label: '动力安排（推演）',
+      placeholder: '选一份材料，说明你选快还是稳，以及代价落在谁身上。这是推演。',
     },
   },
   C: {
     ...SHARED,
     ports: [
       {
-        id: 'float-port',
-        name: '漂浮港（候选）',
+        id: 'signal-port',
+        name: '信号港（候选）',
         x: 26,
         z: -16,
         radius: 12,
         pierLength: 11,
         mark: 'pending',
-        silhouette: 'float',
+        silhouette: 'signal',
       },
     ],
     fragments: [
       {
-        id: 'C-slr',
-        title: '海平面情景摘录',
-        x: 10,
-        z: 8,
-        pickupRadius: 5.2,
+        id: 'C-cable',
+        title: '海底电缆接头',
+        x: 4,
+        z: 6,
+        pickupRadius: 7.5,
         classification: 'historical_claim',
-        text: '评估报告给出的是情景与不确定性范围，不是单一预测年份。本条只提醒「有范围」，不把某一年写成注定。待核实引用组别。',
-        sources: [IPCC],
+        text: '电缆把两端的时差压成零，但接头只落在有资本铺线的地方。具体线路与年代待核实。',
+        sources: [UNESCO_Q],
       },
       {
-        id: 'C-memory',
-        title: '应携带的记忆',
-        x: 22,
-        z: -4,
-        pickupRadius: 5.2,
-        classification: 'creative',
-        text: '一张族谱抄件、一袋种子、一口钟。这些物件是为体验写的，不是某个真实社区的行李清单。',
+        id: 'C-tz',
+        title: '时区分界',
+        x: 12,
+        z: -6,
+        pickupRadius: 6.5,
+        classification: 'counterfactual',
+        text: '若航图实时，你会在深夜收到别人的白天。谁被要求适应谁的时间？这是推演。',
         sources: [],
       },
       {
-        id: 'C-who',
-        title: '谁来决定',
-        x: 18,
-        z: -12,
-        pickupRadius: 5,
-        classification: 'counterfactual',
-        text: '若浮力只够带走三成物件：谁投票，谁缺席，后来的人还能不能改这份名单？这是推演，不是预测。',
-        sources: [IPCC],
+        id: 'C-dark',
+        title: '断线的岛',
+        x: 20,
+        z: -14,
+        pickupRadius: 6,
+        classification: 'creative',
+        text: '整张实时航图上仍有一处没有信号。它不在图上，不等于它不存在。这一条为体验而写。',
+        sources: [TEST_SRC],
       },
     ],
     coach: {
-      sea: '朝浮体上的冷灯航行。靠近纸签按 E 收入货舱，靠近港口按 F 靠港。',
-      near: '靠港后，用情景或记忆材料说明：迁徙时保留什么、放弃什么。',
-      portTitle: '漂浮港（候选）',
-      portBody: '模块化浮体，不是赛博霓虹。先分清科学依据、推演和创作，再写安排。',
-      compass: '铜针指向漂浮港',
+      sea: '朝浮台的冷灯航行。按 E 收纸签，靠港按 F。',
+      near: '靠港后，用电缆或断线说明：谁能被看见，谁只剩一个断点。',
+      portTitle: '信号港（候选）',
+      portBody: '模块化浮体，不是赛博霓虹。连通不等于文明，断点也要画在图上。',
+      compass: '铜针指向信号塔',
     },
     arrangement: {
-      label: '港口安排（创作 / 推演）',
-      placeholder: '选一份材料，说明迁徙时保留什么、放弃什么、由谁决定。后来的人还能改吗？',
+      label: '连接安排（推演）',
+      placeholder: '选一份材料，说明先连哪里、谁会被落下。这是推演，不是预测。',
+    },
+  },
+  D: {
+    ...SHARED,
+    ports: [
+      {
+        id: 'auto-port',
+        name: '自绘港（候选）',
+        x: 26,
+        z: -16,
+        radius: 12,
+        pierLength: 11,
+        mark: 'pending',
+        silhouette: 'starlight',
+      },
+    ],
+    fragments: [
+      {
+        id: 'D-star',
+        title: '模型自绘星图',
+        x: 4,
+        z: 6,
+        pickupRadius: 7.5,
+        classification: 'creative',
+        text: '船自己看星、自己画线。图上多出来的那颗星，是它算出来的，不是谁看见的。这一条为体验而写。',
+        sources: [TEST_SRC],
+      },
+      {
+        id: 'D-dest',
+        title: '目的地的定义',
+        x: 12,
+        z: -6,
+        pickupRadius: 6.5,
+        classification: 'counterfactual',
+        text: '当你要它去的地方由它来解释：是它更懂你的意思，还是它替你改了意思？这是推演。',
+        sources: [],
+      },
+      {
+        id: 'D-skip',
+        title: '被略过的港',
+        x: 20,
+        z: -14,
+        pickupRadius: 6,
+        classification: 'creative',
+        text: '它选了一条更快的路，略过了三座港。沿途没人被问过。这一条为体验而写，不是任何系统的实际行为记录。',
+        sources: [TEST_SRC],
+      },
+    ],
+    coach: {
+      sea: '朝自绘的星图航行。按 E 收纸签，靠港按 F。',
+      near: '靠港后，说明你交给它的目的地，以及它替你略过了什么。',
+      portTitle: '自绘港（候选）',
+      portBody: '浮体与光点都是体块。方向由谁设定、路径由谁审，是这一段真正的问题。',
+      compass: '铜针指向自绘的港',
+    },
+    arrangement: {
+      label: '目的地安排（创作 / 推演）',
+      placeholder: '选一份材料，写下你给它的目的地，以及它替你略过了什么。',
     },
   },
 };
 
 export function worldFor(sceneId: string | null | undefined): WorldConfig {
-  if (sceneId === 'A' || sceneId === 'B' || sceneId === 'C') return WORLDS[sceneId];
+  if (sceneId === 'A' || sceneId === 'B' || sceneId === 'C' || sceneId === 'D') return WORLDS[sceneId];
   return WORLDS.test;
 }
 

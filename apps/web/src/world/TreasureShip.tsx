@@ -9,9 +9,11 @@ import {
   buildHullGeometry,
   buildTransomGeometry,
   DECK_Y,
+  HULL_STYLES,
   SHIP_B,
   SHIP_L,
   STERN_HALL,
+  type HullStyle,
 } from './hull';
 
 export { SHIP_L, SHIP_B };
@@ -32,18 +34,28 @@ function SternTower({
   trim,
   glow,
   deck,
+  floors: floorCount = 3,
+  scale = 1,
 }: {
   lacquer: THREE.Material;
   wood: THREE.Material;
   trim: THREE.Material;
   glow: THREE.MeshStandardMaterial;
   deck: number;
+  floors?: number;
+  scale?: number;
 }) {
-  const floors = [
+  const all = [
     { w: STERN_HALL.w, d: STERN_HALL.d, h: 1.5, inset: 0 },
     { w: STERN_HALL.w * 0.84, d: STERN_HALL.d * 0.86, h: 1.34, inset: 0.06 },
     { w: STERN_HALL.w * 0.68, d: STERN_HALL.d * 0.7, h: 1.16, inset: 0.12 },
   ];
+  const floors = all.slice(0, Math.max(1, Math.min(3, floorCount))).map((f) => ({
+    ...f,
+    w: f.w * scale,
+    d: f.d * scale,
+    h: f.h * scale,
+  }));
   const baseZ = STERN_HALL.z;
   let cursor = deck;
 
@@ -210,7 +222,12 @@ function Rigging({ masts }: { masts: { z: number; h: number }[] }) {
   const geo = useMemo(() => {
     const pts: number[] = [];
     const add = (a: number[], b: number[]) => pts.push(...a, ...b);
-    const tops = masts.map((m) => [0, DECK_Y + m.h * 0.94, m.z]);
+    if (masts.length === 0) {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([]), 3));
+      return g;
+    }
+    const tops = masts.map((m) => [0, DECK_Y + m.h * 0.94, m.z] as number[]);
     for (let i = 0; i < tops.length - 1; i++) add(tops[i], tops[i + 1]);
     add([0, DECK_Y + 1.0, -SHIP_L / 2 + 0.4], tops[0]);
     add([0, DECK_Y + 2.0, SHIP_L / 2 - 2.2], tops[tops.length - 1]);
@@ -262,7 +279,13 @@ function Lantern({
   );
 }
 
-export function TreasureShip({ reduceMotion = false }: { reduceMotion?: boolean }) {
+export function TreasureShip({
+  reduceMotion = false,
+  style = HULL_STYLES.junk,
+}: {
+  reduceMotion?: boolean;
+  style?: HullStyle;
+}) {
   const sailMap = useTexture('/textures/sail-canvas.jpg');
   useLayoutEffect(() => {
     sailMap.colorSpace = THREE.SRGBColorSpace;
@@ -298,11 +321,11 @@ export function TreasureShip({ reduceMotion = false }: { reduceMotion?: boolean 
     return { hull, deck, lacquer, trim, sail, shade, eye, pupil, banner, glow };
   }, [sailMap]);
 
-  const hullGeo = useMemo(() => buildHullGeometry(), []);
-  const deckGeo = useMemo(() => buildDeckGeometry(), []);
-  const bulR = useMemo(() => buildBulwarkGeometry(1), []);
-  const bulL = useMemo(() => buildBulwarkGeometry(-1), []);
-  const transom = useMemo(() => buildTransomGeometry(), []);
+  const hullGeo = useMemo(() => buildHullGeometry(style), [style]);
+  const deckGeo = useMemo(() => buildDeckGeometry(style), [style]);
+  const bulR = useMemo(() => buildBulwarkGeometry(1, style), [style]);
+  const bulL = useMemo(() => buildBulwarkGeometry(-1, style), [style]);
+  const transom = useMemo(() => buildTransomGeometry(style), [style]);
   const softBlob = useMemo(() => {
     const c = document.createElement('canvas');
     c.width = c.height = 128;
@@ -319,71 +342,195 @@ export function TreasureShip({ reduceMotion = false }: { reduceMotion?: boolean 
     return tex;
   }, []);
 
-  const half = SHIP_L / 2;
-  const mainH = SHIP_B * 2.5;
-  // 6 桅硬帆 + 1 无帆艏桅（更接近硬帆船的骨架）
-  const masts = [
-    { z: -6.6, h: mainH * 0.6, sailW: 2.2, sailH: 3.0 },
-    { z: -4.4, h: mainH * 0.76, sailW: 2.9, sailH: 4.0 },
-    { z: -2.0, h: mainH * 0.9, sailW: 3.5, sailH: 4.9 },
-    { z: 0.5, h: mainH * 0.99, sailW: 4.0, sailH: 5.6 },
-    { z: 2.9, h: mainH * 0.8, sailW: 2.9, sailH: 3.8 },
-    { z: 4.8, h: mainH * 0.56, sailW: 1.9, sailH: 2.6 },
-    { z: 6.2, h: mainH * 0.36, sailW: 0, sailH: 0 },
-  ];
+  const half = style.length / 2;
+  const spinRef = useRef<THREE.Group>(null);
+  // 推进器空转：转速慢，只用来让人看见「有机器在动」，不代表真实航速。
+  useFrame((_, dt) => {
+    const g = spinRef.current;
+    if (!g || reduceMotion) return;
+    g.rotation.x -= Math.min(dt, 0.05) * 2.4;
+  });
+  const span = style.length;
+  const mainH = style.beam * 2.5;
+
+  // 每段航程的桅：木筏一张草席帆，蒸汽船两桅备用帆，缆线船单桅，自航体无桅。
+  const mastSpec: Record<string, { z: number; h: number; sailW: number; sailH: number }[]> = {
+    junk: [
+      { z: -6.6, h: mainH * 0.6, sailW: 2.2, sailH: 3.0 },
+      { z: -4.4, h: mainH * 0.76, sailW: 2.9, sailH: 4.0 },
+      { z: -2.0, h: mainH * 0.9, sailW: 3.5, sailH: 4.9 },
+      { z: 0.5, h: mainH * 0.99, sailW: 4.0, sailH: 5.6 },
+      { z: 2.9, h: mainH * 0.8, sailW: 2.9, sailH: 3.8 },
+      { z: 4.8, h: mainH * 0.56, sailW: 1.9, sailH: 2.6 },
+      { z: 6.2, h: mainH * 0.36, sailW: 0, sailH: 0 },
+    ],
+    raft: [{ z: -1.2, h: 4.4, sailW: 3.4, sailH: 3.0 }],
+    steamer: [
+      { z: -5.0, h: 9.5, sailW: 2.6, sailH: 3.2 },
+      { z: 4.6, h: 7.6, sailW: 2.2, sailH: 2.6 },
+    ],
+    sailnet: [{ z: -1.4, h: 13.4, sailW: 4.2, sailH: 6.4 }],
+    selfnav: [],
+  };
+  const masts = (mastSpec[style.id] ?? mastSpec.junk).map((m) => ({
+    ...m,
+    z: (m.z / SHIP_L) * span,
+    h: (m.h / (SHIP_B * 2.5)) * mainH,
+    sailW: (m.sailW / SHIP_B) * style.beam,
+    sailH: (m.sailH / (SHIP_B * 2.5)) * mainH,
+  }));
 
   const ribs = [];
-  for (let i = 1; i < 14; i++) ribs.push(-half + (SHIP_L * i) / 14);
+  for (let i = 1; i < 14; i++) ribs.push(-half + (span * i) / 14);
+
+  const isRaft = style.id === 'raft';
+  const isSteam = style.id === 'steamer';
+  const isNet = style.id === 'sailnet';
+  const isSelf = style.id === 'selfnav';
 
   return (
     <group>
       <mesh geometry={hullGeo} material={M.hull} castShadow receiveShadow />
-      <mesh geometry={bulR} material={M.lacquer} castShadow />
-      <mesh geometry={bulL} material={M.lacquer} castShadow />
+      <mesh geometry={bulR} material={isSteam ? M.trim : M.lacquer} castShadow />
+      <mesh geometry={bulL} material={isSteam ? M.trim : M.lacquer} castShadow />
       <mesh geometry={deckGeo} material={M.deck} receiveShadow />
       <mesh geometry={transom} material={M.hull} />
 
       {/* 舷侧横木分隔：只作造型节奏 */}
-      {ribs.map((z) => {
-        const t = (z + half) / SHIP_L;
-        const w = SHIP_B * (t < 0.2 ? 0.6 + t * 2 : 1) * 0.99;
-        return (
-          <mesh key={z} position={[0, DECK_Y - 0.42, z]} material={M.hull}>
-            <boxGeometry args={[w, 0.045, 0.06]} />
+      {!isSteam &&
+        !isSelf &&
+        ribs.map((z) => {
+          const t = (z + half) / span;
+          const w = style.beam * (t < 0.2 ? 0.6 + t * 2 : 1) * 0.99;
+          return (
+            <mesh key={z} position={[0, style.deckY - 0.42 * (isRaft ? 0.4 : 1), z]} material={M.hull}>
+              <boxGeometry args={[w, 0.045, 0.06]} />
+            </mesh>
+          );
+        })}
+      {/* 蒸汽船：铆接列板 */}
+      {isSteam &&
+        [-0.7, -0.35, 0].map((dy) => (
+          <mesh key={dy} position={[0, style.deckY + dy, 0]} material={M.trim}>
+            <boxGeometry args={[style.beam * 1.005, 0.035, span * 0.8]} />
           </mesh>
-        );
-      })}
+        ))}
 
-      {/* 艏楼：前 1/10，一层，低矮 */}
-      <mesh position={[0, DECK_Y + 0.72, -half + SHIP_L * 0.055]} material={M.lacquer} castShadow>
-        <boxGeometry args={[SHIP_B * 0.5, 0.9, SHIP_L * 0.1]} />
-      </mesh>
-      <mesh position={[0, DECK_Y + 1.2, -half + SHIP_L * 0.055]} material={M.trim}>
-        <boxGeometry args={[SHIP_B * 0.54, 0.06, SHIP_L * 0.11]} />
-      </mesh>
+      {/* 艏楼：只给宝船。其他船型不叠楼 */}
+      {style.id === 'junk' && (
+        <>
+          <mesh position={[0, DECK_Y + 0.72, -half + span * 0.055]} material={M.lacquer} castShadow>
+            <boxGeometry args={[style.beam * 0.5, 0.9, span * 0.1]} />
+          </mesh>
+          <mesh position={[0, DECK_Y + 1.2, -half + span * 0.055]} material={M.trim}>
+            <boxGeometry args={[style.beam * 0.54, 0.06, span * 0.11]} />
+          </mesh>
+        </>
+      )}
 
-      {/* 船眼：白底墨瞳，不发光 */}
-      {[1, -1].map((sx) => (
-        <group key={sx} position={[sx * SHIP_B * 0.44, DECK_Y - 0.18, -half + 1.5]}>
-          <mesh rotation={[0, (sx * Math.PI) / 2, 0]} material={M.eye}>
-            <circleGeometry args={[0.31, 20]} />
-          </mesh>
-          <mesh position={[sx * 0.006, 0, 0]} rotation={[0, (sx * Math.PI) / 2, 0]} material={M.pupil}>
-            <circleGeometry args={[0.13, 16]} />
-          </mesh>
-          <mesh position={[sx * 0.004, 0.24, 0.02]} rotation={[0, (sx * Math.PI) / 2, 0]} material={M.trim}>
-            <torusGeometry args={[0.33, 0.02, 6, 20, Math.PI]} />
-          </mesh>
-        </group>
-      ))}
+      {/* 首部装饰 */}
+      {style.prow === 'eye' &&
+        [1, -1].map((sx) => (
+          <group key={sx} position={[sx * style.beam * 0.44, DECK_Y - 0.18, -half + 1.5]}>
+            <mesh rotation={[0, (sx * Math.PI) / 2, 0]} material={M.eye}>
+              <circleGeometry args={[0.31, 20]} />
+            </mesh>
+            <mesh position={[sx * 0.006, 0, 0]} rotation={[0, (sx * Math.PI) / 2, 0]} material={M.pupil}>
+              <circleGeometry args={[0.13, 16]} />
+            </mesh>
+            <mesh position={[sx * 0.004, 0.24, 0.02]} rotation={[0, (sx * Math.PI) / 2, 0]} material={M.trim}>
+              <torusGeometry args={[0.33, 0.02, 6, 20, Math.PI]} />
+            </mesh>
+          </group>
+        ))}
+      {style.prow === 'ram' && (
+        <mesh position={[0, style.deckY - 0.45, -half - 0.35]} rotation={[0, 0, Math.PI / 2]} material={M.trim}>
+          <coneGeometry args={[0.34, 1.1, 10]} />
+        </mesh>
+      )}
 
-      <SternTower
-        lacquer={M.lacquer}
-        wood={M.deck}
-        trim={M.trim}
-        glow={M.glow}
-        deck={DECK_Y}
-      />
+      {/* 楼：宝船三层，其余一层的驾驶舱体块 */}
+      {style.towerFloors > 0 && (
+        <SternTower
+          lacquer={M.lacquer}
+          wood={M.deck}
+          trim={M.trim}
+          glow={M.glow}
+          deck={DECK_Y}
+          floors={style.towerFloors}
+          scale={style.towerScale}
+        />
+      )}
+
+      {/* 蒸汽船：单烟囱 + 明轮罩 */}
+      {isSteam && (
+        <>
+          <mesh position={[0, style.deckY + 3.4, -1.2]} material={M.trim} castShadow>
+            <cylinderGeometry args={[0.55, 0.72, 6.4, 12]} />
+          </mesh>
+          <mesh position={[0, style.deckY + 6.7, -1.2]} material={M.lacquer}>
+            <cylinderGeometry args={[0.6, 0.6, 0.36, 12]} />
+          </mesh>
+          {[1, -1].map((sx) => (
+            // 明轮装在舷侧轴上：轮面竖直（法线朝 x），下半浸水。
+            <group key={sx} position={[sx * (style.beam / 2 + 0.46), style.deckY - 0.75, span * 0.16]}>
+              <group ref={sx === 1 ? spinRef : undefined}>
+              {/* 轮毂 + 八片轮叶，绕 x 轴转：下缘擦水，上缘高出舷墙 */}
+              <mesh rotation={[0, 0, Math.PI / 2]}>
+                <cylinderGeometry args={[0.3, 0.3, 1.2, 12]} />
+                <meshStandardMaterial color="#262a2d" roughness={0.7} metalness={0.25} />
+              </mesh>
+              {Array.from({ length: 8 }, (_, i) => (
+                <group key={i} rotation={[(i * Math.PI) / 4, 0, 0]}>
+                  <mesh position={[0, 1.32, 0]} castShadow>
+                    <boxGeometry args={[1.15, 0.62, 0.1]} />
+                    <meshStandardMaterial color="#3a4044" roughness={0.55} metalness={0.35} />
+                  </mesh>
+                </group>
+              ))}
+              {/* 外舷支架：两根斜撑连到舷墙 */}
+              {[-0.34, 0.34].map((dz) => (
+                <mesh key={dz} position={[-sx * 0.3, 0.75, dz]} rotation={[0, 0, (sx * Math.PI) / 5]}>
+                  <boxGeometry args={[0.9, 0.09, 0.09]} />
+                  <meshStandardMaterial color="#2f3438" roughness={0.6} metalness={0.3} />
+                </mesh>
+              ))}
+              </group>
+            </group>
+          ))}
+        </>
+      )}
+
+      {/* 缆线船：天线与拉索 */}
+      {isNet && (
+        <>
+          {[-0.3, 0.5].map((t, i) => (
+            <mesh key={i} position={[style.beam * 0.3 * (i ? 1 : -1), style.deckY + 3.2 + i * 0.8, t * span]}>
+              <cylinderGeometry args={[0.035, 0.05, 6.4, 6]} />
+              <meshStandardMaterial color="#8fa6ae" roughness={0.42} metalness={0.5} />
+            </mesh>
+          ))}
+          <mesh position={[style.beam * 0.3, style.deckY + 6.5, -0.3 * span]}>
+            <sphereGeometry args={[0.12, 8, 8]} />
+            <meshStandardMaterial color={cssColor('--cv-ship-lamp-core', '#ffd9a0')} emissive={cssColor('--cv-ship-lamp-cool', '#8fb6c8')} emissiveIntensity={1.8} toneMapped={false} />
+          </mesh>
+        </>
+      )}
+
+      {/* 自航体：一排冷光点，无桅无帆 */}
+      {isSelf &&
+        Array.from({ length: 6 }, (_, i) => (
+          <mesh key={i} position={[0, style.deckY + 0.3, -span * 0.35 + (i * span * 0.7) / 5]}>
+            <boxGeometry args={[style.beam * 0.5, 0.06, 0.16]} />
+            <meshStandardMaterial color={cssColor('--cv-ship-lamp-core', '#ffd9a0')} emissive={cssColor('--cv-ship-lamp-cool', '#8fb6c8')} emissiveIntensity={1.4} toneMapped={false} />
+          </mesh>
+        ))}
+      {isSelf && (
+        <mesh position={[0, style.deckY + 0.55, -1.0]}>
+          <sphereGeometry args={[0.28, 12, 12]} />
+          <meshStandardMaterial color={cssColor('--cv-ship-lamp-core', '#ffd9a0')} emissive={cssColor('--cv-ship-lamp-cool', '#8fb6c8')} emissiveIntensity={2.0} toneMapped={false} />
+        </mesh>
+      )}
 
       {/* 舵：船尾中央大舵，舵杆与舵叶可见 */}
       <group position={[0, 0, half + 0.55]}>
@@ -438,13 +585,13 @@ export function TreasureShip({ reduceMotion = false }: { reduceMotion?: boolean 
 
       {/* 接触阴影：径向柔边，船身压在水上，避免「浮在空气里」 */}
       <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={-1}>
-        <planeGeometry args={[SHIP_B * 2.4, SHIP_L * 1.15]} />
+        <planeGeometry args={[style.beam * 2.4, span * 1.15]} />
         <meshBasicMaterial map={softBlob} color="#04161a" transparent opacity={0.55} depthWrite={false} />
       </mesh>
 
       {/* 水线雾：船像从雾里出来 */}
-      <mesh position={[0, 0.62, 0]} renderOrder={1}>
-        <cylinderGeometry args={[SHIP_B * 1.25, SHIP_B * 1.5, 1.1, 20, 1, true]} />
+      <mesh position={[0, 0.42, 0]} renderOrder={1}>
+        <cylinderGeometry args={[style.beam * 1.25, style.beam * 1.5, 0.9, 20, 1, true]} />
         <meshBasicMaterial
           color={cssColor('--cv-scene-fog', '#24343c')}
           transparent

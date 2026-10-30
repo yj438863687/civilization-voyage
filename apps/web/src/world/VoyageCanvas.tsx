@@ -5,8 +5,9 @@ import { bootPushPose, desiredPose, easeSwell, type CamMode } from './camera';
 import { Cabin } from './Cabin';
 import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
+import { HULL_STYLES, STYLE_BY_SCENE } from './hull';
 import type { WorldConfig } from './world.config';
-import { BLEND_SEC, DEST_TRAIL, FOLLOW_TAU, HARBOR_APPROACH, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, PORT_BEACON, SHIP_MOTION } from './voyageConstants';
+import { BLEND_SEC, DEST_TRAIL, FOLLOW_TAU, HARBOR_APPROACH, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, PORT_BEACON, PORT_BERTH, SHIP_MOTION } from './voyageConstants';
 
 export type { CamMode };
 
@@ -360,6 +361,7 @@ function PortBeacon({
 }
 
 function Rig({
+  sceneId: sceneIdForStyle,
   mode,
   reduceMotion,
   canSail,
@@ -369,10 +371,16 @@ function Rig({
   onBlend,
   world,
   collectedIds,
-}: Omit<Props, 'sceneId'>) {
+}: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
   const exterior = useRef<THREE.Group>(null);
+  // 场景 → 船型。props 里没有 sceneId（Rig 只收部分），从 world 的港口剪影推不合适，
+  // 因此由下面 Rig 的调用处传入。
+  const propsScene = sceneIdForStyle;
+  // 镜头距离按当前船型长度缩放：木筏 14 与蒸汽船 26 用同一组常数会让船头出画。
+  const shipL = HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']?.length ?? SHIP_L;
+  const camScale = shipL / SHIP_L;
   const speed = useRef(0);
   const followYaw = useRef(0);
   const heel = useRef(0);
@@ -437,6 +445,9 @@ function Rig({
         harbor = p;
       }
       if (d < p.radius) nearPort = p.id;
+      // 靠港判定必须算上码头进深与船体半径：码头平台厚 15、伸向玩家半个身位，
+      // 只按 radius 判定会出现「船头已顶住码头、提示仍不出现」。
+      if (d < p.radius + PORT_BERTH.slack) nearPort = p.id;
     }
     if (harbor) {
       const r = harbor.radius;
@@ -519,7 +530,7 @@ function Rig({
 
     const headingFwd = mode === 'follow' ? laggedFwd : tmpFwd;
     const headingRight = mode === 'follow' ? laggedRight : tmpRight;
-    const pose = desiredPose(mode, g.position, headingFwd, headingRight);
+    const pose = desiredPose(mode, g.position, headingFwd, headingRight, camScale);
 
     if (!booted.current) {
       blendFrom.current.copy(camera.position);
@@ -623,14 +634,16 @@ function Rig({
           {/* 驾驶舱是独立舱室：此时隐藏船体外壳，否则桅杆与桅座会穿进镜头 */}
           <group ref={exterior} visible={mode !== 'cockpit'}>
             <Suspense fallback={null}>
-              <TreasureShip reduceMotion={reduceMotion} />
+              <TreasureShip reduceMotion={reduceMotion} style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']} />
             </Suspense>
             <Wake speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
             <BowSpray speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
           </group>
-          <Suspense fallback={null}>
-            <Cabin />
-          </Suspense>
+          {mode === 'cockpit' && (
+            <Suspense fallback={null}>
+              <Cabin />
+            </Suspense>
+          )}
         </group>
       </group>
       <DestTrail ship={ship} visible={mode === 'follow' || mode === 'route'} world={world} reduceMotion={reduceMotion} />

@@ -87,12 +87,24 @@ function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string })
   const lamp = cssVar('--cv-ship-lamp-warm', '#f0b46a');
   const core = cssVar('--cv-ship-lamp-core', '#ffd9a0');
   const trim = cssVar('--cv-ship-trim', '#c9a15a');
-  const cool = sceneId === 'B' || sceneId === 'C';
-  const lampCol = cool ? cssVar('--cv-ship-lamp-cool', '#8fb6c8') : lamp;
+  const coolMode = sceneId === 'B' || sceneId === 'C' || sceneId === 'D';
+  const lampCol = coolMode ? cssVar('--cv-ship-lamp-cool', '#8fb6c8') : lamp;
+  const cool = cssVar('--cv-ship-lamp-cool', '#8fb6c8');
   const kind = port.silhouette;
+  const WIDE_PORTS = new Set<string>(['container', 'steam', 'signal']);
 
-  const stone = kind === 'quanzhou' ? '#4b443b' : kind === 'container' ? '#3a4145' : kind === 'float' ? '#33474d' : '#433d36';
-  const roof = kind === 'quanzhou' ? '#5d3223' : kind === 'container' ? '#8a4a1e' : kind === 'float' ? '#4a7a74' : '#5a4430';
+  const palette: Record<string, { stone: string; roof: string }> = {
+    quanzhou: { stone: '#4b443b', roof: '#5d3223' },
+    float: { stone: '#33474d', roof: '#4a7a74' },
+    harbor: { stone: '#433d36', roof: '#5a4430' },
+    riverbank: { stone: '#4d4034', roof: '#7d6238' },
+    steam: { stone: '#3a3f43', roof: '#8a4a28' },
+    signal: { stone: '#243a42', roof: '#35596a' },
+    starlight: { stone: '#1b2740', roof: '#4a5a86' },
+    container: { stone: '#3a4145', roof: '#8a4a1e' },
+  };
+  const stone = (palette[kind] ?? palette.harbor).stone;
+  const roof = (palette[kind] ?? palette.harbor).roof;
 
   // 码头灯：同色同强，三种灯罩并排
   const pierLamps = [-6, -2, 2, 6];
@@ -101,51 +113,218 @@ function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string })
     <group position={[port.x, 0, port.z]}>
       {/* 基础石台 / 浮台 */}
       <mesh position={[0, 0.34, 0]} receiveShadow>
-        <boxGeometry args={[kind === 'container' ? 24 : 20, 0.68, 15]} />
+        <boxGeometry args={[WIDE_PORTS.has(kind) ? 24 : 20, 0.68, 15]} />
         <meshStandardMaterial color={stone} roughness={0.95} />
       </mesh>
       {/* 前沿护木 */}
       <mesh position={[0, 0.7, 7.4]}>
-        <boxGeometry args={[kind === 'container' ? 24 : 20, 0.18, 0.5]} />
+        <boxGeometry args={[WIDE_PORTS.has(kind) ? 24 : 20, 0.18, 0.5]} />
         <meshStandardMaterial color="#2a2521" roughness={0.9} />
       </mesh>
 
-      {kind === 'quanzhou' ? (
+      {kind === 'riverbank' ? (
         <>
-          {/* 几座低矮仓房 + 坡顶，只作体块 */}
+          {/* 农业：缓坡河岸、木桩、粮仓、低矮茅顶 */}
+          <mesh position={[0, 0.34, 0]} rotation={[0, 0.12, 0]} receiveShadow>
+            <boxGeometry args={[22, 0.68, 16]} />
+            <meshStandardMaterial color="#4d4034" roughness={0.98} />
+          </mesh>
+          {/* 河岸缓坡 */}
+          <mesh position={[0, 0.95, -7.5]} rotation={[-0.34, 0, 0]}>
+            <boxGeometry args={[24, 0.3, 5.5]} />
+            <meshStandardMaterial color="#5d4d3c" roughness={0.98} />
+          </mesh>
+          {/* 粮仓：圆筒 + 草顶 */}
+          {[-6.2, -2.4].map((x, i) => (
+            <group key={i} position={[x, 0, -3.6]}>
+              <mesh position={[0, 1.4, 0]} castShadow>
+                <cylinderGeometry args={[1.65, 1.85, 2.8, 14]} />
+                <meshStandardMaterial color="#7a6144" roughness={0.95} />
+              </mesh>
+              <mesh position={[0, 3.1, 0]} castShadow>
+                <coneGeometry args={[2.05, 1.35, 14]} />
+                <meshStandardMaterial color="#6d5734" roughness={0.9} />
+              </mesh>
+            </group>
+          ))}
+          {/* 长屋 */}
+          <mesh position={[4.6, 1.15, -3.2]} castShadow>
+            <boxGeometry args={[7.4, 2.3, 4.0]} />
+            <meshStandardMaterial color="#5a4a39" roughness={0.96} />
+          </mesh>
+          <mesh position={[4.6, 2.45, -3.2]} rotation={[0.2, 0, 0]} castShadow>
+            <boxGeometry args={[8.0, 0.16, 4.6]} />
+            <meshStandardMaterial color="#7d6238" roughness={0.88} />
+          </mesh>
+          {/* 界桩：一排短木桩 */}
+          {Array.from({ length: 7 }, (_, i) => (
+            <mesh key={`st${i}`} position={[-9 + i * 3.1, 0.68, 3.4]} castShadow>
+              <cylinderGeometry args={[0.09, 0.12, 1.2, 6]} />
+              <meshStandardMaterial color="#3f3226" roughness={0.95} />
+            </mesh>
+          ))}
+          {/* 火塘：农业唯一的暖光点 */}
+          <mesh position={[2.0, 0.72, 2.6]}>
+            <sphereGeometry args={[0.16, 8, 8]} />
+            <meshStandardMaterial color={core} emissive={lampCol} emissiveIntensity={2.2} toneMapped={false} />
+          </mesh>
+        </>
+      ) : kind === 'steam' ? (
+        <>
+          {/* 工业：铁厂、烟囱、栈桥式铁轨、龙门吊 */}
+          <mesh position={[0, 0.34, 0]} receiveShadow>
+            <boxGeometry args={[24, 0.68, 14]} />
+            <meshStandardMaterial color="#3a3f43" roughness={0.9} />
+          </mesh>
           {[
-            [-5.5, 2.4, -2.6, 6.4, 2.6, 4.2],
-            [3.4, 1.9, -1.4, 5.2, 2.1, 3.6],
-            [8.0, 1.4, 2.6, 3.0, 1.5, 2.4],
+            [-6.4, 2.6, -3.4, 8.0, 4.4, 5.0],
+            [1.6, 2.0, -3.0, 6.0, 3.2, 4.2],
           ].map(([x, y, z, w, h, d], i) => (
             <group key={i}>
               <mesh position={[x, y, z]} castShadow>
                 <boxGeometry args={[w, h, d]} />
-                <meshStandardMaterial color={i === 0 ? '#6b6154' : '#544a3f'} roughness={0.9} />
+                <meshStandardMaterial color={i === 0 ? '#4a3f36' : '#434a4e'} roughness={0.86} />
               </mesh>
-              <mesh position={[x, y + h / 2 + 0.12, z]} rotation={[0.16, 0, 0]}>
-                <boxGeometry args={[w + 0.5, 0.16, d + 0.5]} />
-                <meshStandardMaterial color={roof} roughness={0.72} />
+              <mesh position={[x, y + h / 2 + 0.1, z]} rotation={[0.1, 0, 0]}>
+                <boxGeometry args={[w + 0.4, 0.14, d + 0.4]} />
+                <meshStandardMaterial color="#2c3134" roughness={0.8} />
               </mesh>
             </group>
           ))}
-          {/* 塔：三层体块，轮廓醒目 */}
-          {[0, 1, 2].map((i) => (
-            <mesh key={`t${i}`} position={[1.6, 3.3 + i * 1.5, -4.6]} castShadow>
-              <boxGeometry args={[1.9 - i * 0.34, 1.5, 1.9 - i * 0.34]} />
-              <meshStandardMaterial color={i === 2 ? trim : '#7a4a33'} roughness={0.62} />
+          {/* 三根烟囱，高度不同 */}
+          {[
+            [6.6, 7.8, -2.2, 0.75],
+            [8.4, 6.0, 0.8, 0.6],
+            [-8.6, 5.2, 1.4, 0.55],
+          ].map(([x, h, z, r], i) => (
+            <group key={`ch${i}`} position={[x, 0, z]}>
+              <mesh position={[0, h / 2 + 0.6, 0]} castShadow>
+                <cylinderGeometry args={[r * 0.72, r, h, 10]} />
+                <meshStandardMaterial color="#4b3a32" roughness={0.88} />
+              </mesh>
+              <mesh position={[0, h * 0.72 + 0.6, 0]}>
+                <cylinderGeometry args={[r * 0.78, r * 0.78, 0.3, 10]} />
+                <meshStandardMaterial color="#8a4a28" roughness={0.7} />
+              </mesh>
+            </group>
+          ))}
+          {/* 铁轨：两条平行钢轨 + 枕木 */}
+          {[-0.6, 0.6].map((x) => (
+            <mesh key={`r${x}`} position={[x, 0.78, 2.2]} rotation={[0, 0, 0]}>
+              <boxGeometry args={[0.12, 0.1, 12]} />
+              <meshStandardMaterial color="#6a6f73" roughness={0.4} metalness={0.6} />
             </mesh>
           ))}
-          {/* 桅樯：停靠的船 */}
-          {[-7.5, -6.2].map((x, i) => (
-            <mesh key={`m${i}`} position={[x, 4.4, 4.2]}>
-              <cylinderGeometry args={[0.06, 0.09, 8.2, 6]} />
-              <meshStandardMaterial color="#221b16" roughness={0.8} />
+          {Array.from({ length: 9 }, (_, i) => (
+            <mesh key={`t${i}`} position={[0, 0.72, -3.4 + i * 1.4]}>
+              <boxGeometry args={[1.8, 0.08, 0.22]} />
+              <meshStandardMaterial color="#3b3028" roughness={0.95} />
             </mesh>
           ))}
+          {/* 吊臂 */}
+          <group position={[9.2, 0, 4.0]}>
+            <mesh position={[0, 4.4, 0]}>
+              <boxGeometry args={[0.3, 8.8, 0.3]} />
+              <meshStandardMaterial color="#2c3236" roughness={0.45} metalness={0.55} />
+            </mesh>
+            <mesh position={[-2.6, 8.4, 0]} rotation={[0, 0, 0.28]}>
+              <boxGeometry args={[5.6, 0.26, 0.26]} />
+              <meshStandardMaterial color={roof} roughness={0.5} metalness={0.4} />
+            </mesh>
+            <mesh position={[0, 4.5, 0]}>
+              <sphereGeometry args={[0.14, 8, 8]} />
+              <meshStandardMaterial color={core} emissive={lampCol} emissiveIntensity={1.7} toneMapped={false} />
+            </mesh>
+          </group>
+        </>
+      ) : kind === 'signal' ? (
+        <>
+          {/* 信息：浮台 + 天线阵列 + 光缆接驳 + 屏幕墙 */}
+          <mesh position={[0, 0.3, 0]} receiveShadow>
+            <boxGeometry args={[22, 0.6, 14]} />
+            <meshStandardMaterial color="#243a42" roughness={0.72} metalness={0.2} />
+          </mesh>
+          {/* 机柜方阵：整齐、重复，暗示机房 */}
+          {[-6.4, -4.4, -2.4, 0.4, 2.4].map((x, i) => (
+            <mesh key={i} position={[x, 1.5, -3.4]} castShadow>
+              <boxGeometry args={[1.5, 2.0, 2.2]} />
+              <meshStandardMaterial color="#2c4450" roughness={0.6} metalness={0.28} />
+            </mesh>
+          ))}
+          {/* 屏幕墙：一块竖起的冷光面 */}
+          <mesh position={[6.6, 3.0, -3.0]} rotation={[0, -0.32, 0]}>
+            <planeGeometry args={[5.0, 3.2]} />
+            <meshStandardMaterial color={core} emissive={cool} emissiveIntensity={0.5} toneMapped={false} side={THREE.DoubleSide} />
+          </mesh>
+          {/* 三根天线 */}
+          {[
+            [-8.4, 9.0],
+            [4.2, 7.0],
+            [8.8, 8.2],
+          ].map(([x, h], i) => (
+            <group key={`an${i}`} position={[x, 0, 1.4]}>
+              <mesh position={[0, h / 2, 0]}>
+                <cylinderGeometry args={[0.05, 0.09, h, 6]} />
+                <meshStandardMaterial color="#8fa6ae" roughness={0.4} metalness={0.5} />
+              </mesh>
+              <mesh position={[0, h, 0]}>
+                <sphereGeometry args={[0.13, 8, 8]} />
+                <meshStandardMaterial color={core} emissive={cool} emissiveIntensity={1.9} toneMapped={false} />
+              </mesh>
+            </group>
+          ))}
+          {/* 光缆接驳：一段露出水面的缆 */}
+          <mesh position={[0, 0.12, 6.6]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[1.0, 9]} />
+            <meshStandardMaterial color="#7a8f96" roughness={0.5} metalness={0.4} side={THREE.DoubleSide} />
+          </mesh>
+        </>
+      ) : kind === 'starlight' ? (
+        <>
+          {/* 智能：无固定建筑，只有浮体、桩、与自绘的星点 */}
+          <mesh position={[0, 0.26, 0]} receiveShadow>
+            <boxGeometry args={[20, 0.52, 12]} />
+            <meshStandardMaterial color="#1b2740" roughness={0.62} metalness={0.24} />
+          </mesh>
+          {[
+            [-6.0, -2.0, 4.2],
+            [2.0, -5.0, 3.4],
+            [7.0, 1.0, 3.0],
+          ].map(([x, z, r], i) => (
+            <mesh key={i} position={[x, 0.9, z]} castShadow>
+              <boxGeometry args={[r, 1.2, r * 0.8]} />
+              <meshStandardMaterial color="#26334f" roughness={0.7} metalness={0.2} />
+            </mesh>
+          ))}
+          {/* 自绘星图：一组悬空冷光点，位置不对称 */}
+          {Array.from({ length: 14 }, (_, i) => {
+            const a = i * 2.399;
+            const rad = 3 + (i % 5) * 2.4;
+            return (
+              <mesh key={`s${i}`} position={[Math.cos(a) * rad, 5.5 + ((i * 1.7) % 6), Math.sin(a) * rad * 0.7 - 3]}>
+                <sphereGeometry args={[0.07 + (i % 3) * 0.03, 6, 6]} />
+                <meshStandardMaterial color={core} emissive={cool} emissiveIntensity={1.6} toneMapped={false} />
+              </mesh>
+            );
+          })}
+          {/* 一根引航柱 */}
+          <group position={[0, 0, 2.0]}>
+            <mesh position={[0, 3.4, 0]}>
+              <cylinderGeometry args={[0.08, 0.12, 6.8, 8]} />
+              <meshStandardMaterial color={trim} roughness={0.4} metalness={0.5} />
+            </mesh>
+            <mesh position={[0, 6.9, 0]}>
+              <sphereGeometry args={[0.18, 10, 10]} />
+              <meshStandardMaterial color={core} emissive={cool} emissiveIntensity={2.2} toneMapped={false} />
+            </mesh>
+          </group>
         </>
       ) : kind === 'container' ? (
         <>
+          <mesh position={[0, 0.38, 0]} receiveShadow>
+            <boxGeometry args={[24, 0.76, 14]} />
+            <meshStandardMaterial color="#3d4448" roughness={0.92} />
+          </mesh>
           {[
             [-7.5, 0, -3, '#8a4a1e'],
             [-7.5, 1.25, -3, '#2f4a5c'],
@@ -161,7 +340,6 @@ function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string })
               <meshStandardMaterial color={color as string} roughness={0.6} metalness={0.22} />
             </mesh>
           ))}
-          {/* 两台门吊：腿、横梁、吊臂 */}
           {[5.2, 9.4].map((x, i) => (
             <group key={`c${i}`} position={[x, 0, 1.2]}>
               {[-1.4, 1.4].map((lz) => (
@@ -174,94 +352,37 @@ function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string })
                 <boxGeometry args={[0.5, 0.4, 3.4]} />
                 <meshStandardMaterial color={roof} roughness={0.45} metalness={0.4} />
               </mesh>
-              <mesh position={[0, 10.2, 4.2]} rotation={[0.34, 0, 0]}>
-                <boxGeometry args={[0.34, 0.3, 6.4]} />
-                <meshStandardMaterial color={roof} roughness={0.45} metalness={0.4} />
-              </mesh>
-              <mesh position={[0, 10.5, -1.4]}>
-                <sphereGeometry args={[0.12, 8, 8]} />
-                <meshStandardMaterial color={core} emissive={lampCol} emissiveIntensity={1.6} toneMapped={false} />
-              </mesh>
             </group>
           ))}
-        </>
-      ) : kind === 'float' ? (
-        <>
-          {[
-            [0, 0],
-            [-7.2, 3.0],
-            [6.8, 2.2],
-            [-3.0, -5.2],
-            [4.2, -4.4],
-          ].map(([x, z], i) => (
-            <group key={i} position={[x, 0, z]}>
-              <mesh position={[0, 0.24, 0]} receiveShadow>
-                <boxGeometry args={[5.4, 0.44, 4.2]} />
-                <meshStandardMaterial color="#2c4148" roughness={0.72} metalness={0.14} />
-              </mesh>
-              <mesh position={[0, 1.15, -0.3]} castShadow>
-                <boxGeometry args={[2.9, 1.4, 2.2]} />
-                <meshStandardMaterial color="#46666e" roughness={0.8} />
-              </mesh>
-              <mesh position={[0, 1.95, -0.3]}>
-                <boxGeometry args={[3.1, 0.06, 2.4]} />
-                <meshStandardMaterial color="#5f9d95" roughness={0.6} />
-              </mesh>
-              {/* 浮体吃水线 */}
-              <mesh position={[0, -0.02, 0]}>
-                <boxGeometry args={[5.7, 0.12, 4.5]} />
-                <meshStandardMaterial color="#16333a" roughness={0.9} />
-              </mesh>
-            </group>
-          ))}
-          {/* 连桥 */}
-          <mesh position={[2.0, 0.4, 1.0]} rotation={[0, 0.3, 0]}>
-            <boxGeometry args={[7.0, 0.1, 0.66]} />
-            <meshStandardMaterial color="#5f9d95" roughness={0.55} />
-          </mesh>
         </>
       ) : (
         <>
-          {/* 默认：小型石港。仓库、钟楼、栈桥 */}
-          <mesh position={[-1.6, 2.0, -3.2]} castShadow>
-            <boxGeometry args={[8.0, 2.9, 4.6]} />
-            <meshStandardMaterial color="#4a4238" roughness={0.88} />
+          <mesh position={[0, 0.38, 0]} receiveShadow>
+            <boxGeometry args={[17, 0.72, 12]} />
+            <meshStandardMaterial color="#4a4036" roughness={0.9} />
           </mesh>
-          <mesh position={[-1.6, 3.55, -3.2]} rotation={[0.18, 0, 0]}>
-            <boxGeometry args={[8.6, 0.18, 5.2]} />
-            <meshStandardMaterial color="#5e3a26" roughness={0.7} />
+          <mesh position={[-2.6, 2.15, -2.8]} castShadow>
+            <boxGeometry args={[7.2, 2.8, 4.4]} />
+            <meshStandardMaterial color="#3a2f28" roughness={0.78} />
           </mesh>
-          <mesh position={[5.4, 1.7, -2.2]} castShadow>
-            <boxGeometry args={[4.2, 2.3, 3.4]} />
-            <meshStandardMaterial color="#564c40" roughness={0.86} />
+          <mesh position={[-2.6, 3.7, -2.8]} rotation={[0.2, 0, 0]} castShadow>
+            <boxGeometry args={[8.0, 0.16, 5.0]} />
+            <meshStandardMaterial color="#8a4a32" roughness={0.62} />
           </mesh>
-          <mesh position={[5.4, 2.95, -2.2]} rotation={[0.14, 0, 0]}>
-            <boxGeometry args={[4.7, 0.14, 3.8]} />
-            <meshStandardMaterial color="#5e3a26" roughness={0.68} />
+          <mesh position={[4.8, 1.55, -1.6]} castShadow>
+            <boxGeometry args={[4.2, 1.7, 3.2]} />
+            <meshStandardMaterial color="#5c4638" roughness={0.82} />
           </mesh>
-          {/* 钟楼 */}
-          <mesh position={[1.9, 4.2, -3.6]}>
-            <boxGeometry args={[1.5, 4.2, 1.5]} />
-            <meshStandardMaterial color="#6b6154" roughness={0.84} />
+          <mesh position={[0.4, 5.4, -5.2]} castShadow>
+            <cylinderGeometry args={[0.22, 0.32, 10.4, 8]} />
+            <meshStandardMaterial color="#2c241e" roughness={0.7} />
           </mesh>
-          <mesh position={[1.9, 6.5, -3.6]}>
-            <coneGeometry args={[1.15, 1.2, 4]} />
-            <meshStandardMaterial color={roof} roughness={0.6} />
+          <mesh position={[0.4, 10.7, -5.2]}>
+            <sphereGeometry args={[0.55, 10, 10]} />
+            <meshStandardMaterial color={core} emissive={lamp} emissiveIntensity={1.8} toneMapped={false} />
           </mesh>
-          {/* 栈桥 */}
-          <mesh position={[2.0, 0.62, 5.6]}>
-            <boxGeometry args={[3.0, 0.16, 5.2]} />
-            <meshStandardMaterial color="#3a332c" roughness={0.92} />
-          </mesh>
-          {[4.0, 6.4].map((z) => (
-            <mesh key={z} position={[2.0, 0.3, z]}>
-              <boxGeometry args={[3.0, 0.7, 0.24]} />
-              <meshStandardMaterial color="#2a2521" roughness={0.94} />
-            </mesh>
-          ))}
         </>
       )}
-
       {/* 码头灯杆：同色同强，三种灯罩 */}
       {pierLamps.map((x, i) => (
         <group key={`pl${x}`} position={[x, 0, 6.6]}>
@@ -374,6 +495,62 @@ function PaperSign({
   );
 }
 
+/** 每段航程独有的空气/海面天气层。便宜的效果：粒子 + 低面数面片，不做体积雾。 */
+function WeatherField({ sceneId, reduceMotion }: { sceneId: string; reduceMotion: boolean }) {
+  const group = useRef<THREE.Group>(null);
+  const spec = useMemo(() => {
+    // count/高度/漂移速度/颜色/尺寸。A 河雾、B 煤烟、C 电波静电、D 星尘。
+    const table: Record<string, { n: number; y: [number, number]; drift: number; color: string; size: number; opacity: number; spread: number }> = {
+      A: { n: 90, y: [0.4, 3.2], drift: 0.5, color: '#e8c79a', size: 0.5, opacity: 0.16, spread: 62 },
+      B: { n: 110, y: [1.5, 14], drift: 0.9, color: '#8d8578', size: 1.4, opacity: 0.2, spread: 70 },
+      C: { n: 120, y: [6, 30], drift: 0.22, color: '#9fdfe8', size: 0.3, opacity: 0.5, spread: 74 },
+      D: { n: 150, y: [2, 26], drift: 0.14, color: '#c6cff5', size: 0.26, opacity: 0.5, spread: 80 },
+    };
+    return table[sceneId] ?? null;
+  }, [sceneId]);
+
+  const geo = useMemo(() => {
+    if (!spec) return null;
+    const g = new THREE.BufferGeometry();
+    const pos = new Float32Array(spec.n * 3);
+    for (let i = 0; i < spec.n; i++) {
+      const a = i * 2.399963;
+      const rad = 6 + ((i * 41) % 100) / 100 * spec.spread;
+      pos[i * 3] = Math.cos(a) * rad;
+      pos[i * 3 + 1] = spec.y[0] + ((i * 29) % 100) / 100 * (spec.y[1] - spec.y[0]);
+      pos[i * 3 + 2] = Math.sin(a) * rad;
+    }
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    return g;
+  }, [spec]);
+
+  useFrame(({ clock }) => {
+    const g = group.current;
+    if (!g || !spec || reduceMotion) return;
+    const t = clock.elapsedTime;
+    // 整体缓慢平移，粒子之间不做逐点动画：看起来是雾在走，不是点在飞。
+    g.position.x = Math.sin(t * 0.07 * spec.drift) * 6;
+    g.position.z = Math.cos(t * 0.05 * spec.drift) * 6;
+  });
+
+  if (!spec || !geo) return null;
+  return (
+    <group ref={group}>
+      <points geometry={geo}>
+        <pointsMaterial
+          color={spec.color}
+          size={spec.size}
+          sizeAttenuation
+          transparent
+          opacity={spec.opacity}
+          depthWrite={false}
+          fog
+        />
+      </points>
+    </group>
+  );
+}
+
 export function Atmosphere({
   reduceMotion,
   sceneId,
@@ -414,7 +591,15 @@ export function Atmosphere({
     });
   }, [sceneId]);
 
-  const sun = sceneId === 'A' ? cssVar('--cv-scene-light', '#f3c98b') : sceneId === 'B' ? '#e6d7a8' : cssVar('--cv-ship-lamp-cool', '#8fb6c8');
+  // 每个纪元自己的天体：河口低日、工业白日、电波冷月、自绘星夜无月。
+  const celestial: Record<string, { color: string; pos: [number, number, number]; r: number; moon: boolean }> = {
+    A: { color: cssVar('--cv-scene-light', '#ffcf94'), pos: [34, 14, -52], r: 7.4, moon: false },
+    B: { color: '#e8e2d0', pos: [-26, 46, -58], r: 4.0, moon: false },
+    C: { color: cssVar('--cv-ship-lamp-cool', '#bfe0ea'), pos: [-38, 30, -56], r: 4.6, moon: true },
+    D: { color: '#dde4ff', pos: [10, 52, -64], r: 3.2, moon: true },
+    test: { color: cssVar('--cv-ship-lamp-cool', '#8fb6c8'), pos: [-40, 38, -50], r: 4.5, moon: true },
+  };
+  const sky3 = celestial[sceneId] ?? celestial.test;
 
   return (
     <group>
@@ -424,10 +609,32 @@ export function Atmosphere({
       <Suspense fallback={<WaterFallback />}>
         <HarborWater reduceMotion={reduceMotion} sceneId={sceneId} />
       </Suspense>
-      <mesh position={sceneId === 'A' ? [36, 22, -48] : [-40, 38, -50]}>
-        <sphereGeometry args={[sceneId === 'A' ? 5.4 : 4.5, 16, 12]} />
-        <meshBasicMaterial color={sun} fog={false} />
+      <mesh position={sky3.pos}>
+        <sphereGeometry args={[sky3.r, 20, 16]} />
+        <meshBasicMaterial color={sky3.color} fog={false} />
       </mesh>
+      {/* 天体周围一圈柔光：河口是暖晕，星夜是小冷晕 */}
+      <mesh position={sky3.pos}>
+        <sphereGeometry args={[sky3.r * (sky3.moon ? 1.5 : 1.9), 18, 14]} />
+        <meshBasicMaterial color={sky3.color} transparent opacity={sky3.moon ? 0.07 : 0.1} depthWrite={false} fog={false} />
+      </mesh>
+      {/* D：自绘星点。稀疏、不闪 */}
+      {sceneId === 'D' && (
+        <group>
+          {Array.from({ length: 70 }, (_, i) => {
+            const a = i * 2.399963;
+            const y = 12 + ((i * 37) % 70);
+            const rad = 60 + ((i * 17) % 40);
+            return (
+              <mesh key={i} position={[Math.cos(a) * rad, y, Math.sin(a) * rad]}>
+                <sphereGeometry args={[0.18 + (i % 4) * 0.07, 5, 5]} />
+                <meshBasicMaterial color="#dde4ff" transparent opacity={0.45 + (i % 3) * 0.16} depthWrite={false} fog={false} />
+              </mesh>
+            );
+          })}
+        </group>
+      )}
+      <WeatherField sceneId={sceneId} reduceMotion={reduceMotion} />
       {world.ports.map((p) => (
         <PortSilhouette key={p.id} port={p} sceneId={sceneId} />
       ))}

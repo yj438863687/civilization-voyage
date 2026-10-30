@@ -29,14 +29,17 @@ export function desiredPose(
   shipPos: THREE.Vector3,
   fwd: THREE.Vector3,
   right: THREE.Vector3,
+  /** 当前船型长度 / 基准船长。镜头距离随之缩放，短船不空旷、长船不出画。 */
+  scale = 1,
 ): CamPose {
   const pos = new THREE.Vector3();
   const look = new THREE.Vector3();
   const up = UP.clone();
   let fov = 42;
+  const L = SHIP_L * scale;
 
   if (mode === 'embark') {
-    const dist = SHIP_L * 1.82;
+    const dist = L * 1.82;
     const yaw = (52 * Math.PI) / 180;
     const pitch = (8 * Math.PI) / 180;
     pos
@@ -62,8 +65,8 @@ export function desiredPose(
     const p = WORLD.ports[0];
     const az = (60 * Math.PI) / 180;
     const el = (12 * Math.PI) / 180;
-    const dist = SHIP_L * 0.9;
-    const bow = new THREE.Vector3().copy(shipPos).addScaledVector(fwd, SHIP_L * 0.42);
+    const dist = L * 0.9;
+    const bow = new THREE.Vector3().copy(shipPos).addScaledVector(fwd, L * 0.42);
     const aim = new THREE.Vector3(
       THREE.MathUtils.lerp(bow.x, p.x, 0.35),
       2.2,
@@ -81,7 +84,7 @@ export function desiredPose(
     look.copy(shipPos).addScaledVector(fwd, 2).setY(3.2);
     fov = 46;
   } else {
-    const dist = SHIP_L * 1.35;
+    const dist = L * 1.35;
     const yaw = (35 * Math.PI) / 180;
     const pitch = (18 * Math.PI) / 180;
     pos
@@ -89,7 +92,7 @@ export function desiredPose(
       .addScaledVector(fwd, -dist * Math.cos(yaw) * Math.cos(pitch))
       .addScaledVector(right, dist * Math.sin(yaw) * Math.cos(pitch))
       .addScaledVector(UP, dist * Math.sin(pitch) + 2);
-    look.copy(shipPos).addScaledVector(fwd, 0.6 * SHIP_L).setY(3.4);
+    look.copy(shipPos).addScaledVector(fwd, 0.6 * L).setY(3.4);
     fov = 50;
   }
   return { pos, look, fov, up };

@@ -24,9 +24,10 @@ function worldState(
 }
 
 const TITLE_PRESETS: Record<string, string> = {
-  A: '刺桐一问',
-  B: '标准之问',
-  C: '漂浮港一问',
+  A: '靠岸一问',
+  B: '逆风一问',
+  C: '断线一问',
+  D: '目的地一问',
   'neutral-test': '玄览一问',
 };
 
@@ -36,7 +37,7 @@ function latestScenes(list: Scene[]): Scene[] {
     const prev = map.get(s.id);
     if (!prev || s.version > prev.version) map.set(s.id, s);
   }
-  const order = ['neutral-test', 'A', 'B', 'C'];
+  const order = ['neutral-test', 'A', 'B', 'C', 'D'];
   return [...map.values()].sort((a, b) => {
     const ia = order.indexOf(a.id);
     const ib = order.indexOf(b.id);
@@ -45,9 +46,10 @@ function latestScenes(list: Scene[]): Scene[] {
 }
 
 function sceneShort(s: Scene) {
-  if (s.id === 'A') return '宋元泉州港';
-  if (s.id === 'B') return '集装箱与标准';
-  if (s.id === 'C') return '漂浮港';
+  if (s.id === 'A') return '农业 · 从漂流到靠岸';
+  if (s.id === 'B') return '工业 · 从风帆到蒸汽';
+  if (s.id === 'C') return '信息 · 从海上到电波';
+  if (s.id === 'D') return '智能 · 从驾驶到设定目的地';
   if (s.id === 'neutral-test') return '启航港 · 玄览内海';
   return s.label.replace(/^AI 推荐，待组员确认：/, '');
 }
@@ -150,10 +152,10 @@ function guide(view: View, ctx: GuideCtx) {
       : ctx.nearFragment
         ? '按 E 拾取纸签。'
         : misaligned
-          ? '铜针对准船头再加速。'
+          ? `转动船头，让铜针对准船头（偏 ${Math.round(Math.abs(ctx.relDeg ?? 0))}°）。`
           : approaching
-            ? `接近 ${ctx.portName}。靠港后，用你带的材料做一件事。`
-            : '朝海图上的目的港航行。';
+            ? `铜针已对准 ${ctx.portName}。再靠近一些，压进港区就会提示靠港。`
+            : '铜针对准目的港，按 W 前进。';
     return {
       step: '第 4 拍 · 行',
       title: ctx.nearPort ? '已经靠近港口' : '朝海图上的目的港航行',
@@ -214,7 +216,7 @@ const CREW_PROMPT = `请用两段、各自不超过三句回答，不要合并�
 
 function sceneAttr(voyage: Voyage | null, pick?: Scene | null) {
   const id = voyage?.scene_id ?? pick?.id ?? 'test';
-  if (id === 'A' || id === 'B' || id === 'C') return id;
+  if (id === 'A' || id === 'B' || id === 'C' || id === 'D') return id;
   return 'test';
 }
 
@@ -251,6 +253,8 @@ export function App() {
   const [reason, setReason] = useState('');
   const [dissent, setDissent] = useState('');
   const [arrangement, setArrangement] = useState('');
+  const [gain, setGain] = useState('');
+  const [cost, setCost] = useState('');
   const [routeId, setRouteId] = useState('simple');
   const [nearPort, setNearPort] = useState<string | null>(null);
   const [nearFragment, setNearFragment] = useState<string | null>(null);
@@ -817,11 +821,11 @@ export function App() {
         <>
           <div className={`hud hud-tl${view === 'world' ? ' hud-world' : ' scrim'}`}>
             {view === 'world' ? (
-              <>
+              <div className="hud-world-card">
                 <div className="hud-quest">{voyage?.question || '未形成文化问题'}</div>
                 <StageBar current={beat.current} reached={beat.reached} compact />
                 {status.kind !== 'idle' && <StatusBanner kind={status.kind} text={status.text} compact />}
-              </>
+              </div>
             ) : (
               <>
                 <div className="label">{voyage?.title ?? '文明航程'}</div>
@@ -874,11 +878,13 @@ export function App() {
                   </div>
                   <div className={`compass-bow${relNow != null && Math.abs(relNow) <= 12 ? ' is-aligned' : ''}`} />
                   <div
-                    className="compass-port"
+                    className={`compass-port${relNow != null && Math.abs(relNow) <= 12 ? ' is-aligned' : ''}`}
                     style={{
                       transform: `rotate(${relNow ?? 0}deg)`,
                     }}
-                  />
+                  >
+                    <span className="compass-port-tip" />
+                  </div>
                   <div className="compass-needle" />
                   <span className={`compass-key compass-key-a${relNow != null && relNow < -32 ? ' is-on' : ''}`}>A</span>
                   <span className={`compass-key compass-key-d${relNow != null && relNow > 32 ? ' is-on' : ''}`}>D</span>
@@ -925,7 +931,7 @@ export function App() {
       )}
 
       {view !== 'embark' && view !== 'reflection' && (
-        <div className={`coach-bar ${view === 'world' ? 'coach-bar-top' : ''}`}>
+        <div className={`coach-bar ${view === 'world' || view === 'cockpit' ? 'coach-bar-top' : ''}`}>
           <div className="scrim">
             <div className="label">{tip.step}</div>
             <div>{tip.next}</div>
@@ -1224,22 +1230,38 @@ export function App() {
                 rows={3}
                 placeholder={sea.arrangement.placeholder}
               />
+            </div>
+            {/* 安排落地后的两支同粗墨线：谁受益 / 谁承担。两侧同字号同宽带，不给谁更亮。 */}
+            <div className="ledger-lines" aria-label="这份安排的后果">
+              <label className="ledger-line">
+                <span className="label">谁受益</span>
+                <textarea value={gain} onChange={(e) => setGain(e.target.value)} rows={2} placeholder="这份安排先落在谁身上。" />
+              </label>
+              <label className="ledger-line">
+                <span className="label">谁承担</span>
+                <textarea value={cost} onChange={(e) => setCost(e.target.value)} rows={2} placeholder="代价落在谁身上，谁没被问到。" />
+              </label>
+            </div>
+            <div className="seal-dock">
               <SealButton
                 label="用材料说明安排"
                 disabled={busy || !arrangement.trim()}
-                hint="选一份材料，用它说明你的安排。"
+                hint="写下这段安排；若货舱里有材料，它会一并记进这条记录。"
                 onSeal={() => {
                   if (!voyage || !arrangement.trim()) return;
+                  const used = records.filter((r) => r.kind === 'fragment' || r.kind === 'material');
                   void api.addRecord(voyage.id, {
                     kind: 'choice',
-                    text: arrangement.trim(),
+                    text: `${arrangement.trim()}\n\n谁受益：${gain.trim() || '未写'}\n谁承担：${cost.trim() || '未写'}`,
                     classification: voyage.scene_id === 'C' ? 'creative' : 'counterfactual',
                     sources: [],
-                    material_ids: records.filter((r) => r.kind === 'fragment' || r.kind === 'material').map((r) => r.id),
+                    material_ids: used.map((r) => r.id),
                     version: 1,
                     access: 'private',
                   }).then(async () => {
                     setArrangement('');
+                    setGain('');
+                    setCost('');
                     setRecords(await api.records(voyage.id));
                   }).catch((e) => setError(errText(e)));
                 }}

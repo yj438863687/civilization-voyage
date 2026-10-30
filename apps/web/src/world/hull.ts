@@ -5,6 +5,76 @@ export const SHIP_L = 22;
 export const SHIP_B = 5.5;
 export const DECK_Y = 2.05;
 
+/**
+ * 四段航程的船型参数。船仍是「同一艘船」的容器，
+ * 但每段有自己的轮廓与帆制：木筏 → 明轮蒸汽船 → 缆线单桅船 → 无帆自航体。
+ * 全部为概念设计，不是任何历史原船的复原。
+ */
+export type HullStyle = {
+  id: 'raft' | 'junk' | 'steamer' | 'sailnet' | 'selfnav';
+  /** 长宽比与干舷 */
+  length: number;
+  beam: number;
+  deckY: number;
+  /** 船底最低点（负值）；越小吃水越深 */
+  keelMin: number;
+  /** 船头抬升 */
+  bowLift: number;
+  /** 舷侧外张强度 */
+  flare: number;
+  /** 帆：数量、类型 */
+  masts: number;
+  sail: 'mat' | 'batten' | 'canvas' | 'none';
+  /** 楼：层数与宽度比 */
+  towerFloors: number;
+  towerScale: number;
+  /** 首部装饰：船眼 / 撞角 / 无 */
+  prow: 'eye' | 'ram' | 'none';
+  /** 推进：桨 / 明轮 / 螺旋 / 无 */
+  drive: 'oar' | 'paddle' | 'prop' | 'none';
+};
+
+export const HULL_STYLES: Record<string, HullStyle> = {
+  // 农业：木筏与独木舟之间。低干舷、平底、一张草席帆。
+  raft: {
+    id: 'raft', length: 14, beam: 6.4, deckY: 0.92, keelMin: -0.18, bowLift: 0.1,
+    flare: 0.25, masts: 1, sail: 'mat', towerFloors: 0, towerScale: 0.5,
+    prow: 'none', drive: 'oar',
+  },
+  // 启航港：宝船气势的通用容器（现有）
+  junk: {
+    id: 'junk', length: 22, beam: 5.5, deckY: 2.05, keelMin: -0.52, bowLift: 1.05,
+    flare: 1, masts: 7, sail: 'batten', towerFloors: 3, towerScale: 1,
+    prow: 'eye', drive: 'prop',
+  },
+  // 工业：铁壳蒸汽船。高干舷、单烟囱、明轮或螺旋桨、两张帆备用。
+  steamer: {
+    id: 'steamer', length: 26, beam: 5.2, deckY: 2.5, keelMin: -0.62, bowLift: 0.55,
+    flare: 0.55, masts: 2, sail: 'canvas', towerFloors: 1, towerScale: 0.62,
+    prow: 'ram', drive: 'paddle',
+  },
+  // 信息：轻壳单桅。细长、低楼、天线与缆线。
+  sailnet: {
+    id: 'sailnet', length: 24, beam: 4.4, deckY: 1.9, keelMin: -0.44, bowLift: 0.5,
+    flare: 0.5, masts: 1, sail: 'canvas', towerFloors: 1, towerScale: 0.5,
+    prow: 'none', drive: 'prop',
+  },
+  // 智能：无帆自航体。低矮、对称、无桅，靠光点与推进器。
+  selfnav: {
+    id: 'selfnav', length: 20, beam: 6.6, deckY: 1.5, keelMin: -0.34, bowLift: 0.18,
+    flare: 0.3, masts: 0, sail: 'none', towerFloors: 0, towerScale: 0.4,
+    prow: 'none', drive: 'prop',
+  },
+};
+
+export const STYLE_BY_SCENE: Record<string, HullStyle['id']> = {
+  test: 'junk',
+  A: 'raft',
+  B: 'steamer',
+  C: 'sailnet',
+  D: 'selfnav',
+};
+
 /** 「霸气」主要来自艉楼：占船长后 1/4，三层递退，逐层挑檐。 */
 /**
  * 驾驶舱：艉楼第一层的内部空间。相机坐在桌后向前看，前窗三扇朝船头。
@@ -27,36 +97,45 @@ export const STERN_HALL = {
   eyeY: DECK_Y + 1.18,
 };
 
-/** 干舷与吃水。船头抬高、船尾微抬，中段最深。 */
-function sheer(t: number) {
-  const bow = Math.max(0, 1 - t / 0.22);
-  const stern = Math.max(0, (t - 0.86) / 0.14);
-  return {
-    deck: DECK_Y + Math.pow(bow, 1.6) * 1.05 + Math.pow(stern, 2) * 0.26,
-    keel: -0.86 + Math.pow(bow, 2.2) * 0.78 + Math.pow(stern, 2.4) * 0.34,
+/**
+ * 干舷与吃水。水线在 y = 0：船体只在水下露 0.5 左右，
+ * 甲板离水 deckY，看起来是浮着而不是快淹了。
+ */
+function makeSheer(st: HullStyle) {
+  return (t: number) => {
+    const bow = Math.max(0, 1 - t / 0.22);
+    const stern = Math.max(0, (t - 0.86) / 0.14);
+    return {
+      deck: st.deckY + Math.pow(bow, 1.6) * st.bowLift + Math.pow(stern, 2) * st.bowLift * 0.25,
+      keel: st.keelMin + Math.pow(bow, 2.2) * st.keelMin * -0.88 + Math.pow(stern, 2.4) * st.keelMin * -0.38,
+    };
   };
 }
 
 /** 舷弧：船头收窄收尖，舯部最宽，船尾保留方形平艉。 */
-function halfBeam(t: number) {
-  if (t < 0.2) return (SHIP_B / 2) * Math.pow(t / 0.2, 0.66);
-  if (t > 0.965) return (SHIP_B / 2) * 0.965;
-  return (SHIP_B / 2) * (1 - Math.pow((t - 0.2) / 0.8, 6) * 0.22);
+function makeBeam(st: HullStyle) {
+  return (t: number) => {
+    if (t < 0.2) return (st.beam / 2) * Math.pow(t / 0.2, 0.66);
+    if (t > 0.965) return (st.beam / 2) * 0.965;
+    return (st.beam / 2) * (1 - Math.pow((t - 0.2) / 0.8, 6) * 0.22);
+  };
 }
 
 const N_Z = 40;
 const N_ARC = 16;
 
-function station(t: number) {
-  const s = sheer(t);
-  return { z: -SHIP_L / 2 + t * SHIP_L, deckY: s.deck, keelY: s.keel, half: halfBeam(t), t };
-}
-
 /**
  * 船体放样：外张舷侧 + 内收船底 + 船头抬升。
  * 只做体块与弧度，不复原任何具体船只。概念设计。
  */
-export function buildHullGeometry() {
+export function buildHullGeometry(st: HullStyle = HULL_STYLES.junk) {
+  const sheer = makeSheer(st);
+  const halfBeam = makeBeam(st);
+  const station = (t: number) => {
+    const s = sheer(t);
+    return { z: -st.length / 2 + t * st.length, deckY: s.deck, keelY: s.keel, half: halfBeam(t), t };
+  };
+
   const positions: number[] = [];
   const uvs: number[] = [];
   const index: number[] = [];
@@ -66,11 +145,11 @@ export function buildHullGeometry() {
     const s = station(i / N_Z);
     const ring: THREE.Vector3[] = [];
     for (let j = 0; j <= N_ARC; j++) {
-      const u = j / N_ARC; // 0 = 右舷甲板边 → 0.5 龙骨 → 1 左舷甲板边
+      const u = j / N_ARC;
       const fromDeck = u <= 0.5 ? u * 2 : (1 - u) * 2;
       const side = u <= 0.5 ? 1 : -1;
-      // 舷侧上部外张，接近船底快速内收
-      const flare = 1 - Math.pow(fromDeck, 1.55) * 0.985;
+      // 舷侧上部外张（flare 越小越直，像铁壳），接近船底快速内收
+      const flare = 1 - Math.pow(fromDeck, 1.55) * (0.985 - (1 - st.flare) * 0.35);
       const x = side * s.half * flare;
       const y = s.deckY + (s.keelY - s.deckY) * (fromDeck * 0.42 + fromDeck * fromDeck * 0.58);
       ring.push(new THREE.Vector3(x, y, s.z));
@@ -98,7 +177,6 @@ export function buildHullGeometry() {
   geo.setIndex(index);
   geo.computeVertexNormals();
 
-  // 朝向自检：法线整体应朝外（+y 成分）
   const n = geo.getAttribute('normal');
   let ny = 0;
   for (let i = 0; i < n.count; i++) ny += n.getY(i);
@@ -118,14 +196,15 @@ export function buildHullGeometry() {
 }
 
 /** 甲板：带中拱的曲面，不是平板。 */
-export function buildDeckGeometry() {
-  const g = new THREE.PlaneGeometry(SHIP_B, SHIP_L, 12, N_Z);
+export function buildDeckGeometry(st: HullStyle = HULL_STYLES.junk) {
+  const sheer = makeSheer(st);
+  const g = new THREE.PlaneGeometry(st.beam, st.length, 12, N_Z);
   const pos = g.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const z = pos.getY(i);
     const x = pos.getX(i);
-    const t = (z + SHIP_L / 2) / SHIP_L;
-    const camber = 0.09 * (1 - Math.pow((x / (SHIP_B / 2)) * 1, 2)) * (1 - Math.pow(Math.abs(t - 0.5) * 2, 4));
+    const t = (z + st.length / 2) / st.length;
+    const camber = 0.09 * st.flare * (1 - Math.pow((x / (st.beam / 2)) * 1, 2)) * (1 - Math.pow(Math.abs(t - 0.5) * 2, 4));
     pos.setZ(i, sheer(t).deck + camber);
   }
   g.rotateX(-Math.PI / 2);
@@ -135,16 +214,20 @@ export function buildDeckGeometry() {
 }
 
 /** 舷墙：沿舷弧起伏的一圈朱漆墙，带顶栏。 */
-export function buildBulwarkGeometry(side: 1 | -1, height = 0.62) {
+export function buildBulwarkGeometry(side: 1 | -1, st: HullStyle = HULL_STYLES.junk, height = 0.62) {
+  const sheer = makeSheer(st);
+  const halfBeam = makeBeam(st);
   const positions: number[] = [];
   const index: number[] = [];
   const n = 24;
   for (let i = 0; i <= n; i++) {
     const t = 0.02 + (i / n) * 0.96;
-    const s = station(t);
-    const x = side * (s.half - 0.02);
-    positions.push(x, s.deckY, s.z);
-    positions.push(x, s.deckY + height, s.z);
+    const s = sheer(t);
+    const z = -st.length / 2 + t * st.length;
+    const x = side * (halfBeam(t) - 0.02);
+    const h = height * (st.id === 'raft' ? 0.25 : 1);
+    positions.push(x, s.deck, z);
+    positions.push(x, s.deck + h, z);
   }
   for (let i = 0; i < n; i++) {
     const a = i * 2;
@@ -158,16 +241,19 @@ export function buildBulwarkGeometry(side: 1 | -1, height = 0.62) {
 }
 
 /** 方形平艉板。 */
-export function buildTransomGeometry() {
-  const s = station(1);
+export function buildTransomGeometry(st: HullStyle = HULL_STYLES.junk) {
+  const sheer = makeSheer(st);
+  const halfBeam = makeBeam(st);
+  const s = sheer(1);
+  const half = halfBeam(1);
   const shape = new THREE.Shape();
-  shape.moveTo(-s.half, s.deckY);
-  shape.lineTo(s.half, s.deckY);
-  shape.lineTo(s.half * 0.88, s.keelY + 0.16);
-  shape.lineTo(-s.half * 0.88, s.keelY + 0.16);
+  shape.moveTo(-half, s.deck);
+  shape.lineTo(half, s.deck);
+  shape.lineTo(half * 0.88, s.keel + 0.16);
+  shape.lineTo(-half * 0.88, s.keel + 0.16);
   shape.closePath();
   const g = new THREE.ShapeGeometry(shape);
-  g.translate(0, 0, s.z - 0.001);
+  g.translate(0, 0, st.length / 2 - 0.001);
   return g;
 }
 

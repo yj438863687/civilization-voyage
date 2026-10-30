@@ -226,38 +226,50 @@
 }
 
 /* ---------- 场景皮肤：只覆盖 --cv-scene-*，均为 AI 推荐待确认 ---------- */
+/* 四段航程用「一天的光线」区分：河口黎明 → 蒸汽正午 → 电波夜蓝 → 自绘星夜。 */
 
-/* A 候选：宋元泉州港 · 古风 */
+/* A 农业 · 从漂流到靠岸：河口黎明。暖河泥、低雾、第一道光。 */
 [data-scene="A"] {
-  --cv-scene-accent: #c58b4b;       /* 瓷土与船木 */
-  --cv-scene-sky-top: #1b2430;
-  --cv-scene-sky-horizon: #b98a5e;  /* 黄昏港湾 */
-  --cv-scene-fog: #6d6253;
-  --cv-scene-water: #23413f;
-  --cv-scene-light: #f3c98b;
-  --cv-scene-label: "场景 A · AI 推荐，待组员确认";
+  --cv-scene-accent: #c08a4e;
+  --cv-scene-sky-top: #2a2f3c;
+  --cv-scene-sky-horizon: #d2a071;
+  --cv-scene-fog: #8a7761;
+  --cv-scene-water: #2c4340;
+  --cv-scene-light: #ffcf94;
+  --cv-scene-label: "农业 · 从漂流到靠岸（AI 推荐待确认）";
 }
 
-/* B 候选：集装箱化港口 · 现代 */
+/* B 工业 · 从风帆到蒸汽：正午煤烟。铁灰、焦炉橙、白昼硬光。 */
 [data-scene="B"] {
-  --cv-scene-accent: #d27a3a;       /* 安全橙 */
-  --cv-scene-sky-top: #1a2229;
-  --cv-scene-sky-horizon: #5c6f7a;
-  --cv-scene-fog: #4a565d;
-  --cv-scene-water: #1e3340;
-  --cv-scene-light: #e6eef2;        /* 钠灯与日光混合，偏冷 */
-  --cv-scene-label: "场景 B · AI 推荐，待组员确认";
+  --cv-scene-accent: #c8702c;
+  --cv-scene-sky-top: #2b3238;
+  --cv-scene-sky-horizon: #7d8288;
+  --cv-scene-fog: #565d63;
+  --cv-scene-water: #22343c;
+  --cv-scene-light: #e8e2d0;
+  --cv-scene-label: "工业 · 从风帆到蒸汽（AI 推荐待确认）";
 }
 
-/* C 候选：海平面上升后的漂浮港 · 未来 */
+/* C 信息 · 从海上到电波：电波夜蓝。冷青、屏幕微光、低饱和。 */
 [data-scene="C"] {
-  --cv-scene-accent: #7fd1c2;
-  --cv-scene-sky-top: #0c1420;
-  --cv-scene-sky-horizon: #3d5a6e;
-  --cv-scene-fog: #2a3d4c;
-  --cv-scene-water: #0f2e3a;
-  --cv-scene-light: #cfe7ff;
-  --cv-scene-label: "场景 C · AI 推荐，待组员确认";
+  --cv-scene-accent: #66b8c0;
+  --cv-scene-sky-top: #0a1520;
+  --cv-scene-sky-horizon: #35546a;
+  --cv-scene-fog: #26404f;
+  --cv-scene-water: #0f2d38;
+  --cv-scene-light: #bfe0ea;
+  --cv-scene-label: "信息 · 从海上到电波（AI 推荐待确认）";
+}
+
+/* D 智能 · 从驾驶到设定目的地：自绘星夜。深靛，星点冷白，船灯更少。 */
+[data-scene="D"] {
+  --cv-scene-accent: #9aa8e0;
+  --cv-scene-sky-top: #080d1c;
+  --cv-scene-sky-horizon: #243050;
+  --cv-scene-fog: #1a2440;
+  --cv-scene-water: #0b1a2c;
+  --cv-scene-light: #dde4ff;
+  --cv-scene-label: "智能 · 从驾驶到设定目的地（AI 推荐待确认）";
 }
 
 /* 启航港 · 玄览内海：夜港创作，不是灰网格测试场 */

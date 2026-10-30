@@ -82,6 +82,9 @@ export const DEST_TRAIL = {
   emitNear: 0.9,
 };
 
+/** 靠港判定余量：码头平台进深 15（半幅 7.5）+ 船体半径，落在这个环内就该提示靠港。 */
+export const PORT_BERTH = { slack: 6 };
+
 export const PORT_BEACON = {
   height: 1.2 * SHIP_L,
   radius: 0.006 * SHIP_L,
