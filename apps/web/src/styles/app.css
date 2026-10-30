@@ -707,3 +707,82 @@ html[data-reduce-motion='true'] .btn:active { transform: none; }
     z-index: var(--cv-z-hud);
   }
 }
+
+/* ---------- 世界页 HUD：主机式，轻量、四角、不遮挡 ---------- */
+.hud-world {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  max-width: 300px;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.8);
+}
+.hud-quest {
+  font-family: var(--cv-font-display);
+  font-size: var(--cv-text-lg);
+  line-height: 1.35;
+  color: var(--cv-paper-50);
+  max-width: 22ch;
+  margin-bottom: 6px;
+}
+.hud-tr-world {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  max-width: none;
+}
+.ledger-compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--cv-font-mono);
+  font-size: var(--cv-text-xs);
+  letter-spacing: 0.02em;
+  padding: 6px 10px;
+  border-radius: var(--cv-radius-xs);
+  background: var(--cv-hud-scrim);
+  border: 1px solid var(--cv-line);
+}
+.ledger-compact .stamp { margin-right: 4px; padding: 0 5px; font-size: 10px; }
+.ledger-sep { width: 1px; height: 12px; background: var(--cv-line-strong); }
+.ledger-test { color: var(--cv-brass-400); display: inline-flex; align-items: center; gap: 4px; }
+.unconnected-inline { color: var(--cv-state-unconnected); border-bottom: 1px dashed var(--cv-state-unconnected); }
+
+.stage-compact .stage-bar { gap: 6px; font-size: 13px; letter-spacing: 0.16em; }
+.stage-compact .stage-caption { display: none; }
+.stage-compact { text-shadow: 0 1px 8px rgb(0 0 0 / 0.9); }
+
+.status-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: var(--cv-radius-xs);
+  background: var(--cv-hud-scrim);
+  border: 1px solid var(--cv-line);
+  text-shadow: none;
+}
+.status-compact .status-dot { margin-top: 0; width: 6px; height: 6px; }
+
+/* 世界页导航：图标化，避免一排后台按钮 */
+.hud-br .hud-action {
+  background: var(--cv-hud-scrim);
+  border: 1px solid var(--cv-line);
+  border-radius: var(--cv-radius-xs);
+  color: var(--cv-text-muted);
+  transition: color var(--cv-dur-fast) var(--cv-ease-out), border-color var(--cv-dur-fast) var(--cv-ease-out);
+}
+.hud-br .hud-action:hover:not(:disabled) { color: var(--cv-brass-300); border-color: var(--cv-line-brass); }
+.hud-br .hud-action:disabled { opacity: 0.3; }
+
+/* 世界页：场景签放左上、教练条放顶部中央，二者不重叠 */
+.hud-tc-world {
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--cv-hud-edge) + env(safe-area-inset-bottom));
+  opacity: 0.7;
+}
+.hud-tc-world .stamp { font-size: 10px; background: var(--cv-hud-scrim); }

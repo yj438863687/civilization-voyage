@@ -248,17 +248,27 @@ function DestTrail({
 
 const BEACON_VERT = /* glsl */ `
 varying float vH;
+varying vec2 vUv;
 void main() {
   vH = uv.y;
+  vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
+// 灯柱：底部亮、向上淡出，两侧软边。不做激光线，不做扫描。
 const BEACON_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uFade;
+uniform float uTime;
+uniform float uReduce;
 varying float vH;
+varying vec2 vUv;
 void main() {
-  float a = mix(0.55, 0.0, vH) * uFade;
+  float edge = sin(vUv.x * 3.14159);
+  edge = pow(max(edge, 0.0), 2.2);
+  float up = pow(1.0 - vH, 1.7);
+  float ripple = uReduce > 0.5 ? 1.0 : 0.86 + 0.14 * sin(vH * 9.0 - uTime * 1.1);
+  float a = up * edge * uFade * 0.30 * ripple;
   gl_FragColor = vec4(uColor, a);
 }
 `;
@@ -272,46 +282,80 @@ function PortBeacon({
   world: WorldConfig;
   reduceMotion: boolean;
 }) {
-  const mesh = useRef<THREE.Mesh>(null);
+  const group = useRef<THREE.Group>(null);
   const fade = useRef(1);
-  const mat = useMemo(() => {
-    const lamp = hexColor('--cv-ship-lamp-warm', '#f0b46a');
-    return new THREE.ShaderMaterial({
-      uniforms: { uColor: { value: lamp }, uFade: { value: 1 } },
-      vertexShader: BEACON_VERT,
-      fragmentShader: BEACON_FRAG,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      fog: false,
-      side: THREE.DoubleSide,
-    });
-  }, []);
+  const core = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          uColor: { value: hexColor('--cv-ship-lamp-core', '#ffd9a0') },
+          uFade: { value: 1 },
+          uTime: { value: 0 },
+          uReduce: { value: reduceMotion ? 1 : 0 },
+        },
+        vertexShader: BEACON_VERT,
+        fragmentShader: BEACON_FRAG,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false,
+        side: THREE.DoubleSide,
+      }),
+    [],
+  );
+  const halo = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          uColor: { value: hexColor('--cv-ship-lamp-warm', '#f0b46a') },
+          uFade: { value: 1 },
+          uTime: { value: 0 },
+          uReduce: { value: 1 },
+        },
+        vertexShader: BEACON_VERT,
+        fragmentShader: BEACON_FRAG,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false,
+        side: THREE.DoubleSide,
+      }),
+    [],
+  );
+
   useFrame((_, dt) => {
     const g = ship.current;
     const p = world.ports[0];
-    if (!g || !p || !mesh.current) return;
+    if (!g || !p || !group.current) return;
     const d = Math.hypot(g.position.x - p.x, g.position.z - p.z);
     let target = 1;
     if (d < p.radius) target = 0;
     else if (d < p.radius * HARBOR_APPROACH.inner) target = PORT_BEACON.innerFade;
-    const tau = reduceMotion ? 0.001 : 0.48;
+    const tau = reduceMotion ? 0.001 : 0.5;
     fade.current += (target - fade.current) * (1 - Math.exp(-Math.min(dt, 0.05) / tau));
-    mat.uniforms.uFade.value = fade.current;
-    mesh.current.visible = fade.current > 0.02;
+    const t = performance.now() / 1000;
+    for (const m of [core, halo]) {
+      m.uniforms.uFade.value = fade.current;
+      m.uniforms.uTime.value = t;
+    }
+    group.current.visible = fade.current > 0.02;
   });
+
   const p = world.ports[0];
   if (!p) return null;
-  const h = PORT_BEACON.height;
+  const h = PORT_BEACON.height * 0.62;
+
   return (
-    <mesh
-      ref={mesh}
-      position={[p.x, PORT_BEACON.baseY + h / 2, p.z]}
-      material={mat}
-      frustumCulled={false}
-    >
-      <cylinderGeometry args={[PORT_BEACON.radius * 0.45, PORT_BEACON.radius, h, 8, 1, true]} />
-    </mesh>
+    <group ref={group} position={[p.x, 0, p.z]}>
+      {/* 细柱：从码头灯高度起，向上淡出 */}
+      <mesh position={[0, PORT_BEACON.baseY + h / 2, 0]} material={core} frustumCulled={false}>
+        <cylinderGeometry args={[PORT_BEACON.radius * 0.6, PORT_BEACON.radius * 1.5, h, 12, 1, true]} />
+      </mesh>
+      {/* 外晕：更宽更淡，让它像雾里的光而不像激光 */}
+      <mesh position={[0, PORT_BEACON.baseY + h / 2, 0]} material={halo} frustumCulled={false}>
+        <cylinderGeometry args={[PORT_BEACON.radius * 3.2, PORT_BEACON.radius * 5.5, h * 0.9, 16, 1, true]} />
+      </mesh>
+    </group>
   );
 }
 
@@ -611,7 +655,7 @@ export function VoyageCanvas(props: Props) {
       <Canvas
         shadows
         dpr={[1, 1.75]}
-        camera={{ fov: 34, near: 0.1, far: 360, position: [28, 5.2, 8] }}
+        camera={{ fov: 34, near: 0.3, far: 420, position: [28, 5.2, 8] }}
         onCreated={({ gl }) => {
           gl.setClearColor(sky, 1);
           gl.outputColorSpace = THREE.SRGBColorSpace;
@@ -621,7 +665,7 @@ export function VoyageCanvas(props: Props) {
         gl={{ antialias: true, powerPreference: 'high-performance' }}
       >
         <color attach="background" args={[sky]} />
-        <fog attach="fog" args={[fog, 70, 190]} />
+        <fog attach="fog" args={[fog, 55, 210]} />
         <SceneTint sceneId={props.sceneId} />
         <ambientLight intensity={0.24} color={'#8a9298'} />
         <hemisphereLight args={['#7d8c96', '#1a1410', 0.38]} />

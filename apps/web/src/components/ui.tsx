@@ -114,6 +114,7 @@ export function SealButton({
   );
 }
 
+/** 两本账：真实用量与剧情资源物理分开，未接入就写未接入。 */
 export function Ledgers({
   connected,
   usage,
@@ -121,6 +122,7 @@ export function Ledgers({
   inventory,
   capacity,
   materials = 0,
+  compact = false,
 }: {
   connected: boolean;
   usage: Usage[];
@@ -128,6 +130,7 @@ export function Ledgers({
   inventory: Record<string, number> | null;
   capacity: number | null;
   materials?: number;
+  compact?: boolean;
 }) {
   const tokens = usage.reduce((n, u) => {
     const raw = u.usage;
@@ -136,6 +139,21 @@ export function Ledgers({
   }, 0);
   const held = inventory ? Object.values(inventory).reduce((a, b) => a + b, 0) : 0;
 
+  if (compact) {
+    return (
+      <div className="ledger-compact">
+        <span className={connected ? 'ledger-real' : 'unconnected-inline'}>
+          {connected ? `真实 ${tokens ? `${tokens} tok` : '0'}` : '真实 未接入'}
+        </span>
+        <span className="ledger-sep" aria-hidden />
+        <span className="ledger-story">材料 {materials}</span>
+        <span className="ledger-test">
+          <Stamp kind="test">测试</Stamp>补给 {balance ?? '—'}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="ledger">
       <div className="ledger-block">
@@ -143,10 +161,10 @@ export function Ledgers({
         {connected ? (
           usage.length ? (
             <div className="mono ledger-real">
-              已用 token {tokens || '—'} · 金额未知 · {usage[0]?.settlement === 'not_connected' ? 'HMT 尚未接入' : ''}
+              {tokens || '—'} tokens · 金额未知 · {usage[0]?.settlement === 'not_connected' ? 'HMT 尚未接入' : ''}
             </div>
           ) : (
-            <div className="mono ledger-real">已接入 · 本航程尚未产生用量</div>
+            <div className="mono ledger-real">本航程尚无用量</div>
           )
         ) : (
           <div className="unconnected">尚未接入</div>
@@ -180,10 +198,12 @@ export function StatusBanner({
   kind,
   text,
   action,
+  compact = false,
 }: {
   kind: 'idle' | 'running' | 'waiting' | 'unconnected' | 'failed' | 'insufficient' | 'done';
   text: string;
   action?: ReactNode;
+  compact?: boolean;
 }) {
   const color: Record<typeof kind, string> = {
     idle: 'var(--cv-state-idle)',
@@ -195,7 +215,7 @@ export function StatusBanner({
     done: 'var(--cv-state-done)',
   };
   return (
-    <div className="status">
+    <div className={`status${compact ? ' status-compact' : ''}`}>
       <span className="status-dot" style={{ background: color[kind] }} />
       <div>
         <div>{text}</div>
@@ -229,9 +249,11 @@ export function Coach({
 export function StageBar({
   current,
   reached,
+  compact = false,
 }: {
   current: string;
   reached: string[];
+  compact?: boolean;
 }) {
   const items = [
     ['ask', '问'],
@@ -248,7 +270,7 @@ export function StageBar({
     reflect: '回看你信了什么',
   };
   return (
-    <div className="stage-bar-wrap">
+    <div className={`stage-bar-wrap${compact ? ' stage-compact' : ''}`}>
       <div className="stage-bar">
         {items.map(([id, label], i) => (
           <span key={id} data-on={String(reached.includes(id))} data-now={String(current === id)}>

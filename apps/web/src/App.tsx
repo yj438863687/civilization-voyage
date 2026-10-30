@@ -813,13 +813,23 @@ export function App() {
 
       {view !== 'embark' && (
         <>
-          <div className="hud hud-tl scrim">
-            <div className="label">{voyage?.title ?? '文明航程'}</div>
-            <div>{voyage?.question || '未形成文化问题'}</div>
-            <StageBar current={beat.current} reached={beat.reached} />
-            <StatusBanner kind={status.kind} text={status.text} />
+          <div className={`hud hud-tl${view === 'world' ? ' hud-world' : ' scrim'}`}>
+            {view === 'world' ? (
+              <>
+                <div className="hud-quest">{voyage?.question || '未形成文化问题'}</div>
+                <StageBar current={beat.current} reached={beat.reached} compact />
+                {status.kind !== 'idle' && <StatusBanner kind={status.kind} text={status.text} compact />}
+              </>
+            ) : (
+              <>
+                <div className="label">{voyage?.title ?? '文明航程'}</div>
+                <div>{voyage?.question || '未形成文化问题'}</div>
+                <StageBar current={beat.current} reached={beat.reached} />
+                <StatusBanner kind={status.kind} text={status.text} />
+              </>
+            )}
           </div>
-          <div className="hud hud-tr scrim">
+          <div className={`hud hud-tr${view === 'world' ? ' hud-tr-world' : ' scrim'}`}>
             <Ledgers
               connected={connected}
               usage={usage}
@@ -827,9 +837,10 @@ export function App() {
               inventory={voyage?.inventory ?? null}
               capacity={voyage?.capacity ?? null}
               materials={unusedFragments}
+              compact={view === 'world'}
             />
           </div>
-          <div className="hud hud-tc">
+          <div className={`hud hud-tc${view === 'world' ? ' hud-tc-world' : ''}`}>
             <Stamp
               kind={
                 voyage?.scene_id === 'neutral-test' || scenePick?.id === 'neutral-test'
