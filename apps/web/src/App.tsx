@@ -488,12 +488,14 @@ export function App() {
     try {
       const scene = scenePick ?? scenes.find((s) => s.status === 'test');
       if (!scene) throw new Error('没有可用场景');
+      const seedQuestion = scene.questions[0] ?? '';
       const created = await api.createVoyage({
         title: title.trim() || TITLE_PRESETS[scene.id] || '未命名航程',
         scene_id: scene.id,
         scene_version: scene.version,
         scene_track: scene.status === 'pending' ? 'candidate' : scene.status === 'confirmed' ? 'confirmed' : 'test',
-        question: '',
+        // 场景问题先落进草稿：陌生人不必先编一句才有东西可改
+        question: seedQuestion,
         shared_task: scene.interactions[0] ?? '',
         crew: DEFAULT_CREW.map((c) => ({ ...c, model_id: models[0]?.id ?? null })),
       });
@@ -1083,13 +1085,28 @@ export function App() {
               >
                 用场景给出的问题
               </button>
-              <button className="btn btn-ghost" type="button" onClick={() => setReason('我想亲眼对照材料，不先下结论。')}>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => {
+                  if (!question.trim()) {
+                    const q = snapshotQuestion(voyage);
+                    if (q) setQuestion(q);
+                  }
+                  if (!reason.trim()) setReason('我想亲眼对照材料，不先下结论。');
+                }}
+              >
                 先带着疑问出海
               </button>
             </div>
             <div className="field">
               <span className="label">文化问题</span>
-              <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
+              <textarea
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                rows={3}
+                placeholder="这一程你想弄清什么？可以先用上面给出的问题，再改成你自己的。"
+              />
             </div>
             <div className="field">
               <span className="label">共同任务</span>
@@ -1105,7 +1122,7 @@ export function App() {
             </div>
             <Stamp kind="pending">草稿</Stamp>
             {dissent.trim() ? <Stamp kind="dissent">分歧</Stamp> : null}
-            <div style={{ marginTop: 16 }}>
+            <div className="seal-dock">
               <SealButton
                 label="确认此行的问题"
                 disabled={busy || !question.trim() || !reason.trim()}
