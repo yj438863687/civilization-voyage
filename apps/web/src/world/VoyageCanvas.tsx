@@ -567,14 +567,17 @@ function Rig({
       persp.fov = boot.fov;
       persp.updateProjectionMatrix();
     } else if (mode === 'follow' && blend.current >= 1) {
-      const dist = approach ? SHIP_L * 0.9 : SHIP_L * 1.35;
+      // 跟船弹簧：距离、横移、高度、注视点都按当前船型长度缩放，
+      // 否则蒸汽船（L=26）船头出画、木筏（L=14）又空得只剩海。
+      const L = SHIP_L * camScale;
+      const dist = approach ? L * 0.9 : L * 1.35;
       const az = ((approach ? 60 : 35) * Math.PI) / 180;
       const el = ((approach ? 12 : 18) * Math.PI) / 180;
       const dBack = dist * Math.cos(az) * Math.cos(el);
       const dRight = dist * Math.sin(az) * Math.cos(el);
-      const dHeight = dist * Math.sin(el) + 2;
+      const dHeight = dist * Math.sin(el) + 2 + (camScale - 1) * 3;
       const turnRate = input.turn * world.ship.turn;
-      const extra = Math.min(Math.abs(turnRate) / ((60 * Math.PI) / 180), 1) * 0.12 * SHIP_L * Math.sign(turnRate || 1);
+      const extra = Math.min(Math.abs(turnRate) / ((60 * Math.PI) / 180), 1) * 0.12 * L * Math.sign(turnRate || 1);
       const damp = (cur: number, target: number, t: number) =>
         reduceMotion ? target : target + (cur - target) * Math.exp(-clamped / t);
       followOff.current.back = damp(followOff.current.back, dBack, FOLLOW_TAU.dist);
@@ -588,12 +591,12 @@ function Rig({
         .addScaledVector(UP, followOff.current.height);
       if (approach && harbor) {
         look.set(
-          THREE.MathUtils.lerp(g.position.x + laggedFwd.x * 0.6 * SHIP_L, harbor.x, 0.35),
+          THREE.MathUtils.lerp(g.position.x + laggedFwd.x * 0.6 * L, harbor.x, 0.35),
           followOff.current.lookY,
-          THREE.MathUtils.lerp(g.position.z + laggedFwd.z * 0.6 * SHIP_L, harbor.z, 0.35),
+          THREE.MathUtils.lerp(g.position.z + laggedFwd.z * 0.6 * L, harbor.z, 0.35),
         );
       } else {
-        look.copy(g.position).addScaledVector(laggedFwd, 0.6 * SHIP_L).setY(followOff.current.lookY);
+        look.copy(g.position).addScaledVector(laggedFwd, 0.3 * L).setY(followOff.current.lookY);
       }
       camera.up.copy(UP);
       camera.lookAt(look);

@@ -84,6 +84,7 @@ export function desiredPose(
     look.copy(shipPos).addScaledVector(fwd, 2).setY(3.2);
     fov = 46;
   } else {
+    // 跟船：视角目标落点也要随船长走，否则长船的船头会顶出画面。
     const dist = L * 1.35;
     const yaw = (35 * Math.PI) / 180;
     const pitch = (18 * Math.PI) / 180;
@@ -91,8 +92,8 @@ export function desiredPose(
       .copy(shipPos)
       .addScaledVector(fwd, -dist * Math.cos(yaw) * Math.cos(pitch))
       .addScaledVector(right, dist * Math.sin(yaw) * Math.cos(pitch))
-      .addScaledVector(UP, dist * Math.sin(pitch) + 2);
-    look.copy(shipPos).addScaledVector(fwd, 0.6 * L).setY(3.4);
+      .addScaledVector(UP, dist * Math.sin(pitch) + 2 + (scale - 1) * 3);
+    look.copy(shipPos).addScaledVector(fwd, 0.28 * L).setY(3.4);
     fov = 50;
   }
   return { pos, look, fov, up };

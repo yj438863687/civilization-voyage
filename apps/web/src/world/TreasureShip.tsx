@@ -473,7 +473,7 @@ export function TreasureShip({
           </mesh>
           {[1, -1].map((sx) => (
             // 明轮装在舷侧轴上：轮面竖直（法线朝 x），下半浸水。
-            <group key={sx} position={[sx * (style.beam / 2 + 0.46), style.deckY - 0.75, span * 0.16]}>
+            <group key={sx} position={[sx * (style.beam / 2 + 0.98), style.deckY - 0.75, span * 0.16]}>
               <group ref={sx === 1 ? spinRef : undefined}>
               {/* 轮毂 + 八片轮叶，绕 x 轴转：下缘擦水，上缘高出舷墙 */}
               <mesh rotation={[0, 0, Math.PI / 2]}>
@@ -490,8 +490,8 @@ export function TreasureShip({
               ))}
               {/* 外舷支架：两根斜撑连到舷墙 */}
               {[-0.34, 0.34].map((dz) => (
-                <mesh key={dz} position={[-sx * 0.3, 0.75, dz]} rotation={[0, 0, (sx * Math.PI) / 5]}>
-                  <boxGeometry args={[0.9, 0.09, 0.09]} />
+                <mesh key={dz} position={[-sx * 0.52, 0.72, dz]} rotation={[0, 0, (sx * Math.PI) / 5]}>
+                  <boxGeometry args={[1.1, 0.09, 0.09]} />
                   <meshStandardMaterial color="#2f3438" roughness={0.6} metalness={0.3} />
                 </mesh>
               ))}
