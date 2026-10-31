@@ -855,34 +855,133 @@ html[data-reduce-motion='true'] .btn:active { transform: none; }
 .seal-btn:hover:not(:disabled) { filter: brightness(1.06); }
 .seal-empty:hover { filter: none; }
 
-/* 谁受益 / 谁承担：两支同粗同号的墨线，不设红绿道德路线 */
-.ledger-lines {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--cv-space-3);
-  margin-top: var(--cv-space-3);
+/* 站位刻度：这一程真正要拨的那根尺。停在哪个刻度上，就承担哪个刻度的后果。 */
+.stance { margin-top: var(--cv-space-4); }
+.stance-q {
+  font-family: var(--cv-font-display);
+  font-size: var(--cv-text-lg);
+  line-height: var(--cv-leading-tight);
+  margin: 0 0 var(--cv-space-3);
+  color: var(--cv-text-on-paper);
 }
-.ledger-line {
+.stance-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--cv-text-sm);
+  color: var(--cv-text-on-paper-muted);
+  letter-spacing: 0.04em;
+}
+.stance-scale {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0;
+  margin: var(--cv-space-2) 0 var(--cv-space-3);
+  padding-top: 14px;
+}
+/* 刻度线：一条横贯的墨线，刻度点骑在上面 */
+.stance-scale::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8px;
+  height: 1px;
+  background: var(--cv-line-on-paper);
+}
+.stance-stop {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-top: 6px;
-  border-top: 2px solid var(--cv-line-on-paper);
-}
-.ledger-line .label { color: var(--cv-text-on-paper-muted); }
-.ledger-line textarea {
-  min-height: 56px;
-  background: transparent;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px;
+  background: none;
   border: 0;
-  border-bottom: 1px solid var(--cv-line-on-paper);
-  border-radius: 0;
-  padding: 4px 0;
+  cursor: pointer;
+  color: var(--cv-text-on-paper-muted);
+  font: inherit;
   font-size: var(--cv-text-sm);
-  resize: vertical;
+  text-align: center;
 }
-.ledger-line textarea:focus-visible { outline: 2px solid var(--cv-brass-500); outline-offset: 2px; }
+.stance-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--cv-radius-round);
+  border: 1.5px solid var(--cv-text-on-paper-muted);
+  background: var(--cv-surface-paper);
+  transition: transform 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+.stance-stop:hover .stance-dot { border-color: var(--cv-text-on-paper); }
+.stance-stop:hover .stance-label { color: var(--cv-text-on-paper); }
+.stance-stop.is-on .stance-dot {
+  background: var(--cv-accent);
+  border-color: var(--cv-accent);
+  transform: scale(1.5);
+}
+.stance-stop.is-on .stance-label { color: var(--cv-text-on-paper); font-weight: var(--cv-weight-bold); }
+.stance-stop:focus-visible { outline: 2px solid var(--cv-brass-500); outline-offset: 4px; }
+.stance-label { line-height: 1.25; }
+.stance-note {
+  margin: 0 0 var(--cv-space-3);
+  padding-left: var(--cv-space-3);
+  border-left: 2px solid var(--cv-accent);
+  font-size: var(--cv-text-sm);
+  color: var(--cv-text-on-paper);
+}
+
+.stance-cost-block { margin: var(--cv-space-3) 0; }
+.stance-costs { display: grid; gap: 6px; margin-top: 6px; }
+.stance-cost {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid var(--cv-line-on-paper);
+  border-radius: var(--cv-radius-sm);
+  cursor: pointer;
+  color: var(--cv-text-on-paper);
+  font: inherit;
+  font-size: var(--cv-text-sm);
+}
+.stance-cost:hover { border-color: var(--cv-text-on-paper); }
+.stance-cost.is-on {
+  border-color: var(--cv-accent);
+  box-shadow: inset 3px 0 0 var(--cv-accent);
+}
+.stance-cost:focus-visible { outline: 2px solid var(--cv-brass-500); outline-offset: 2px; }
+.stance-cost .faint { color: var(--cv-text-on-paper-muted); }
+
+/* 两种读法：并排同权，谁都不加粗成答案 */
+.stacks-pair { display: grid; gap: var(--cv-space-3); }
+.stack-card {
+  padding: var(--cv-space-3);
+  border: 1px solid var(--cv-line-on-paper);
+  border-radius: var(--cv-radius-sm);
+}
+.stack-who {
+  font-family: var(--cv-font-display);
+  font-size: var(--cv-text-md);
+  margin-bottom: 4px;
+}
+.stack-card p { margin: 0 0 6px; font-size: var(--cv-text-sm); }
+.stack-card .stack-blind {
+  color: var(--cv-text-on-paper-muted);
+  padding-left: var(--cv-space-2);
+  border-left: 2px solid var(--cv-line-on-paper);
+}
+.third-opinion {
+  margin-top: var(--cv-space-4);
+  border-top: 1px solid var(--cv-line-on-paper);
+  padding-top: var(--cv-space-2);
+}
+.third-opinion summary { cursor: pointer; font-size: var(--cv-text-sm); color: var(--cv-text-on-paper-muted); }
+
 @media (max-width: 639px) {
   .ledger-lines { grid-template-columns: 1fr; }
+  .stance-label { font-size: var(--cv-text-xs); }
 }
 
 /* 世界页左上：一整块，字号与对比度优先 */

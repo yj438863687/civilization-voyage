@@ -5,6 +5,7 @@ import { Coach, Ledgers, SealButton, StageBar, Stamp, StatusBanner, contentStamp
 import { crewArt, kernelBeat } from './crew';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
 import { worldFor, type WorldConfig } from './world/world.config';
+import { stanceFor } from './world/stances';
 
 const LAST_KEY = 'cv.lastVoyageId';
 const MOTION_KEY = 'cv.reduceMotion';
@@ -253,8 +254,10 @@ export function App() {
   const [reason, setReason] = useState('');
   const [dissent, setDissent] = useState('');
   const [arrangement, setArrangement] = useState('');
-  const [gain, setGain] = useState('');
-  const [cost, setCost] = useState('');
+  /** 站位：这一程真正要拨的那根刻度。null = 还没表态 */
+  const [stanceIdx, setStanceIdx] = useState<number | null>(null);
+  /** 代价落在谁身上。必须点名，不让写「社会」 */
+  const [costIdx, setCostIdx] = useState<number | null>(null);
   const [routeId, setRouteId] = useState('simple');
   const [nearPort, setNearPort] = useState<string | null>(null);
   const [nearFragment, setNearFragment] = useState<string | null>(null);
@@ -274,6 +277,14 @@ export function App() {
     [voyage?.scene_id, scenePick?.id],
   );
   const portPlace = sea.ports[0];
+  const stance = useMemo(() => stanceFor(voyage?.scene_id ?? scenePick?.id), [voyage?.scene_id, scenePick?.id]);
+  /** 主线上的下一段场景。走到 D 就没有下一段了 —— 这趟航程没有终点港。 */
+  const nextScene = useMemo(() => {
+    const id = voyage?.scene_id;
+    if (!id) return null;
+    const next = nextEpochId(id);
+    return next ? scenes.find((s) => s.id === next) ?? null : null;
+  }, [voyage?.scene_id, scenes]);
 
   useEffect(() => {
     try {
@@ -486,11 +497,11 @@ export function App() {
     return 'follow';
   }, [view]);
 
-  async function createVoyage() {
+  async function createVoyage(seed?: { sceneId: string; carried?: string[] }) {
     setError(null);
     setBusy(true);
     try {
-      const scene = scenePick ?? scenes.find((s) => s.status === 'test');
+      const scene = seed ? scenes.find((s) => s.id === seed.sceneId) : scenePick ?? scenes.find((s) => s.status === 'test');
       if (!scene) throw new Error('没有可用场景');
       const seedQuestion = scene.questions[0] ?? '';
       const created = await api.createVoyage({
@@ -503,6 +514,20 @@ export function App() {
         shared_task: scene.interactions[0] ?? '',
         crew: DEFAULT_CREW.map((c) => ({ ...c, model_id: models[0]?.id ?? null })),
       });
+      // 上一程留下的东西：同一张海图交到下一个驾驶舱，而不是每段从零开始
+      if (seed?.carried?.length) {
+        for (const text of seed.carried) {
+          await api.addRecord(created.id, {
+            kind: 'log',
+            text,
+            classification: 'counterfactual',
+            sources: [],
+            material_ids: [],
+            version: 1,
+            access: 'private',
+          });
+        }
+      }
       setChat([]);
       await loadVoyage(created.id, 'cockpit');
       await refreshLists();
@@ -511,6 +536,31 @@ export function App() {
     } finally {
       setBusy(false);
     }
+  }
+
+  /**
+   * 把这一程的站位与代价打成一张纸，交给下一段。
+   * 从 records 里读，不读界面状态：玩家可能是在刷新后才来日志页的。
+   */
+  function carryForward() {
+    if (!voyage) return [] as string[];
+    const sealed = records.filter((r) => r.kind === 'choice');
+    const last = sealed[sealed.length - 1];
+    if (!last) return [] as string[];
+    const line = last.text.split('\n').find((l) => l.startsWith('站位：'));
+    const costLine = last.text.split('\n').find((l) => l.startsWith('代价落在：'));
+    if (!line || !costLine) return [] as string[];
+    return [
+      `上一程（${voyage.scene_id}）留下的：${line.replace('站位：', '站位「')}」，${costLine}`,
+      `上一程的原话：${voyage.question}`,
+    ];
+  }
+
+  /** 这一段的下一段是谁。neutral-test 不进主线。 */
+  function nextEpochId(cur: string): string | null {
+    const chain = ['A', 'B', 'C', 'D'];
+    const i = chain.indexOf(cur);
+    return i >= 0 && i < chain.length - 1 ? chain[i + 1] : null;
   }
 
   async function confirmCockpit() {
@@ -1222,46 +1272,89 @@ export function App() {
             ) : (
               <StatusBanner kind="idle" text="货舱还空。回到海域，靠近纸签，先看来源再收。" />
             )}
-            <div className="field" style={{ marginTop: 16 }}>
-              <span className="label">{sea.arrangement.label}</span>
-              <textarea
-                value={arrangement}
-                onChange={(e) => setArrangement(e.target.value)}
-                rows={3}
-                placeholder={sea.arrangement.placeholder}
-              />
-            </div>
-            {/* 安排落地后的两支同粗墨线：谁受益 / 谁承担。两侧同字号同宽带，不给谁更亮。 */}
-            <div className="ledger-lines" aria-label="这份安排的后果">
-              <label className="ledger-line">
-                <span className="label">谁受益</span>
-                <textarea value={gain} onChange={(e) => setGain(e.target.value)} rows={2} placeholder="这份安排先落在谁身上。" />
-              </label>
-              <label className="ledger-line">
-                <span className="label">谁承担</span>
-                <textarea value={cost} onChange={(e) => setCost(e.target.value)} rows={2} placeholder="代价落在谁身上，谁没被问到。" />
-              </label>
-            </div>
+            {/* 站位：这一程真正要拨的那根刻度。不是写作文，是把手放上去。 */}
+            {stance && (
+              <div className="stance" aria-label={stance.axis.question}>
+                <p className="stance-q">{stance.axis.question}</p>
+                <div className="stance-ends">
+                  <span>{stance.axis.left}</span>
+                  <span>{stance.axis.right}</span>
+                </div>
+                <div className="stance-scale">
+                  {stance.axis.choices.map((c, i) => (
+                    <button
+                      key={c.label}
+                      type="button"
+                      className={`stance-stop${stanceIdx === i ? ' is-on' : ''}`}
+                      aria-pressed={stanceIdx === i}
+                      onClick={() => setStanceIdx(i)}
+                    >
+                      <span className="stance-dot" aria-hidden />
+                      <span className="stance-label">{c.label}</span>
+                    </button>
+                  ))}
+                </div>
+                {stanceIdx != null && (
+                  <p className="stance-note">{stance.axis.choices[stanceIdx].note}</p>
+                )}
+                <div className="stance-cost-block">
+                  <span className="label">这一步的代价落在谁身上</span>
+                  <div className="stance-costs">
+                    {stance.costs.map((c, i) => (
+                      <button
+                        key={c.label}
+                        type="button"
+                        className={`stance-cost${costIdx === i ? ' is-on' : ''}`}
+                        aria-pressed={costIdx === i}
+                        onClick={() => setCostIdx(i)}
+                      >
+                        <strong>{c.label}</strong>
+                        <span className="faint">{c.note}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="field">
+                  <span className="label">补一句你自己的话（可空）</span>
+                  <textarea
+                    value={arrangement}
+                    onChange={(e) => setArrangement(e.target.value)}
+                    rows={2}
+                    placeholder={sea.arrangement.placeholder}
+                  />
+                </div>
+              </div>
+            )}
             <div className="seal-dock">
               <SealButton
-                label="用材料说明安排"
-                disabled={busy || !arrangement.trim()}
-                hint="写下这段安排；若货舱里有材料，它会一并记进这条记录。"
+                label={stance ? '按此落印' : '落印'}
+                disabled={busy || !stance || stanceIdx == null || costIdx == null}
+                hint={
+                  stance
+                    ? '在刻度上选一个位置，再点名谁承担。两样都有了才能落印。'
+                    : '这一段还没有站位刻度。'
+                }
                 onSeal={() => {
-                  if (!voyage || !arrangement.trim()) return;
+                  if (!voyage || !stance || stanceIdx == null || costIdx == null) return;
+                  const pick = stance.axis.choices[stanceIdx];
+                  const own = stance.costs[costIdx];
                   const used = records.filter((r) => r.kind === 'fragment' || r.kind === 'material');
+                  const lines = [
+                    `站位：${pick.label}`,
+                    `轴：${stance.axis.left} ↔ ${stance.axis.right}`,
+                    `代价落在：${own.label}`,
+                  ];
+                  if (arrangement.trim()) lines.push(`补充：${arrangement.trim()}`);
                   void api.addRecord(voyage.id, {
                     kind: 'choice',
-                    text: `${arrangement.trim()}\n\n谁受益：${gain.trim() || '未写'}\n谁承担：${cost.trim() || '未写'}`,
-                    classification: voyage.scene_id === 'C' ? 'creative' : 'counterfactual',
+                    text: lines.join('\n'),
+                    classification: 'counterfactual',
                     sources: [],
                     material_ids: used.map((r) => r.id),
                     version: 1,
                     access: 'private',
                   }).then(async () => {
                     setArrangement('');
-                    setGain('');
-                    setCost('');
                     setRecords(await api.records(voyage.id));
                   }).catch((e) => setError(errText(e)));
                 }}
@@ -1297,22 +1390,26 @@ export function App() {
       {view === 'collaborate' && voyage && (
         <div className="overlay overlay-right">
           <div className="paper">
-            <h2 className="display title-panel">大副求证 · 二副义利</h2>
-            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <StatusBanner
-              kind={connected ? (busy ? 'running' : 'waiting') : 'unconnected'}
-              text={connected ? '可观察事件见下方。选择或补充解释。' : '模型服务尚未接入，不能生成假解释。'}
-            />
-            <div className="stack">
-              {tasks.map((t) => (
-                <div key={t.id} className="muted">任务 {t.status}{t.cancel_requested ? ' · 已请求停止' : ''}</div>
-              ))}
-              {events.map((e) => (
-                <div key={e.seq} className="card">
-                  <span className="label">{e.kind}</span>
-                  <div>{typeof e.data.output === 'string' ? e.data.output : JSON.stringify(e.data)}</div>
-                </div>
-              ))}
+            <h2 className="display title-panel">两种读法</h2>
+            <p className="muted">
+              两套读法各自成立，也各自有看不到的地方。模型接入后只是第三方意见，不是答案。
+            </p>
+            {stance ? (
+              <div className="stacks-pair">
+                {stance.crew.map((c) => (
+                  <div key={c.who} className="stack-card">
+                    <div className="stack-who">{c.who}</div>
+                    <p>{c.reads}</p>
+                    <p className="stack-blind">看不到：{c.blind}</p>
+                    <p className="faint">依据：{c.from}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <StatusBanner kind="idle" text="这一段还没有写两种读法。" />
+            )}
+
+            <div className="stack" style={{ marginTop: 12 }}>
               {records.filter((r) => r.kind === 'fragment' || r.kind === 'artifact').map((r) => {
                 const stamp = contentStamp(r.classification, r.sources);
                 return (
@@ -1328,28 +1425,38 @@ export function App() {
                 );
               })}
             </div>
-            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} placeholder="你的解释和理由" />
-            <div className="row">
-              <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void askCrew()}>请船员解释</button>
-              <SealButton
-                label="采纳"
-                disabled={busy || !draft.trim()}
-                hint="写下理由，由你落印。"
-                onSeal={() => {
-                  void api.addRecord(voyage.id, {
-                    kind: 'choice',
-                    text: draft.trim(),
-                    classification: 'counterfactual',
-                    sources: [],
-                    material_ids: [],
-                    version: 1,
-                    access: 'private',
-                  }).then(async () => {
-                    setDraft('');
-                    setRecords(await api.records(voyage.id));
-                  }).catch((e) => setError(errText(e)));
-                }}
-              />
+
+            {/* 模型是第三只手，不是必经之路。没接入就如实说，不挡住往下走。 */}
+            <details className="third-opinion">
+              <summary>第三方意见（模型）· {connected ? '已接入' : '尚未接入'}</summary>
+              {connected ? (
+                <>
+                  <div className="row">
+                    <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void askCrew()}>
+                      请船员解释
+                    </button>
+                  </div>
+                  {tasks.map((t) => (
+                    <div key={t.id} className="muted">任务 {t.status}{t.cancel_requested ? ' · 已请求停止' : ''}</div>
+                  ))}
+                  {events.map((e) => (
+                    <div key={e.seq} className="card">
+                      <span className="label">{e.kind}</span>
+                      <div>{typeof e.data.output === 'string' ? e.data.output : JSON.stringify(e.data)}</div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <p className="muted">
+                  没有接入模型，这里不会生成假解释。上面两套读法已经够你判断，往下走不需要它。
+                </p>
+              )}
+            </details>
+
+            <div className="row" style={{ marginTop: 12 }}>
+              <button className="btn btn-primary" type="button" onClick={() => setView(voyage.stage === 'world' || nearPort ? 'port' : 'route')}>
+                回到海边
+              </button>
             </div>
             {error && <p className="error">{error}</p>}
           </div>
@@ -1387,9 +1494,23 @@ export function App() {
             <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} placeholder="回看来源，修订解释" />
             <div className="row">
               <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void saveReflection()}>写入日志</button>
-              <button className="btn btn-primary" type="button" onClick={() => { setView('cockpit'); void persist({ stage: 'cockpit' }); }}>
-                带上没解决的问题，再走一程
-              </button>
+              {nextScene ? (
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    const carried = carryForward();
+                    void createVoyage({ sceneId: nextScene.id, carried });
+                  }}
+                >
+                  带着这张海图，进入「{sceneShort(nextScene)}」
+                </button>
+              ) : (
+                <button className="btn btn-ghost" type="button" onClick={() => { setView('cockpit'); void persist({ stage: 'cockpit' }); }}>
+                  回到这一程的驾驶舱
+                </button>
+              )}
             </div>
           </div>
         </div>
