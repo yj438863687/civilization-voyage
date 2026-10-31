@@ -61,9 +61,13 @@ function voyageSceneLabel(v: Voyage) {
   return raw.replace(/^AI 推荐，待组员确认：/, '');
 }
 
-function snapshotQuestion(voyage: Voyage | null) {
-  const q = voyage?.scene_snapshot?.questions;
-  return Array.isArray(q) && typeof q[0] === 'string' ? q[0] : '';
+/** 当前场景给出的问题（可能不止一条）。没有就从 snapshot 里取。 */
+function sceneQuestions(v: Voyage): string[] {
+  const fromSnapshot = (v.scene_snapshot as { questions?: unknown })?.questions;
+  if (Array.isArray(fromSnapshot)) {
+    return fromSnapshot.filter((x): x is string => typeof x === 'string' && x.trim().length > 0);
+  }
+  return v.question ? [v.question] : [];
 }
 
 function wrapDeg(deg: number) {
@@ -91,6 +95,8 @@ const ROUTES: Route[] = [
     currency: 'unknown',
   },
 ];
+
+const DEFAULT_REASON = '我想先看清两头，再决定站哪边。';
 
 const DEFAULT_CREW: Crew[] = [
   { id: 'first-mate', role: '大副', model_id: null, confirmation: 'pending' },
@@ -278,6 +284,13 @@ export function App() {
   );
   const portPlace = sea.ports[0];
   const stance = useMemo(() => stanceFor(voyage?.scene_id ?? scenePick?.id), [voyage?.scene_id, scenePick?.id]);
+  /** 第 1 拍可以选的问法：场景自带的那一句 + 这一段的几种问法，去重。 */
+  const askChoices = useMemo(() => {
+    const base = voyage ? sceneQuestions(voyage) : [];
+    const extra = stance?.altQ ?? [];
+    return [...new Set([...base, ...extra].map((q) => q.trim()).filter(Boolean))];
+  }, [voyage, stance]);
+
   /** 主线上的下一段场景。走到 D 就没有下一段了 —— 这趟航程没有终点港。 */
   const nextScene = useMemo(() => {
     const id = voyage?.scene_id;
@@ -332,7 +345,8 @@ export function App() {
     setQuestion(v.question);
     setSharedTask(v.shared_task);
     const notes = notesOf(v.world);
-    setReason(notes.reason);
+    // 理由给一句默认：让人改，而不是逼人从空白开始。空白卡住的是第一步。
+    setReason(notes.reason || DEFAULT_REASON);
     setDissent(notes.dissent);
     if (v.route) setRouteId(v.route.id);
     localStorage.setItem(LAST_KEY, id);
@@ -682,16 +696,10 @@ export function App() {
   }
 
   async function askCrew() {
-    if (!voyage) return;
-    const text = draft.trim();
-    if (!text) return;
-    setDraft('');
-    setChat((c) => [...c, { who: 'user', text }]);
-    if (!question) setQuestion(text);
-    if (!connected) {
-      setChat((c) => [...c, { who: 'sys', text: '模型服务尚未接入。到通讯台填写你自己的服务配置。不会出现假回复。' }]);
-      return;
-    }
+    if (!voyage || !question.trim()) return;
+    // 没有独立的输入框了：问的就是这一程已经落下的那个问题。
+    const text = question.trim();
+    if (!connected) return;
     const modelId = models[0].id;
     setBusy(true);
     setError(null);
@@ -1094,7 +1102,7 @@ export function App() {
           <div className="cockpit-window">
             <div className="chat">
               {chat.length === 0 && (
-                <div className="bubble bubble-sys">灯已点亮。先问一件你想弄清的事。大副查依据，二副问谁被看见。</div>
+                <div className="bubble bubble-sys">灯已点亮。右边选一个问题，就能出海。大副查依据，二副问谁被看见——两边的看法到下一拍再展开。</div>
               )}
               {chat.filter((m) => m.who !== 'crew').map((m, i) => (
                 <div key={`m-${i}`} className={`bubble bubble-${m.who === 'user' ? 'user' : 'sys'}`}>
@@ -1120,69 +1128,48 @@ export function App() {
                 </div>
               )}
             </div>
-            <div className="row">
-              <input style={{ flex: 1 }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="写一件你想理解的事" />
-              <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void askCrew()}>
-                发送
-              </button>
-            </div>
           </div>
           <div className="paper">
-            <h2 className="display title-panel">这一拍要落下的问题</h2>
-            <p className="muted">问题是这次要弄清的事。大副和二副只对照，结论由你落印。</p>
-            <div className="row" style={{ marginBottom: 8 }}>
-              <button
-                className="btn btn-ghost"
-                type="button"
-                onClick={() => {
-                  const q = snapshotQuestion(voyage);
-                  if (q) setQuestion(q);
-                }}
-              >
-                用场景给出的问题
-              </button>
-              <button
-                className="btn btn-ghost"
-                type="button"
-                onClick={() => {
-                  if (!question.trim()) {
-                    const q = snapshotQuestion(voyage);
-                    if (q) setQuestion(q);
-                  }
-                  if (!reason.trim()) setReason('我想亲眼对照材料，不先下结论。');
-                }}
-              >
-                先带着疑问出海
-              </button>
+            <h2 className="display title-panel">这一程要问的事</h2>
+            <p className="muted">选一个问题。想改就改，改完落印出海。船员下面已经给了两种看法，不用等模型。</p>
+
+            <div className="ask-picks">
+              {askChoices.map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  className={`ask-pick${question === q ? ' is-on' : ''}`}
+                  onClick={() => setQuestion(q)}
+                >
+                  {q}
+                </button>
+              ))}
             </div>
+
             <div className="field">
-              <span className="label">文化问题</span>
+              <span className="label">或者，用你自己的问法</span>
               <textarea
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                rows={3}
-                placeholder="这一程你想弄清什么？可以先用上面给出的问题，再改成你自己的。"
+                rows={2}
+                placeholder="这一程你想弄清什么？一句话就够。"
               />
             </div>
+
             <div className="field">
-              <span className="label">共同任务</span>
-              <textarea value={sharedTask} onChange={(e) => setSharedTask(e.target.value)} rows={3} />
+              <span className="label">为什么值得问这一句（一句话）</span>
+              <input
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="我怀疑这件事还有另一面。"
+              />
             </div>
-            <div className="field">
-              <span className="label">保留的分歧</span>
-              <textarea value={dissent} onChange={(e) => setDissent(e.target.value)} rows={2} placeholder="可以先不统一。写下一处还没谈拢的地方。" />
-            </div>
-            <div className="field">
-              <span className="label">落印理由</span>
-              <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} placeholder="你为什么确认这个问题值得出海。" />
-            </div>
-            <Stamp kind="pending">草稿</Stamp>
-            {dissent.trim() ? <Stamp kind="dissent">分歧</Stamp> : null}
+
             <div className="seal-dock">
               <SealButton
-                label="确认此行的问题"
+                label="落印出海"
                 disabled={busy || !question.trim() || !reason.trim()}
-                hint="写下问题和一句理由，才能落印。"
+                hint="选一个问题，补一句为什么，就能落印。"
                 onSeal={() => void confirmCockpit()}
               />
             </div>
@@ -1470,6 +1457,21 @@ export function App() {
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <Stamp kind="creative">概念创作</Stamp>
             <p>{voyage.shared_task || '尚未形成共同任务。'}</p>
+            {/* 这一程你站哪、代价落在谁身上：放在材料前面，是这一段的结论 */}
+            {records.filter((r) => r.kind === 'choice').length > 0 && (
+              <>
+                <h3 className="display title-panel">你落下的印</h3>
+                {records
+                  .filter((r) => r.kind === 'choice')
+                  .map((r) => (
+                    <div key={r.id} className="card sealed" style={{ marginBottom: 8 }}>
+                      {r.text.split('\n').map((line, i) => (
+                        <div key={i} className={i === 0 ? '' : 'sealed-line'}>{line}</div>
+                      ))}
+                    </div>
+                  ))}
+              </>
+            )}
             <h3 className="display title-panel">材料与出处</h3>
             {records.length === 0 && <p className="muted">还没有记录。</p>}
             {records.map((r) => {

@@ -1005,3 +1005,34 @@ html[data-reduce-motion='true'] .btn:active { transform: none; }
 }
 .hud-world-card .status-compact { margin-top: 0; background: rgb(0 0 0 / 0.3); }
 .hud-world-card .stage-compact { margin-top: 2px; }
+
+/* 第 1 拍：选一个问题 + 一句话，不再让人先填四个文本框 */
+.ask-picks { display: grid; gap: 6px; margin: var(--cv-space-3) 0; }
+.ask-pick {
+  text-align: left;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid var(--cv-line-on-paper);
+  border-radius: var(--cv-radius-sm);
+  color: var(--cv-text-on-paper);
+  font: inherit;
+  font-size: var(--cv-text-sm);
+  line-height: 1.45;
+  cursor: pointer;
+}
+.ask-pick:hover { border-color: var(--cv-text-on-paper-muted); }
+.ask-pick.is-on {
+  border-color: var(--cv-accent);
+  box-shadow: inset 3px 0 0 var(--cv-accent);
+}
+.ask-pick:focus-visible { outline: 2px solid var(--cv-brass-500); outline-offset: 2px; }
+
+/* 日志页：落印的站位是结论，用朱漆边标出来，不和材料混在一起 */
+.card.sealed {
+  border-left: 3px solid var(--cv-accent);
+  background: rgb(182 69 44 / 0.06);
+}
+.card.sealed .sealed-line {
+  font-size: var(--cv-text-sm);
+  color: var(--cv-text-on-paper-muted);
+}

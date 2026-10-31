@@ -24,6 +24,8 @@ export type CrewStance = {
 };
 
 export type EpochStance = {
+  /** 除了场景自带的那一句，还有几种问法。同一件事，问法不同，后面的读法也不同。 */
+  altQ: string[];
   axis: {
     /** 这一程真正要拨的那一根刻度 */
     question: string;
@@ -40,6 +42,11 @@ export type EpochStance = {
 
 export const STANCES: Record<string, EpochStance> = {
   A: {
+    altQ: [
+      '不立桩、不定界，一只船能靠一片岸过多久？',
+      '第一批留下的人，怎么说服还在船上的人一起等下一季？',
+      '粮食能存过冬之后，谁开始不用下地？',
+    ],
     axis: {
       question: '岸已经在眼前。你把船靠上去，还是把船留在还能走的地方？',
       left: '继续漂流',
@@ -75,6 +82,11 @@ export const STANCES: Record<string, EpochStance> = {
   },
 
   B: {
+    altQ: [
+      '同一段航程，蒸汽省下的是时间，还是别人的睡眠？',
+      '一条铁路先铺到哪里，那里的镇子就先连上。剩下的等多久？',
+      '不必看风之后，掌舵的人还看得见什么？',
+    ],
     axis: {
       question: '汽压表指针往右拨一格，船就更快。你拨到哪里？',
       left: '稳',
@@ -109,6 +121,11 @@ export const STANCES: Record<string, EpochStance> = {
   },
 
   C: {
+    altQ: [
+      '实时航图上没有光点的地方，算不存在吗？',
+      '把断线的岛连进来，是给它们信号，还是要它们接电话？',
+      '谁在深夜替别人的白天值班？',
+    ],
     axis: {
       question: '航图能实时更新了。你要把所有岛都连进来吗？',
       left: '留断点',
@@ -143,6 +160,11 @@ export const STANCES: Record<string, EpochStance> = {
   },
 
   D: {
+    altQ: [
+      '它选了一条更快的路，略过三座港。这三座港找谁说话？',
+      '当你说"随便找个好地方"，是谁决定什么叫好？',
+      '你把手从舵上拿开，还剩下哪一部分是你自己的选择？',
+    ],
     axis: {
       question: '船能自己画航线、自己选下一个港。你把手放在哪里？',
       left: '自己定',
