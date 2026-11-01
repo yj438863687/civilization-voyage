@@ -652,80 +652,172 @@ function SeaLane({
  * 两根门柱 + 一道水面上的光幕，门楣上写着下一段的名字。
  * 船开进去，这一段就结束。
  */
+/**
+ * 通往下一段的海门。
+ *
+ * 以前它只是两根柱子加一层光幕：站在船上看，分不清那是一个门，还是一段残桥；
+ * 夜里锁着的时候更是两块黑石头。现在它是一座真的门——两根石柱扎在礁座上，
+ * 一道门楣把两根柱子连起来，光幕从水面一直立到门楣，门里透出下一段海域的颜色；
+ * 水面上有一道指向门内的光路。锁着的时候光幕是暗的，柱顶只剩一点余烬。
+ */
 function Portal({
   portal,
   color,
   reduceMotion,
   open,
+  face,
 }: {
   portal: NonNullable<WorldConfig['portal']>;
   color: string;
   reduceMotion: boolean;
   /** 锁着的门：只有石柱，没有光。落印之后才亮 */
   open: boolean;
+  /** 门朝哪儿开（弧度）。门是一道开口，侧着看只是一条线 */
+  face: number;
 }) {
   const veil = useRef<THREE.MeshBasicMaterial>(null);
+  const rim = useRef<THREE.MeshBasicMaterial>(null);
+  const halo = useRef<THREE.MeshBasicMaterial>(null);
   const group = useRef<THREE.Group>(null);
-  const H = 9;
-  const W = 9;
+  const H = 13;
+  const W = 11;
 
   useFrame(({ clock }) => {
     if (reduceMotion) return;
     const t = clock.elapsedTime;
-    if (veil.current) veil.current.opacity = open ? 0.22 + Math.sin(t * 1.3) * 0.07 : 0;
-    if (group.current) group.current.position.y = Math.sin(t * 0.5) * 0.12;
+    if (veil.current) veil.current.opacity = open ? 0.16 + Math.sin(t * 1.3) * 0.05 : 0.05;
+    if (rim.current) rim.current.opacity = open ? 0.9 : 0.16;
+    if (halo.current) halo.current.opacity = open ? 0.42 + Math.sin(t * 1.1) * 0.08 : 0.1;
+    if (group.current) group.current.position.y = Math.sin(t * 0.5) * 0.1;
   });
 
+  const stone = '#3a342c';
+  const stoneLit = '#4a4238';
+
   return (
-    <group ref={group} position={[portal.x, 0, portal.z]}>
-      {/* 两根门柱：石与铜，不像科幻 */}
+    <group ref={group} position={[portal.x, 0, portal.z]} rotation={[0, face, 0]}>
+      {/* 礁座：两根柱子不是插在水里，是长在一块礁石上 */}
+      <mesh position={[0, 0.5, 0]} receiveShadow>
+        <boxGeometry args={[W + 3.2, 1.0, 3.4]} />
+        <meshStandardMaterial color="#2f2a24" roughness={0.98} />
+      </mesh>
+
       {[-1, 1].map((sx) => (
         <group key={sx} position={[sx * (W / 2), 0, 0]}>
+          {/* 柱身：下粗上细，有翼板，看得出一块一块垒上去 */}
           <mesh position={[0, H / 2, 0]} castShadow>
-            <cylinderGeometry args={[0.42, 0.62, H, 10]} />
-            <meshStandardMaterial color="#3a342c" roughness={0.85} metalness={0.15} />
+            <cylinderGeometry args={[0.5, 0.82, H, 10]} />
+            <meshStandardMaterial color={stone} roughness={0.88} metalness={0.14} />
           </mesh>
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.75, 0.85, 1, 10]} />
-            <meshStandardMaterial color="#4a4238" roughness={0.9} />
+          {[0.26, 0.5, 0.74].map((f) => (
+            <mesh key={f} position={[0, H * f, 0]}>
+              <cylinderGeometry args={[0.62, 0.7, 0.28, 10]} />
+              <meshStandardMaterial color={stoneLit} roughness={0.9} />
+            </mesh>
+          ))}
+          {/* 柱座：方石，比柱身宽出一圈 */}
+          <mesh position={[0, 0.7, 0]}>
+            <boxGeometry args={[2.4, 1.4, 2.4]} />
+            <meshStandardMaterial color={stoneLit} roughness={0.92} />
           </mesh>
-          <mesh position={[0, H - 0.4, 0]}>
-            <sphereGeometry args={[0.28, 12, 12]} />
+          {/* 柱顶灯：落印前是余烬，落印后是下一段的海色 */}
+          <mesh position={[0, H + 0.5, 0]}>
+            <sphereGeometry args={[0.42, 14, 12]} />
             <meshStandardMaterial
               color={open ? '#fff4dc' : '#3a3a38'}
-              emissive={open ? color : '#000000'}
-              emissiveIntensity={open ? 2.6 : 0}
+              emissive={open ? color : '#5a3a1e'}
+              emissiveIntensity={open ? 3.2 : 0.4}
               toneMapped={!open}
             />
           </mesh>
+          {open && <pointLight position={[0, H + 0.5, 0]} color={color} intensity={9} distance={30} decay={2} />}
         </group>
       ))}
-      {/* 门楣 */}
-      <mesh position={[0, H, 0]}>
-        <boxGeometry args={[W + 1.4, 0.5, 0.6]} />
-        <meshStandardMaterial color="#4a4238" roughness={0.8} metalness={0.2} />
+
+      {/* 门楣：一道横梁压在两根柱子之间，门因此有「上边」 */}
+      <mesh position={[0, H + 1.6, 0]} castShadow>
+        <boxGeometry args={[W + 4.2, 1.7, 2.2]} />
+        <meshStandardMaterial color={stoneLit} roughness={0.86} metalness={0.18} />
       </mesh>
-      {/* 光幕：从水面立到门楣 */}
-      <mesh position={[0, H / 2, 0]}>
+      <mesh position={[0, H + 0.5, 1.12]}>
+        <boxGeometry args={[W + 2.4, 0.3, 0.12]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={open ? 1.5 : 0.12} toneMapped={!open} />
+      </mesh>
+
+      {/* 门内的光：下一段的海色。落印前是一块暗石，落印后是一整面会呼吸的光 */}
+      <mesh position={[0, H / 2 + 0.5, 0]}>
         <planeGeometry args={[W, H]} />
-        <meshBasicMaterial ref={veil} color={color} transparent opacity={0.18} side={THREE.DoubleSide} depthWrite={false} />
+        <meshBasicMaterial
+          ref={veil}
+          color={open ? color : '#15130f'}
+          transparent
+          opacity={0.06}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+          blending={open ? THREE.AdditiveBlending : THREE.NormalBlending}
+        />
       </mesh>
-      {/* 水面上的门影：一圈光，告诉玩家"开进来" */}
-      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[W * 0.52, W * 0.62, 48]} />
-        <meshBasicMaterial color={color} transparent opacity={open ? 0.55 : 0.08} side={THREE.DoubleSide} depthWrite={false} />
+      {/* 门框内沿：一圈亮边，远看也知道这是个开口 */}
+      <mesh position={[0, H / 2 + 0.5, 0.02]}>
+        <ringGeometry args={[W * 0.52, W * 0.56, 4, 1, Math.PI / 4]} />
+        <meshBasicMaterial ref={rim} color={color} transparent opacity={0.16} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
-      {open && <pointLight position={[0, H * 0.55, 0]} color={color} intensity={7} distance={26} decay={2} />}
+
+      {/* 水面上的门影与光路：从船这一侧指进门里 */}
+      <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[W * 0.5, W * 0.62, 48]} />
+        <meshBasicMaterial ref={halo} color={color} transparent opacity={0.1} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, 0.09, 9]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[4.2, 18]} />
+        <meshBasicMaterial color={color} transparent opacity={open ? 0.16 : 0.05} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+
+      {/* 光柱：落印之后，这道门从任何方向都看得见。不是科幻，是灯塔的道理 */}
+      {open && (
+        <group>
+          <mesh position={[0, 34, 0]}>
+            <cylinderGeometry args={[0.9, 2.2, 68, 16, 1, true]} />
+            <meshBasicMaterial
+              color={color}
+              transparent
+              opacity={0.07}
+              depthWrite={false}
+              side={THREE.DoubleSide}
+              blending={THREE.AdditiveBlending}
+              fog={false}
+            />
+          </mesh>
+          <mesh position={[0, 34, 0]}>
+            <cylinderGeometry args={[0.3, 0.62, 68, 12, 1, true]} />
+            <meshBasicMaterial
+              color="#fff4dc"
+              transparent
+              opacity={0.18}
+              depthWrite={false}
+              side={THREE.DoubleSide}
+              blending={THREE.AdditiveBlending}
+              fog={false}
+            />
+          </mesh>
+        </group>
+      )}
+
+      {/* 夜里从远处看：门楣下方悬着一点光，是这一带的唯一航标 */}
+      <mesh position={[0, H - 0.2, 0]}>
+        <sphereGeometry args={[0.5, 10, 10]} />
+        <meshStandardMaterial
+          color={open ? '#fff8e8' : '#4a3a28'}
+          emissive={color}
+          emissiveIntensity={open ? 2.4 : 0.18}
+          toneMapped={!open}
+        />
+      </mesh>
     </group>
   );
 }
 
 
-/**
- * 远海景物：每段海不该只有航道和码头。
- * 农业是河口的芦苇与浅滩，工业是远处的烟囱与驳船，信息是浮标阵列与塔，
- * 智能是成排的无人浮体。都在雾里，只给轮廓 —— 让海有纵深，不抢主角。
- */
 function SeaFurniture({ sceneId, reduceMotion }: { sceneId: string; reduceMotion: boolean }) {
   const group = useRef<THREE.Group>(null);
   const dark = cssVar('--cv-ship-hull', '#2a211c');
@@ -916,7 +1008,13 @@ export function Atmosphere({
       <WeatherField sceneId={sceneId} reduceMotion={reduceMotion} />
       <SeaFurniture sceneId={sceneId} reduceMotion={reduceMotion} />
       {world.portal && (
-        <Portal portal={world.portal} color={laneColor(true, sceneId)} reduceMotion={reduceMotion} open={portalOpen} />
+        <Portal
+          portal={world.portal}
+          color={laneColor(true, sceneId)}
+          reduceMotion={reduceMotion}
+          open={portalOpen}
+          face={Math.atan2((world.ports[0]?.x ?? 0) - world.portal.x, (world.ports[0]?.z ?? 0) - world.portal.z)}
+        />
       )}
       {(world.lanes ?? []).map((lane: Lane) => (
         <SeaLane

@@ -957,7 +957,7 @@ export function App() {
   });
   // 落印之后，这一段剩下的事只有一件：去门那里
   if (view === 'world' && sealedHere && sea.portal) {
-    tip.next = `门开了。铜针指着门，驶进去就是「${sea.portal.label}」。`;
+    tip.next = `门开了。它在港口的右舷外海，一根光柱立在海上——驶进去就是「${sea.portal.label}」。`;
   } else if (view === 'world' && sealedHere && !sea.portal) {
     tip.next = '这一段没有门。';
   }
@@ -1196,7 +1196,7 @@ export function App() {
 
       {/* 靠近传送门：门后是哪一段，字从画面里浮出来 */}
       {view === 'world' && sea.portal && ship && !portalCross &&
-        Math.hypot(sea.portal.x - ship.x, sea.portal.z - ship.z) < 24 && (
+        Math.hypot(sea.portal.x - ship.x, sea.portal.z - ship.z) < 40 && (
           <div className="portal-hint" aria-live="polite">
             <span className="portal-hint-kicker">{sealedHere ? '门已开' : '门锁着'}</span>
             <span className="portal-hint-name">{sea.portal.label}</span>
