@@ -320,6 +320,8 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [camBlend, setCamBlend] = useState(1);
   const [cine, setCine] = useState(false);
+  /** 靠港戏：0..1 的时间轴，和镜头对齐；面板要等它走到 1 才出现 */
+  const [landing, setLanding] = useState(0);
   const [pickupFlash, setPickupFlash] = useState<string | null>(null);
   const keys = useRef({ w: false, a: false, s: false, d: false });
   const shipRef = useRef<ShipSnapshot | null>(null);
@@ -331,6 +333,18 @@ export function App() {
   );
   const portPlace = sea.ports[0];
   const stance = useMemo(() => stanceFor(voyage?.scene_id ?? scenePick?.id), [voyage?.scene_id, scenePick?.id]);
+  /**
+   * 靠港戏的主角：这一程最后拾到的那件东西。
+   * 什么都没拾就靠港，就用这条航道上的标志物 —— 戏不能没有主角。
+   */
+  const landingRelicId = useMemo(() => {
+    const picked = records.filter((r) => r.kind === 'fragment').flatMap((r) => r.material_ids);
+    const last = picked[picked.length - 1];
+    if (last) return last;
+    const onLane = sea.fragments.find((f) => f.lane === laneId) ?? sea.fragments[0];
+    return onLane?.id ?? null;
+  }, [records, sea, laneId]);
+
   /** 已经走过的段（含当前这段）：海图上留下笔迹的那几笔。 */
   const struck = useMemo(() => {
     const chain = ['A', 'B', 'C', 'D'];
@@ -357,6 +371,11 @@ export function App() {
       setWebgl(false);
     }
   }, []);
+
+  useEffect(() => {
+    // 靠港戏期间把所有 HUD 收起来：这几秒只看那件东西
+    document.documentElement.dataset.cine = landing > 0 && landing < 1 ? 'landing' : '';
+  }, [landing]);
 
   useEffect(() => {
     document.documentElement.dataset.reduceMotion = reduceMotion ? 'true' : 'false';
@@ -550,13 +569,15 @@ export function App() {
   }, [view, question, sharedTask, nearPort]);
 
   const camMode: CamMode = useMemo(() => {
+    // 靠港戏占住镜头：船还在海域，但镜头已经推上去看东西了
+    if (landing > 0 && landing < 1) return 'landing';
     if (view === 'embark') return 'embark';
     if (view === 'cockpit') return 'cockpit';
     if (view === 'route') return 'route';
     if (view === 'port' || view === 'collaborate') return 'port';
     if (view === 'reflection') return 'reflection';
     return 'follow';
-  }, [view]);
+  }, [view, landing]);
 
   async function createVoyage(seed?: { sceneId: string; carried?: string[] }) {
     setError(null);
@@ -671,7 +692,7 @@ export function App() {
   }
 
   async function dock() {
-    if (!voyage || !nearPort) return;
+    if (!voyage || !nearPort || landing > 0) return;
     setBusy(true);
     setError(null);
     try {
@@ -682,13 +703,33 @@ export function App() {
       });
       const p = await api.ports(voyage.id);
       setPorts(p);
-      setView('port');
+      // 先把这一程的实物看完，再让人做选择
+      setLanding(0.0001);
     } catch (e) {
       setError(errText(e));
-    } finally {
       setBusy(false);
     }
   }
+
+  // 靠港戏的时间轴：镜头推近、物件出水，走完才开面板
+  useEffect(() => {
+    if (landing <= 0) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const dur = reduceMotion ? 900 : 5400;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / dur);
+      setLanding(p);
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else {
+        setView('port');
+        setBusy(false);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [landing > 0, reduceMotion]);
 
   async function collectFragment() {
     if (!voyage || !nearFragment) return;
@@ -844,6 +885,8 @@ export function App() {
           nearFragmentId={nearFragment}
           laneId={laneId}
           struck={struck}
+          landingT={landing > 0 && landing < 1 ? landing : 0}
+          landingRelic={landingRelicId}
           input={input}
           restored={restored}
           onShip={onShip}
@@ -857,6 +900,32 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* 靠港戏：文字分层浮现，不一次全给 */}
+      {landing > 0 && landing < 1 && (() => {
+        const frag = sea.fragments.find((f) => f.id === landingRelicId);
+        const stage1 = landing > 0.3;
+        const stage2 = landing > 0.55;
+        const stage3 = landing > 0.78;
+        return (
+          <div className="landing-cine" aria-live="polite">
+            <div className="landing-cine-inner">
+              <div className={`landing-kicker${stage1 ? ' is-in' : ''}`}>
+                {stage1 ? `靠港 · ${portPlace?.name ?? '港口'}` : ''}
+              </div>
+              <div className={`landing-name${stage2 ? ' is-in' : ''}`}>
+                {stage2 && frag ? frag.title : ''}
+              </div>
+              <div className={`landing-body${stage3 ? ' is-in' : ''}`}>
+                {stage3 && frag ? frag.text : ''}
+              </div>
+              <div className={`landing-stamp${stage3 ? ' is-in' : ''}`}>
+                {stage3 && frag ? contentStamp(frag.classification, frag.sources).label : ''}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {view !== 'embark' && view !== 'cockpit' && (
         <>

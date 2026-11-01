@@ -3,7 +3,7 @@ import { DECK_Y, SHIP_L, STERN_HALL } from './hull';
 import { WORLD } from './world.config';
 import { smootherstep } from './voyageConstants';
 
-export type CamMode = 'embark' | 'cockpit' | 'route' | 'follow' | 'port' | 'reflection';
+export type CamMode = 'embark' | 'cockpit' | 'route' | 'follow' | 'port' | 'reflection' | 'landing';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -22,6 +22,78 @@ export interface CamPose {
   look: THREE.Vector3;
   fov: number;
   up: THREE.Vector3;
+}
+
+
+/** 靠港戏时长（秒）。与 App 里的面板延迟对齐。 */
+export const LANDING_SEC = 5.4;
+
+/**
+ * 靠港戏的机位。t 是 0..1 的整段时间轴：
+ *   0.00–0.34  从跟船机位压向船头，东西正从水里被提上来
+ *   0.34–0.72  推近到物件前，看清材质与刻痕
+ *   0.72–1.00  停住，留出时间让文字浮上来
+ * 三段之间用 smootherstep，避免任何一帧的硬切。
+ */
+export function landingPose(
+  t: number,
+  shipPos: THREE.Vector3,
+  fwd: THREE.Vector3,
+  right: THREE.Vector3,
+  scale = 1,
+) {
+  // 距离用绝对单位，不跟着船体缩放：小木筏上缩得太近，镜头会埋进甲板。
+  const L = SHIP_L * scale;
+
+  // 主角悬在船头前方的水面上方。高度取绝对值，高于任何船型的甲板。
+  const relic = new THREE.Vector3()
+    .copy(shipPos)
+    .addScaledVector(fwd, 0.1 * L)
+    .addScaledVector(UP, 3.0);
+
+  // 机位：始终在船的斜后上方、外舷一侧，俯看主角。
+  // 绝不越过船头，否则会看进码头体块里。
+  const k0 = new THREE.Vector3()
+    .copy(shipPos)
+    .addScaledVector(fwd, -1.15 * L)
+    .addScaledVector(right, 0.85 * L)
+    .addScaledVector(UP, 6.4);
+  const k1 = new THREE.Vector3()
+    .copy(relic)
+    .addScaledVector(fwd, -0.85 * L)
+    .addScaledVector(right, 0.55 * L)
+    .addScaledVector(UP, 3.2);
+  const k2 = new THREE.Vector3()
+    .copy(relic)
+    .addScaledVector(fwd, -0.62 * L)
+    .addScaledVector(right, 0.4 * L)
+    .addScaledVector(UP, 2.4);
+
+  const look0 = relic.clone().addScaledVector(UP, -0.3);
+  const look1 = relic.clone();
+  const look2 = relic.clone();
+
+  const pos = new THREE.Vector3();
+  const look = new THREE.Vector3();
+  let fov = 40;
+
+  if (t <= 0.34) {
+    const u = smootherstep(t / 0.34);
+    pos.lerpVectors(k0, k1, u);
+    look.lerpVectors(look0, look1, u);
+    fov = THREE.MathUtils.lerp(40, 34, u);
+  } else if (t <= 0.72) {
+    const u = smootherstep((t - 0.34) / 0.38);
+    pos.lerpVectors(k1, k2, u);
+    look.lerpVectors(look1, look2, u);
+    fov = THREE.MathUtils.lerp(34, 28, u);
+  } else {
+    const u = smootherstep((t - 0.72) / 0.28);
+    pos.copy(k2).addScaledVector(right, -0.1 * u);
+    look.copy(look2);
+    fov = THREE.MathUtils.lerp(28, 27, u);
+  }
+  return { pos, look, fov, up: UP.clone(), relic };
 }
 
 export function desiredPose(

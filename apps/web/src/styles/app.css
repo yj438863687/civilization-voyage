@@ -1191,3 +1191,80 @@ html[data-reduce-motion='true'] .btn:active { transform: none; }
   color: var(--cv-text-on-paper-muted);
 }
 .depart-lanes { margin: 0; }
+
+/* 靠港戏：银幕文字。三层分别浮现，不抢镜头，也不一次全给 */
+.landing-cine {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 3);
+  pointer-events: none;
+  display: grid;
+  align-items: end;
+  padding: 0 24px calc(64px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgb(6 10 12 / 0.5) 0%, rgb(6 10 12 / 0) 26%, rgb(6 10 12 / 0) 52%, rgb(6 10 12 / 0.82) 100%);
+}
+.landing-cine-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgb(220 200 160 / 0.28);
+}
+.landing-kicker {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--cv-brass-300);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 520ms ease, transform 520ms ease;
+}
+.landing-name {
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  line-height: 1.2;
+  color: #f4ecdc;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 620ms ease, transform 620ms ease;
+}
+.landing-body {
+  font-size: var(--cv-text-md);
+  line-height: 1.75;
+  color: rgb(232 226 210 / 0.88);
+  max-width: 46ch;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 620ms ease 60ms, transform 620ms ease 60ms;
+}
+.landing-stamp {
+  margin-top: 4px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--cv-brass-300);
+  opacity: 0;
+  transition: opacity 520ms ease;
+}
+.landing-kicker.is-in,
+.landing-name.is-in,
+.landing-body.is-in,
+.landing-stamp.is-in {
+  opacity: 1;
+  transform: none;
+}
+@media (max-width: 639px) {
+  .landing-cine { padding: 0 16px calc(48px + env(safe-area-inset-bottom)); }
+  .landing-body { font-size: var(--cv-text-sm); }
+}
+
+/* 靠港戏：所有 HUD 退场，只留银幕字幕 */
+html[data-cine='landing'] .hud,
+html[data-cine='landing'] .coach-bar,
+html[data-cine='landing'] .interact-prompt,
+html[data-cine='landing'] .skip-hint {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 420ms ease;
+}
+.hud, .coach-bar, .interact-prompt { transition: opacity 420ms ease; }

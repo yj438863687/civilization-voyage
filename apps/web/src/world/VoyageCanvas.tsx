@@ -1,8 +1,9 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { bootPushPose, desiredPose, easeSwell, type CamMode } from './camera';
+import { bootPushPose, desiredPose, easeSwell, landingPose, type CamMode } from './camera';
 import { Cabin } from './Cabin';
+import { Relic, relicKindOf } from './relics';
 import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
 import { HULL_STYLES, STYLE_BY_SCENE } from './hull';
@@ -38,6 +39,10 @@ interface Props {
   laneId: string;
   /** 已经走完的段，用来在海图上留下笔迹 */
   struck: string[];
+  /** 靠港戏的时间轴 0..1 */
+  landingT?: number;
+  /** 这场戏的主角：从水里提上来的那件东西 */
+  landingRelic?: string | null;
   input: ControlInput;
   restored?: { x: number; z: number; yaw: number } | null;
   onShip: (s: ShipSnapshot, nearPort: string | null, nearFragment: string | null) => void;
@@ -377,6 +382,8 @@ function Rig({
   collectedIds,
   laneId,
   struck,
+  landingT = 0,
+  landingRelic = null,
 }: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
@@ -402,6 +409,10 @@ function Rig({
   const booted = useRef(false);
   const lastBlendNote = useRef(1);
   const approachHold = useRef(false);
+  /** 靠港戏起步时的镜头位置，保证第一帧不跳 */
+  const landFrom = useRef<{ pos: THREE.Vector3; look: THREE.Vector3; fov: number } | null>(null);
+  /** 靠港戏的舞台：被提上来的那件东西，挂在世界坐标里，跟镜头走 */
+  const relicStage = useRef<THREE.Group>(null);
   const { camera, gl } = useThree();
   const tmpFwd = useMemo(() => new THREE.Vector3(), []);
   const tmpRight = useMemo(() => new THREE.Vector3(), []);
@@ -563,10 +574,40 @@ function Rig({
     else blend.current = Math.min(1, blend.current + clamped / dur);
     const k = easeSwell(blend.current);
 
+    if (mode !== 'landing') {
+      landFrom.current = null;
+      if (relicStage.current) relicStage.current.visible = false;
+    }
+
     const useBoot =
       mode === 'cockpit' && fromMode.current === 'embark' && blend.current < 1 && !reduceMotion && !skip.current;
 
-    if (useBoot) {
+    if (mode === 'landing') {
+      const lp = landingPose(landingT, g.position, tmpFwd, tmpRight, camScale);
+      if (!landFrom.current) {
+        landFrom.current = { pos: camera.position.clone(), look: look.clone(), fov: persp.fov };
+      }
+      // 前 18% 从当前机位接过去，再完全交给这场戏的轨道
+      const handoff = Math.min(1, landingT / 0.18);
+      const h = easeSwell(handoff);
+      camera.position.lerpVectors(landFrom.current.pos, lp.pos, h);
+      look.lerpVectors(landFrom.current.look, lp.look, h);
+      camera.up.copy(UP);
+      camera.lookAt(look);
+      persp.fov = THREE.MathUtils.lerp(landFrom.current.fov, lp.fov, h);
+      persp.updateProjectionMatrix();
+      relicStage.current?.position.copy(lp.relic);
+      if (relicStage.current) {
+        // 东西从船头下方的水里升上来，停在镜头前
+        const rise = THREE.MathUtils.clamp((landingT - 0.04) / 0.36, 0, 1);
+        const e = easeSwell(rise);
+        relicStage.current.position.y = lp.relic.y - (1 - e) * 2.6 * camScale;
+        relicStage.current.rotation.y = g.rotation.y + Math.PI * 0.18 + (1 - e) * 0.9 + landingT * 0.35;
+        relicStage.current.visible = true;
+        const sc = 0.62 + e * 0.38;
+        relicStage.current.scale.setScalar(sc);
+      }
+    } else if (useBoot) {
       const boot = bootPushPose(blend.current, g.position, tmpFwd, tmpRight);
       camera.position.copy(boot.pos);
       look.copy(boot.look);
@@ -640,10 +681,22 @@ function Rig({
 
   return (
     <>
+      {/* 靠港戏的主角：从水里提上来，停在镜头前。只在戏里可见 */}
+      <group ref={relicStage} visible={false}>
+        {landingRelic && (
+          <>
+            <Relic kind={relicKindOf(landingRelic)} active hero reduceMotion={reduceMotion} />
+            {/* 一束从上方落下的光，只照这件东西 */}
+            <spotLight position={[0.6, 4.2, 1.4]} angle={0.42} penumbra={0.8} intensity={14} distance={9} color="#ffe3b8" />
+            <pointLight position={[-1.2, 0.8, 1.2]} intensity={1.6} distance={5} color="#8fb6c8" />
+          </>
+        )}
+      </group>
       <group ref={ship} position={[world.spawn.x, 0, world.spawn.z]}>
         <group ref={rock}>
           {/* 驾驶舱是独立舱室：此时隐藏船体外壳，否则桅杆与桅座会穿进镜头 */}
-          <group ref={exterior} visible={mode !== 'cockpit'}>
+          {/* 靠港戏与驾驶舱都不需要船体外壳：一个会挡住主角，一个会穿进镜头 */}
+          <group ref={exterior} visible={mode !== 'cockpit' && mode !== 'landing'}>
             <Suspense fallback={null}>
               <TreasureShip reduceMotion={reduceMotion} style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']} />
             </Suspense>

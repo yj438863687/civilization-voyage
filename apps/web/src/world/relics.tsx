@@ -75,10 +75,13 @@ export function Relic({
   kind,
   active,
   reduceMotion,
+  hero = false,
 }: {
   kind: RelicKind;
   active: boolean;
   reduceMotion: boolean;
+  /** 靠港戏的主角：不要托板，不要地面光圈，让它真的浮在水面上 */
+  hero?: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
   const lit = useRef<THREE.MeshStandardMaterial>(null);
@@ -88,11 +91,16 @@ export function Relic({
     const g = group.current;
     if (!g) return;
     const t = clock.elapsedTime;
-    // 漂在水上：很慢的起伏，不是摇铃
-    g.position.y = reduceMotion ? 0 : Math.sin(t * 1.1 + kind.length) * 0.09;
+    // 靠近时：整件东西从水里被提上来，立住，才停在水面上
+    // 不是"靠近就变大"，是被捞起来给你看
+    const liftTarget = active ? 0.42 : 0;
+    g.position.y += (liftTarget - g.position.y) * 0.04;
+    const settle = g.position.y;
+    g.position.y = settle + (reduceMotion ? 0 : Math.sin(t * 1.1 + kind.length) * 0.05);
     g.rotation.y = reduceMotion ? 0 : Math.sin(t * 0.23 + kind.length) * 0.06;
+    // 出水时略微前倾，像刚从水里提起来还挂着水
+    g.rotation.x = active ? Math.sin(t * 0.6) * 0.012 : 0;
     if (lit.current) {
-      // 靠近时才真的亮起来：越近越亮，是"被你看见"而不是"一直在发光"
       const target = active ? 2.6 : 0.55;
       lit.current.emissiveIntensity += (target - lit.current.emissiveIntensity) * 0.08;
     }
@@ -104,11 +112,13 @@ export function Relic({
 
   return (
     <group ref={group}>
-      {/* 水面上的托板：所有物件都浮在一小块深色板上，读得清是"漂着" */}
-      <mesh position={[0, 0.06, 0]} receiveShadow>
-        <cylinderGeometry args={[1.15, 1.15, 0.12, 20]} />
-        <meshStandardMaterial color="#1b1712" roughness={0.95} />
-      </mesh>
+      {/* 水面上的托板：海里那些物件需要它，戏里的主角不需要 */}
+      {!hero && (
+        <mesh position={[0, 0.06, 0]} receiveShadow>
+          <cylinderGeometry args={[1.15, 1.15, 0.12, 20]} />
+          <meshStandardMaterial color="#1b1712" roughness={0.95} />
+        </mesh>
+      )}
 
       {kind === 'clay-tablet' && (
         <group position={[0, 0.62, 0]} rotation={[0, 0.3, 0.12]}>
@@ -436,16 +446,18 @@ export function Relic({
       )}
 
       {/* 靠近时的一圈光：只在 active 时出现，告诉玩家"就是它" */}
-      <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.35, 1.75, 40]} />
-        <meshBasicMaterial
-          color={P.lit}
-          transparent
-          opacity={active ? 0.34 : 0.1}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
+      {!hero && (
+        <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.35, 1.75, 40]} />
+          <meshBasicMaterial
+            color={P.lit}
+            transparent
+            opacity={active ? 0.34 : 0.1}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
       <pointLight position={[0, 1.6, 0]} color={P.lit} intensity={active ? 2.2 : 0.5} distance={7} decay={2} />
     </group>
   );
