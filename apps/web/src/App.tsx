@@ -157,7 +157,7 @@ function portRelDeg(ship: { x: number; z: number; headingDeg: number }, port: { 
 const ROUTES: Route[] = [
   {
     id: 'simple',
-    steps: ['带着已有材料出海', '靠港对照纸签', '记下发现'],
+    steps: ['带着已有材料出海', '靠港对照实物', '记下发现'],
     rationale: '步骤少、不调用模型也能走完。步骤多、成本高不代表结论更正确。',
     budget: 0,
     currency: 'unknown',
@@ -232,7 +232,7 @@ function guide(view: View, ctx: GuideCtx) {
     const next = ctx.nearPort
       ? '按 F 靠港'
       : ctx.nearFragment
-        ? '按 E 拾取纸签。'
+        ? '按 E 拾取。'
         : misaligned
           ? `转动船头，让铜针对准船头（偏 ${Math.round(Math.abs(ctx.relDeg ?? 0))}°）。`
           : approaching
@@ -1383,7 +1383,7 @@ export function App() {
                 })}
               </div>
             ) : (
-              <StatusBanner kind="idle" text="货舱还空。回到海域，靠近纸签，先看来源再收。" />
+              <StatusBanner kind="idle" text="货舱还空。回到海域，靠近漂着的东西，先看来源再收。" />
             )}
             {/* 站位：这一程真正要拨的那根刻度。不是写作文，是把手放上去。 */}
             {stance && (

@@ -427,7 +427,6 @@ function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string })
   );
 }
 
-/** 纸签：竖杆 + 纸面 + 一枚小暖灯，作为「还没照到的地方」的标记。 */
 /** 每段航程独有的空气/海面天气层。便宜的效果：粒子 + 低面数面片，不做体积雾。 */
 function WeatherField({ sceneId, reduceMotion }: { sceneId: string; reduceMotion: boolean }) {
   const group = useRef<THREE.Group>(null);
