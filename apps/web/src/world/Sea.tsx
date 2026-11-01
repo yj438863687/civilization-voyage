@@ -596,7 +596,7 @@ function SeaLane({
         <meshBasicMaterial
           color={color}
           transparent
-          opacity={active ? 0.5 : 0.1}
+          opacity={active ? 0.24 : 0.07}
           depthWrite={false}
           side={THREE.DoubleSide}
           fog
@@ -629,8 +629,8 @@ function SeaLane({
                 <meshStandardMaterial color="#fff4dc" emissive={color} emissiveIntensity={3.2} toneMapped={false} />
               </mesh>
               <mesh position={[0, 1.78, 0]}>
-                <sphereGeometry args={[0.62, 10, 10]} />
-                <meshBasicMaterial color={color} transparent opacity={0.16} depthWrite={false} />
+                <sphereGeometry args={[0.42, 10, 10]} />
+                <meshBasicMaterial color={color} transparent opacity={0.08} depthWrite={false} />
               </mesh>
             </>
           )}
@@ -656,10 +656,13 @@ function Portal({
   portal,
   color,
   reduceMotion,
+  open,
 }: {
   portal: NonNullable<WorldConfig['portal']>;
   color: string;
   reduceMotion: boolean;
+  /** 锁着的门：只有石柱，没有光。落印之后才亮 */
+  open: boolean;
 }) {
   const veil = useRef<THREE.MeshBasicMaterial>(null);
   const group = useRef<THREE.Group>(null);
@@ -669,7 +672,7 @@ function Portal({
   useFrame(({ clock }) => {
     if (reduceMotion) return;
     const t = clock.elapsedTime;
-    if (veil.current) veil.current.opacity = 0.16 + Math.sin(t * 1.3) * 0.05;
+    if (veil.current) veil.current.opacity = open ? 0.22 + Math.sin(t * 1.3) * 0.07 : 0;
     if (group.current) group.current.position.y = Math.sin(t * 0.5) * 0.12;
   });
 
@@ -688,7 +691,12 @@ function Portal({
           </mesh>
           <mesh position={[0, H - 0.4, 0]}>
             <sphereGeometry args={[0.28, 12, 12]} />
-            <meshStandardMaterial color="#fff4dc" emissive={color} emissiveIntensity={2.6} toneMapped={false} />
+            <meshStandardMaterial
+              color={open ? '#fff4dc' : '#3a3a38'}
+              emissive={open ? color : '#000000'}
+              emissiveIntensity={open ? 2.6 : 0}
+              toneMapped={!open}
+            />
           </mesh>
         </group>
       ))}
@@ -705,9 +713,103 @@ function Portal({
       {/* 水面上的门影：一圈光，告诉玩家"开进来" */}
       <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[W * 0.52, W * 0.62, 48]} />
-        <meshBasicMaterial color={color} transparent opacity={0.5} side={THREE.DoubleSide} depthWrite={false} />
+        <meshBasicMaterial color={color} transparent opacity={open ? 0.55 : 0.08} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
-      <pointLight position={[0, H * 0.55, 0]} color={color} intensity={6} distance={22} decay={2} />
+      {open && <pointLight position={[0, H * 0.55, 0]} color={color} intensity={7} distance={26} decay={2} />}
+    </group>
+  );
+}
+
+
+/**
+ * 远海景物：每段海不该只有航道和码头。
+ * 农业是河口的芦苇与浅滩，工业是远处的烟囱与驳船，信息是浮标阵列与塔，
+ * 智能是成排的无人浮体。都在雾里，只给轮廓 —— 让海有纵深，不抢主角。
+ */
+function SeaFurniture({ sceneId, reduceMotion }: { sceneId: string; reduceMotion: boolean }) {
+  const group = useRef<THREE.Group>(null);
+  const dark = cssVar('--cv-ship-hull', '#2a211c');
+  const stone = sceneId === 'A' ? '#4d4034' : sceneId === 'B' ? '#3a3f43' : sceneId === 'C' ? '#243a42' : '#1b2740';
+  const cold = cssVar('--cv-ship-lamp-cool', '#8fb6c8');
+  const warm = cssVar('--cv-ship-lamp-core', '#ffd9a0');
+
+  useFrame(({ clock }) => {
+    if (reduceMotion || !group.current) return;
+    group.current.rotation.y = Math.sin(clock.elapsedTime * 0.02) * 0.004;
+  });
+
+  const reeds = useMemo(
+    () =>
+      Array.from({ length: 46 }, (_, i) => {
+        const a = i * 2.399;
+        const r = 34 + ((i * 17) % 26);
+        return { x: Math.cos(a) * r, z: Math.sin(a) * r, h: 1.1 + ((i * 7) % 10) / 10 };
+      }),
+    [],
+  );
+
+  return (
+    <group ref={group}>
+      {sceneId === 'A' &&
+        reeds.map((r, i) => (
+          <mesh key={i} position={[r.x, r.h / 2, r.z]} rotation={[0, i * 0.7, 0.06]}>
+            <cylinderGeometry args={[0.035, 0.05, r.h, 4]} />
+            <meshStandardMaterial color="#6a5a3c" roughness={0.95} />
+          </mesh>
+        ))}
+
+      {sceneId === 'B' &&
+        [
+          [-40, -46, 9],
+          [-52, -30, 7],
+          [-34, -58, 11],
+        ].map(([x, z, h], i) => (
+          <group key={i} position={[x, 0, z]}>
+            <mesh position={[0, h / 2, 0]}>
+              <cylinderGeometry args={[0.9, 1.2, h, 8]} />
+              <meshStandardMaterial color={stone} roughness={0.9} />
+            </mesh>
+            <mesh position={[0, h + 0.4, 0]}>
+              <cylinderGeometry args={[0.7, 0.8, 3, 8]} />
+              <meshStandardMaterial color={dark} roughness={0.9} />
+            </mesh>
+          </group>
+        ))}
+
+      {sceneId === 'C' &&
+        Array.from({ length: 9 }, (_, i) => {
+          const x = -44 + i * 11;
+          return (
+            <group key={i} position={[x, 0, -52]}>
+              <mesh position={[0, 2.4, 0]}>
+                <cylinderGeometry args={[0.05, 0.06, 4.8, 6]} />
+                <meshStandardMaterial color={stone} roughness={0.7} metalness={0.4} />
+              </mesh>
+              <mesh position={[0, 4.9, 0]}>
+                <sphereGeometry args={[0.11, 8, 8]} />
+                <meshStandardMaterial color={warm} emissive={cold} emissiveIntensity={1.6} toneMapped={false} />
+              </mesh>
+            </group>
+          );
+        })}
+
+      {sceneId === 'D' &&
+        Array.from({ length: 7 }, (_, i) => {
+          const x = -40 + i * 13;
+          const z = -46 - (i % 3) * 7;
+          return (
+            <group key={i} position={[x, 0, z]}>
+              <mesh position={[0, 0.4, 0]} rotation={[0, i * 0.4, 0]}>
+                <boxGeometry args={[5.5, 0.8, 3]} />
+                <meshStandardMaterial color={stone} roughness={0.8} metalness={0.3} />
+              </mesh>
+              <mesh position={[0, 0.95, 0]}>
+                <boxGeometry args={[3.2, 0.12, 0.5]} />
+                <meshStandardMaterial color={warm} emissive={cold} emissiveIntensity={1.2} toneMapped={false} />
+              </mesh>
+            </group>
+          );
+        })}
     </group>
   );
 }
@@ -719,6 +821,7 @@ export function Atmosphere({
   collectedIds,
   nearFragmentId,
   laneId,
+  portalOpen = false,
 }: {
   reduceMotion: boolean;
   sceneId: string;
@@ -726,6 +829,7 @@ export function Atmosphere({
   collectedIds: string[];
   nearFragmentId: string | null;
   laneId: string;
+  portalOpen?: boolean;
 }) {
   // 夜空：竖向渐变 + 地平线暖带。不做体积云，行高处的雾由 fog 负责。
   const sky = useMemo(() => {
@@ -798,8 +902,9 @@ export function Atmosphere({
         </group>
       )}
       <WeatherField sceneId={sceneId} reduceMotion={reduceMotion} />
+      <SeaFurniture sceneId={sceneId} reduceMotion={reduceMotion} />
       {world.portal && (
-        <Portal portal={world.portal} color={laneColor(true, sceneId)} reduceMotion={reduceMotion} />
+        <Portal portal={world.portal} color={laneColor(true, sceneId)} reduceMotion={reduceMotion} open={portalOpen} />
       )}
       {(world.lanes ?? []).map((lane: Lane) => (
         <SeaLane

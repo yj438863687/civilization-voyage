@@ -46,6 +46,15 @@ export function relicKindOf(id: string): RelicKind {
     'D-star': 'starchart',
     'D-dest': 'dest',
     'D-skip': 'skipped',
+    // 每条航道上的第二件
+    'A-water': 'spike',
+    'A-bone': 'clay-tablet',
+    'B-coal': 'shift',
+    'B-ticket': 'chart-scrap',
+    'C-relay': 'cable',
+    'C-screen': 'starchart',
+    'D-weight': 'dest',
+    'D-log': 'starchart',
   };
   return map[id] ?? 'buoy';
 }

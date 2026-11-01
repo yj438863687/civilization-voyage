@@ -3,7 +3,7 @@ import { DECK_Y, SHIP_L, STERN_HALL } from './hull';
 import { WORLD } from './world.config';
 import { smootherstep } from './voyageConstants';
 
-export type CamMode = 'embark' | 'cockpit' | 'route' | 'follow' | 'port' | 'reflection' | 'landing';
+export type CamMode = 'embark' | 'cockpit' | 'route' | 'follow' | 'port' | 'reflection' | 'landing' | 'finale';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -151,6 +151,15 @@ export function desiredPose(
       .addScaledVector(UP, dist * Math.sin(el) + 3.2);
     look.copy(aim);
     fov = 42;
+  } else if (mode === 'finale') {
+    // 收帆：镜头退到高处，船变小，海变大。看它自己往前开
+    pos
+      .copy(shipPos)
+      .addScaledVector(fwd, -L * 2.4)
+      .addScaledVector(right, L * 1.1)
+      .addScaledVector(UP, L * 1.05);
+    look.copy(shipPos).addScaledVector(fwd, L * 2.2).setY(1.5);
+    fov = 44;
   } else if (mode === 'reflection') {
     pos.copy(shipPos).addScaledVector(right, 0.4).addScaledVector(UP, 5.2).addScaledVector(fwd, -2.4);
     look.copy(shipPos).addScaledVector(fwd, 2).setY(3.2);

@@ -1661,3 +1661,157 @@ html[data-cine='reflection'] .coach-bar {
   letter-spacing: 0.06em;
 }
 .portal-hint-sub { font-size: var(--cv-text-xs); color: rgb(232 226 210 / 0.6); letter-spacing: 0.12em; }
+
+/* 靠港戏：物件名之下先说它是什么 */
+.landing-what {
+  font-size: var(--cv-text-sm);
+  letter-spacing: 0.16em;
+  color: rgb(240 214 170 / 0.72);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 560ms ease, transform 560ms ease;
+}
+.landing-what.is-in { opacity: 1; transform: none; }
+
+/* 入海开场：像片头。四行字依次浮出，点一下或按任意键跳过 */
+.epoch-intro {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 4);
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 18px;
+  padding: max(12vh, 84px) 24px 24px;
+  text-align: center;
+  cursor: pointer;
+  background:
+    linear-gradient(180deg, rgb(5 9 11 / 0.78) 0%, rgb(5 9 11 / 0.34) 34%, rgb(5 9 11 / 0) 56%, rgb(5 9 11 / 0.4) 100%);
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.9);
+  animation: intro-out 6.2s ease forwards;
+}
+.epoch-intro > span { opacity: 0; animation: intro-line 1.1s ease forwards; }
+.epoch-intro-era { font-size: 12px; letter-spacing: 0.6em; color: var(--cv-brass-300); animation-delay: 0.3s !important; }
+.epoch-intro-title {
+  font-family: var(--cv-font-display);
+  font-size: clamp(2.2rem, 5.4vw, 3.8rem);
+  letter-spacing: 0.1em;
+  color: #f6efe0;
+  animation-delay: 1s !important;
+}
+.epoch-intro-line { font-size: var(--cv-text-md); color: rgb(232 226 210 / 0.82); max-width: 32ch; line-height: 1.8; animation-delay: 2.1s !important; }
+.epoch-intro-q {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid rgb(220 200 160 / 0.24);
+  font-size: var(--cv-text-sm);
+  color: rgb(240 214 170 / 0.85);
+  max-width: 38ch;
+  line-height: 1.7;
+  animation-delay: 3.2s !important;
+}
+@keyframes intro-line { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes intro-out { 0%, 86% { opacity: 1; } 100% { opacity: 0; } }
+
+/* 落印回响 */
+.seal-beat {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 4);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 24px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgb(5 9 11 / 0.55) 0%, rgb(5 9 11 / 0.85) 75%);
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.9);
+}
+.seal-beat > span { opacity: 0; animation: intro-line 0.9s ease forwards; }
+.seal-beat-mark {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #c0472c;
+  border-radius: 6px;
+  color: #e0583a;
+  font-family: var(--cv-font-display);
+  font-size: 30px;
+  transform: rotate(-6deg);
+  animation: seal-stamp 520ms cubic-bezier(0.3, 1.6, 0.5, 1) forwards !important;
+}
+@keyframes seal-stamp {
+  from { opacity: 0; transform: scale(1.8) rotate(-6deg); }
+  to { opacity: 1; transform: scale(1) rotate(-6deg); }
+}
+.seal-beat-pick { font-family: var(--cv-font-display); font-size: clamp(1.6rem, 3.6vw, 2.4rem); color: #f6efe0; animation-delay: 0.5s !important; }
+.seal-beat-cost { font-size: var(--cv-text-sm); color: rgb(232 226 210 / 0.72); animation-delay: 1s !important; }
+.seal-beat-epi { font-size: var(--cv-text-md); color: rgb(240 214 170 / 0.9); max-width: 34ch; line-height: 1.8; animation-delay: 1.7s !important; }
+.seal-beat-next { margin-top: 12px; font-size: 12px; letter-spacing: 0.4em; color: var(--cv-brass-300); animation-delay: 2.6s !important; }
+
+/* 收帆 */
+.finale {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 4);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 28px;
+  padding: 24px;
+  text-align: center;
+  background: linear-gradient(180deg, rgb(5 9 11 / 0.2), rgb(5 9 11 / 0.7));
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.95);
+}
+.finale-lines { display: grid; gap: 14px; max-width: 44ch; justify-items: center; }
+.finale-lines .finale-big { white-space: nowrap; }
+.finale-lines p {
+  margin: 0;
+  font-size: var(--cv-text-md);
+  line-height: 1.85;
+  color: rgb(232 226 210 / 0.86);
+  opacity: 0;
+  animation: intro-line 1.6s ease forwards;
+}
+.finale-lines .finale-big { font-family: var(--cv-font-display); font-size: clamp(1.6rem, 3.4vw, 2.3rem); color: #f6efe0; }
+.finale-chart { display: grid; gap: 10px; justify-items: center; opacity: 0; animation: intro-line 1.6s ease forwards; }
+.finale-chart .chart-map { width: 220px; }
+
+html[data-cine='finale'] .hud,
+html[data-cine='finale'] .coach-bar,
+html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
+
+/* 靠港：两种读法，折叠在画面里 */
+.cine-readings {
+  margin-top: 6px;
+}
+.cine-readings summary {
+  cursor: pointer;
+  font-size: var(--cv-text-xs);
+  letter-spacing: 0.12em;
+  color: rgb(220 200 160 / 0.72);
+  padding: 4px 0;
+}
+.cine-readings-list { display: grid; gap: 10px; margin-top: 8px; }
+.cine-reading {
+  padding-left: 12px;
+  border-left: 1px solid rgb(220 200 160 / 0.3);
+}
+.cine-reading-who { font-size: 11px; letter-spacing: 0.18em; color: var(--cv-brass-300); }
+.cine-reading-main { margin: 2px 0 4px; font-size: var(--cv-text-sm); line-height: 1.65; color: #f2ead9; }
+.cine-reading-blind { margin: 0; font-size: var(--cv-text-xs); color: rgb(232 226 210 / 0.5); }
+
+/* 出发：同样只有画面字 */
+.cine-depart {
+  position: fixed;
+  inset: 0;
+  z-index: var(--cv-z-panel);
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 0 24px calc(56px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgb(5 9 11 / 0.35) 0%, rgb(5 9 11 / 0.15) 35%, rgb(5 9 11 / 0.82) 72%, rgb(5 9 11 / 0.94) 100%);
+}
+.cine-depart-q { font-size: clamp(1.35rem, 2.8vw, 2rem); }

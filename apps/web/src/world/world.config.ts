@@ -36,6 +36,10 @@ export type FragmentPlace = {
   pickupRadius: number;
   classification: Classification;
   text: string;
+  /** 这是什么物件 */
+  what?: string;
+  /** 它为什么重要。一句，不训人 */
+  why?: string;
   sources: Source[];
   /** 这段材料只在哪条航道上遇到。'both' = 两条都会碰到 */
   lane: LaneId | 'both';
@@ -159,6 +163,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 7.5,
         lane: 'both',
         classification: 'creative',
+        what: '海图残页',
+        why: '铜针指向有灯的地方。',
         text: '铜针指向有灯的地方。纸签是材料，不是风景。这一页是为体验写的，不作航路史实。',
         sources: [TEST_SRC],
       },
@@ -170,6 +176,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6.5,
         lane: 'both',
         classification: 'creative',
+        what: '一枚旧印',
+        why: '先看来源，再听船员，最后由你落印。',
         text: '先看来源，再听船员，最后由你落印。口诀是创作，提醒判断在你手里。',
         sources: [TEST_SRC],
       },
@@ -181,6 +189,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6,
         lane: 'both',
         classification: 'creative',
+        what: '一份没有署名的名单',
+        why: '安排若做成了，谁还没被问到？',
         text: '安排若做成了，谁还没被问到？这一条是创作的义利提醒，不是某份档案。',
         sources: [TEST_SRC],
       },
@@ -215,6 +225,32 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     portal: { x: -26, z: -30, radius: 7, to: 'B', label: '工业 · 从风帆到蒸汽' },
     fragments: [
       {
+        id: 'A-water',
+        title: '水渠的木闸',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'near',
+        what: '一道拦水的闸板。',
+        why: '把水分给哪块地，是定居之后的第一次公共决定。',
+        classification: 'creative',
+        text: '把水分给哪块地，是定居之后的第一次公共决定。',
+        sources: [],
+      },
+      {
+        id: 'A-bone',
+        title: '一枚刻痕骨片',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'far',
+        what: '骨头上划着几道横线。',
+        why: '有人开始记数了。记的是粮、是月、还是人，已经没人知道。',
+        classification: 'creative',
+        text: '有人开始记数了。记的是粮、是月、还是人，已经没人知道。',
+        sources: [],
+      },
+      {
         id: 'A-seed',
         title: '第一粒种子',
         x: 4,
@@ -222,6 +258,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 7.5,
         lane: 'both',
         classification: 'creative',
+        what: '一把炭化的谷粒',
+        why: '新石器时代的遗址里常有炭化谷粒，它证明的不是"种了地"，而是"留下的种子够过一冬"。',
         text: '把种子埋进土里，意味着你要在这里等一季。等不等得起，是这一程真正的问题。这一条为体验而写，不作农业起源的考古结论。',
         sources: [TEST_SRC],
       },
@@ -233,6 +271,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6.5,
         lane: 'near',
         classification: 'historical_claim',
+        what: '界桩与泥板的刻痕',
+        why: '定居要划界。具体记号形式随地区而变，这里只作制度线索，不作任何遗址的复原。',
         text: '定居要划界：哪块地先种，谁的地界。具体记号形式随地区而变，本条只作制度线索，待核实。',
         sources: [UNESCO_Q],
       },
@@ -244,6 +284,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6,
         lane: 'far',
         classification: 'counterfactual',
+        what: '鼓腹陶罐',
+        why: '能存粮，才敢留下。容器比房子更能说明定居是否真的发生。',
         text: '若第一年就有余粮：谁负责存，谁有权开仓？这是推演，不是任何一处遗址的记载。',
         sources: [],
       },
@@ -278,6 +320,32 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     portal: { x: -26, z: -30, radius: 7, to: 'C', label: '信息 · 从海上到电波' },
     fragments: [
       {
+        id: 'B-coal',
+        title: '一筐压舱煤',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'near',
+        what: '湿重的煤块。',
+        why: '煤从哪来、谁下的井，账本上通常没有这一栏。',
+        classification: 'creative',
+        text: '煤从哪来、谁下的井，账本上通常没有这一栏。',
+        sources: [],
+      },
+      {
+        id: 'B-ticket',
+        title: '一张三等船票',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'far',
+        what: '票根已经磨白。',
+        why: '同一艘船上，舱位把"快"分成了几种价格。',
+        classification: 'creative',
+        text: '同一艘船上，舱位把"快"分成了几种价格。',
+        sources: [],
+      },
+      {
         id: 'B-gauge',
         title: '汽压表',
         x: 4,
@@ -285,6 +353,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 7.5,
         lane: 'near',
         classification: 'creative',
+        what: '铜壳压力表',
+        why: '同一段航程，蒸汽船把"看风"换成了"算煤"。指针往右一格，快的是船，热的是炉前。',
         text: '汽压高一点，船快一点，炉子也更烫。快与稳在这里是同一根指针的两端。这一条为体验而写。',
         sources: [TEST_SRC],
       },
@@ -296,6 +366,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6.5,
         lane: 'far',
         classification: 'counterfactual',
+        what: '班次铜牌',
+        why: '效率的账本只记煤与吨位，不记炉前的人几点换班。',
         text: '若把航程缩短一半：省下的是煤，还是一班人的睡眠？这是推演，不是某家船公司的档案。',
         sources: [],
       },
@@ -307,6 +379,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6,
         lane: 'both',
         classification: 'historical_claim',
+        what: '铁轨与测量桩',
+        why: '铁轨先铺到哪里，哪座镇就先被连上。选线与设站的具体史料待核实。',
         text: '铁轨先铺到哪里，哪座镇就被连上。选线与设站的具体史料待核实，本条只作空间线索。',
         sources: [UNESCO_Q],
       },
@@ -341,6 +415,32 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     portal: { x: -26, z: -30, radius: 7, to: 'D', label: '智能 · 从驾驶到设定目的地' },
     fragments: [
       {
+        id: 'C-relay',
+        title: '一台旧中继器',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'far',
+        what: '铜壳发暗的转发器。',
+        why: '信号到这里要停一下再走。停的这一下，就是延迟。',
+        classification: 'creative',
+        text: '信号到这里要停一下再走。停的这一下，就是延迟。',
+        sources: [],
+      },
+      {
+        id: 'C-screen',
+        title: '一块屏幕墙',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'near',
+        what: '成排的发光面。',
+        why: '被显示出来的地方，才像存在。没显示的，连"断线"都算不上。',
+        classification: 'creative',
+        text: '被显示出来的地方，才像存在。没显示的，连"断线"都算不上。',
+        sources: [],
+      },
+      {
         id: 'C-cable',
         title: '海底电缆接头',
         x: 4,
@@ -348,6 +448,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 7.5,
         lane: 'both',
         classification: 'historical_claim',
+        what: '海底电缆接头',
+        why: '电缆把两端的时差压成零；接头只落在有人出钱铺线的地方。',
         text: '电缆把两端的时差压成零，但接头只落在有资本铺线的地方。具体线路与年代待核实。',
         sources: [UNESCO_Q],
       },
@@ -359,6 +461,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6.5,
         lane: 'far',
         classification: 'counterfactual',
+        what: '一面钟',
+        why: '实时航图让别人的白天变成你的夜班。',
         text: '若航图实时，你会在深夜收到别人的白天。谁被要求适应谁的时间？这是推演。',
         sources: [],
       },
@@ -370,6 +474,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6,
         lane: 'near',
         classification: 'creative',
+        what: '断掉的缆',
+        why: '整张图上仍有一处没有信号。不在图上，不等于不存在。',
         text: '整张实时航图上仍有一处没有信号。它不在图上，不等于它不存在。这一条为体验而写。',
         sources: [TEST_SRC],
       },
@@ -403,6 +509,32 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     lanes: LANES('模型自绘星图', '目的地的定义', '它选的', '你要的', '最短的一条，它说这样最好', '长一些，你会经过它想略过的地方'),
     fragments: [
       {
+        id: 'D-weight',
+        title: '一颗配重块',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'far',
+        what: '压舱用的金属块。',
+        why: '它可以自己算重心。你只需要说"稳一点"。',
+        classification: 'creative',
+        text: '它可以自己算重心。你只需要说"稳一点"。',
+        sources: [],
+      },
+      {
+        id: 'D-log',
+        title: '一份算法日志',
+        x: 0,
+        z: 0,
+        pickupRadius: 7,
+        lane: 'near',
+        what: '没人读过的运行记录。',
+        why: '它写了三万字，没有一句是给岸上的人看的。',
+        classification: 'creative',
+        text: '它写了三万字，没有一句是给岸上的人看的。',
+        sources: [],
+      },
+      {
         id: 'D-star',
         title: '模型自绘星图',
         x: 4,
@@ -410,6 +542,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 7.5,
         lane: 'far',
         classification: 'creative',
+        what: '一块自绘星图',
+        why: '它自己看星、自己画线。图上多出来的那颗星，是它算出来的，不是谁看见的。',
         text: '船自己看星、自己画线。图上多出来的那颗星，是它算出来的，不是谁看见的。这一条为体验而写。',
         sources: [TEST_SRC],
       },
@@ -421,6 +555,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6.5,
         lane: 'both',
         classification: 'counterfactual',
+        what: '一个坐标框',
+        why: '当"目的地"由它解释，是它更懂你的意思，还是它替你改了意思。',
         text: '当你要它去的地方由它来解释：是它更懂你的意思，还是它替你改了意思？这是推演。',
         sources: [],
       },
@@ -432,6 +568,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         pickupRadius: 6,
         lane: 'near',
         classification: 'creative',
+        what: '被划掉的港',
+        why: '它选了一条更快的路，略过三座港。沿途没人被问过。',
         text: '它选了一条更快的路，略过了三座港。沿途没人被问过。这一条为体验而写，不是任何系统的实际行为记录。',
         sources: [TEST_SRC],
       },
@@ -449,6 +587,36 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     },
   },
 };
+
+/**
+ * 把材料摆到它所属的航道上：'both' 落在分叉点，沿岸的落在沿岸转折点，
+ * 外海的落在外海转折点。之前三件东西排成一条直线，外海那条路根本碰不到外海的东西。
+ */
+// 每条航道上依次排开：先是分叉点与转折点之间的中途，再是转折点本身
+const NEAR_MID = { x: (FORK.x + NEAR_STOP.x) / 2, z: (FORK.z + NEAR_STOP.z) / 2 - 1 };
+const FAR_MID = { x: (FORK.x + FAR_STOP.x) / 2 - 1, z: (FORK.z + FAR_STOP.z) / 2 };
+for (const id of ['A', 'B', 'C', 'D'] as const) {
+  const seen: Record<string, number> = { near: 0, far: 0, both: 0 };
+  for (const f of WORLDS[id].fragments) {
+    const n = seen[f.lane]++;
+    const at =
+      f.lane === 'both'
+        ? FORK
+        : f.lane === 'near'
+          ? n === 0 ? NEAR_MID : NEAR_STOP
+          : n === 0 ? FAR_MID : FAR_STOP;
+    f.x = at.x;
+    f.z = at.z;
+    f.pickupRadius = 6;
+  }
+}
+
+/** 一条航道上要按顺序经过的材料：先分叉点，再这条路自己的那件。 */
+export function laneStops(world: WorldConfig, laneId: string): FragmentPlace[] {
+  const both = world.fragments.filter((f) => f.lane === 'both');
+  const own = world.fragments.filter((f) => f.lane === laneId);
+  return [...both, ...own];
+}
 
 export function worldFor(sceneId: string | null | undefined): WorldConfig {
   if (sceneId === 'A' || sceneId === 'B' || sceneId === 'C' || sceneId === 'D') return WORLDS[sceneId];

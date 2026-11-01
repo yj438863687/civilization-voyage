@@ -9,6 +9,7 @@ export const BLEND_SEC: Record<string, number> = {
   follow: 1.8,
   port: 1.2,
   reflection: 0.48,
+  finale: 7,
 };
 
 export const FOLLOW_TAU = {

@@ -37,10 +37,14 @@ interface Props {
   nearFragmentId: string | null;
   /** 这一程走的是哪条航道：'near' 沿岸 / 'far' 外海 */
   laneId: string;
+  /** 门开没开：这一段落过印才开 */
+  portalOpen?: boolean;
   /** 已经走完的段，用来在海图上留下笔迹 */
   struck: string[];
   /** 靠港戏的时间轴 0..1 */
   landingT?: number;
+  /** 收帆：控制权交出去，船自己往前开 */
+  autopilot?: boolean;
   /** 这场戏的主角：从水里提上来的那件东西 */
   landingRelic?: string | null;
   input: ControlInput;
@@ -384,6 +388,7 @@ function Rig({
   struck,
   landingT = 0,
   landingRelic = null,
+  autopilot = false,
 }: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
@@ -413,6 +418,8 @@ function Rig({
   const landFrom = useRef<{ pos: THREE.Vector3; look: THREE.Vector3; fov: number } | null>(null);
   /** 靠港戏的舞台：被提上来的那件东西，挂在世界坐标里，跟镜头走 */
   const relicStage = useRef<THREE.Group>(null);
+  /** 收帆开始后经过的秒数：先掉头离港，再匀速往外海去 */
+  const autoT = useRef(0);
   const { camera, gl } = useThree();
   const tmpFwd = useMemo(() => new THREE.Vector3(), []);
   const tmpRight = useMemo(() => new THREE.Vector3(), []);
@@ -510,14 +517,22 @@ function Rig({
           capMul *= 1 - (1 - HARBOR_APPROACH.misalignCap) * t;
         }
       }
-      const cap = world.ship.maxSpeed * capMul;
-      const target = input.forward >= 0 ? input.forward * cap : input.forward * world.ship.reverseSpeed;
+      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul);
+      // 收帆：不再听玩家的，匀速往前，一点点偏向外海
+      if (autopilot) autoT.current += clamped;
+      else autoT.current = 0;
+      const fwdIn = autopilot ? Math.min(0.5, 0.12 + autoT.current * 0.06) : input.forward;
+      const target = fwdIn >= 0 ? fwdIn * cap : fwdIn * world.ship.reverseSpeed;
       speed.current += (target - speed.current) * Math.min(1, world.ship.accel * clamped);
-      g.rotation.y += input.turn * world.ship.turn * clamped;
+      // 掉头约 150°：从码头调转船头朝外海，然后几乎不再转
+      const autoTurn = autoT.current < 6 ? 0.62 : 0.03;
+      g.rotation.y += (autopilot ? autoTurn : input.turn) * world.ship.turn * clamped;
       tmpFwd.set(0, 0, -1).applyQuaternion(g.quaternion);
       g.position.addScaledVector(tmpFwd, speed.current * clamped);
-      g.position.x = THREE.MathUtils.clamp(g.position.x, world.bounds.minX, world.bounds.maxX);
-      g.position.z = THREE.MathUtils.clamp(g.position.z, world.bounds.minZ, world.bounds.maxZ);
+      if (!autopilot) {
+        g.position.x = THREE.MathUtils.clamp(g.position.x, world.bounds.minX, world.bounds.maxX);
+        g.position.z = THREE.MathUtils.clamp(g.position.z, world.bounds.minZ, world.bounds.maxZ);
+      }
     } else {
       speed.current *= 1 - Math.min(1, 4 * clamped);
     }
@@ -608,11 +623,16 @@ function Rig({
         // 东西从船头下方的水里升上来，停在镜头前
         const rise = THREE.MathUtils.clamp((landingT - 0.04) / 0.36, 0, 1);
         const e = easeSwell(rise);
-        relicStage.current.position.y = lp.relic.y - (1 - e) * 2.6 * camScale;
+        const sc0 = (0.9 + e * 0.9) * Math.max(1, camScale);
+        // 镜头瞄的是物件中心，不是它的底座：底座往下压半个身高
+        relicStage.current.position.y = lp.relic.y - (1 - e) * 2.6 * camScale - 0.85 * sc0;
+        relicStage.current.rotation.order = 'YXZ';
         relicStage.current.rotation.y = g.rotation.y + Math.PI * 0.18 + (1 - e) * 0.9 + landingT * 0.35;
+        // 表盘、星图这类平放的东西，要把正面朝向镜头，否则从侧面只看到一条边
+        relicStage.current.rotation.x = 0.5 * e;
         relicStage.current.visible = true;
-        const sc = 0.62 + e * 0.38;
-        relicStage.current.scale.setScalar(sc);
+        // 主角要压得住画面：比海上那件大一倍多
+        relicStage.current.scale.setScalar(sc0);
       }
     } else if (useBoot) {
       const boot = bootPushPose(blend.current, g.position, tmpFwd, tmpRight);
@@ -695,8 +715,9 @@ function Rig({
           <>
             <Relic kind={relicKindOf(landingRelic)} active hero reduceMotion={reduceMotion} />
             {/* 一束从上方落下的光，只照这件东西 */}
-            <spotLight position={[0.6, 4.2, 1.4]} angle={0.42} penumbra={0.8} intensity={14} distance={9} color="#ffe3b8" />
-            <pointLight position={[-1.2, 0.8, 1.2]} intensity={1.6} distance={5} color="#8fb6c8" />
+            <spotLight position={[0.6, 4.2, 1.4]} angle={0.5} penumbra={0.8} intensity={26} distance={12} color="#ffe3b8" />
+            <pointLight position={[-1.6, 1.2, 1.6]} intensity={3.2} distance={7} color="#8fb6c8" />
+            <pointLight position={[1.4, 1.6, -1.2]} intensity={2.4} distance={6} color="#ffd9a0" />
           </>
         )}
       </group>
@@ -783,6 +804,7 @@ export function VoyageCanvas(props: Props) {
           collectedIds={props.collectedIds}
           nearFragmentId={props.nearFragmentId}
           laneId={props.laneId}
+          portalOpen={props.portalOpen ?? false}
         />
         <Rig {...props} />
       </Canvas>
