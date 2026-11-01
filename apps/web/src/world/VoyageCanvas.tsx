@@ -422,17 +422,19 @@ function Rig({
    * 玩家自己的视角：滚轮/双指缩放，拖动环视，双击复位。
    * target 是输入直接改的值，cur 是镜头真正用的值（做阻尼，避免一顿一顿）。
    */
-  const view = useRef({ zoom: 1, yaw: 0, pitch: 0, tZoom: 1, tYaw: 0, tPitch: 0 });
+  const view = useRef({ zoom: 1, yaw: 0, pitch: 0, tZoom: 1, tYaw: 0, tPitch: 0, dragging: false });
   const glForInput = useThree((st) => st.gl);
   useEffect(() => {
     const el = glForInput.domElement;
-    let drag: { x: number; y: number; id: number } | null = null;
+    let drag: { x: number; y: number; id: number; moved: boolean } | null = null;
     const pinch = new Map<number, { x: number; y: number }>();
     let pinchD = 0;
     const clampAll = () => {
       const v = view.current;
       v.tZoom = THREE.MathUtils.clamp(v.tZoom, 0.38, 3.2);
       v.tPitch = THREE.MathUtils.clamp(v.tPitch, -0.22, 0.95);
+      // 环视只在船尾半圈里转：镜头一旦绕到船头前面，按「前进」看起来就像在倒车
+      v.tYaw = THREE.MathUtils.clamp(v.tYaw, -1.0, 1.0);
     };
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -447,7 +449,7 @@ function Rig({
         drag = null;
         return;
       }
-      drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
+      drag = { x: e.clientX, y: e.clientY, id: e.pointerId, moved: false };
     };
     const onMove = (e: PointerEvent) => {
       if (pinch.has(e.pointerId)) pinch.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -460,8 +462,18 @@ function Rig({
         return;
       }
       if (!drag || drag.id !== e.pointerId) return;
+      // 松手发生在窗口外时收不到 pointerup：按键已松开就当拖动结束，免得镜头粘在鼠标上
+      if (e.buttons === 0) {
+        drag = null;
+        view.current.dragging = false;
+        return;
+      }
       const dx = e.clientX - drag.x;
       const dy = e.clientY - drag.y;
+      // 点一下不算拖：超过几个像素才开始环视
+      if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+      drag.moved = true;
+      view.current.dragging = true;
       drag.x = e.clientX;
       drag.y = e.clientY;
       view.current.tYaw -= dx * 0.006;
@@ -471,7 +483,10 @@ function Rig({
     const onUp = (e: PointerEvent) => {
       pinch.delete(e.pointerId);
       if (pinch.size < 2) pinchD = 0;
-      if (drag?.id === e.pointerId) drag = null;
+      if (drag?.id === e.pointerId) {
+        drag = null;
+        view.current.dragging = false;
+      }
     };
     const onDbl = () => {
       const v = view.current;
@@ -682,6 +697,10 @@ function Rig({
     {
       const v = view.current;
       const kk = reduceMotion ? 1 : 1 - Math.exp(-clamped / 0.16);
+      // 一开船，环视角就慢慢回到船尾：前进永远是「离开镜头」的方向
+      if (!v.dragging && (input.forward !== 0 || input.turn !== 0 || autopilot)) {
+        v.tYaw *= Math.exp(-clamped / 0.9);
+      }
       v.zoom += (v.tZoom - v.zoom) * kk;
       v.yaw += (v.tYaw - v.yaw) * kk;
       v.pitch += (v.tPitch - v.pitch) * kk;
@@ -734,7 +753,7 @@ function Rig({
       const L = SHIP_L * camScale;
       const vw = view.current;
       const dist = (approach ? L * 0.95 : L * 1.45) * vw.zoom;
-      const az = ((approach ? 60 : 35) * Math.PI) / 180 + vw.yaw;
+      const az = THREE.MathUtils.clamp(((approach ? 60 : 35) * Math.PI) / 180 + vw.yaw, -1.4, 1.4);
       const el = ((approach ? 12 : 18) * Math.PI) / 180 + vw.pitch;
       const dBack = dist * Math.cos(az) * Math.cos(el);
       const dRight = dist * Math.sin(az) * Math.cos(el);
