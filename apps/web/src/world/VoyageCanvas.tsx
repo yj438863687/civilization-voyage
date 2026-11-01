@@ -45,7 +45,7 @@ interface Props {
   landingRelic?: string | null;
   input: ControlInput;
   restored?: { x: number; z: number; yaw: number } | null;
-  onShip: (s: ShipSnapshot, nearPort: string | null, nearFragment: string | null) => void;
+  onShip: (s: ShipSnapshot, nearPort: string | null, nearFragment: string | null, nearPortal: string | null) => void;
   onBlend?: (t: number) => void;
 }
 
@@ -482,6 +482,13 @@ function Rig({
       if (dx * dx + dz * dz < f.pickupRadius * f.pickupRadius) nearFragment = f.id;
     }
 
+    let nearPortal: string | null = null;
+    if (world.portal) {
+      const dx = g.position.x - world.portal.x;
+      const dz = g.position.z - world.portal.z;
+      if (dx * dx + dz * dz < world.portal.radius * world.portal.radius) nearPortal = world.portal.to;
+    }
+
     if (canSail) {
       let capMul = 1;
       if (harbor) {
@@ -676,6 +683,7 @@ function Rig({
       },
       nearPort,
       nearFragment,
+      nearPortal,
     );
   });
 

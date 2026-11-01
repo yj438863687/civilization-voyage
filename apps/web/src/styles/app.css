@@ -1268,3 +1268,396 @@ html[data-cine='landing'] .skip-hint {
   transition: opacity 420ms ease;
 }
 .hud, .coach-bar, .interact-prompt { transition: opacity 420ms ease; }
+
+/* 穿门：不是加载条，是一次换气的黑 */
+.portal-cross {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  background: #06090b;
+  animation: portal-in 1100ms ease forwards;
+}
+.portal-cross-word {
+  font-family: var(--cv-font-display);
+  font-size: 14px;
+  letter-spacing: 0.5em;
+  color: rgb(220 200 160 / 0.6);
+  animation: portal-word 1100ms ease forwards;
+}
+@keyframes portal-in {
+  0% { opacity: 0; }
+  55% { opacity: 1; }
+  100% { opacity: 1; }
+}
+@keyframes portal-word {
+  0% { opacity: 0; }
+  60% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+/* 靠港：没有卡片，文字直接浮在画面上，随镜头一起呼吸 */
+.cine-panel {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 1);
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 0 24px calc(48px + env(safe-area-inset-bottom));
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(6 10 12 / 0) 34%, rgb(6 10 12 / 0.62) 66%, rgb(6 10 12 / 0.9) 100%);
+}
+.cine-inner {
+  width: min(760px, 100%);
+  display: grid;
+  gap: 10px;
+  pointer-events: auto;
+  animation: cine-rise 620ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+@keyframes cine-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.cine-kicker {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--cv-brass-300);
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+.cine-tag {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgb(220 200 160 / 0.55);
+  border: 1px solid rgb(220 200 160 / 0.28);
+  border-radius: 2px;
+  padding: 1px 5px;
+}
+.cine-line {
+  margin: 0;
+  color: #f2ead9;
+  line-height: 1.7;
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.7);
+}
+.cine-q {
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.2rem, 2.3vw, 1.65rem);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.cine-note { font-size: var(--cv-text-sm); color: rgb(240 214 170 / 0.95); }
+.cine-prompt { font-size: var(--cv-text-xs); letter-spacing: 0.14em; color: rgb(232 226 210 / 0.6); margin-top: 6px; }
+
+/* 刻度：一条墨线，五个点，直接浮在画面上 */
+.cine-axis {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  font-size: var(--cv-text-sm);
+  color: rgb(232 226 210 / 0.75);
+}
+.cine-stops {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+.cine-stops::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6px;
+  height: 1px;
+  background: rgb(220 200 160 / 0.42);
+}
+.cine-stop {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  cursor: pointer;
+  color: rgb(232 226 210 / 0.66);
+  font: inherit;
+  font-size: var(--cv-text-xs);
+  text-align: center;
+  transition: color 160ms ease;
+}
+.cine-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid rgb(220 200 160 / 0.7);
+  background: rgb(10 16 18 / 0.9);
+  transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+.cine-stop:hover { color: #f2ead9; }
+.cine-stop.is-on { color: #fff6e4; }
+.cine-stop.is-on .cine-dot {
+  background: var(--cv-brass-300);
+  box-shadow: 0 0 12px rgb(240 200 140 / 0.8);
+  transform: scale(1.45);
+}
+.cine-stop-label { line-height: 1.25; }
+
+/* 代价：三行字，选中的那一行才亮 */
+.cine-costs { display: grid; gap: 4px; }
+.cine-cost {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+  padding: 6px 10px;
+  background: none;
+  border: 0;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  color: rgb(232 226 210 / 0.62);
+  font: inherit;
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+.cine-cost:hover { color: #f2ead9; }
+.cine-cost.is-on {
+  color: #fff6e4;
+  border-left-color: var(--cv-brass-300);
+  background: linear-gradient(90deg, rgb(240 200 140 / 0.12), transparent 70%);
+}
+.cine-cost-name { font-size: var(--cv-text-sm); }
+.cine-cost-note { font-size: var(--cv-text-xs); color: rgb(232 226 210 / 0.5); }
+.cine-cost.is-on .cine-cost-note { color: rgb(240 214 170 / 0.85); }
+
+.cine-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+.cine-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: rgb(220 200 160 / 0.7);
+  font: inherit;
+  font-size: var(--cv-text-sm);
+  cursor: pointer;
+  border-bottom: 1px solid rgb(220 200 160 / 0.3);
+}
+.cine-link:hover { color: var(--cv-brass-300); }
+@media (max-width: 639px) {
+  .cine-axis { grid-template-columns: 1fr; gap: 6px; }
+  .cine-axis > span:last-child { text-align: right; }
+}
+
+
+/* 靠港与日志：同样不留卡片。画面归画面，字浮在上面 */
+html[data-cine='port'] .hud,
+html[data-cine='port'] .coach-bar,
+html[data-cine='port'] .interact-prompt,
+html[data-cine='port'] .skip-hint,
+html[data-cine='reflection'] .hud,
+html[data-cine='reflection'] .coach-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 启航：没有卡片，没有侧栏。一句话，一个选择，一个印 */
+.cine-embark {
+  position: fixed;
+  inset: 0;
+  z-index: var(--cv-z-panel);
+  display: grid;
+  align-content: end;
+  gap: 20px;
+  padding: 0 32px calc(40px + env(safe-area-inset-bottom));
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(5 9 11 / 0.72) 0%, rgb(5 9 11 / 0.18) 30%, rgb(5 9 11 / 0.55) 62%, rgb(5 9 11 / 0.94) 100%);
+}
+.cine-embark-main {
+  width: min(760px, 100%);
+  display: grid;
+  gap: 14px;
+  pointer-events: auto;
+  animation: cine-rise 700ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.cine-embark-title {
+  font-family: var(--cv-font-display);
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  margin: 0;
+  color: #f6efe0;
+  text-shadow: 0 2px 28px rgb(0 0 0 / 0.8);
+}
+.cine-embark-sub {
+  margin: 0 0 6px;
+  font-size: var(--cv-text-md);
+  color: rgb(232 226 210 / 0.8);
+  max-width: 40ch;
+  line-height: 1.7;
+}
+.cine-embark-scenes { display: grid; gap: 2px; }
+.cine-scene {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: 8px 0 8px 14px;
+  background: none;
+  border: 0;
+  border-left: 2px solid transparent;
+  color: rgb(232 226 210 / 0.5);
+  font: inherit;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+.cine-scene:hover { color: rgb(242 234 217 / 0.86); }
+.cine-scene.is-on {
+  color: #f6efe0;
+  border-left-color: var(--cv-brass-300);
+}
+.cine-scene-name { font-size: var(--cv-text-md); letter-spacing: 0.04em; }
+.cine-scene-q {
+  font-size: var(--cv-text-sm);
+  color: rgb(232 226 210 / 0.45);
+  line-height: 1.5;
+}
+.cine-scene.is-on .cine-scene-q { color: rgb(240 214 170 / 0.8); }
+.cine-embark-actions { display: flex; align-items: center; gap: 18px; margin-top: 4px; }
+.cine-embark-note,
+.cine-embark-error,
+.cine-embark-foot {
+  margin: 0;
+  font-size: var(--cv-text-xs);
+  color: rgb(232 226 210 / 0.45);
+}
+.cine-embark-error { color: #e0856a; }
+.cine-embark-foot { letter-spacing: 0.1em; }
+.cine-embark-note .cine-link { margin-left: 8px; }
+
+.cine-embark-continue {
+  position: absolute;
+  right: 32px;
+  bottom: calc(40px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+  pointer-events: auto;
+}
+.cine-continue {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: var(--cv-text-sm);
+  color: rgb(232 226 210 / 0.66);
+  cursor: pointer;
+  text-align: right;
+}
+.cine-continue:hover { color: #f6efe0; }
+.cine-continue-sub {
+  display: block;
+  font-size: var(--cv-text-xs);
+  color: rgb(232 226 210 / 0.35);
+}
+@media (max-width: 900px) {
+  .cine-embark-continue { display: none; }
+  .cine-embark { padding: 0 18px calc(28px + env(safe-area-inset-bottom)); }
+}
+
+/* 航海日志：一屏滚动的字，没有卡片边框 */
+.cine-scroll {
+  position: fixed;
+  inset: 0;
+  z-index: var(--cv-z-panel);
+  overflow-y: auto;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: 72px 24px 96px;
+  pointer-events: auto;
+  background: linear-gradient(180deg, rgb(6 10 12 / 0.86) 0%, rgb(6 10 12 / 0.72) 40%, rgb(6 10 12 / 0.94) 100%);
+}
+.cine-journal {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 40px;
+}
+.cine-chart {
+  border-top: 1px solid rgb(220 200 160 / 0.22);
+  padding-top: 12px;
+}
+.cine-chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.cine-chart-count { font-size: 11px; color: rgb(232 226 210 / 0.5); letter-spacing: 0.1em; }
+.cine-chart .chart-map { width: 100%; max-width: 300px; display: block; margin: 0 auto 10px; opacity: 0.95; }
+.cine-chart-text {
+  margin: 0 0 6px;
+  font-family: inherit;
+  font-size: var(--cv-text-sm);
+  line-height: 1.8;
+  color: #f2ead9;
+  white-space: pre-wrap;
+}
+.cine-chart-foot { margin: 0; font-size: var(--cv-text-xs); color: rgb(232 226 210 / 0.45); }
+
+.cine-sealed-list { display: grid; gap: 8px; }
+.cine-sealed {
+  padding: 8px 0 8px 14px;
+  border-left: 2px solid var(--cv-brass-300);
+  background: linear-gradient(90deg, rgb(240 200 140 / 0.08), transparent 60%);
+}
+.cine-sealed-main { font-family: var(--cv-font-display); font-size: var(--cv-text-lg); color: #f6efe0; }
+.cine-sealed-line { font-size: var(--cv-text-sm); color: rgb(232 226 210 / 0.6); line-height: 1.6; }
+
+.cine-fold { border-top: 1px solid rgb(220 200 160 / 0.18); padding-top: 10px; }
+.cine-fold summary {
+  cursor: pointer;
+  font-size: var(--cv-text-sm);
+  color: rgb(220 200 160 / 0.75);
+  letter-spacing: 0.06em;
+}
+.cine-material { margin-top: 10px; }
+.cine-material-name { font-size: var(--cv-text-sm); color: #f2ead9; }
+.cine-material-src { font-size: var(--cv-text-xs); color: rgb(232 226 210 / 0.4); }
+
+.cine-end { margin-top: 12px; display: grid; gap: 8px; }
+.cine-end-line {
+  margin: 0;
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
+  line-height: 1.35;
+  color: #f6efe0;
+}
+.cine-end-body { margin: 0; font-size: var(--cv-text-sm); line-height: 1.8; color: rgb(232 226 210 / 0.62); }
+
+/* 靠近门：门后的名字从画面中浮出来 */
+.portal-hint {
+  position: fixed;
+  left: 50%;
+  top: 24%;
+  transform: translateX(-50%);
+  z-index: calc(var(--cv-z-panel) + 1);
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  pointer-events: none;
+  text-shadow: 0 2px 20px rgb(0 0 0 / 0.85);
+  animation: cine-rise 900ms cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.portal-hint-kicker { font-size: 11px; letter-spacing: 0.5em; color: var(--cv-brass-300); }
+.portal-hint-name {
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  color: #f6efe0;
+  letter-spacing: 0.06em;
+}
+.portal-hint-sub { font-size: var(--cv-text-xs); color: rgb(232 226 210 / 0.6); letter-spacing: 0.12em; }

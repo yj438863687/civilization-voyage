@@ -302,10 +302,8 @@ export function App() {
   const [question, setQuestion] = useState('');
   const [sharedTask, setSharedTask] = useState('');
   const [chat, setChat] = useState<{ who: 'user' | 'crew' | 'sys'; text: string; role?: string }[]>([]);
-  const [draft, setDraft] = useState('');
   const [reason, setReason] = useState('');
   const [dissent, setDissent] = useState('');
-  const [arrangement, setArrangement] = useState('');
   /** 站位：这一程真正要拨的那根刻度。null = 还没表态 */
   const [stanceIdx, setStanceIdx] = useState<number | null>(null);
   /** 代价落在谁身上。必须点名，不让写「社会」 */
@@ -315,6 +313,8 @@ export function App() {
   const [laneId, setLaneId] = useState<string>('near');
   const [nearPort, setNearPort] = useState<string | null>(null);
   const [nearFragment, setNearFragment] = useState<string | null>(null);
+  /** 已经开进传送门：值是下一段的场景 id */
+  const [nearPortal, setNearPortal] = useState<string | null>(null);
   const [ship, setShip] = useState<ShipSnapshot | null>(null);
   const [input, setInput] = useState<ControlInput>({ forward: 0, turn: 0 });
   const [busy, setBusy] = useState(false);
@@ -374,8 +374,9 @@ export function App() {
 
   useEffect(() => {
     // 靠港戏期间把所有 HUD 收起来：这几秒只看那件东西
-    document.documentElement.dataset.cine = landing > 0 && landing < 1 ? 'landing' : '';
-  }, [landing]);
+    document.documentElement.dataset.cine =
+      landing > 0 && landing < 1 ? 'landing' : view === 'port' ? 'port' : view === 'reflection' ? 'reflection' : '';
+  }, [landing, view]);
 
   useEffect(() => {
     document.documentElement.dataset.reduceMotion = reduceMotion ? 'true' : 'false';
@@ -465,19 +466,29 @@ export function App() {
     [voyage, question, sharedTask, dissent, reason],
   );
 
-  const nearRef = useRef({ t: 0, port: '', frag: '' });
-  const onShip = useCallback((s: ShipSnapshot, port: string | null, frag: string | null) => {
-    shipRef.current = s;
-    const now = performance.now();
-    const portKey = port ?? '';
-    const fragKey = frag ?? '';
-    if (portKey !== nearRef.current.port || fragKey !== nearRef.current.frag || now - nearRef.current.t > 120) {
-      nearRef.current = { t: now, port: portKey, frag: fragKey };
-      setShip(s);
-      setNearPort(port);
-      setNearFragment(frag);
-    }
-  }, []);
+  const nearRef = useRef({ t: 0, port: '', frag: '', portal: '' });
+  const onShip = useCallback(
+    (s: ShipSnapshot, port: string | null, frag: string | null, portal: string | null) => {
+      shipRef.current = s;
+      const now = performance.now();
+      const portKey = port ?? '';
+      const fragKey = frag ?? '';
+      const portalKey = portal ?? '';
+      if (
+        portKey !== nearRef.current.port ||
+        fragKey !== nearRef.current.frag ||
+        portalKey !== nearRef.current.portal ||
+        now - nearRef.current.t > 120
+      ) {
+        nearRef.current = { t: now, port: portKey, frag: fragKey, portal: portalKey };
+        setShip(s);
+        setNearPort(port);
+        setNearFragment(frag);
+        setNearPortal(portal);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -638,8 +649,23 @@ export function App() {
     ];
   }
 
+  /** 开进传送门：先把画面压黑，再换到下一段。 */
+  const [portalCross, setPortalCross] = useState(false);
+  useEffect(() => {
+    if (!nearPortal || portalCross) return;
+    setPortalCross(true);
+    const t = window.setTimeout(() => {
+      const carried = carryForward();
+      void createVoyage({ sceneId: nearPortal, carried }).finally(() => setPortalCross(false));
+    }, 1100);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nearPortal]);
+
   /** 这一段的下一段是谁。neutral-test 不进主线。 */
   function nextEpochId(cur: string): string | null {
+    // 启航港是练习：走完接进第一段
+    if (cur === 'neutral-test') return 'A';
     const chain = ['A', 'B', 'C', 'D'];
     const i = chain.indexOf(cur);
     return i >= 0 && i < chain.length - 1 ? chain[i + 1] : null;
@@ -780,28 +806,6 @@ export function App() {
     }
   }
 
-  async function saveReflection() {
-    if (!voyage || !draft.trim()) return;
-    setBusy(true);
-    try {
-      await api.addRecord(voyage.id, {
-        kind: 'reflection',
-        text: draft.trim(),
-        classification: 'creative',
-        sources: [],
-        material_ids: [],
-        version: 1,
-        access: 'private',
-      });
-      setDraft('');
-      setRecords(await api.records(voyage.id));
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setBusy(false);
-    }
-  }
-
   function joystick(el: HTMLDivElement | null) {
     if (!el) return;
     const handle = (ev: PointerEvent) => {
@@ -850,7 +854,21 @@ export function App() {
     crewReplies,
     sealed: Boolean(voyage?.question),
   });
-  const relNow = ship && portPlace ? portRelDeg(ship, portPlace) : null;
+  /**
+   * 铜针指向哪里：默认指向港口，但船靠近传送门时改指门。
+   * 门是这一程真正的出口，指针不指它，玩家找不到。
+   */
+  const guideTarget = useMemo(() => {
+    const p = portPlace;
+    if (!p) return null;
+    const portal = sea.portal;
+    if (!portal || !ship) return p;
+    const dPort = Math.hypot(p.x - ship.x, p.z - ship.z);
+    const dPortal = Math.hypot(portal.x - ship.x, portal.z - ship.z);
+    return dPortal < dPort ? { x: portal.x, z: portal.z } : p;
+  }, [portPlace, sea.portal, ship]);
+
+  const relNow = ship && guideTarget ? portRelDeg(ship, guideTarget) : null;
   const portDistNow = ship && portPlace ? Math.hypot(portPlace.x - ship.x, portPlace.z - ship.z) : null;
   const tip = guide(view, {
     connected,
@@ -1029,15 +1047,6 @@ export function App() {
           </div>
           <div className="hud hud-br">
             <button className="btn btn-icon hud-action" type="button" onClick={() => setView('embark')}>启航</button>
-            <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => setView('cockpit')}>驾驶舱</button>
-            <button
-              className="btn btn-icon hud-action"
-              type="button"
-              disabled={!voyage || (!voyage.question && voyage.stage === 'cockpit')}
-              onClick={() => setView('route')}
-            >
-              航线
-            </button>
             <button
               className="btn btn-icon hud-action"
               type="button"
@@ -1065,6 +1074,22 @@ export function App() {
         </div>
       )}
 
+      {/* 靠近传送门：门后是哪一段，字从画面里浮出来 */}
+      {view === 'world' && sea.portal && ship && !portalCross &&
+        Math.hypot(sea.portal.x - ship.x, sea.portal.z - ship.z) < 24 && (
+          <div className="portal-hint" aria-live="polite">
+            <span className="portal-hint-kicker">门后</span>
+            <span className="portal-hint-name">{sea.portal.label}</span>
+            <span className="portal-hint-sub">驶入门内，这一段就结束</span>
+          </div>
+        )}
+
+      {/* 穿门：整屏压黑一瞬，换段从这里过去 */}
+      {portalCross && (
+        <div className="portal-cross" aria-hidden>
+          <span className="portal-cross-word">过门</span>
+        </div>
+      )}
       {(view === 'embark' || cine) && <div className="letterbox" aria-hidden />}
       {pickupFlash && (
         <div className="pickup-flash" aria-live="polite">
@@ -1076,81 +1101,63 @@ export function App() {
       )}
 
       {view === 'embark' && (
-        <>
-          <div className="overlay overlay-left">
-            <h1 className="display title-hero">文明航程</h1>
-            <p className="muted">问一件事，对照两种看法，由你落印，再靠港去做。航向由你决定。</p>
-            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <p className="faint" title="概念设计，不是考古复原，不冒充任何一艘历史上的具体船只。">
-              概念宝船，非考古复原。
+        <div className="cine-embark">
+          <div className="cine-embark-main">
+            <h1 className="cine-embark-title">文明航程</h1>
+            <p className="cine-embark-sub">
+              问一件事，对照两种看法，由你落印，再靠港去做。航向由你决定。
             </p>
-            <div className="field">
-              <span className="label">航程名</span>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} />
+
+            <div className="cine-embark-scenes">
+              {scenes.map((sc) => {
+                const on = scenePick?.id === sc.id && scenePick.status === sc.status;
+                return (
+                  <button
+                    key={`${sc.id}-${sc.version}-${sc.status}`}
+                    type="button"
+                    className={`cine-scene${on ? ' is-on' : ''}`}
+                    onClick={() => setScenePick(sc)}
+                    aria-pressed={on}
+                  >
+                    <span className="cine-scene-name">{sceneShort(sc)}</span>
+                    <span className="cine-scene-q">{sc.questions[0]}</span>
+                  </button>
+                );
+              })}
             </div>
-            <div className="row">
-              <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void createVoyage()}>
-                新航程
-              </button>
-              <button className="btn btn-secondary" type="button" onClick={() => setReduceMotion((v) => !v)}>
+
+            <div className="cine-embark-actions">
+              <SealButton label="启航" disabled={busy} hint="" onSeal={() => void createVoyage()} />
+              <button className="cine-link" type="button" onClick={() => setReduceMotion((v) => !v)}>
                 {reduceMotion ? '已减少动态' : '减少动态效果'}
               </button>
             </div>
+
             {!connected && (
-              <div style={{ marginTop: 16 }}>
-                <StatusBanner
-                  kind="unconnected"
-                  text="模型服务尚未接入，船员暂时不能回复，仍可浏览海域与材料。"
-                  action={
-                    <button className="btn btn-ghost" type="button" onClick={() => setComms(true)}>
-                      打开通讯台
-                    </button>
-                  }
-                />
-              </div>
+              <p className="cine-embark-note">
+                模型服务尚未接入。船员不会假装回话，整程仍可走完。
+                <button className="cine-link" type="button" onClick={() => setComms(true)}>通讯台</button>
+              </p>
             )}
-            {bootError && <p className="error">后端未接通：{bootError}。先运行仓库根目录 scripts/dev.sh。</p>}
-            {error && <p className="error">{error}</p>}
+            {bootError && <p className="cine-embark-error">后端未接通：{bootError}。先运行 scripts/dev.sh。</p>}
+            {error && <p className="cine-embark-error">{error}</p>}
+            <p className="cine-embark-foot" title="概念设计，不是考古复原，不冒充任何一艘历史上的具体船只。">
+              概念宝船，非考古复原。
+            </p>
           </div>
-          <div className="overlay overlay-right">
-            <div className="paper">
-              <h2 className="display title-panel">场景入口</h2>
-              <p className="muted">先点选一个，再点左边「新航程」。每张卡片只问一件事。</p>
-              <div className="list">
-                {scenes.map((s) => (
-                  <button
-                    key={`${s.id}-${s.version}-${s.status}`}
-                    className={`card ${scenePick?.id === s.id && scenePick.status === s.status ? 'card-on' : ''}`}
-                    type="button"
-                    onClick={() => setScenePick(s)}
-                  >
-                    <div className="row">
-                      {s.status === 'pending' && <Stamp kind="pending">AI 推荐，待组员确认</Stamp>}
-                      {s.id === 'neutral-test' && <Stamp kind="creative">创作</Stamp>}
-                      {s.status === 'confirmed' && <Stamp kind="confirmed">已确认</Stamp>}
-                    </div>
-                    <strong>{sceneShort(s)}</strong>
-                    <div>{s.questions[0]}</div>
-                  </button>
-                ))}
-              </div>
-              <h3 className="display title-panel" style={{ marginTop: 24 }}>继续航程</h3>
-              <p className="muted">点一张卡片会回到你上次停的地方（驾驶舱、航线、海域或日志）。</p>
-              {voyages.length === 0 ? (
-                <StatusBanner kind="idle" text="还没有航程。先起个名字，开一条。" />
-              ) : (
-                <div className="list">
-                  {voyages.map((v) => (
-                    <button key={v.id} className="card" type="button" onClick={() => void loadVoyage(v.id)}>
-                      <strong>{v.title}</strong>
-                      <div className="muted">{voyageSceneLabel(v)}</div>
-                    </button>
-                  ))}
-                </div>
-              )}
+
+          {voyages.length > 0 && (
+            <div className="cine-embark-continue">
+              <span className="cine-prompt">继续航程</span>
+              {voyages.slice(0, 4).map((v) => (
+                <button key={v.id} type="button" className="cine-continue" onClick={() => void loadVoyage(v.id)}>
+                  {v.title}
+                  <span className="cine-continue-sub">{voyageSceneLabel(v)}</span>
+                </button>
+              ))}
             </div>
-          </div>
-        </>
+          )}
+        </div>
       )}
 
       {/* 出发：只剩一件事——看清这一程问的是什么，然后出海 */}
@@ -1265,227 +1272,181 @@ export function App() {
         </button>
       )}
 
+      {/* 靠港：没有卡片。文字浮在画面上，刻度直接在画面上拨 */}
       {view === 'port' && voyage && (
-        <div className="overlay overlay-right">
-          <div className="paper">
-            <h2 className="display title-panel">{sea.coach.portTitle}</h2>
-            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <Stamp kind={portPlace?.mark === 'creative' ? 'creative' : portPlace?.mark === 'test' ? 'test' : 'pending'}>
-              {portPlace?.mark === 'creative' ? '创作' : portPlace?.mark === 'test' ? '测试数据' : 'AI 推荐，待组员确认'}
-            </Stamp>
-            <p>{portPlace?.name ?? ports[0]?.name}。体块与剪影，不代表真实港口。</p>
-            <p className="muted">{sea.coach.portBody}</p>
-            {records.filter((r) => r.kind === 'fragment' || r.kind === 'material').length > 0 ? (
-              <div className="list" style={{ marginTop: 12 }}>
-                <p className="muted">已收入货舱，还没用上。货物到了，理解也到了吗？</p>
-                {records.filter((r) => r.kind === 'fragment' || r.kind === 'material').map((r) => {
-                  const stamp = contentStamp(r.classification, r.sources);
-                  return (
-                    <div key={r.id} className="card">
-                      <Stamp kind={stamp.kind}>{stamp.label}</Stamp>
-                      <div>{r.text}</div>
-                      {r.sources.map((s) => (
-                        <div key={s.id} className="muted">出处 {s.title} · {s.verification}</div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <StatusBanner kind="idle" text="货舱还空。回到海域，靠近漂着的东西，先看来源再收。" />
-            )}
-            {/* 站位：这一程真正要拨的那根刻度。不是写作文，是把手放上去。 */}
-            {stance && (
-              <div className="stance" aria-label={stance.axis.question}>
-                <p className="stance-q">{stance.axis.question}</p>
-                <div className="stance-ends">
-                  <span>{stance.axis.left}</span>
-                  <span>{stance.axis.right}</span>
-                </div>
-                <div className="stance-scale">
-                  {stance.axis.choices.map((c, i) => (
-                    <button
-                      key={c.label}
-                      type="button"
-                      className={`stance-stop${stanceIdx === i ? ' is-on' : ''}`}
-                      aria-pressed={stanceIdx === i}
-                      onClick={() => setStanceIdx(i)}
-                    >
-                      <span className="stance-dot" aria-hidden />
-                      <span className="stance-label">{c.label}</span>
-                    </button>
-                  ))}
-                </div>
-                {stanceIdx != null && (
-                  <p className="stance-note">{stance.axis.choices[stanceIdx].note}</p>
-                )}
-                <div className="stance-cost-block">
-                  <span className="label">这一步的代价落在谁身上</span>
-                  <div className="stance-costs">
-                    {stance.costs.map((c, i) => (
+        <div className="cine-panel" aria-live="polite">
+          <div className="cine-inner">
+            <div className="cine-kicker">
+              {portPlace?.name ?? ports[0]?.name}
+              <span className="cine-tag">
+                {portPlace?.mark === 'creative' ? '创作' : portPlace?.mark === 'test' ? '测试数据' : 'AI 推荐，待组员确认'}
+              </span>
+            </div>
+
+            {stance ? (
+              <>
+                <p className="cine-line cine-q">{stance.axis.question}</p>
+
+                <div className="cine-axis">
+                  {/* 端点名只在和首尾刻度不同名时才显示，否则屏幕上会出现两遍同样的字 */}
+                  <span>{stance.axis.left !== stance.axis.choices[0]?.label ? stance.axis.left : ''}</span>
+                  <div className="cine-stops">
+                    {stance.axis.choices.map((c, i) => (
                       <button
                         key={c.label}
                         type="button"
-                        className={`stance-cost${costIdx === i ? ' is-on' : ''}`}
-                        aria-pressed={costIdx === i}
-                        onClick={() => setCostIdx(i)}
+                        className={`cine-stop${stanceIdx === i ? ' is-on' : ''}`}
+                        aria-pressed={stanceIdx === i}
+                        onClick={() => setStanceIdx(i)}
                       >
-                        <strong>{c.label}</strong>
-                        <span className="faint">{c.note}</span>
+                        <span className="cine-dot" aria-hidden />
+                        <span className="cine-stop-label">{c.label}</span>
                       </button>
                     ))}
                   </div>
+                  <span>
+                    {stance.axis.right !== stance.axis.choices[stance.axis.choices.length - 1]?.label
+                      ? stance.axis.right
+                      : ''}
+                  </span>
                 </div>
-                <div className="field">
-                  <span className="label">补一句你自己的话（可空）</span>
-                  <textarea
-                    value={arrangement}
-                    onChange={(e) => setArrangement(e.target.value)}
-                    rows={2}
-                    placeholder={sea.arrangement.placeholder}
+                {stanceIdx != null && <p className="cine-line cine-note">{stance.axis.choices[stanceIdx].note}</p>}
+
+                <p className="cine-line cine-prompt">这一步的代价落在谁身上</p>
+                <div className="cine-costs">
+                  {stance.costs.map((c, i) => (
+                    <button
+                      key={c.label}
+                      type="button"
+                      className={`cine-cost${costIdx === i ? ' is-on' : ''}`}
+                      aria-pressed={costIdx === i}
+                      onClick={() => setCostIdx(i)}
+                    >
+                      <span className="cine-cost-name">{c.label}</span>
+                      <span className="cine-cost-note">{c.note}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="cine-actions">
+                  <SealButton
+                    label="按住落印"
+                    disabled={busy || stanceIdx == null || costIdx == null}
+                    hint="在刻度上选一个位置，再点名谁承担。"
+                    onSeal={() => {
+                      if (!voyage || stanceIdx == null || costIdx == null) return;
+                      const pick = stance.axis.choices[stanceIdx];
+                      const own = stance.costs[costIdx];
+                      const used = records.filter((r) => r.kind === 'fragment' || r.kind === 'material');
+                      void api
+                        .addRecord(voyage.id, {
+                          kind: 'choice',
+                          text: [`站位：${pick.label}`, `轴：${stance.axis.left} ↔ ${stance.axis.right}`, `代价落在：${own.label}`].join('\n'),
+                          classification: 'counterfactual',
+                          sources: [],
+                          material_ids: used.map((r) => r.id),
+                          version: 1,
+                          access: 'private',
+                        })
+                        .then(async () => {
+                          setRecords(await api.records(voyage.id));
+                        })
+                        .catch((e) => setError(errText(e)));
+                    }}
                   />
+                  <button className="cine-link" type="button" onClick={() => void goReflect()}>
+                    看这一程的图
+                  </button>
                 </div>
-              </div>
+              </>
+            ) : (
+              <p className="cine-line">这一段还没有站位刻度。</p>
             )}
-            <div className="seal-dock">
-              <SealButton
-                label="按住落印"
-                disabled={busy || !stance || stanceIdx == null || costIdx == null}
-                hint={
-                  stance
-                    ? '在刻度上选一个位置，再点名谁承担。两样都有了，按住按钮不放才能落印。'
-                    : '这一段还没有站位刻度。'
-                }
-                onSeal={() => {
-                  if (!voyage || !stance || stanceIdx == null || costIdx == null) return;
-                  const pick = stance.axis.choices[stanceIdx];
-                  const own = stance.costs[costIdx];
-                  const used = records.filter((r) => r.kind === 'fragment' || r.kind === 'material');
-                  const lines = [
-                    `站位：${pick.label}`,
-                    `轴：${stance.axis.left} ↔ ${stance.axis.right}`,
-                    `代价落在：${own.label}`,
-                  ];
-                  if (arrangement.trim()) lines.push(`补充：${arrangement.trim()}`);
-                  void api.addRecord(voyage.id, {
-                    kind: 'choice',
-                    text: lines.join('\n'),
-                    classification: 'counterfactual',
-                    sources: [],
-                    material_ids: used.map((r) => r.id),
-                    version: 1,
-                    access: 'private',
-                  }).then(async () => {
-                    setArrangement('');
-                    setRecords(await api.records(voyage.id));
-                  }).catch((e) => setError(errText(e)));
-                }}
-              />
-            </div>
-            <div className="row" style={{ marginTop: 16 }}>
-              <button className="btn btn-ghost" type="button" onClick={() => setView('world')}>回到海域</button>
-              <button className="btn btn-primary" type="button" onClick={() => void goReflect()}>打开航海日志</button>
-            </div>
             {error && <p className="error">{error}</p>}
           </div>
         </div>
       )}
 
+      {/* 航海日志：同样没有卡片。图、印、材料都浮在画面上 */}
       {view === 'reflection' && voyage && (
-        <div className="overlay" style={{ inset: 0, display: 'grid', placeItems: 'center', padding: 24 }}>
-          <div className="paper" style={{ maxWidth: '68ch', width: 'min(720px, 100%)', maxHeight: '90vh', overflow: 'auto', paddingBottom: 120 }}>
-            <h2 className="display title-page">{voyage.title}</h2>
-            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <Stamp kind="creative">概念创作</Stamp>
-            {/* 这一趟的海图：四段走完，同一张图上有四种笔迹 */}
+        <div className="cine-scroll">
+          <div className="cine-inner cine-journal">
+            <div className="cine-kicker">
+              {voyage.title}
+              <span className="cine-tag">第 5 拍 · 省</span>
+            </div>
+
             {struck.length > 0 && (
-              <div className="chart-recap">
-                <div className="chart-recap-head">
-                  <span className="label">这一趟的海图</span>
-                  <span className="faint">第 {struck.length} / 4 笔</span>
+              <div className="cine-chart">
+                <div className="cine-chart-head">
+                  <span className="cine-prompt">这一趟的海图</span>
+                  <span className="cine-chart-count">第 {struck.length} / 4 笔</span>
                 </div>
                 <ChartMap struck={struck} activeEpoch={voyage.scene_id} />
-                <pre className="chart-recap-text">{chartSummary(struck)}</pre>
+                <pre className="cine-chart-text">{chartSummary(struck)}</pre>
                 {struck.length < 4 && (
-                  <p className="muted">图上还空着 {4 - struck.length} 处。没走到的地方，仍然是空白。</p>
+                  <p className="cine-chart-foot">图上还空着 {4 - struck.length} 处。没走到的地方，仍然是空白。</p>
                 )}
               </div>
             )}
-            <p>{voyage.shared_task || '尚未形成共同任务。'}</p>
-            {/* 这一程你站哪、代价落在谁身上：放在材料前面，是这一段的结论 */}
+
             {records.filter((r) => r.kind === 'choice').length > 0 && (
-              <>
-                <h3 className="display title-panel">你落下的印</h3>
+              <div className="cine-sealed-list">
                 {records
                   .filter((r) => r.kind === 'choice')
                   .map((r) => (
-                    <div key={r.id} className="card sealed" style={{ marginBottom: 8 }}>
+                    <div key={r.id} className="cine-sealed">
                       {r.text.split('\n').map((line, i) => (
-                        <div key={i} className={i === 0 ? '' : 'sealed-line'}>{line}</div>
+                        <div key={i} className={i === 0 ? 'cine-sealed-main' : 'cine-sealed-line'}>{line}</div>
                       ))}
                     </div>
                   ))}
-              </>
+              </div>
             )}
-            <h3 className="display title-panel">材料与出处</h3>
-            {records.length === 0 && <p className="muted">还没有记录。</p>}
-            {records.map((r) => {
-              const stamp = contentStamp(r.classification, r.sources);
-              return (
-                <div key={r.id} className="card" style={{ marginBottom: 8 }}>
-                  <span className="label">{r.kind}</span>
-                  <Stamp kind={stamp.kind}>{stamp.label}</Stamp>
-                  <div>{r.text}</div>
-                  {r.sources.map((s) => (
-                    <div key={s.id} className="muted">{s.title} · {s.license} · {s.verification}</div>
+
+            {records.filter((r) => r.kind === 'fragment').length > 0 && (
+              <details className="cine-fold">
+                <summary>材料与出处 · {records.filter((r) => r.kind === 'fragment').length} 件</summary>
+                {records
+                  .filter((r) => r.kind === 'fragment')
+                  .map((r) => (
+                    <div key={r.id} className="cine-material">
+                      <div className="cine-material-name">{r.text.split('\n')[0]}</div>
+                      {r.sources.map((src) => (
+                        <div key={src.id} className="cine-material-src">
+                          {src.title} · {src.verification}
+                        </div>
+                      ))}
+                    </div>
                   ))}
-                </div>
-              );
-            })}
-            <h3 className="display title-panel">两本账结算</h3>
-            <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} materials={unusedFragments} />
-            <h3 className="display title-panel">反思</h3>
-            <p className="muted">你相信了什么？又凭什么相信？</p>
-            <p className="muted">这次求快时，有没有漏查什么？</p>
-            <p className="muted">后来的人，还能改这份安排吗？</p>
-            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={4} placeholder="回看来源，修订解释" />
-            <div className="row">
-              <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void saveReflection()}>写入日志</button>
+              </details>
+            )}
+
+            {struck.length >= 4 && (
+              <div className="cine-end">
+                <p className="cine-end-line">四笔都画完了。这张图上没有终点港。</p>
+                <p className="cine-end-body">
+                  农业画下第一个圈，工业把它连成线，信息在线上留下一处断点，智能把最后一颗星交给了一个不必经过人的地方。
+                </p>
+                <p className="cine-end-body">航程到这里结束。可这张图还在你手里 —— 下一次，你仍然可以决定从哪一笔开始改。</p>
+              </div>
+            )}
+
+            <div className="cine-actions">
               {nextScene ? (
-                <button
-                  className="btn btn-primary"
-                  type="button"
+                <SealButton
+                  label={`进入${sceneShort(nextScene)}`}
                   disabled={busy}
-                  onClick={() => {
+                  hint=""
+                  onSeal={() => {
                     const carried = carryForward();
                     void createVoyage({ sceneId: nextScene.id, carried });
                   }}
-                >
-                  带着这张海图，进入「{sceneShort(nextScene)}」
-                </button>
-              ) : (
-                <>
-                  {/* 第四段走完：没有下一段，也没有终点港。这里不是"再来一次"，是收帆。 */}
-                  {struck.length >= 4 && (
-                    <div className="voyage-end">
-                      <p className="voyage-end-line">
-                        四笔都画完了。这张图上没有终点港。
-                      </p>
-                      <p className="voyage-end-body">
-                        农业画下第一个圈，工业把它连成线，信息在线上留下一处断点，
-                        智能把最后一颗星交给了一个不必经过人的地方。
-                      </p>
-                      <p className="voyage-end-body">
-                        航程到这里结束。可这张图还在你手里 —— 下一次，你仍然可以决定
-                        从哪一笔开始改。
-                      </p>
-                    </div>
-                  )}
-                  <button className="btn btn-ghost" type="button" onClick={() => { setView('cockpit'); void persist({ stage: 'cockpit' }); }}>
-                    回到这一程的驾驶舱
-                  </button>
-                </>
-              )}
+                />
+              ) : null}
+              <button className="cine-link" type="button" onClick={() => setView('world')}>
+                回到海上
+              </button>
             </div>
           </div>
         </div>

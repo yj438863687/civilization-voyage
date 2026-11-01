@@ -646,6 +646,72 @@ function SeaLane({
   );
 }
 
+
+/**
+ * 传送门：通往下一段的门，立在海上。
+ * 两根门柱 + 一道水面上的光幕，门楣上写着下一段的名字。
+ * 船开进去，这一段就结束。
+ */
+function Portal({
+  portal,
+  color,
+  reduceMotion,
+}: {
+  portal: NonNullable<WorldConfig['portal']>;
+  color: string;
+  reduceMotion: boolean;
+}) {
+  const veil = useRef<THREE.MeshBasicMaterial>(null);
+  const group = useRef<THREE.Group>(null);
+  const H = 9;
+  const W = 9;
+
+  useFrame(({ clock }) => {
+    if (reduceMotion) return;
+    const t = clock.elapsedTime;
+    if (veil.current) veil.current.opacity = 0.16 + Math.sin(t * 1.3) * 0.05;
+    if (group.current) group.current.position.y = Math.sin(t * 0.5) * 0.12;
+  });
+
+  return (
+    <group ref={group} position={[portal.x, 0, portal.z]}>
+      {/* 两根门柱：石与铜，不像科幻 */}
+      {[-1, 1].map((sx) => (
+        <group key={sx} position={[sx * (W / 2), 0, 0]}>
+          <mesh position={[0, H / 2, 0]} castShadow>
+            <cylinderGeometry args={[0.42, 0.62, H, 10]} />
+            <meshStandardMaterial color="#3a342c" roughness={0.85} metalness={0.15} />
+          </mesh>
+          <mesh position={[0, 0.5, 0]}>
+            <cylinderGeometry args={[0.75, 0.85, 1, 10]} />
+            <meshStandardMaterial color="#4a4238" roughness={0.9} />
+          </mesh>
+          <mesh position={[0, H - 0.4, 0]}>
+            <sphereGeometry args={[0.28, 12, 12]} />
+            <meshStandardMaterial color="#fff4dc" emissive={color} emissiveIntensity={2.6} toneMapped={false} />
+          </mesh>
+        </group>
+      ))}
+      {/* 门楣 */}
+      <mesh position={[0, H, 0]}>
+        <boxGeometry args={[W + 1.4, 0.5, 0.6]} />
+        <meshStandardMaterial color="#4a4238" roughness={0.8} metalness={0.2} />
+      </mesh>
+      {/* 光幕：从水面立到门楣 */}
+      <mesh position={[0, H / 2, 0]}>
+        <planeGeometry args={[W, H]} />
+        <meshBasicMaterial ref={veil} color={color} transparent opacity={0.18} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+      {/* 水面上的门影：一圈光，告诉玩家"开进来" */}
+      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[W * 0.52, W * 0.62, 48]} />
+        <meshBasicMaterial color={color} transparent opacity={0.5} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+      <pointLight position={[0, H * 0.55, 0]} color={color} intensity={6} distance={22} decay={2} />
+    </group>
+  );
+}
+
 export function Atmosphere({
   reduceMotion,
   sceneId,
@@ -732,6 +798,9 @@ export function Atmosphere({
         </group>
       )}
       <WeatherField sceneId={sceneId} reduceMotion={reduceMotion} />
+      {world.portal && (
+        <Portal portal={world.portal} color={laneColor(true, sceneId)} reduceMotion={reduceMotion} />
+      )}
       {(world.lanes ?? []).map((lane: Lane) => (
         <SeaLane
           key={lane.id}
