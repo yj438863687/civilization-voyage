@@ -21,7 +21,7 @@ function HarborWater({ reduceMotion, sceneId }: { reduceMotion: boolean; sceneId
   const water = useMemo(() => {
     normals.wrapS = normals.wrapT = THREE.RepeatWrapping;
     normals.anisotropy = 8;
-    const mesh = new Water(new THREE.PlaneGeometry(220, 220), {
+    const mesh = new Water(new THREE.PlaneGeometry(1600, 1600), {
       textureWidth: 512,
       textureHeight: 512,
       waterNormals: normals,
@@ -814,6 +814,19 @@ function SeaFurniture({ sceneId, reduceMotion }: { sceneId: string; reduceMotion
   );
 }
 
+
+function SkyFollow({ material }: { material: THREE.Material }) {
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame(({ camera }) => {
+    if (ref.current) ref.current.position.set(camera.position.x, 0, camera.position.z);
+  });
+  return (
+    <mesh ref={ref} material={material}>
+      <sphereGeometry args={[170, 24, 16]} />
+    </mesh>
+  );
+}
+
 export function Atmosphere({
   reduceMotion,
   sceneId,
@@ -870,9 +883,8 @@ export function Atmosphere({
 
   return (
     <group>
-      <mesh material={sky} rotation={[0, 0, 0]}>
-        <sphereGeometry args={[170, 24, 16]} />
-      </mesh>
+      {/* 天空球跟着镜头：收帆时船会开出原来的海域，天不能有边 */}
+      <SkyFollow material={sky} />
       <Suspense fallback={<WaterFallback />}>
         <HarborWater reduceMotion={reduceMotion} sceneId={sceneId} />
       </Suspense>

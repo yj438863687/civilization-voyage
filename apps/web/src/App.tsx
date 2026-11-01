@@ -955,6 +955,12 @@ export function App() {
     portDist: portDistNow,
     portRadius: portPlace?.radius ?? 12,
   });
+  // 落印之后，这一段剩下的事只有一件：去门那里
+  if (view === 'world' && sealedHere && sea.portal) {
+    tip.next = `门开了。铜针指着门，驶进去就是「${sea.portal.label}」。`;
+  } else if (view === 'world' && sealedHere && !sea.portal) {
+    tip.next = '这一段没有门。';
+  }
 
   return (
     <>
@@ -963,7 +969,7 @@ export function App() {
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !sealBeat && !finale}
+          canSail={view === 'world' && !sealBeat}
           sceneId={voyage?.scene_id ?? scenePick?.id ?? 'test'}
           world={sea}
           collectedIds={[...collectedIds]}
