@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, newRequestId } from './api/client';
-import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Task, type TaskEvent, type Trade, type Usage, type Voyage, type VoyageRecord } from './api/types';
+import { api } from './api/client';
+import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Usage, type Voyage, type VoyageRecord } from './api/types';
 import { Coach, Ledgers, SealButton, StageBar, Stamp, StatusBanner, contentStamp } from './components/ui';
-import { crewArt, kernelBeat } from './crew';
+import { kernelBeat } from './crew';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
 import { worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
@@ -134,15 +134,6 @@ function sceneShortFromId(id: string | undefined) {
     'neutral-test': '启航港 · 玄览内海',
   };
   return (id && map[id]) || '启航港';
-}
-
-/** 当前场景给出的问题（可能不止一条）。没有就从 snapshot 里取。 */
-function sceneQuestions(v: Voyage): string[] {
-  const fromSnapshot = (v.scene_snapshot as { questions?: unknown })?.questions;
-  if (Array.isArray(fromSnapshot)) {
-    return fromSnapshot.filter((x): x is string => typeof x === 'string' && x.trim().length > 0);
-  }
-  return v.question ? [v.question] : [];
 }
 
 function wrapDeg(deg: number) {
@@ -279,23 +270,6 @@ function notesOf(world: Record<string, unknown> | undefined) {
   };
 }
 
-function parseCrewVoices(out: string): { role: string; text: string }[] {
-  const first = out.match(/【大副】([\s\S]*?)(?=【二副】|$)/);
-  const second = out.match(/【二副】([\s\S]*?)$/);
-  if (first || second) {
-    return [
-      first ? { role: '大副', text: first[1].trim() } : null,
-      second ? { role: '二副', text: second[1].trim() } : null,
-    ].filter((x): x is { role: string; text: string } => !!x && !!x.text);
-  }
-  return [{ role: '大副', text: out.trim() }];
-}
-
-const CREW_PROMPT = `请用两段、各自不超过三句回答，不要合并成一段。不要写「知行合一」「和而不同」「仁义」这些词。
-【大副】关注依据：这句话有没有出处，能证明到哪一步。不要替玩家下结论。缺出处就明说先保留。
-【二副】关注义利：这件事落在谁身上，谁还没开口。用问句，不训斥，不自称更有良心。
-未查清就写还没查清。`;
-
 function sceneAttr(voyage: Voyage | null, pick?: Scene | null) {
   const id = voyage?.scene_id ?? pick?.id ?? 'test';
   if (id === 'A' || id === 'B' || id === 'C' || id === 'D') return id;
@@ -316,9 +290,6 @@ export function App() {
   const [voyage, setVoyage] = useState<Voyage | null>(null);
   const [records, setRecords] = useState<VoyageRecord[]>([]);
   const [ports, setPorts] = useState<Port[]>([]);
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [events, setEvents] = useState<TaskEvent[]>([]);
   const [usage, setUsage] = useState<Usage[]>([]);
   const [view, setView] = useState<View>('embark');
   const [error, setError] = useState<string | null>(null);
@@ -352,7 +323,6 @@ export function App() {
   const [pickupFlash, setPickupFlash] = useState<string | null>(null);
   const keys = useRef({ w: false, a: false, s: false, d: false });
   const shipRef = useRef<ShipSnapshot | null>(null);
-  const poll = useRef<number | null>(null);
 
   const connected = models.length > 0;
   const sea = useMemo(
@@ -361,13 +331,6 @@ export function App() {
   );
   const portPlace = sea.ports[0];
   const stance = useMemo(() => stanceFor(voyage?.scene_id ?? scenePick?.id), [voyage?.scene_id, scenePick?.id]);
-  /** 第 1 拍可以选的问法：场景自带的那一句 + 这一段的几种问法，去重。 */
-  const askChoices = useMemo(() => {
-    const base = voyage ? sceneQuestions(voyage) : [];
-    const extra = stance?.altQ ?? [];
-    return [...new Set([...base, ...extra].map((q) => q.trim()).filter(Boolean))];
-  }, [voyage, stance]);
-
   /** 已经走过的段（含当前这段）：海图上留下笔迹的那几笔。 */
   const struck = useMemo(() => {
     const chain = ['A', 'B', 'C', 'D'];
@@ -438,17 +401,13 @@ export function App() {
     const savedLane = (v.world as { lane?: unknown })?.lane;
     setLaneId(typeof savedLane === 'string' ? savedLane : 'near');
     localStorage.setItem(LAST_KEY, id);
-    const [rec, p, t, tk, u] = await Promise.all([
+    const [rec, p, u] = await Promise.all([
       api.records(id),
       api.ports(id),
-      api.trades(id),
-      api.tasks(id),
       api.usage(id),
     ]);
     setRecords(rec);
     setPorts(p);
-    setTrades(t);
-    setTasks(tk);
     setUsage(u);
     setView(nextView ?? (v.stage === 'world' ? 'world' : v.stage));
   }, []);
@@ -665,18 +624,22 @@ export function App() {
     return i >= 0 && i < chain.length - 1 ? chain[i + 1] : null;
   }
 
-  async function confirmCockpit() {
-    if (!voyage || !question.trim() || !reason.trim()) return;
+  /** 出海：不再分「确认问题」和「选航线」两步，一次落印直接进海域。 */
+  async function departNow() {
+    if (!voyage) return;
     setBusy(true);
     setError(null);
     try {
+      const route = ROUTES.find((r) => r.id === routeId) ?? ROUTES[0];
+      const snap = shipRef.current;
       await persist({
-        stage: 'route',
-        question,
-        shared_task: sharedTask || `围绕「${question}」完成一次探索。`,
-        world: { ...voyage.world, notes: { dissent, reason } },
+        stage: 'world',
+        route,
+        world: { ...worldState(voyage, snap, 'at-sea', sea), lane: laneId },
       });
-      setView('route');
+      setView('world');
+      setCine(true);
+      window.setTimeout(() => setCine(false), 1400);
     } catch (e) {
       setError(errText(e));
     } finally {
@@ -760,77 +723,6 @@ export function App() {
   actRef.current.collect = () => {
     void collectFragment();
   };
-
-  async function doTrade(side: 'buy' | 'sell') {
-    if (!voyage) return;
-    const port = ports[0];
-    const goodId = port ? Object.keys(port.goods)[0] : null;
-    if (!port || !goodId) return;
-    setBusy(true);
-    setError(null);
-    try {
-      await api.trade(voyage.id, {
-        request_id: newRequestId('trade'),
-        port_id: port.id,
-        good_id: goodId,
-        side,
-        quantity: 1,
-      });
-      await loadVoyage(voyage.id, 'port');
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function askCrew() {
-    if (!voyage || !question.trim()) return;
-    // 没有独立的输入框了：问的就是这一程已经落下的那个问题。
-    const text = question.trim();
-    if (!connected) return;
-    const modelId = models[0].id;
-    setBusy(true);
-    setError(null);
-    try {
-      const task = await api.createTask(voyage.id, {
-        request_id: newRequestId('task'),
-        prompt: `文化问题：${question || text}\n用户说：${text}\n${CREW_PROMPT}`,
-        model_id: modelId,
-      });
-      setTasks((t) => [...t, task]);
-      if (poll.current) window.clearInterval(poll.current);
-      poll.current = window.setInterval(async () => {
-        try {
-          const latest = await api.getTask(voyage.id, task.id);
-          const ev = await api.events(voyage.id, task.id, 0);
-          setEvents(ev);
-          if (latest.status === 'succeeded') {
-            const out = ev.find((e) => e.kind === 'succeeded')?.data.output;
-            const voices = parseCrewVoices(typeof out === 'string' ? out : '已完成，见事件记录。');
-            setChat((c) => [...c, ...voices.map((v) => ({ who: 'crew' as const, role: v.role, text: v.text }))]);
-            setUsage(await api.usage(voyage.id));
-            setRecords(await api.records(voyage.id));
-            if (poll.current) window.clearInterval(poll.current);
-            setBusy(false);
-          } else if (latest.status === 'failed' || latest.status === 'cancelled') {
-            setChat((c) => [...c, { who: 'sys', text: `查阅失败：${ev.at(-1)?.data.message ?? latest.status}` }]);
-            if (poll.current) window.clearInterval(poll.current);
-            setBusy(false);
-          }
-        } catch (e) {
-          setError(errText(e));
-          if (poll.current) window.clearInterval(poll.current);
-          setBusy(false);
-        }
-      }, 800);
-    } catch (e) {
-      if (e instanceof ApiError && e.status === 503) {
-        setChat((c) => [...c, { who: 'sys', text: '模型服务尚未接入。没有调用付费接口。' }]);
-      } else setError(errText(e));
-      setBusy(false);
-    }
-  }
 
   async function goReflect() {
     if (!voyage) return;
@@ -966,7 +858,7 @@ export function App() {
         </div>
       )}
 
-      {view !== 'embark' && (
+      {view !== 'embark' && view !== 'cockpit' && (
         <>
           <div className={`hud hud-tl${view === 'world' ? ' hud-world' : ' scrim'}`}>
             {view === 'world' ? (
@@ -1192,92 +1084,40 @@ export function App() {
         </>
       )}
 
+      {/* 出发：只剩一件事——看清这一程问的是什么，然后出海 */}
       {view === 'cockpit' && voyage && (
-        <div className="cockpit">
-          <div className="crew-rail">
-            {voyage.crew.map((c) => {
-              const art = crewArt(c.id);
-              return (
-                <div key={c.id} className={`crew-card ${connected ? '' : 'seat-off'}`}>
-                  <img src={art.bust} alt="" width={140} height={140} />
-                  <div className="crew-role">{c.role} · {art.voice}</div>
-                  <span className="faint">{art.duty}</span>
-                </div>
-              );
-            })}
-          </div>
-          <div className="cockpit-window">
-            <div className="chat">
-              {chat.length === 0 && (
-                <div className="bubble bubble-sys">灯已点亮。右边选一个问题，就能出海。大副查依据，二副问谁被看见——两边的看法到下一拍再展开。</div>
-              )}
-              {chat.filter((m) => m.who !== 'crew').map((m, i) => (
-                <div key={`m-${i}`} className={`bubble bubble-${m.who === 'user' ? 'user' : 'sys'}`}>
-                  {m.text}
-                </div>
-              ))}
-              {(['大副', '二副'] as const).some((role) => chat.some((m) => m.who === 'crew' && m.role === role)) && (
-                <div className="voice-pair">
-                  {(['大副', '二副'] as const).map((role) => {
-                    const last = [...chat].reverse().find((m) => m.who === 'crew' && m.role === role);
-                    if (!last) return null;
-                    const art = crewArt(role);
-                    return (
-                      <div key={role} className="voice-card">
-                        <img src={art.bust} alt="" width={56} height={56} />
-                        <div>
-                          <div className="label">{role} · {art.duty}</div>
-                          <div>{last.text}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+        <div className="depart">
+          <div className="paper depart-card">
+            <span className="label">这一程问的是</span>
+            <h2 className="depart-q">{question || '未形成文化问题'}</h2>
+            <p className="depart-hint">
+              {sea.lanes?.length ? '两条航道都到同一个港。路上遇见的东西不一样。' : ''}
+            </p>
+            <div className="lanes depart-lanes">
+              {(sea.lanes ?? []).map((lane) => {
+                const on = laneId === lane.id;
+                return (
+                  <button
+                    key={lane.id}
+                    type="button"
+                    className={`lane${on ? ' is-on' : ''}`}
+                    onClick={() => setLaneId(lane.id)}
+                    aria-pressed={on}
+                  >
+                    <div className="lane-head">
+                      <strong className="lane-name">{lane.name}</strong>
+                    </div>
+                    <p className="lane-promise">{lane.promise}</p>
+                  </button>
+                );
+              })}
             </div>
-          </div>
-          <div className="paper">
-            <h2 className="display title-panel">这一程要问的事</h2>
-            <p className="muted">选一个问题。想改就改，改完落印出海。船员下面已经给了两种看法，不用等模型。</p>
-
-            <div className="ask-picks">
-              {askChoices.map((q) => (
-                <button
-                  key={q}
-                  type="button"
-                  className={`ask-pick${question === q ? ' is-on' : ''}`}
-                  onClick={() => setQuestion(q)}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-
-            <div className="field">
-              <span className="label">或者，用你自己的问法</span>
-              <textarea
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                rows={2}
-                placeholder="这一程你想弄清什么？一句话就够。"
-              />
-            </div>
-
-            <div className="field">
-              <span className="label">为什么值得问这一句（一句话）</span>
-              <input
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="我怀疑这件事还有另一面。"
-              />
-            </div>
-
             <div className="seal-dock">
               <SealButton
-                label="按住落印出海"
-                disabled={busy || !question.trim() || !reason.trim()}
-                hint="选一个问题，补一句为什么，按住按钮不放，就能落印。"
-                onSeal={() => void confirmCockpit()}
+                label="出海"
+                disabled={busy}
+                hint=""
+                onSeal={() => void departNow()}
               />
             </div>
             {error && <p className="error">{error}</p>}
@@ -1473,103 +1313,9 @@ export function App() {
                 }}
               />
             </div>
-            {ports[0] && (
-              <details className="ledger-fold">
-                <summary>测试补给（虚构数字，不是这一步的主事）</summary>
-                {Object.entries(ports[0].goods).map(([id, g]) => (
-                  <div key={id} className="card card-test">
-                    <div className="mono">{id} 买 {g.buy} / 卖 {g.sell} · 市场库存 {g.stock}</div>
-                    <div className="row">
-                      <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void doTrade('buy')}>买入 1</button>
-                      <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void doTrade('sell')}>卖出 1</button>
-                    </div>
-                  </div>
-                ))}
-                {trades.length > 0 && (
-                  <div className="muted">最近交易 Δ补给 {trades.at(-1)?.delta_balance} · 现有 {voyage.balance}</div>
-                )}
-              </details>
-            )}
             <div className="row" style={{ marginTop: 16 }}>
-              <button className="btn btn-secondary" type="button" onClick={() => setView('collaborate')}>请船员解释</button>
               <button className="btn btn-ghost" type="button" onClick={() => setView('world')}>回到海域</button>
               <button className="btn btn-primary" type="button" onClick={() => void goReflect()}>打开航海日志</button>
-            </div>
-            {error && <p className="error">{error}</p>}
-          </div>
-        </div>
-      )}
-
-      {view === 'collaborate' && voyage && (
-        <div className="overlay overlay-right">
-          <div className="paper">
-            <h2 className="display title-panel">两种读法</h2>
-            <p className="muted">
-              两套读法各自成立，也各自有看不到的地方。模型接入后只是第三方意见，不是答案。
-            </p>
-            {stance ? (
-              <div className="stacks-pair">
-                {stance.crew.map((c) => (
-                  <div key={c.who} className="stack-card">
-                    <div className="stack-who">{c.who}</div>
-                    <p>{c.reads}</p>
-                    <p className="stack-blind">看不到：{c.blind}</p>
-                    <p className="faint">依据：{c.from}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <StatusBanner kind="idle" text="这一段还没有写两种读法。" />
-            )}
-
-            <div className="stack" style={{ marginTop: 12 }}>
-              {records.filter((r) => r.kind === 'fragment' || r.kind === 'artifact').map((r) => {
-                const stamp = contentStamp(r.classification, r.sources);
-                return (
-                  <div key={r.id} className="card">
-                    <Stamp kind={stamp.kind}>{stamp.label}</Stamp>
-                    <div>{r.text}</div>
-                    {r.sources.map((s) => (
-                      <div key={s.id} className="muted">
-                        出处 {s.title} · {s.license}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* 模型是第三只手，不是必经之路。没接入就如实说，不挡住往下走。 */}
-            <details className="third-opinion">
-              <summary>第三方意见（模型）· {connected ? '已接入' : '尚未接入'}</summary>
-              {connected ? (
-                <>
-                  <div className="row">
-                    <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void askCrew()}>
-                      请船员解释
-                    </button>
-                  </div>
-                  {tasks.map((t) => (
-                    <div key={t.id} className="muted">任务 {t.status}{t.cancel_requested ? ' · 已请求停止' : ''}</div>
-                  ))}
-                  {events.map((e) => (
-                    <div key={e.seq} className="card">
-                      <span className="label">{e.kind}</span>
-                      <div>{typeof e.data.output === 'string' ? e.data.output : JSON.stringify(e.data)}</div>
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <p className="muted">
-                  没有接入模型，这里不会生成假解释。上面两套读法已经够你判断，往下走不需要它。
-                </p>
-              )}
-            </details>
-
-            <div className="row" style={{ marginTop: 12 }}>
-              <button className="btn btn-primary" type="button" onClick={() => setView(voyage.stage === 'world' || nearPort ? 'port' : 'route')}>
-                回到海边
-              </button>
             </div>
             {error && <p className="error">{error}</p>}
           </div>
