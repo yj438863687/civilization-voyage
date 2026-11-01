@@ -25,6 +25,9 @@ export type PortPlace = {
   silhouette: PortSilhouette;
 };
 
+/** 两条航道：近道贴着岸走，远路绕去外海。只有选中的那条亮着。 */
+export type LaneId = 'near' | 'far';
+
 export type FragmentPlace = {
   id: string;
   title: string;
@@ -34,6 +37,18 @@ export type FragmentPlace = {
   classification: Classification;
   text: string;
   sources: Source[];
+  /** 这段材料只在哪条航道上遇到。'both' = 两条都会碰到 */
+  lane: LaneId | 'both';
+};
+
+/** 一条航道：从出生点出发，经过几个航标，汇到港口。渲染时按点串成一条光路。 */
+export type Lane = {
+  id: LaneId;
+  name: string;
+  /** 一句话说清这条路会让你多看见什么 */
+  promise: string;
+  /** 沿途会遇到几件东西，也用来读秒：走得久不久 */
+  waypoints: { x: number; z: number; label: string }[];
 };
 
 export type WorldConfig = {
@@ -43,6 +58,7 @@ export type WorldConfig = {
   camera: { followDistance: number; followHeight: number; cockpitHeight: number; cockpitForward: number };
   ports: PortPlace[];
   fragments: FragmentPlace[];
+  lanes: Lane[];
   coach: { sea: string; near: string; portTitle: string; portBody: string; compass: string };
   arrangement: { label: string; placeholder: string };
 };
@@ -58,6 +74,46 @@ const SHARED = {
     cockpitForward: -(STERN_HALL.z + STERN_HALL.d * 0.22),
   },
 };
+
+
+/**
+ * 两条航道共用一套几何：从出生点出发，在分叉点分开，一条沿岸直去，一条绕出去。
+ * 港口对所有纪元都在 (26,-16)，所以分叉与转折点可以共用；只有名字和承诺各自不同。
+ * 概念设计，不是任何真实航路。
+ */
+const FORK = { x: 2, z: 8 };
+const NEAR_STOP = { x: 13, z: -5 };
+const FAR_STOP = { x: -12, z: -12 };
+
+function LANES(
+  nearLabel: string,
+  farLabel: string,
+  nearName: string,
+  farName: string,
+  nearPromise: string,
+  farPromise: string,
+): Lane[] {
+  return [
+    {
+      id: 'near',
+      name: nearName,
+      promise: nearPromise,
+      waypoints: [
+        { x: FORK.x, z: FORK.z, label: nearLabel },
+        { x: NEAR_STOP.x, z: NEAR_STOP.z, label: '' },
+      ],
+    },
+    {
+      id: 'far',
+      name: farName,
+      promise: farPromise,
+      waypoints: [
+        { x: FORK.x, z: FORK.z, label: farLabel },
+        { x: FAR_STOP.x, z: FAR_STOP.z, label: '' },
+      ],
+    },
+  ];
+}
 
 const UNESCO_Q: Source = {
   id: 'A-unesco-1561',
@@ -90,6 +146,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         silhouette: 'harbor',
       },
     ],
+    lanes: LANES('海图残页', '未开口的人', '沿岸', '外海', '短，能早一点靠港', '远，多遇见一件没人问起的事'),
     fragments: [
       {
         id: 'chart-scrap',
@@ -97,6 +154,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 4,
         z: 6,
         pickupRadius: 7.5,
+        lane: 'both',
         classification: 'creative',
         text: '铜针指向有灯的地方。纸签是材料，不是风景。这一页是为体验写的，不作航路史实。',
         sources: [TEST_SRC],
@@ -107,6 +165,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 12,
         z: -6,
         pickupRadius: 6.5,
+        lane: 'both',
         classification: 'creative',
         text: '先看来源，再听船员，最后由你落印。口诀是创作，提醒判断在你手里。',
         sources: [TEST_SRC],
@@ -117,6 +176,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 20,
         z: -14,
         pickupRadius: 6,
+        lane: 'both',
         classification: 'creative',
         text: '安排若做成了，谁还没被问到？这一条是创作的义利提醒，不是某份档案。',
         sources: [TEST_SRC],
@@ -148,6 +208,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         silhouette: 'riverbank',
       },
     ],
+    lanes: LANES('第一粒种子', '粮仓记号', '沿岸', '外海', '贴着河岸走，先看到界桩与泥板', '绕出去，先看到囤粮的那一头'),
     fragments: [
       {
         id: 'A-seed',
@@ -155,6 +216,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 4,
         z: 6,
         pickupRadius: 7.5,
+        lane: 'both',
         classification: 'creative',
         text: '把种子埋进土里，意味着你要在这里等一季。等不等得起，是这一程真正的问题。这一条为体验而写，不作农业起源的考古结论。',
         sources: [TEST_SRC],
@@ -165,6 +227,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 12,
         z: -6,
         pickupRadius: 6.5,
+        lane: 'near',
         classification: 'historical_claim',
         text: '定居要划界：哪块地先种，谁的地界。具体记号形式随地区而变，本条只作制度线索，待核实。',
         sources: [UNESCO_Q],
@@ -175,6 +238,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 20,
         z: -14,
         pickupRadius: 6,
+        lane: 'far',
         classification: 'counterfactual',
         text: '若第一年就有余粮：谁负责存，谁有权开仓？这是推演，不是任何一处遗址的记载。',
         sources: [],
@@ -206,6 +270,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         silhouette: 'steam',
       },
     ],
+    lanes: LANES('汽压表', '锅炉工班次', '近岸', '外海', '沿航线走，一路看表、看班次', '绕开礁线，多看到一班人的夜'),
     fragments: [
       {
         id: 'B-gauge',
@@ -213,6 +278,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 4,
         z: 6,
         pickupRadius: 7.5,
+        lane: 'near',
         classification: 'creative',
         text: '汽压高一点，船快一点，炉子也更烫。快与稳在这里是同一根指针的两端。这一条为体验而写。',
         sources: [TEST_SRC],
@@ -223,6 +289,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 12,
         z: -6,
         pickupRadius: 6.5,
+        lane: 'far',
         classification: 'counterfactual',
         text: '若把航程缩短一半：省下的是煤，还是一班人的睡眠？这是推演，不是某家船公司的档案。',
         sources: [],
@@ -233,6 +300,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 20,
         z: -14,
         pickupRadius: 6,
+        lane: 'both',
         classification: 'historical_claim',
         text: '铁轨先铺到哪里，哪座镇就被连上。选线与设站的具体史料待核实，本条只作空间线索。',
         sources: [UNESCO_Q],
@@ -264,6 +332,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         silhouette: 'signal',
       },
     ],
+    lanes: LANES('海底电缆接头', '时区分界', '贴岸', '绕岛', '信号最强，但图上只剩亮点', '信号弱，多看到一处时差'),
     fragments: [
       {
         id: 'C-cable',
@@ -271,6 +340,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 4,
         z: 6,
         pickupRadius: 7.5,
+        lane: 'both',
         classification: 'historical_claim',
         text: '电缆把两端的时差压成零，但接头只落在有资本铺线的地方。具体线路与年代待核实。',
         sources: [UNESCO_Q],
@@ -281,6 +351,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 12,
         z: -6,
         pickupRadius: 6.5,
+        lane: 'far',
         classification: 'counterfactual',
         text: '若航图实时，你会在深夜收到别人的白天。谁被要求适应谁的时间？这是推演。',
         sources: [],
@@ -291,6 +362,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 20,
         z: -14,
         pickupRadius: 6,
+        lane: 'near',
         classification: 'creative',
         text: '整张实时航图上仍有一处没有信号。它不在图上，不等于它不存在。这一条为体验而写。',
         sources: [TEST_SRC],
@@ -322,6 +394,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         silhouette: 'starlight',
       },
     ],
+    lanes: LANES('模型自绘星图', '目的地的定义', '它选的', '你要的', '最短的一条，它说这样最好', '长一些，你会经过它想略过的地方'),
     fragments: [
       {
         id: 'D-star',
@@ -329,6 +402,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 4,
         z: 6,
         pickupRadius: 7.5,
+        lane: 'far',
         classification: 'creative',
         text: '船自己看星、自己画线。图上多出来的那颗星，是它算出来的，不是谁看见的。这一条为体验而写。',
         sources: [TEST_SRC],
@@ -339,6 +413,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 12,
         z: -6,
         pickupRadius: 6.5,
+        lane: 'both',
         classification: 'counterfactual',
         text: '当你要它去的地方由它来解释：是它更懂你的意思，还是它替你改了意思？这是推演。',
         sources: [],
@@ -349,6 +424,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         x: 20,
         z: -14,
         pickupRadius: 6,
+        lane: 'near',
         classification: 'creative',
         text: '它选了一条更快的路，略过了三座港。沿途没人被问过。这一条为体验而写，不是任何系统的实际行为记录。',
         sources: [TEST_SRC],

@@ -1036,3 +1036,37 @@ html[data-reduce-motion='true'] .btn:active { transform: none; }
   font-size: var(--cv-text-sm);
   color: var(--cv-text-on-paper-muted);
 }
+
+/* 选航道：两条并列，选中那条亮起来，另一条留着但压暗 */
+.lanes { display: grid; gap: var(--cv-space-3); margin: var(--cv-space-3) 0; }
+.lane {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--cv-space-3);
+  background: transparent;
+  border: 1px solid var(--cv-line-on-paper);
+  border-radius: var(--cv-radius-sm);
+  color: var(--cv-text-on-paper);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+.lane:hover { border-color: var(--cv-text-on-paper-muted); }
+.lane.is-on {
+  border-color: var(--cv-accent);
+  background: rgb(182 69 44 / 0.05);
+  box-shadow: inset 3px 0 0 var(--cv-accent);
+}
+.lane-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.lane-name { font-family: var(--cv-font-display); font-size: var(--cv-text-md); }
+.lane-count { font-size: var(--cv-text-xs); color: var(--cv-text-on-paper-muted); }
+.lane-promise { margin: 6px 0 8px; font-size: var(--cv-text-sm); }
+.lane-stops {
+  margin: 0;
+  padding-left: 1.1em;
+  font-size: var(--cv-text-sm);
+  color: var(--cv-text-on-paper-muted);
+}
+.lane-stops li { margin: 2px 0; }
+.lane.is-on .lane-stops { color: var(--cv-text-on-paper); }

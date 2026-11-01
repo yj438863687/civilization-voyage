@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { Water } from 'three/examples/jsm/objects/Water.js';
-import type { PortPlace, WorldConfig } from './world.config';
+import type { Lane, PortPlace, WorldConfig } from './world.config';
 import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
 
 function cssVar(name: string, fallback: string) {
@@ -551,18 +551,163 @@ function WeatherField({ sceneId, reduceMotion }: { sceneId: string; reduceMotion
   );
 }
 
+
+/**
+ * 航道：从出生点串到港口的一条水面光路。
+ * 选中的那条亮、有流动光点；没走的留一条暗线，不消失 —— 没走的路也记在海图上。
+ * 概念设计，不是任何真实航路。
+ */
+function SeaLane({
+  lane,
+  active,
+  color,
+  reduceMotion,
+}: {
+  lane: Lane;
+  active: boolean;
+  color: string;
+  reduceMotion: boolean;
+}) {
+  const motes = useRef<THREE.Points>(null);
+
+  // 航道从出生点出发，经分叉点，到自己的转折点，再汇向港口
+  const curve = useMemo(() => {
+    const pts = [
+      new THREE.Vector3(0, 0.34, 22),
+      ...lane.waypoints.map((w) => new THREE.Vector3(w.x, 0.34, w.z)),
+      new THREE.Vector3(26, 0.34, -16),
+    ];
+    return new THREE.CatmullRomCurve3(pts);
+  }, [lane]);
+
+  // 水面光带：宽一点、亮一点，是"这条路"的本体
+  const ribbon = useMemo(() => {
+    const N = 120;
+    const W = active ? 3.2 : 1.4;
+    const pos: number[] = [];
+    const uv: number[] = [];
+    const idx: number[] = [];
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const p = curve.getPoint(t);
+      const tan = curve.getTangent(t);
+      const len = Math.hypot(-tan.z, tan.x) || 1;
+      const ox = (-tan.z / len) * W;
+      const oz = (tan.x / len) * W;
+      pos.push(p.x + ox, p.y, p.z + oz, p.x - ox, p.y, p.z - oz);
+      uv.push(0, t, 1, t);
+    }
+    for (let i = 0; i < N; i++) {
+      const a = i * 2;
+      idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    return g;
+  }, [curve, active]);
+
+  // 实体航标：沿航道摆一排浮标，选中的那条有灯，没走的只剩杆
+  const buoys = useMemo(() => {
+    const n = active ? 14 : 10;
+    return Array.from({ length: n }, (_, i) => {
+      const p = curve.getPoint((i + 0.5) / n);
+      const tan = curve.getTangent((i + 0.5) / n);
+      return { x: p.x, z: p.z, rot: Math.atan2(tan.x, tan.z) };
+    });
+  }, [curve, active]);
+
+  const flowGeo = useMemo(() => {
+    if (!active) return null;
+    const n = 20;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+    return g;
+  }, [active]);
+
+  useFrame(({ clock }) => {
+    if (!active || reduceMotion || !flowGeo || !motes.current) return;
+    const t = clock.elapsedTime;
+    const pos = flowGeo.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) {
+      const u = ((i / pos.count) + (t * 0.05)) % 1;
+      const p = curve.getPoint(u);
+      pos.setXYZ(i, p.x, p.y + 0.12, p.z);
+    }
+    pos.needsUpdate = true;
+  });
+
+  return (
+    <group>
+      <mesh geometry={ribbon} renderOrder={2}>
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={active ? 0.5 : 0.1}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+          fog
+        />
+      </mesh>
+
+      {buoys.map((b, i) => (
+        <group key={i} position={[b.x, 0, b.z]} rotation={[0, b.rot, 0]}>
+          {/* 浮体 */}
+          <mesh position={[0, 0.12, 0]}>
+            <cylinderGeometry args={[0.34, 0.42, 0.34, 8]} />
+            <meshStandardMaterial
+              color={active ? color : '#3a3f42'}
+              emissive={active ? color : '#000000'}
+              emissiveIntensity={active ? 2.2 : 0}
+              roughness={0.6}
+              toneMapped={!active}
+            />
+          </mesh>
+          {/* 标杆 */}
+          <mesh position={[0, 0.95, 0]}>
+            <cylinderGeometry args={[0.05, 0.06, 1.5, 6]} />
+            <meshStandardMaterial color={active ? color : '#4a4f52'} roughness={0.7} toneMapped={!active} />
+          </mesh>
+          {active && (
+            <>
+              {/* 顶端小灯：这是海面上最醒目的东西 */}
+              <mesh position={[0, 1.78, 0]}>
+                <sphereGeometry args={[0.2, 10, 10]} />
+                <meshStandardMaterial color="#fff4dc" emissive={color} emissiveIntensity={3.2} toneMapped={false} />
+              </mesh>
+              <mesh position={[0, 1.78, 0]}>
+                <sphereGeometry args={[0.62, 10, 10]} />
+                <meshBasicMaterial color={color} transparent opacity={0.16} depthWrite={false} />
+              </mesh>
+            </>
+          )}
+        </group>
+      ))}
+
+      {flowGeo && (
+        <points ref={motes} geometry={flowGeo}>
+          <pointsMaterial color="#fff4dc" size={1.1} transparent opacity={0.95} depthWrite={false} fog />
+        </points>
+      )}
+    </group>
+  );
+}
+
 export function Atmosphere({
   reduceMotion,
   sceneId,
   world,
   collectedIds,
   nearFragmentId,
+  laneId,
 }: {
   reduceMotion: boolean;
   sceneId: string;
   world: WorldConfig;
   collectedIds: string[];
   nearFragmentId: string | null;
+  laneId: string;
 }) {
   // 夜空：竖向渐变 + 地平线暖带。不做体积云，行高处的雾由 fog 负责。
   const sky = useMemo(() => {
@@ -635,11 +780,20 @@ export function Atmosphere({
         </group>
       )}
       <WeatherField sceneId={sceneId} reduceMotion={reduceMotion} />
+      {(world.lanes ?? []).map((lane: Lane) => (
+        <SeaLane
+          key={lane.id}
+          lane={lane}
+          active={lane.id === laneId}
+          color={cssVar(lane.id === laneId ? '--cv-ship-lamp-core' : '--cv-ship-lamp-cool', '#ffd9a0')}
+          reduceMotion={reduceMotion}
+        />
+      ))}
       {world.ports.map((p) => (
         <PortSilhouette key={p.id} port={p} sceneId={sceneId} />
       ))}
       {world.fragments
-        .filter((f) => !collectedIds.includes(f.id))
+        .filter((f) => !collectedIds.includes(f.id) && (f.lane === 'both' || f.lane === laneId))
         .map((f) => (
           <group key={f.id} position={[f.x, 0, f.z]}>
             <PaperSign title={f.title} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />

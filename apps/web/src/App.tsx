@@ -20,6 +20,8 @@ function worldState(
   return {
     hull_id: typeof voyage.world.hull_id === 'string' ? voyage.world.hull_id : DEFAULT_HULL,
     port_id: portId,
+    // 航道单独存：不写进这里就会被下一次 worldState 覆盖掉，刷新后路会变
+    lane: typeof voyage.world.lane === 'string' ? voyage.world.lane : 'near',
     ship: snap ? { x: snap.x, z: snap.z, yaw: snap.yaw } : voyage.world.ship ?? sea.spawn,
   };
 }
@@ -265,6 +267,8 @@ export function App() {
   /** 代价落在谁身上。必须点名，不让写「社会」 */
   const [costIdx, setCostIdx] = useState<number | null>(null);
   const [routeId, setRouteId] = useState('simple');
+  /** 实际走的航道。和 routeId 是一回事，但 world 里按 near/far 存，方便渲染。 */
+  const [laneId, setLaneId] = useState<string>('near');
   const [nearPort, setNearPort] = useState<string | null>(null);
   const [nearFragment, setNearFragment] = useState<string | null>(null);
   const [ship, setShip] = useState<ShipSnapshot | null>(null);
@@ -349,6 +353,8 @@ export function App() {
     setReason(notes.reason || DEFAULT_REASON);
     setDissent(notes.dissent);
     if (v.route) setRouteId(v.route.id);
+    const savedLane = (v.world as { lane?: unknown })?.lane;
+    setLaneId(typeof savedLane === 'string' ? savedLane : 'near');
     localStorage.setItem(LAST_KEY, id);
     const [rec, p, t, tk, u] = await Promise.all([
       api.records(id),
@@ -606,7 +612,8 @@ export function App() {
       await persist({
         stage: 'world',
         route,
-        world: worldState(voyage, snap, 'at-sea', sea),
+        // 航道同时写进 world：刷新后仍然走同一条，不会悄悄换路
+        world: { ...worldState(voyage, snap, 'at-sea', sea), lane: laneId },
       });
       setView('world');
       setCine(true);
@@ -861,6 +868,7 @@ export function App() {
           world={sea}
           collectedIds={[...collectedIds]}
           nearFragmentId={nearFragment}
+          laneId={laneId}
           input={input}
           restored={restored}
           onShip={onShip}
@@ -1167,9 +1175,9 @@ export function App() {
 
             <div className="seal-dock">
               <SealButton
-                label="落印出海"
+                label="按住落印出海"
                 disabled={busy || !question.trim() || !reason.trim()}
-                hint="选一个问题，补一句为什么，就能落印。"
+                hint="选一个问题，补一句为什么，按住按钮不放，就能落印。"
                 onSeal={() => void confirmCockpit()}
               />
             </div>
@@ -1181,20 +1189,39 @@ export function App() {
       {view === 'route' && voyage && (
         <div className="overlay overlay-right">
           <div className="paper">
-            <h2 className="display title-panel">航线与资源</h2>
+            <h2 className="display title-panel">选一条航道</h2>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <p className="muted">查得多一些，或先查关键处。</p>
-            <div className="list">
-              {ROUTES.map((r) => (
-                <button key={r.id} className="card" type="button" onClick={() => setRouteId(r.id)} style={{ boxShadow: routeId === r.id ? 'var(--cv-shadow-lamp)' : undefined }}>
-                  <strong>{r.id === 'simple' ? '较简单航线' : '步骤较多航线'}</strong>
-                  <div>{r.steps.join(' → ')}</div>
-                  <div className="muted">{r.rationale}</div>
-                  <div className="unconnected">预计真实用量：—（尚未接入计价）</div>
-                </button>
-              ))}
+            <p className="muted">两条都到同一个港。路上遇见的东西不一样 —— 没走的这条，不算白走。</p>
+            <div className="lanes">
+              {(sea.lanes ?? []).map((lane) => {
+                const on = laneId === lane.id;
+                const seen = sea.fragments.filter(
+                  (f) => (f.lane === lane.id || f.lane === 'both') && collectedIds.has(f.id),
+                ).length;
+                const total = sea.fragments.filter((f) => f.lane === lane.id || f.lane === 'both').length;
+                return (
+                  <button
+                    key={lane.id}
+                    type="button"
+                    className={`lane${on ? ' is-on' : ''}`}
+                    onClick={() => setLaneId(lane.id)}
+                    aria-pressed={on}
+                  >
+                    <div className="lane-head">
+                      <strong className="lane-name">{lane.name}</strong>
+                      <span className="lane-count">{total} 处可看{seen ? ` · 已看 ${seen}` : ''}</span>
+                    </div>
+                    <p className="lane-promise">{lane.promise}</p>
+                    <ol className="lane-stops">
+                      {lane.waypoints.map((w) => (
+                        <li key={w.label}>{w.label}</li>
+                      ))}
+                    </ol>
+                  </button>
+                );
+              })}
             </div>
-            <p className="faint">路线不同，留下的问题也不同。查得多，不等于更对。没走的这条，也记在海图上。</p>
+            <p className="faint">航道画在水面上：亮的那条是你选的，暗的那条还在，只是不去了。</p>
             <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} materials={unusedFragments} />
             <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void launchRoute()}>
               按此航线启航
@@ -1314,11 +1341,11 @@ export function App() {
             )}
             <div className="seal-dock">
               <SealButton
-                label={stance ? '按此落印' : '落印'}
+                label="按住落印"
                 disabled={busy || !stance || stanceIdx == null || costIdx == null}
                 hint={
                   stance
-                    ? '在刻度上选一个位置，再点名谁承担。两样都有了才能落印。'
+                    ? '在刻度上选一个位置，再点名谁承担。两样都有了，按住按钮不放才能落印。'
                     : '这一段还没有站位刻度。'
                 }
                 onSeal={() => {

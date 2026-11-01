@@ -34,6 +34,8 @@ interface Props {
   world: WorldConfig;
   collectedIds: string[];
   nearFragmentId: string | null;
+  /** 这一程走的是哪条航道：'near' 沿岸 / 'far' 外海 */
+  laneId: string;
   input: ControlInput;
   restored?: { x: number; z: number; yaw: number } | null;
   onShip: (s: ShipSnapshot, nearPort: string | null, nearFragment: string | null) => void;
@@ -371,6 +373,7 @@ function Rig({
   onBlend,
   world,
   collectedIds,
+  laneId,
 }: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
@@ -458,6 +461,8 @@ function Rig({
     let nearFragment: string | null = null;
     for (const f of world.fragments) {
       if (collectedIds.includes(f.id)) continue;
+      // 不在这一条航道上的东西，既看不见也拾不到
+      if (f.lane !== 'both' && f.lane !== laneId) continue;
       const dx = g.position.x - f.x;
       const dz = g.position.z - f.z;
       if (dx * dx + dz * dz < f.pickupRadius * f.pickupRadius) nearFragment = f.id;
@@ -713,6 +718,7 @@ export function VoyageCanvas(props: Props) {
           world={props.world}
           collectedIds={props.collectedIds}
           nearFragmentId={props.nearFragmentId}
+          laneId={props.laneId}
         />
         <Rig {...props} />
       </Canvas>
