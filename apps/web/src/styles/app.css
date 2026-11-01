@@ -1070,3 +1070,87 @@ html[data-reduce-motion='true'] .btn:active { transform: none; }
 }
 .lane-stops li { margin: 2px 0; }
 .lane.is-on .lane-stops { color: var(--cv-text-on-paper); }
+
+/* HUD 里的海图小图：这一趟走到第几笔，一眼能看到 */
+.chart-hud { display: grid; gap: 4px; padding: var(--cv-space-2); }
+.chart-map { width: 132px; height: auto; display: block; border-radius: 2px; }
+.chart-hud-note {
+  font-size: 11px;
+  color: var(--cv-text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* 靠近实物：名称比拍子条更靠前，先看见"那是什么" */
+.hud-relic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  animation: relic-in 220ms ease-out;
+}
+.hud-relic-key {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--cv-line-brass);
+  border-radius: 2px;
+  color: var(--cv-brass-300);
+  font-size: 11px;
+}
+.hud-relic-name {
+  font-size: var(--cv-text-md);
+  color: var(--cv-text);
+  letter-spacing: 0.02em;
+}
+@keyframes relic-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 日志页的海图回顾：这一趟走出来的图 */
+.chart-recap {
+  margin: var(--cv-space-3) 0 var(--cv-space-4);
+  padding: var(--cv-space-3);
+  border: 1px solid var(--cv-line-on-paper);
+  border-radius: var(--cv-radius-sm);
+}
+.chart-recap-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.chart-recap .chart-map {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  display: block;
+  margin: 0 auto 8px;
+  background: rgb(20 28 30 / 0.08);
+  border-radius: 2px;
+}
+.chart-recap-text {
+  margin: 0;
+  font-family: inherit;
+  font-size: var(--cv-text-sm);
+  line-height: 1.7;
+  color: var(--cv-text-on-paper);
+  white-space: pre-wrap;
+}
+
+/* 第四段收束：不是通关画面，是一张画满了的图 */
+.voyage-end { margin: var(--cv-space-4) 0; }
+.voyage-end-line {
+  font-family: var(--cv-font-display);
+  font-size: var(--cv-text-lg);
+  line-height: var(--cv-leading-tight);
+  margin: 0 0 var(--cv-space-2);
+  color: var(--cv-text-on-paper);
+}
+.voyage-end-body {
+  margin: 0 0 8px;
+  font-size: var(--cv-text-sm);
+  line-height: 1.75;
+  color: var(--cv-text-on-paper-muted);
+}

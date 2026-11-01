@@ -6,6 +6,7 @@ import { crewArt, kernelBeat } from './crew';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
 import { worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
+import { chartSummary } from './world/chart';
 
 const LAST_KEY = 'cv.lastVoyageId';
 const MOTION_KEY = 'cv.reduceMotion';
@@ -57,10 +58,82 @@ function sceneShort(s: Scene) {
   return s.label.replace(/^AI 推荐，待组员确认：/, '');
 }
 
+
+/** HUD 里的海图小图：SVG，不用第二个 WebGL 上下文。 */
+function ChartMap({ struck, activeEpoch }: { struck: string[]; activeEpoch: string }) {
+  const order = ['A', 'B', 'C', 'D'];
+  const ink: Record<string, string> = { A: '#c8794f', B: '#9aa3ad', C: '#6fb3bd', D: '#8fa0dc' };
+  return (
+    <svg viewBox="0 0 120 76" className="chart-map" role="img" aria-label="这一趟的海图">
+      <rect x="0" y="0" width="120" height="76" fill="rgba(20,28,30,0.55)" />
+      {[15, 30, 45, 60].map((y) => (
+        <line key={y} x1="0" y1={y} x2="120" y2={y} stroke="rgba(220,200,160,0.12)" strokeWidth="0.5" />
+      ))}
+      {[24, 48, 72, 96].map((x) => (
+        <line key={x} x1={x} y1="0" x2={x} y2="76" stroke="rgba(220,200,160,0.12)" strokeWidth="0.5" />
+      ))}
+      {order.map((e, i) => {
+        const on = struck.includes(e);
+        const cx = 24 + i * 24;
+        const cy = 30 + (i % 2) * 16;
+        const c = ink[e] ?? '#c9a15a';
+        return (
+          <g key={e} opacity={on ? 1 : 0.22}>
+            {i > 0 && (
+              <line
+                x1={24 + (i - 1) * 24}
+                y1={30 + ((i - 1) % 2) * 16}
+                x2={cx}
+                y2={cy}
+                stroke={c}
+                strokeWidth="0.9"
+                strokeDasharray={on ? '0' : '2 2'}
+              />
+            )}
+            {e === 'A' && on && <circle cx={cx} cy={cy} r="6" fill="none" stroke={c} strokeWidth="1.1" />}
+            {e === 'C' && on && <line x1={cx} y1={cy - 5} x2={cx} y2={cy + 5} stroke={c} strokeWidth="1.1" strokeDasharray="2 2" />}
+            {e === 'D' && on && (
+              <path d={`M${cx} ${cy - 5} L${cx + 1.6} ${cy - 1.6} L${cx + 5} ${cy} L${cx + 1.6} ${cy + 1.6} L${cx} ${cy + 5} L${cx - 1.6} ${cy + 1.6} L${cx - 5} ${cy} L${cx - 1.6} ${cy - 1.6} Z`} fill={c} />
+            )}
+            {e === 'B' && on && <circle cx={cx} cy={cy} r="2" fill={c} />}
+            <circle cx={cx} cy={cy} r="1.4" fill={c} opacity={e === 'A' || e === 'C' || e === 'D' ? 0 : 1} />
+            <text x={cx} y={cy + 14} textAnchor="middle" fontSize="6" fill={on ? '#e8dcc6' : '#7d7568'}>
+              {e}
+            </text>
+          </g>
+        );
+      })}
+      {activeEpoch && (
+        <circle
+          cx={24 + order.indexOf(activeEpoch) * 24}
+          cy={30 + (order.indexOf(activeEpoch) % 2) * 16}
+          r="9"
+          fill="none"
+          stroke="#f0b46a"
+          strokeWidth="0.8"
+          opacity="0.6"
+        />
+      )}
+    </svg>
+  );
+}
+
 function voyageSceneLabel(v: Voyage) {
   const raw = String(v.scene_snapshot.label ?? v.scene_id);
   if (raw.includes('中性测试') || raw.includes('测试海域')) return '启航港 · 玄览内海（创作）';
   return raw.replace(/^AI 推荐，待组员确认：/, '');
+}
+
+/** 场景 id → 短名。HUD 里只放得下这一行。 */
+function sceneShortFromId(id: string | undefined) {
+  const map: Record<string, string> = {
+    A: '农业 · 从漂流到靠岸',
+    B: '工业 · 从风帆到蒸汽',
+    C: '信息 · 从海上到电波',
+    D: '智能 · 从驾驶到设定目的地',
+    'neutral-test': '启航港 · 玄览内海',
+  };
+  return (id && map[id]) || '启航港';
 }
 
 /** 当前场景给出的问题（可能不止一条）。没有就从 snapshot 里取。 */
@@ -294,6 +367,15 @@ export function App() {
     const extra = stance?.altQ ?? [];
     return [...new Set([...base, ...extra].map((q) => q.trim()).filter(Boolean))];
   }, [voyage, stance]);
+
+  /** 已经走过的段（含当前这段）：海图上留下笔迹的那几笔。 */
+  const struck = useMemo(() => {
+    const chain = ['A', 'B', 'C', 'D'];
+    const id = voyage?.scene_id ?? '';
+    const i = chain.indexOf(id);
+    if (i < 0) return [] as string[];
+    return chain.slice(0, i + 1);
+  }, [voyage?.scene_id]);
 
   /** 主线上的下一段场景。走到 D 就没有下一段了 —— 这趟航程没有终点港。 */
   const nextScene = useMemo(() => {
@@ -869,6 +951,7 @@ export function App() {
           collectedIds={[...collectedIds]}
           nearFragmentId={nearFragment}
           laneId={laneId}
+          struck={struck}
           input={input}
           restored={restored}
           onShip={onShip}
@@ -889,7 +972,15 @@ export function App() {
             {view === 'world' ? (
               <div className="hud-world-card">
                 <div className="hud-quest">{voyage?.question || '未形成文化问题'}</div>
-                <StageBar current={beat.current} reached={beat.reached} compact />
+                {/* 靠近一件实物时，先告诉眼睛"那是什么"，文字后补 */}
+                {nearFrag ? (
+                  <div className="hud-relic" key={nearFrag.id}>
+                    <span className="hud-relic-key">E</span>
+                    <span className="hud-relic-name">{nearFrag.title}</span>
+                  </div>
+                ) : (
+                  <StageBar current={beat.current} reached={beat.reached} compact />
+                )}
                 {status.kind !== 'idle' && <StatusBanner kind={status.kind} text={status.text} compact />}
               </div>
             ) : (
@@ -930,6 +1021,14 @@ export function App() {
             </Stamp>
           </div>
           <div className="hud hud-bl">
+            {view === 'world' && (
+              <div className="scrim chart-hud" aria-label="这一趟的海图">
+                <ChartMap struck={struck} activeEpoch={voyage?.scene_id ?? ''} />
+                <div className="chart-hud-note">
+                  {sceneShortFromId(voyage?.scene_id)} · 第 {struck.length} / 4 笔
+                </div>
+              </div>
+            )}
             {view === 'world' && (
               <div className="scrim">
                 <div className="mono">
@@ -1483,6 +1582,20 @@ export function App() {
             <h2 className="display title-page">{voyage.title}</h2>
             <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
             <Stamp kind="creative">概念创作</Stamp>
+            {/* 这一趟的海图：四段走完，同一张图上有四种笔迹 */}
+            {struck.length > 0 && (
+              <div className="chart-recap">
+                <div className="chart-recap-head">
+                  <span className="label">这一趟的海图</span>
+                  <span className="faint">第 {struck.length} / 4 笔</span>
+                </div>
+                <ChartMap struck={struck} activeEpoch={voyage.scene_id} />
+                <pre className="chart-recap-text">{chartSummary(struck)}</pre>
+                {struck.length < 4 && (
+                  <p className="muted">图上还空着 {4 - struck.length} 处。没走到的地方，仍然是空白。</p>
+                )}
+              </div>
+            )}
             <p>{voyage.shared_task || '尚未形成共同任务。'}</p>
             {/* 这一程你站哪、代价落在谁身上：放在材料前面，是这一段的结论 */}
             {records.filter((r) => r.kind === 'choice').length > 0 && (
@@ -1536,9 +1649,27 @@ export function App() {
                   带着这张海图，进入「{sceneShort(nextScene)}」
                 </button>
               ) : (
-                <button className="btn btn-ghost" type="button" onClick={() => { setView('cockpit'); void persist({ stage: 'cockpit' }); }}>
-                  回到这一程的驾驶舱
-                </button>
+                <>
+                  {/* 第四段走完：没有下一段，也没有终点港。这里不是"再来一次"，是收帆。 */}
+                  {struck.length >= 4 && (
+                    <div className="voyage-end">
+                      <p className="voyage-end-line">
+                        四笔都画完了。这张图上没有终点港。
+                      </p>
+                      <p className="voyage-end-body">
+                        农业画下第一个圈，工业把它连成线，信息在线上留下一处断点，
+                        智能把最后一颗星交给了一个不必经过人的地方。
+                      </p>
+                      <p className="voyage-end-body">
+                        航程到这里结束。可这张图还在你手里 —— 下一次，你仍然可以决定
+                        从哪一笔开始改。
+                      </p>
+                    </div>
+                  )}
+                  <button className="btn btn-ghost" type="button" onClick={() => { setView('cockpit'); void persist({ stage: 'cockpit' }); }}>
+                    回到这一程的驾驶舱
+                  </button>
+                </>
               )}
             </div>
           </div>

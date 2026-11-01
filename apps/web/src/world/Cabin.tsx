@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { STERN_HALL } from './hull';
+import { SeaChart } from './chart';
 
 function cssColor(name: string, fallback: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
@@ -11,7 +12,7 @@ function cssColor(name: string, fallback: string) {
  * 驾驶舱模式下船体隐藏，这间房单独渲染，镜头才能稳定坐在桌后。
  * 概念设计，不是考古复原。
  */
-export function Cabin() {
+export function Cabin({ struck = [], sceneId }: { struck?: string[]; sceneId?: string }) {
   const M = useMemo(() => {
     const wood = new THREE.MeshStandardMaterial({
       color: cssColor('--cv-ship-hull', '#2a211c'),
@@ -142,10 +143,10 @@ export function Cabin() {
           <boxGeometry args={[0.08, tableTop - floorY, d * 0.3]} />
         </mesh>
       ))}
-      {/* 摊开的海图 */}
-      <mesh position={[0, tableTop + 0.07, tableZ - 0.1]} rotation={[-Math.PI / 2, 0, 0.02]} material={M.paper}>
-        <planeGeometry args={[w * 0.38, d * 0.26]} />
-      </mesh>
+      {/* 摊开的海图：四段共用这一张，每段添一笔 */}
+      <group position={[0, tableTop + 0.075, tableZ - 0.05]}>
+        <SeaChart struck={struck} activeEpoch={sceneId ?? ''} width={w * 0.4} height={d * 0.3} />
+      </group>
       {/* 罗盘 */}
       <mesh position={[w * 0.19, tableTop + 0.08, tableZ + 0.35]} material={M.brass}>
         <cylinderGeometry args={[0.12, 0.12, 0.03, 16]} />

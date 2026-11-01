@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import type { Lane, PortPlace, WorldConfig } from './world.config';
+import { Relic, relicKindOf } from './relics';
 import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
 
 function cssVar(name: string, fallback: string) {
@@ -36,13 +37,27 @@ function HarborWater({ reduceMotion, sceneId }: { reduceMotion: boolean; sceneId
   }, [normals]);
 
   useEffect(() => {
-    water.material.uniforms.waterColor.value.copy(hex('--cv-scene-water', '#123039').multiplyScalar(0.34));
-    water.material.uniforms.sunColor.value.copy(hex('--cv-scene-light', '#f1d9a8').multiplyScalar(0.22));
+    // 每段海不一样：农业段是浑的河水泥黄，工业段是灰绿的港水，
+    // 信息段是发青的深水，智能段近乎墨黑。水色先于任何文字告诉你到了哪个时代。
+    const tint: Record<string, { water: number; sun: number; size: number; wave: number }> = {
+      A: { water: 0.52, sun: 0.3, size: 6.5, wave: 1.9 },
+      B: { water: 0.3, sun: 0.18, size: 4.6, wave: 1.25 },
+      C: { water: 0.24, sun: 0.14, size: 5.2, wave: 1.1 },
+      D: { water: 0.14, sun: 0.08, size: 3.6, wave: 0.6 },
+      test: { water: 0.34, sun: 0.22, size: 5.5, wave: 1.5 },
+    };
+    const t = tint[sceneId] ?? tint.test;
+    water.material.uniforms.waterColor.value.copy(hex('--cv-scene-water', '#123039').multiplyScalar(t.water));
+    water.material.uniforms.sunColor.value.copy(hex('--cv-scene-light', '#f1d9a8').multiplyScalar(t.sun));
+    water.material.uniforms.size.value = t.size;
+    water.material.uniforms.distortionScale.value = t.wave;
   }, [sceneId, water]);
 
   useFrame((_, dt) => {
     water.material.uniforms.time.value += reduceMotion ? dt * 0.12 : dt;
-    water.material.uniforms.distortionScale.value = reduceMotion ? 0.7 : 1.6;
+    // 浪也不一样：农业段是活的河，智能段的海几乎不动
+    const calm: Record<string, number> = { A: 1.9, B: 1.3, C: 1.1, D: 0.55, test: 1.6 };
+    water.material.uniforms.distortionScale.value = reduceMotion ? 0.7 : calm[sceneId] ?? 1.6;
   });
 
   return <primitive object={water} />;
@@ -413,88 +428,6 @@ function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string })
 }
 
 /** 纸签：竖杆 + 纸面 + 一枚小暖灯，作为「还没照到的地方」的标记。 */
-function PaperSign({
-  title,
-  active,
-  reduceMotion,
-}: {
-  title: string;
-  active: boolean;
-  reduceMotion: boolean;
-}) {
-  const paper = cssVar('--cv-paper-100', '#e8dcc6');
-  const lamp = cssVar('--cv-ship-lamp-warm', '#f0b46a');
-  const core = cssVar('--cv-ship-lamp-core', '#ffd9a0');
-  const group = useRef<THREE.Group>(null);
-  const ring = useRef<THREE.MeshBasicMaterial>(null);
-  const glow = useRef<THREE.MeshStandardMaterial>(null);
-
-  useFrame(({ clock }) => {
-    const g = group.current;
-    if (!g) return;
-    const t = clock.elapsedTime;
-    const bob = reduceMotion ? 0 : Math.sin(t * 1.9) * 0.1;
-    g.position.y = bob + (active ? 0.3 : 0);
-    const s = active ? 1.14 : 1;
-    g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x, s, 0.14));
-    if (ring.current) ring.current.opacity = active ? 0.2 + Math.sin(t * 3.2) * 0.05 : 0.1;
-    if (glow.current) glow.current.emissiveIntensity = active ? 2.4 : 1.5;
-  });
-
-  return (
-    <group ref={group} name={title}>
-      {/* 杆 */}
-      <mesh position={[0, 1.4, 0]}>
-        <cylinderGeometry args={[0.055, 0.07, 2.8, 6]} />
-        <meshStandardMaterial color="#8a7f70" roughness={0.66} />
-      </mesh>
-      {/* 纸面：略斜，朝向来船 */}
-      <group position={[0, 2.5, 0]} rotation={[0, 0.22, 0.03]}>
-        <mesh>
-          <planeGeometry args={[1.5, 0.98]} />
-          <meshStandardMaterial
-            color={paper}
-            side={THREE.DoubleSide}
-            roughness={0.86}
-            emissive={lamp}
-            emissiveIntensity={active ? 0.22 : 0.1}
-          />
-        </mesh>
-        {/* 纸上的一道墨线，暗示「写着字」 */}
-        <mesh position={[0, 0.16, 0.005]}>
-          <planeGeometry args={[1.0, 0.05]} />
-          <meshBasicMaterial color="#5d5446" transparent opacity={0.55} />
-        </mesh>
-        <mesh position={[-0.1, -0.06, 0.005]}>
-          <planeGeometry args={[0.78, 0.04]} />
-          <meshBasicMaterial color="#5d5446" transparent opacity={0.4} />
-        </mesh>
-        {/* 纸签自己的小灯 */}
-        <mesh position={[0, -0.62, 0]}>
-          <sphereGeometry args={[0.09, 10, 10]} />
-          <meshStandardMaterial
-            ref={glow}
-            color={core}
-            emissive={lamp}
-            emissiveIntensity={1.5}
-            toneMapped={false}
-          />
-        </mesh>
-        <mesh position={[0, -0.62, 0]}>
-          <sphereGeometry args={[0.28, 10, 10]} />
-          <meshBasicMaterial color={lamp} transparent opacity={0.14} depthWrite={false} />
-        </mesh>
-      </group>
-      {/* 地面光圈：可瞄准的落点 */}
-      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.2, 1.9, 32]} />
-        <meshBasicMaterial ref={ring} color={lamp} transparent opacity={0.1} depthWrite={false} />
-      </mesh>
-      <pointLight position={[0, 2.4, 0.4]} color={lamp} intensity={active ? 3.2 : 1.8} distance={9} decay={2} />
-    </group>
-  );
-}
-
 /** 每段航程独有的空气/海面天气层。便宜的效果：粒子 + 低面数面片，不做体积雾。 */
 function WeatherField({ sceneId, reduceMotion }: { sceneId: string; reduceMotion: boolean }) {
   const group = useRef<THREE.Group>(null);
@@ -557,6 +490,26 @@ function WeatherField({ sceneId, reduceMotion }: { sceneId: string; reduceMotion
  * 选中的那条亮、有流动光点；没走的留一条暗线，不消失 —— 没走的路也记在海图上。
  * 概念设计，不是任何真实航路。
  */
+
+/** 航道的光按时代上色：农业陶土暖光，工业铁青，信息冷蓝，智能近白。 */
+function laneColor(active: boolean, sceneId: string) {
+  const on: Record<string, string> = {
+    A: '#ffb877',
+    B: '#d8dde2',
+    C: '#8fdfe8',
+    D: '#c8d2f5',
+    test: '#ffd9a0',
+  };
+  const off: Record<string, string> = {
+    A: '#7a5a3c',
+    B: '#5a6066',
+    C: '#3f5a62',
+    D: '#3a4460',
+    test: '#5a6a70',
+  };
+  return active ? on[sceneId] ?? on.test : off[sceneId] ?? off.test;
+}
+
 function SeaLane({
   lane,
   active,
@@ -785,7 +738,7 @@ export function Atmosphere({
           key={lane.id}
           lane={lane}
           active={lane.id === laneId}
-          color={cssVar(lane.id === laneId ? '--cv-ship-lamp-core' : '--cv-ship-lamp-cool', '#ffd9a0')}
+          color={laneColor(lane.id === laneId, sceneId)}
           reduceMotion={reduceMotion}
         />
       ))}
@@ -796,7 +749,7 @@ export function Atmosphere({
         .filter((f) => !collectedIds.includes(f.id) && (f.lane === 'both' || f.lane === laneId))
         .map((f) => (
           <group key={f.id} position={[f.x, 0, f.z]}>
-            <PaperSign title={f.title} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
+            <Relic kind={relicKindOf(f.id)} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
           </group>
         ))}
     </group>

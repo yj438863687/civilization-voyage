@@ -36,6 +36,8 @@ interface Props {
   nearFragmentId: string | null;
   /** 这一程走的是哪条航道：'near' 沿岸 / 'far' 外海 */
   laneId: string;
+  /** 已经走完的段，用来在海图上留下笔迹 */
+  struck: string[];
   input: ControlInput;
   restored?: { x: number; z: number; yaw: number } | null;
   onShip: (s: ShipSnapshot, nearPort: string | null, nearFragment: string | null) => void;
@@ -374,6 +376,7 @@ function Rig({
   world,
   collectedIds,
   laneId,
+  struck,
 }: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
@@ -649,7 +652,7 @@ function Rig({
           </group>
           {mode === 'cockpit' && (
             <Suspense fallback={null}>
-              <Cabin />
+              <Cabin struck={struck} sceneId={propsScene} />
             </Suspense>
           )}
         </group>
