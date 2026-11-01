@@ -418,6 +418,84 @@ function Rig({
   const landFrom = useRef<{ pos: THREE.Vector3; look: THREE.Vector3; fov: number } | null>(null);
   /** 靠港戏的舞台：被提上来的那件东西，挂在世界坐标里，跟镜头走 */
   const relicStage = useRef<THREE.Group>(null);
+  /**
+   * 玩家自己的视角：滚轮/双指缩放，拖动环视，双击复位。
+   * target 是输入直接改的值，cur 是镜头真正用的值（做阻尼，避免一顿一顿）。
+   */
+  const view = useRef({ zoom: 1, yaw: 0, pitch: 0, tZoom: 1, tYaw: 0, tPitch: 0 });
+  const glForInput = useThree((st) => st.gl);
+  useEffect(() => {
+    const el = glForInput.domElement;
+    let drag: { x: number; y: number; id: number } | null = null;
+    const pinch = new Map<number, { x: number; y: number }>();
+    let pinchD = 0;
+    const clampAll = () => {
+      const v = view.current;
+      v.tZoom = THREE.MathUtils.clamp(v.tZoom, 0.38, 3.2);
+      v.tPitch = THREE.MathUtils.clamp(v.tPitch, -0.22, 0.95);
+    };
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      view.current.tZoom *= Math.exp(e.deltaY * 0.0012);
+      clampAll();
+    };
+    const onDown = (e: PointerEvent) => {
+      pinch.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch.size === 2) {
+        const [a, b] = [...pinch.values()];
+        pinchD = Math.hypot(a.x - b.x, a.y - b.y);
+        drag = null;
+        return;
+      }
+      drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
+    };
+    const onMove = (e: PointerEvent) => {
+      if (pinch.has(e.pointerId)) pinch.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch.size === 2) {
+        const [a, b] = [...pinch.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (pinchD > 0) view.current.tZoom *= pinchD / d;
+        pinchD = d;
+        clampAll();
+        return;
+      }
+      if (!drag || drag.id !== e.pointerId) return;
+      const dx = e.clientX - drag.x;
+      const dy = e.clientY - drag.y;
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+      view.current.tYaw -= dx * 0.006;
+      view.current.tPitch += dy * 0.004;
+      clampAll();
+    };
+    const onUp = (e: PointerEvent) => {
+      pinch.delete(e.pointerId);
+      if (pinch.size < 2) pinchD = 0;
+      if (drag?.id === e.pointerId) drag = null;
+    };
+    const onDbl = () => {
+      const v = view.current;
+      v.tZoom = 1;
+      v.tYaw = 0;
+      v.tPitch = 0;
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    el.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    el.addEventListener('dblclick', onDbl);
+    el.style.touchAction = 'none';
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      el.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      el.removeEventListener('dblclick', onDbl);
+    };
+  }, [glForInput]);
+
   /** 收帆开始后经过的秒数：先掉头离港，再匀速往外海去 */
   const autoT = useRef(0);
   const { camera, gl } = useThree();
@@ -601,6 +679,14 @@ function Rig({
       if (relicStage.current) relicStage.current.visible = false;
     }
 
+    {
+      const v = view.current;
+      const kk = reduceMotion ? 1 : 1 - Math.exp(-clamped / 0.16);
+      v.zoom += (v.tZoom - v.zoom) * kk;
+      v.yaw += (v.tYaw - v.yaw) * kk;
+      v.pitch += (v.tPitch - v.pitch) * kk;
+    }
+
     const useBoot =
       mode === 'cockpit' && fromMode.current === 'embark' && blend.current < 1 && !reduceMotion && !skip.current;
 
@@ -646,9 +732,10 @@ function Rig({
       // 跟船弹簧：距离、横移、高度、注视点都按当前船型长度缩放，
       // 否则蒸汽船（L=26）船头出画、木筏（L=14）又空得只剩海。
       const L = SHIP_L * camScale;
-      const dist = approach ? L * 0.9 : L * 1.35;
-      const az = ((approach ? 60 : 35) * Math.PI) / 180;
-      const el = ((approach ? 12 : 18) * Math.PI) / 180;
+      const vw = view.current;
+      const dist = (approach ? L * 0.95 : L * 1.45) * vw.zoom;
+      const az = ((approach ? 60 : 35) * Math.PI) / 180 + vw.yaw;
+      const el = ((approach ? 12 : 18) * Math.PI) / 180 + vw.pitch;
       const dBack = dist * Math.cos(az) * Math.cos(el);
       const dRight = dist * Math.sin(az) * Math.cos(el);
       const dHeight = dist * Math.sin(el) + 2 + (camScale - 1) * 3;
@@ -672,11 +759,11 @@ function Rig({
           THREE.MathUtils.lerp(g.position.z + laggedFwd.z * 0.6 * L, harbor.z, 0.35),
         );
       } else {
-        look.copy(g.position).addScaledVector(laggedFwd, 0.3 * L).setY(followOff.current.lookY);
+        look.copy(g.position).addScaledVector(laggedFwd, 0.3 * L * Math.min(vw.zoom, 1.6)).setY(followOff.current.lookY);
       }
       camera.up.copy(UP);
       camera.lookAt(look);
-      persp.fov = THREE.MathUtils.lerp(persp.fov, approach ? 42 : pose.fov, 1 - Math.exp(-clamped / 0.35));
+      persp.fov = THREE.MathUtils.lerp(persp.fov, approach ? 46 : 54, 1 - Math.exp(-clamped / 0.35));
       persp.updateProjectionMatrix();
     } else {
       camera.position.lerpVectors(blendFrom.current, pose.pos, k);

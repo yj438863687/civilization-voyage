@@ -1120,6 +1120,7 @@ export function App() {
                   />
                 </div>
                 <div className="faint">WASD 航行 · E 拾取 · F 靠港</div>
+                <div className="faint">滚轮缩放 · 拖动环视 · 双击复位</div>
               </div>
             )}
           </div>
