@@ -9,6 +9,8 @@ import { stanceFor } from './world/stances';
 import { chartSummary } from './world/chart';
 import { BOOST_NAME, addPath, addSupply, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
 import { EncounterOverlay } from './components/Encounter';
+import { PlayerGate } from './components/PlayerGate';
+import { sessionPlayer, signOut, type Player } from './player';
 import { ShoreOverlay, SpiritMap, StoryCaption, StoryPage } from './components/Story';
 import { ISLAND_OFFSET, VILLAGE_OFFSET, fableLive } from './world/fable';
 import { TAOYUAN, TAOYUAN_ECHO, TAOYUAN_ENC, TAOYUAN_FINALE, TAOYUAN_HINT } from './world/taoyuan';
@@ -340,6 +342,8 @@ export function App() {
   const [ship, setShip] = useState<ShipSnapshot | null>(null);
   const [input, setInput] = useState<ControlInput>({ forward: 0, turn: 0 });
   const [busy, setBusy] = useState(false);
+  /** 玩家：名字与口令只在本机。没登录过就先登船 */
+  const [player, setPlayer] = useState<Player | null>(() => sessionPlayer());
   const [camBlend, setCamBlend] = useState(1);
   const [cine, setCine] = useState(false);
   /** 靠港戏：0..1 的时间轴，和镜头对齐；面板要等它走到 1 才出现 */
@@ -1220,6 +1224,8 @@ export function App() {
           reduceMotion={reduceMotion}
           canSail={view === 'world' && !sealBeat && !enc && !crisis && !secret}
           taoyuanFound={!!stats.secrets.taoyuan}
+          player={player?.name ?? null}
+          highlightEra={view === 'embark' ? (scenePick?.id === 'neutral-test' ? 'test' : ((scenePick?.id as 'A' | 'B' | 'C' | 'D' | undefined) ?? null)) : null}
           fableState={progress.state}
           crisisDone={!!story && progress.crisis.includes(story.crisis.id)}
           stageAt={stageAt}
@@ -1377,6 +1383,10 @@ export function App() {
                     }}
                   />
                 </div>
+                <div className="hud-player" title={player ? `编号 ${player.id}` : ''}>
+                  <span>船长</span>
+                  <b>{player?.name ?? '—'}</b>
+                </div>
                 <div className="hud-stats" aria-label="补给与人心">
                   <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`}>
                     补给 <b>{stats.supply}</b>
@@ -1419,6 +1429,8 @@ export function App() {
 
       {/* 出发页只剩画面字，不挂提示条 */}
       {/* 海上不再挂教练条：铜针、旁白和门的光柱已经在指路 */}
+      {!player && <PlayerGate onDone={setPlayer} />}
+      <div className={player ? '' : 'is-gated'} aria-hidden={player ? undefined : true}>
       {!['embark', 'reflection', 'cockpit', 'world'].includes(view) && (
         <div className={`coach-bar ${view === 'world' || view === 'cockpit' ? 'coach-bar-top' : ''}`}>
           <div className="scrim">
@@ -1573,6 +1585,7 @@ export function App() {
         </div>
       )}
       {(view === 'embark' || cine) && <div className="letterbox" aria-hidden />}
+      </div>
       {pickupFlash && (
         <div className="pickup-flash" aria-live="polite">
           已收入货舱 · {pickupFlash}
@@ -1587,8 +1600,14 @@ export function App() {
           <div className="cine-embark-main">
             <h1 className="cine-embark-title">文明航程</h1>
             <p className="cine-embark-sub">
-              问一件事，对照两种看法，由你落印，再靠港去做。航向由你决定。
+              四扇窗，四个时代。船停在它们中间，等你选一扇走进去。
             </p>
+            {scenePick && EPOCH_INTRO[scenePick.id] && (
+              <p className="cine-embark-era" key={scenePick.id}>
+                <span>{EPOCH_INTRO[scenePick.id].era} · {EPOCH_INTRO[scenePick.id].title}</span>
+                {EPOCH_INTRO[scenePick.id].line}
+              </p>
+            )}
 
             <div className="cine-embark-scenes">
               {scenes.map((sc) => {
@@ -1612,6 +1631,19 @@ export function App() {
               <SealButton label="启航" disabled={busy} hint="" onSeal={() => void createVoyage()} />
               <button className="cine-link" type="button" onClick={() => setReduceMotion((v) => !v)}>
                 {reduceMotion ? '已减少动态' : '减少动态效果'}
+              </button>
+            </div>
+            <div className="cine-player">
+              <span>船长 · {player?.name ?? '—'}</span>
+              <button
+                className="cine-link"
+                type="button"
+                onClick={() => {
+                  signOut();
+                  setPlayer(null);
+                }}
+              >
+                换一位船长
               </button>
             </div>
 

@@ -13,8 +13,8 @@
  * 人物与情节都是概念创作，不复原任何具体历史人物。
  */
 
-export type Hat = 'straw' | 'wrap' | 'cap' | 'bowler' | 'headset' | 'visor' | 'none';
-export type Prop = 'hoe' | 'pole' | 'shovel' | 'ledger' | 'key' | 'tablet' | 'mallet' | 'none';
+export type Hat = 'straw' | 'wrap' | 'cap' | 'bowler' | 'headset' | 'visor' | 'guan' | 'none';
+export type Prop = 'hoe' | 'pole' | 'shovel' | 'ledger' | 'key' | 'tablet' | 'mallet' | 'urn' | 'staff' | 'none';
 
 export interface Look {
   coat: string;
@@ -25,6 +25,8 @@ export interface Look {
   prop: Prop;
   /** 智能段的人身上有一道冷光：不是装饰，是他总连着什么 */
   glow?: string;
+  /** 眼睛几只：仓颉相传「四目」，浑沌没有七窍 */
+  eyes?: 0 | 2 | 4;
 }
 
 export interface Outcome {
@@ -37,7 +39,9 @@ export interface Outcome {
 
 /** 岛上的人在做什么：决定他的动作和岛上的景 */
 export type Action = 'idle' | 'watch' | 'hammer' | 'shovel' | 'tap' | 'count';
-export type Stage = 'gate' | 'stakes';
+export type Stage =
+  | 'gate' | 'stakes' | 'tally' | 'jars' | 'well' | 'loom' | 'books' | 'press'
+  | 'cave' | 'elephant' | 'beacon' | 'goose' | 'brooms' | 'hundun' | 'butterflies' | 'automaton';
 
 export type Game =
   | {
@@ -111,6 +115,16 @@ const LOOK = {
   pilotOld: { coat: '#5a3a2a', trim: '#c9a15a', skin: '#b58a6a', pants: '#2e231b', hat: 'cap', prop: 'ledger' },
 } satisfies Record<string, Look>;
 
+/** 玩家自己的穿着：跟着时代换，但一直是同一个人（那块靛蓝）。 */
+export const PLAYER_LOOK: Record<string, Look> = {
+  test: { coat: '#2c3e50', trim: '#c9a15a', skin: '#c19474', pants: '#1e2a33', hat: 'none', prop: 'none' },
+  'neutral-test': { coat: '#2c3e50', trim: '#c9a15a', skin: '#c19474', pants: '#1e2a33', hat: 'none', prop: 'none' },
+  A: { coat: '#3a4a52', trim: '#b08a4a', skin: '#c19474', pants: '#2c2620', hat: 'straw', prop: 'none' },
+  B: { coat: '#2f3a46', trim: '#c9a15a', skin: '#c19474', pants: '#232a32', hat: 'cap', prop: 'none' },
+  C: { coat: '#2c4a56', trim: '#d7c59a', skin: '#c19474', pants: '#1f2d34', hat: 'none', prop: 'none' },
+  D: { coat: '#2a3450', trim: '#c8d2f5', skin: '#c19474', pants: '#1a2030', hat: 'none', prop: 'none', glow: undefined },
+};
+
 /** 甲板上的两个人，每个时代不一样：船换了，站在船上的人也换了。 */
 export const DECK_CREW: Record<string, [Look, Look]> = {
   test: [LOOK.sailor, LOOK.pilotOld],
@@ -132,6 +146,27 @@ export const BOOST_NAME: Record<string, string> = {
 };
 
 /* ---------------- 每件材料旁边的人 ---------------- */
+
+
+/* ---------------- 典籍与史书里的人 ---------------- */
+const CL = {
+  gun: { coat: '#5a4a36', trim: '#3a2c1e', skin: '#a77c58', pants: '#3a2c1e', hat: 'wrap', prop: 'shovel' },
+  yu: { coat: '#6a5a40', trim: '#8a7448', skin: '#a07450', pants: '#4a3a26', hat: 'straw', prop: 'hoe' },
+  cangjie: { coat: '#7a6a4e', trim: '#c9a15a', skin: '#b98d66', pants: '#4a3a28', hat: 'wrap', prop: 'none', eyes: 4 },
+  houji: { coat: '#7a6a3e', trim: '#5a4a28', skin: '#b38660', pants: '#4a3a24', hat: 'straw', prop: 'hoe' },
+  elder: { coat: '#8a7a5e', trim: '#5a4a34', skin: '#b08a6a', pants: '#4a3e2c', hat: 'wrap', prop: 'urn' },
+  weaver: { coat: '#4a4038', trim: '#8a7448', skin: '#b08870', pants: '#2e2a26', hat: 'cap', prop: 'mallet' },
+  lin: { coat: '#2a3a4a', trim: '#c9a15a', skin: '#c49a76', pants: '#1e2630', hat: 'guan', prop: 'ledger' },
+  wei: { coat: '#3a3a3e', trim: '#a89a7a', skin: '#c29a78', pants: '#24242a', hat: 'wrap', prop: 'ledger' },
+  prisoner: { coat: '#4a4440', trim: '#2a2622', skin: '#a8866a', pants: '#2e2a26', hat: 'none', prop: 'none' },
+  blind: { coat: '#6a5a48', trim: '#4a3e30', skin: '#b08a6a', pants: '#3a3026', hat: 'wrap', prop: 'pole', eyes: 0 },
+  king: { coat: '#6a2a22', trim: '#d8b060', skin: '#c49a76', pants: '#3a1a14', hat: 'guan', prop: 'none' },
+  suwu: { coat: '#5a5246', trim: '#c8a070', skin: '#a8805e', pants: '#3a342a', hat: 'wrap', prop: 'staff' },
+  apprentice: { coat: '#3a3a5a', trim: '#c8b070', skin: '#d2a789', pants: '#24243a', hat: 'cap', prop: 'none' },
+  hundun: { coat: '#c8b898', trim: '#8a7a5a', skin: '#d8c8a8', pants: '#8a7a5a', hat: 'none', prop: 'none', eyes: 0 },
+  zhuang: { coat: '#6a6a5a', trim: '#a8a080', skin: '#c49a76', pants: '#3a3a30', hat: 'wrap', prop: 'none' },
+  yanshi: { coat: '#5a4a3a', trim: '#c9a15a', skin: '#b88c6a', pants: '#3a2e22', hat: 'cap', prop: 'mallet' },
+} satisfies Record<string, Look>;
 
 export const ENCOUNTERS: Record<string, Encounter> = {
   /* ---------- 启航港 ---------- */
@@ -173,190 +208,332 @@ export const ENCOUNTERS: Record<string, Encounter> = {
     },
   },
 
-  /* ---------- A 农业 ---------- */
+  /* ---------- A 农业 · 治水：鲧与禹 ---------- */
   'A-water': {
-    who: '看水的人',
-    role: '第一座小岛上，只住着他一个',
-    look: LOOK.farmer,
-    action: 'watch',
-    stage: 'gate',
-    line: '他站在一道木闸旁边，盯着河水，一动不动。',
+    who: '鲧',
+    role: '《山海经》：「鲧窃帝之息壤以堙洪水」',
+    look: CL.gun,
+    action: 'shovel',
+    stage: 'stakes',
+    line: '这座岛被一圈土堤围着。一个人在往堤上填土，填了九年，水一直没有退。',
     dialog: [
-      { you: '你为什么一直看着水？' },
-      { them: '因为水会走。我一眨眼，它就只往一边流。' },
-      { you: '那你什么时候休息？' },
-      { them: '河不休息，我也就不休息。——你来帮我扶一会儿闸吧。' },
+      { you: '你为什么一直在加高堤坝？' },
+      { them: '水来了，就挡住它。挡得越高，越安全。' },
+      { you: '可水一直在涨。' },
+      { them: '那就再高一点。——你说，最后这一段，是接着堵上，还是给它留条路？' },
     ],
-    game: { kind: 'hold', verb: '按住提闸', label: '两边的田都喝到水', band: [0.42, 0.62], secs: 3.2, drift: 0.42 },
-    win: { text: '两块田都喝到了水。他第一次坐了下来，说：「你看，水是可以分的。」', supply: 6, trust: 8, set: { gate: 'even' } },
-    lose: { text: '左边的田汪成一片，右边的田裂开了口子。他没有怪你：「明天再分。水每天都来。」', supply: 0, trust: -2, set: { gate: 'tilt' } },
+    game: {
+      kind: 'choice',
+      ask: '最后一段堤',
+      options: [
+        { label: '堵上', note: '照他的办法：水来土掩', out: { text: '你帮他把最后一段堤也堵上了。水被挡在外面，越积越高。「九年而水不息。」', supply: 4, trust: -4, set: { stakes: 'closed' } } },
+        { label: '留一道口子', note: '给水一条出路', out: { text: '你在堤上开了一道口子。水从口子里流走了一些。鲧看着它，很久没有说话。', supply: -2, trust: 8, set: { stakes: 'gap' } } },
+      ],
+    },
   },
   'A-stake': {
-    who: '立桩的人',
-    role: '第二座小岛上，只住着他一个',
-    look: LOOK.elder,
-    action: 'hammer',
-    stage: 'stakes',
-    line: '这座岛上传来一下一下的敲打声。他在钉桩，岛上已经钉满了桩。',
+    who: '禹',
+    role: '《史记》：「居外十三年，过家门不敢入」',
+    look: CL.yu,
+    action: 'watch',
+    stage: 'gate',
+    line: '下一座岛上，一个晒得很黑的人在开渠。岛那头有一间屋子，门口有人在等他。',
     dialog: [
-      { you: '你为什么要钉这么多桩？' },
-      { them: '钉了桩，这块地就是我的。' },
-      { you: '那流过你地里的水呢？水也是你的吗？' },
-      { them: '……我还没想过。还剩最后一段，你说，围上，还是留个口子？' },
+      { you: '你的家就在那里，为什么不回去？' },
+      { them: '我父亲用堵的办法，治了九年，没有成。我不能再那样。' },
+      { you: '那你要怎么办？' },
+      { them: '水要往低处去，就顺着它，替它开路，把它分到两边的田里去。帮我扶住这道闸。' },
+    ],
+    game: { kind: 'hold', verb: '按住提闸', label: '两边的田都喝到水', band: [0.42, 0.62], secs: 3.2, drift: 0.42 },
+    win: { text: '水顺着渠分到了两边的田里。禹抬头看了一眼家门，又低下头去开下一条渠。', supply: 6, trust: 8, set: { gate: 'even' } },
+    lose: { text: '水偏到了一边，一块田淹了，一块田裂了。禹说：再来。他又一次走过了家门。', supply: 0, trust: -2, set: { gate: 'tilt' } },
+  },
+
+  /* ---------- A 农业 · 记时：仓颉与后稷 ---------- */
+  'A-bone': {
+    who: '仓颉',
+    role: '《淮南子》：「仓颉作书，而天雨粟，鬼夜哭」',
+    look: CL.cangjie,
+    action: 'count',
+    stage: 'tally',
+    line: '岛上立着一块石头。一个长着四只眼睛的人，在上面刻着鸟兽的足迹。',
+    dialog: [
+      { you: '你在刻什么？' },
+      { them: '我看鸟的爪印、兽的蹄印，把它们变成记号。记号就是字。' },
+      { you: '有了字会怎样？' },
+      { them: '人会记住很多事，也会忘了很多事。——天要下粟了，鬼要哭了。帮我刻完这几个字。' },
+    ],
+    game: { kind: 'rhythm', verb: '刻字', label: '刀落进亮圈', beats: 5, speed: 0.85 },
+    win: { text: '最后一笔刻完，天上真的落下了谷粒。远处，有什么东西在夜里哭了。', supply: 8, trust: 6, set: { tally: 'full' } },
+    lose: { text: '有两个字刻歪了。仓颉说：没关系，后人会替我们改。可有些事，从此记错了。', supply: 2, trust: 0, set: { tally: 'missed' } },
+  },
+  'A-granary': {
+    who: '后稷',
+    role: '《史记》：「好耕农，相地之宜……民皆法则之」',
+    look: CL.houji,
+    action: 'hammer',
+    stage: 'jars',
+    line: '这座岛上是一片麦田。一个人在田里弯着腰，身后排着一排陶罐。',
+    dialog: [
+      { you: '你为什么把谷子装进罐子？' },
+      { them: '吃掉的是今天，罐子里的是明年。' },
+      { you: '可是今天有人饿着。' },
+      { them: '所以要会种，也要会存。收成到了，帮我把谷子装进去，别让老鼠钻了空子。' },
+    ],
+    game: { kind: 'catch', verb: '端着篮子接', good: '谷粒', bad: '老鼠', need: 8, secs: 9 },
+    win: { text: '罐子都装满了。后稷说：这些够过冬，也够明年下种。', supply: 12, trust: 4, set: { jars: 'full' } },
+    lose: { text: '罐子只装了一半。后稷说：今年要省着吃，种子不能动。', supply: 2, trust: -2, set: { jars: 'low' } },
+  },
+
+  /* ---------- B 工业 · 动力：汉阴丈人与卢德派 ---------- */
+  'B-coal': {
+    who: '汉阴丈人',
+    role: '《庄子·天地》：「有机械者必有机事」',
+    look: CL.elder,
+    action: 'idle',
+    stage: 'well',
+    line: '岛上有一口井。一个老人抱着一只瓮，一趟一趟走下井去打水，再抱上来浇菜。',
+    dialog: [
+      { you: '旁边就有桔槔，一天能浇一百畦，你为什么不用？' },
+      { them: '我知道它。「有机械者必有机事，有机事者必有机心。」' },
+      { you: '机心？' },
+      { them: '心里有了取巧的念头，就不再纯白了。——你要我用它吗？' },
     ],
     game: {
       kind: 'choice',
-      ask: '最后一段桩',
+      ask: '桔槔用不用',
       options: [
-        {
-          label: '围上',
-          note: '地全是他的，水路也被围在里面',
-          out: { text: '他把最后几根桩钉死。地是他的了。水被关在了桩外面，在岸边打着转。', supply: 6, trust: -6, set: { stakes: 'closed' } },
-        },
-        {
-          label: '留一道口子',
-          note: '他少一块地，水能流到下游',
-          out: { text: '他在桩之间留了一道口子。水从口子里流过去，流向下游别人的地。他看了很久，说：「原来水不是我的。」', supply: -2, trust: 10, set: { stakes: 'gap' } },
-        },
+        { label: '劝他用', note: '一天浇一百畦，省下力气', out: { text: '老人试了一下桔槔。水哗哗地上来了。他站着看了很久，说：「快是快了。」', supply: 10, trust: -4, set: { machine: 'yes' } } },
+        { label: '帮他抱瓮', note: '慢，可他心里是安的', out: { text: '你陪他抱瓮打了一天水。菜浇完了，太阳也落了。他说：「你也看见了，慢的东西，心是静的。」', supply: -4, trust: 8, set: { machine: 'no' } } },
       ],
     },
-  },
-  'A-bone': {
-    who: '记数的女人',
-    role: '在骨片上划线',
-    look: LOOK.counter,
-    line: '月亮圆一次，我划一道。你帮我数，别漏了。',
-    game: { kind: 'rhythm', verb: '划一道', label: '月亮升到亮圈时', beats: 5, speed: 1.05 },
-    win: { text: '骨片上整整齐齐五道。她说，下一个圆月之前要下种。', supply: 4, trust: 6 },
-    lose: { text: '漏了一道。她把骨片翻过来，在背面重新开始数。', supply: 0, trust: 0 },
-  },
-  'A-granary': {
-    who: '看仓的人',
-    role: '守着陶罐过冬',
-    look: LOOK.elder,
-    line: '谷子从罐口漏出来了。接住谷粒，别让老鼠钻进去。',
-    game: { kind: 'catch', verb: '端着篮子接', good: '谷粒', bad: '老鼠', need: 8, secs: 9 },
-    win: { text: '罐子封上了。这一冬，留下的人不用再走。', supply: 12, trust: 4 },
-    lose: { text: '漏了不少。罐里的谷子撑不到开春，有几户人家又上了船。', supply: 2, trust: -4 },
-  },
-
-  /* ---------- B 工业 ---------- */
-  'B-coal': {
-    who: '司炉',
-    role: '炉前的人',
-    look: LOOK.stoker,
-    line: '一铲一铲跟着节拍来，乱了，炉膛就闷了。',
-    game: { kind: 'rhythm', verb: '铲煤', label: '铲进炉口亮圈', beats: 6, speed: 1.2 },
-    win: { text: '炉火一直是白的。船跑得飞快，司炉的手背上又多了一道烫痕。', supply: 10, trust: 2 },
-    lose: { text: '炉膛闷了一下，船慢了半程。司炉说，不怪你，是煤湿了。', supply: 2, trust: 2 },
   },
   'B-gauge': {
-    who: '轮机长',
-    role: '盯着汽压表的人',
-    look: LOOK.clerk,
-    line: '压力低了跑不动，高了要炸。给我稳在这一段。',
-    game: { kind: 'hold', verb: '按住加压', label: '安全又够快', band: [0.58, 0.76], secs: 3.4, drift: 0.55 },
-    win: { text: '指针稳稳停在那一段。轮机长在日志上写：今日航速最高。', supply: 8, trust: 4 },
-    lose: { text: '安全阀叫了一声。没出事，但炉前的人全被蒸汽烫了一下。', supply: 0, trust: -8 },
-  },
-  'B-ticket': {
-    who: '检票员',
-    role: '把人分进舱位',
-    look: LOOK.clerk,
-    line: '风把票根吹散了。接住票，别接到煤渣。',
-    game: { kind: 'catch', verb: '伸手去接', good: '票根', bad: '煤渣', need: 8, secs: 9 },
-    win: { text: '票都收齐了。三等舱的人一个没落下。', supply: 6, trust: 6 },
-    lose: { text: '有几张票没找到。那几个人被请下了船。', supply: 4, trust: -6 },
-  },
-  'B-shift': {
-    who: '值班的锅炉工',
-    role: '刚下夜班',
-    look: LOOK.stoker,
-    line: '敲钟换班。钟敲准了，下一班的人才知道该上来了。',
-    game: { kind: 'rhythm', verb: '敲钟', label: '钟锤落进亮圈', beats: 4, speed: 0.95 },
-    win: { text: '换班准时。下夜班的人终于睡下了。', supply: 4, trust: 8 },
-    lose: { text: '钟敲乱了，下一班晚上来半个钟头。没人记账，只有炉前的人多站了半个钟头。', supply: 4, trust: -6 },
-  },
-
-  /* ---------- C 信息 ---------- */
-  'C-screen': {
-    who: '值守员',
-    role: '盯着整面屏幕墙',
-    look: LOOK.watcher,
-    line: '信号点在往下掉。接住亮的，噪点别碰。',
-    game: { kind: 'catch', verb: '移动接收框', good: '信号', bad: '噪点', need: 9, secs: 9 },
-    win: { text: '屏幕墙上每一格都亮着。值守员说，看得见的，就像存在。', supply: 6, trust: 4 },
-    lose: { text: '有几格黑了。值守员把它们标成「无数据」，然后就不再看那里。', supply: 4, trust: -4 },
-  },
-  'C-dark': {
-    who: '岛上的人',
-    role: '那条断线的另一头',
-    look: LOOK.counter,
-    line: '我们这里只有很弱的信号。你能把频率稳住，让我们说一句话吗？',
-    game: { kind: 'hold', verb: '按住调频', label: '能听见', band: [0.36, 0.5], secs: 3.4, drift: 0.5 },
-    win: { text: '你听见了一句很轻的话：「我们还在。」', supply: 0, trust: 14 },
-    lose: { text: '只听见一阵沙沙声。断点还是断点。', supply: 0, trust: -4 },
-  },
-  'C-relay': {
-    who: '报务员',
-    role: '在中继站转发',
-    look: LOOK.operator,
-    line: '点、划、点。跟着我按，信号才能往下传。',
-    game: { kind: 'rhythm', verb: '按电键', label: '按在亮圈里', beats: 6, speed: 1.3 },
-    win: { text: '电报一字不差地传了下去。对面回了一个「收到」。', supply: 6, trust: 6 },
-    lose: { text: '中间错了两个字。对面回电：请重发。', supply: 2, trust: 0 },
-  },
-  'C-tz': {
-    who: '夜班接线员',
-    role: '别人的白天，她的夜',
-    look: LOOK.operator,
-    line: '把钟拨到对面的白天。他们醒着的时候，我们得醒着。',
-    game: { kind: 'hold', verb: '按住拨钟', label: '对面的白天', band: [0.66, 0.82], secs: 3, drift: 0.46 },
-    win: { text: '两边的钟对上了。她摘下耳机，窗外已经快亮了。', supply: 6, trust: 4 },
-    lose: { text: '钟没拨准。电话在对面的深夜里响了很久。', supply: 2, trust: -4 },
-  },
-
-  /* ---------- D 智能 ---------- */
-  'D-log': {
-    who: '值守工程师',
-    role: '唯一读日志的人',
-    look: LOOK.engineer,
-    line: '三万行日志，跟着节拍校一遍。错一行，没人会发现。',
-    game: { kind: 'rhythm', verb: '校验', label: '在亮圈里确认', beats: 6, speed: 1.4 },
-    win: { text: '你找到一行它没告诉你的决定：略过了一座港。', supply: 4, trust: 10 },
-    lose: { text: '日志滚得太快。你按了「全部确认」。', supply: 4, trust: -6 },
-  },
-  'D-skip': {
-    who: '被略过的港口的守灯人',
-    role: '灯还亮着',
-    look: LOOK.keeper,
-    line: '船从这里过去三次了，一次也没停。你这次要停吗？',
+    who: '织工',
+    role: '卢德运动（1811—1816，英国）',
+    look: CL.weaver,
+    action: 'hammer',
+    stage: 'loom',
+    line: '岛上的作坊里，一群织工举着锤子，围着一台新的织机。',
+    dialog: [
+      { you: '你们为什么要砸它？' },
+      { them: '一台机器，顶我们十个人。老板买了它，我们的孩子就没有饭吃。' },
+      { you: '砸了它，就会好吗？' },
+      { them: '……不知道。可总得有人听见我们。你说，砸，还是不砸？' },
+    ],
     game: {
       kind: 'choice',
-      ask: '要不要停',
+      ask: '织机',
       options: [
-        { label: '停下来', note: '慢一程，绕回去', out: { text: '你让它停了。它重新算了一遍，说：航程增加 14%。守灯人递上来一封信。', supply: -8, trust: 14 } },
-        { label: '让它继续', note: '它算过了，这样最快', out: { text: '船没有停。灯在船尾越来越小。', supply: 8, trust: -8 } },
+        { label: '和他们一起砸', note: '让人听见：机器后面还有人', out: { text: '织机碎了。第二天来了士兵。可从那以后，「卢德」成了一个名字，说的是不肯被机器碾过去的人。', supply: -6, trust: 10, set: { loom: 'broken' } } },
+        { label: '劝他们放下锤子', note: '机器会来的，想想别的办法', out: { text: '他们放下了锤子。织机转起来了，织得又快又密。作坊门口，多了几个找活干的人。', supply: 8, trust: -6, set: { loom: 'running' } } },
       ],
     },
   },
+
+  /* ---------- B 工业 · 出路：林则徐与魏源 ---------- */
+  'B-ticket': {
+    who: '林则徐',
+    role: '组织翻译《四洲志》，「开眼看世界」',
+    look: CL.lin,
+    action: 'count',
+    stage: 'books',
+    line: '岛上的屋子里堆满了外国的书报。一个穿官服的人，在灯下一页一页地翻。',
+    dialog: [
+      { you: '你为什么要读外国人的书？' },
+      { them: '他们的船为什么能逆风而来，炮为什么打得那样远，我们一概不知。' },
+      { you: '知道了又怎样？' },
+      { them: '不知道，就只能挨打。风把译稿吹散了——帮我接住，别让谣言混进来。' },
+    ],
+    game: { kind: 'catch', verb: '伸手去接', good: '译稿', bad: '谣言', need: 8, secs: 9 },
+    win: { text: '译稿都收齐了，编成了一本《四洲志》。林则徐说：这是一扇窗，开得小，总算开了。', supply: 6, trust: 6, set: { eyes: 'open' } },
+    lose: { text: '有几页译稿被风吹走了，几条谣言夹了进来。书还是编成了，只是窗上蒙着一层灰。', supply: 4, trust: -4, set: { eyes: 'half' } },
+  },
+  'B-shift': {
+    who: '魏源',
+    role: '著《海国图志》：「师夷之长技以制夷」',
+    look: CL.wei,
+    action: 'count',
+    stage: 'press',
+    line: '下一座岛上，一个书生接过了林则徐的译稿，要把它扩成一部大书。',
+    dialog: [
+      { you: '你要把这本书写给谁看？' },
+      { them: '写给所有还以为天下只有我们的人。「师夷之长技以制夷。」' },
+      { you: '他们会看吗？' },
+      { them: '不知道。书印出来，也可能被束之高阁。你说，印，还是不印？' },
+    ],
+    game: {
+      kind: 'choice',
+      ask: '《海国图志》',
+      options: [
+        { label: '印出来，送到每个港口', note: '让更多人看见外面', out: { text: '书印出来了，送到了每一个港口。看的人不多。后来它漂洋过海，在日本被人一读再读。', supply: -6, trust: 10, set: { book: 'printed' } } },
+        { label: '先放一放', note: '时局未定，不必张扬', out: { text: '书稿锁进了柜子。又过了很多年，才有人把它找出来，说：当年要是早点看见就好了。', supply: 4, trust: -8, set: { book: 'shelved' } } },
+      ],
+    },
+  },
+
+  /* ---------- C 信息 · 看见：洞穴与盲人摸象 ---------- */
+  'C-screen': {
+    who: '洞穴里的囚徒',
+    role: '柏拉图《理想国》卷七',
+    look: CL.prisoner,
+    action: 'watch',
+    stage: 'cave',
+    line: '岛上有一个洞。洞里的人背对着洞口坐着，看着墙上晃动的影子。',
+    dialog: [
+      { you: '你在看什么？' },
+      { them: '世界。墙上的这些，就是全部的世界。' },
+      { you: '身后有火，还有洞口外的光。你不转过身看看吗？' },
+      { them: '转过去……眼睛会疼的。你扶着我，慢慢转。' },
+    ],
+    game: { kind: 'hold', verb: '按住，扶他慢慢转过身', label: '看见火光', band: [0.62, 0.8], secs: 3.4, drift: 0.5 },
+    win: { text: '他转过身，看见了火，又看见了洞口外的光。他哭了，说：原来墙上的都是影子。', supply: 2, trust: 10, set: { cave: 'turned' } },
+    lose: { text: '光太刺眼了，他又转了回去，盯着墙上的影子说：还是这里好。', supply: 4, trust: -4, set: { cave: 'stayed' } },
+  },
+  'C-dark': {
+    who: '摸象的盲人',
+    role: '《大般涅槃经》：众盲摸象',
+    look: CL.blind,
+    action: 'idle',
+    stage: 'elephant',
+    line: '这座岛上站着一头大象。几个看不见的人围着它，各自摸着一块地方，吵个不停。',
+    dialog: [
+      { you: '你们在吵什么？' },
+      { them: '象像一根柱子！——不对，像一把扇子！——明明像一条绳子！' },
+      { you: '你们说的都对，又都不对。' },
+      { them: '那你告诉我们，象到底是什么样子？' },
+    ],
+    game: {
+      kind: 'choice',
+      ask: '象',
+      options: [
+        { label: '牵着他们，一起摸一遍', note: '慢，但每个人都摸到了全身', out: { text: '你牵着他们，从象鼻摸到象尾。他们不吵了，过了很久，有人说：原来它这么大。', supply: -4, trust: 10, set: { elephant: 'whole' } } },
+        { label: '直接告诉他们答案', note: '快，可他们只能信你', out: { text: '你说：象就是这样那样。他们点点头。可下一次，有人告诉他们别的样子，他们也点了点头。', supply: 4, trust: -4, set: { elephant: 'told' } } },
+      ],
+    },
+  },
+
+  /* ---------- C 信息 · 传信：烽火与鸿雁 ---------- */
+  'C-relay': {
+    who: '周幽王',
+    role: '《史记·周本纪》：烽火戏诸侯',
+    look: CL.king,
+    action: 'idle',
+    stage: 'beacon',
+    line: '岛上的山头排着一座座烽火台。一个戴冠的人站在最高处，身边的人一直不笑。',
+    dialog: [
+      { you: '烽火是有敌人来时才点的，你为什么要点它？' },
+      { them: '诸侯会带着兵马跑来，一个个慌慌张张。她看了，就会笑。' },
+      { you: '可下一次，敌人真的来了呢？' },
+      { them: '……下一次再说。你替我点吧。' },
+    ],
+    game: {
+      kind: 'choice',
+      ask: '烽火',
+      options: [
+        { label: '点火', note: '她会笑', out: { text: '烽火一座接一座亮起来。诸侯赶到，发现没有敌人。她笑了。后来敌人真的来了，烽火再亮，没有一个人来。', supply: 2, trust: -12, set: { beacon: 'lit' } } },
+        { label: '不点', note: '信号只留给真的危险', out: { text: '你没有点火。烽火台一直黑着，安安静静地等着那一天。', supply: 0, trust: 8, set: { beacon: 'kept' } } },
+      ],
+    },
+  },
+  'C-tz': {
+    who: '苏武',
+    role: '《汉书》：「天子射上林中，得雁，足有系帛书」',
+    look: CL.suwu,
+    action: 'watch',
+    stage: 'goose',
+    line: '岛的北边是一片冰冷的湖，一个人拄着光秃秃的节杖，看着天上的雁。',
+    dialog: [
+      { you: '你在这里多久了？' },
+      { them: '十九年。牧羊，持节，等一封信。' },
+      { you: '你写过信吗？' },
+      { them: '写不出去。听说汉家的使者告诉单于，天子在上林苑射下一只雁，雁脚上绑着我的信——其实没有那只雁，可那句话，把我救了回去。帮我接住那封信吧。' },
+    ],
+    game: { kind: 'catch', verb: '移动双手去接', good: '帛书', bad: '雁羽', need: 7, secs: 9 },
+    win: { text: '你接住了那封帛书。上面一个字也没有。苏武笑了：有时候，人们愿意相信的消息，比真的消息走得更远。', supply: 4, trust: 8, set: { letter: 'got' } },
+    lose: { text: '帛书落进了湖里。苏武说：不要紧，消息本来就不在帛上，在说它的人嘴里。', supply: 2, trust: 0, set: { letter: 'lost' } },
+  },
+
+  /* ---------- D 智能 · 目的：魔法师的学徒与浑沌 ---------- */
+  'D-log': {
+    who: '魔法师的学徒',
+    role: '歌德《魔法师的学徒》（1797）',
+    look: CL.apprentice,
+    action: 'idle',
+    stage: 'brooms',
+    line: '岛上的屋子在冒水。一把把扫帚提着水桶，一趟一趟往屋里倒水，停不下来。',
+    dialog: [
+      { you: '这是怎么回事？' },
+      { them: '师父出门了。我念了咒，让扫帚替我打水——它们打得太好了，可我忘了让它们停下的咒。' },
+      { you: '那怎么办？' },
+      { them: '我把扫帚劈成两半，结果变成了两把！帮我想起那句咒语，快——' },
+    ],
+    game: { kind: 'hold', verb: '按住，念出那句咒语', label: '咒语对上了', band: [0.5, 0.64], secs: 3.4, drift: 0.6 },
+    win: { text: '咒语对上了，扫帚一把一把停了下来，靠回墙角。学徒坐在水里喘着气：原来最难的，是让它停。', supply: 2, trust: 10, set: { broom: 'stopped' } },
+    lose: { text: '咒语没念对，水漫出了门。直到师父回来，一句话就让扫帚停了。学徒低着头：我只学会了开始。', supply: 0, trust: -4, set: { broom: 'flooded' } },
+  },
+  'D-skip': {
+    who: '浑沌',
+    role: '《庄子·应帝王》：「日凿一窍，七日而浑沌死」',
+    look: CL.hundun,
+    action: 'idle',
+    stage: 'hundun',
+    line: '这座岛上住着一个没有脸的人。他没有眼耳口鼻，却待每一个来客都很好。',
+    dialog: [
+      { you: '南海的儵和北海的忽想报答你，要给你凿出七窍。' },
+      { them: '人皆有七窍，以视听食息。他们说，我没有，太可怜了。' },
+      { you: '你自己想要吗？' },
+      { them: '……我不知道。你替我决定吧。' },
+    ],
+    game: {
+      kind: 'choice',
+      ask: '凿不凿',
+      options: [
+        { label: '替他凿开', note: '好心：让他像别人一样', out: { text: '一天凿一窍。第七天，七窍都凿好了，浑沌却死了。凿的人，都是为了他好。', supply: 6, trust: -10, set: { hundun: 'carved' } } },
+        { label: '让他保持原样', note: '他本来就好好的', out: { text: '你放下了凿子。浑沌还是没有脸，还是待每个人都很好。儵和忽不明白，可也没有再提。', supply: -2, trust: 10, set: { hundun: 'whole' } } },
+      ],
+    },
+  },
+
+  /* ---------- D 智能 · 思考：庄周梦蝶与偃师造人 ---------- */
   'D-star': {
-    who: '导航模型',
-    role: '自己画星图',
-    look: LOOK.engineer,
-    line: '这些星点是我算出来的。接住你信得过的，别接那些我猜的。',
-    game: { kind: 'catch', verb: '移动校准框', good: '观测星', bad: '推测点', need: 8, secs: 9 },
-    win: { text: '星图上留下的每一颗，都有人真的看见过。', supply: 4, trust: 8 },
-    lose: { text: '星图里混进了几颗它猜的星。没人分得出来了。', supply: 6, trust: -6 },
+    who: '庄周',
+    role: '《庄子·齐物论》：庄周梦为胡蝶',
+    look: CL.zhuang,
+    action: 'watch',
+    stage: 'butterflies',
+    line: '岛上开满了花，一个人刚刚睡醒，看着满天的蝴蝶发呆。',
+    dialog: [
+      { you: '你在想什么？' },
+      { them: '我梦见自己是一只蝴蝶，飞得很快活，不知道自己是庄周。' },
+      { you: '现在你醒了。' },
+      { them: '醒了吗？「不知周之梦为胡蝶与，胡蝶之梦为周与？」你帮我分一分：哪只是真的，哪只是梦里的。' },
+    ],
+    game: { kind: 'catch', verb: '移动双手去接', good: '真的蝴蝶', bad: '梦里的蝴蝶', need: 7, secs: 9 },
+    win: { text: '你接住的都是真的蝴蝶。庄周看着你的手，笑了：你分得出来——可你怎么知道，你自己不在梦里？', supply: 4, trust: 8, set: { dream: 'awake' } },
+    lose: { text: '真的和梦里的混在了一起，你分不清了。庄周说：分不清，也许才是真的醒了。', supply: 4, trust: 0, set: { dream: 'blurred' } },
   },
   'D-weight': {
-    who: '配重系统',
-    role: '自己算重心',
-    look: LOOK.pilot,
-    line: '风浪变大。你可以手动配重，也可以交给我。',
-    game: { kind: 'hold', verb: '按住移重', label: '船身平稳', band: [0.44, 0.58], secs: 3.4, drift: 0.6 },
-    win: { text: '你亲手把船压稳了。它说：比我的方案慢 0.3 秒。', supply: 2, trust: 10 },
-    lose: { text: '船晃了一下，它接管了。一切平稳，你的手还停在半空。', supply: 6, trust: -4 },
+    who: '偃师',
+    role: '《列子·汤问》：偃师造倡',
+    look: CL.yanshi,
+    action: 'idle',
+    stage: 'automaton',
+    line: '岛上，一个工匠带着他造的「人」在王的面前跳舞唱歌，跳得和真人一模一样。',
+    dialog: [
+      { you: '它是人吗？' },
+      { them: '它会走，会唱，会看人眼色。方才它对王的侍妾眨了眨眼，王大怒，要杀我。' },
+      { you: '那你要怎么证明它不是人？' },
+      { them: '我可以把它拆开给王看。——可你说，要拆吗？' },
+    ],
+    game: {
+      kind: 'choice',
+      ask: '拆不拆',
+      options: [
+        { label: '拆开给王看', note: '证明它只是革、木、胶、漆', out: { text: '拆开来，里面「皆傅会革、木、胶、漆、白、黑、丹、青之所为」。王惊叹：「人之巧乃可与造化者同功乎！」', supply: 6, trust: 4, set: { automaton: 'opened' } } },
+        { label: '让它接着唱', note: '既然分不出来，又何必拆', out: { text: '它接着唱完了那支歌。王听完，没有再问它是什么。你也说不清，它最后那一眼，是不是在看你。', supply: 2, trust: 6, set: { automaton: 'kept' } } },
+      ],
+    },
   },
 };
 

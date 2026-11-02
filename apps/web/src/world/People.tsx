@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import type { Action, Look, Prop } from './encounters';
+import type { Action, Hat, Look, Prop } from './encounters';
 
 /**
  * 程序化的人：没有贴图，只靠体块、颜色、帽子和手里的工具认出时代。
@@ -139,7 +139,7 @@ export function Person({
     if (root.current) root.current.rotation.z = sway * 0.015;
   });
 
-  const prop: Prop = action === 'hammer' ? 'mallet' : look.prop;
+  const prop: Prop = action === 'hammer' && look.prop === 'none' ? 'mallet' : look.prop;
 
   const arm = (
     side: 1 | -1,
@@ -210,14 +210,16 @@ export function Person({
               <sphereGeometry args={[0.155, 18, 14]} />
             </mesh>
             {/* 眼睛与鼻子：有了这两点，人就有了朝向 */}
-            {[-0.052, 0.052].map((x) => (
-              <mesh key={x} position={[x, 0.08, 0.142]} material={M.eye}>
+            {(look.eyes === 0 ? [] : look.eyes === 4 ? [[-0.055, 0.1], [0.055, 0.1], [-0.05, 0.045], [0.05, 0.045]] : [[-0.052, 0.08], [0.052, 0.08]]).map(([x, y]) => (
+              <mesh key={`${x}${y}`} position={[x, y, 0.142]} material={M.eye}>
                 <sphereGeometry args={[0.018, 8, 6]} />
               </mesh>
             ))}
-            <mesh position={[0, 0.03, 0.152]} material={M.skin}>
-              <sphereGeometry args={[0.022, 8, 6]} />
-            </mesh>
+            {look.eyes !== 0 && (
+              <mesh position={[0, 0.03, 0.152]} material={M.skin}>
+                <sphereGeometry args={[0.022, 8, 6]} />
+              </mesh>
+            )}
             <HatMesh hat={look.hat} M={M} />
             {M.glow && (
               <mesh position={[0, 0.1, 0.15]} material={M.glow}>
@@ -286,6 +288,17 @@ function HatMesh({ hat, M }: { hat: Look['hat']; M: Mats }) {
         ))}
       </group>
     );
+  if (hat === 'guan')
+    return (
+      <group position={[0, 0.2, 0]}>
+        <mesh material={M.dark!}>
+          <cylinderGeometry args={[0.1, 0.13, 0.16, 12]} />
+        </mesh>
+        <mesh position={[0, 0.1, 0]} rotation={[0.15, 0, 0]} material={M.trim!}>
+          <boxGeometry args={[0.34, 0.025, 0.2]} />
+        </mesh>
+      </group>
+    );
   if (hat === 'visor')
     return (
       <mesh position={[0, 0.1, 0.02]} material={M.coat!}>
@@ -296,6 +309,24 @@ function HatMesh({ hat, M }: { hat: Look['hat']; M: Mats }) {
 }
 
 function PropMesh({ prop, M }: { prop: Prop; M: Mats }) {
+  if (prop === 'urn')
+    return (
+      <mesh position={[0, 0.02, 0.16]} material={M.wood!}>
+        <sphereGeometry args={[0.17, 12, 10]} />
+      </mesh>
+    );
+  if (prop === 'staff')
+    return (
+      <group>
+        <mesh position={[0, 0.35, 0]} material={M.wood!}>
+          <cylinderGeometry args={[0.02, 0.022, 1.8, 6]} />
+        </mesh>
+        {/* 节上的旄：苏武持节十九年，旄尽落 */}
+        <mesh position={[0, 1.15, 0]} material={M.trim!}>
+          <coneGeometry args={[0.07, 0.3, 8]} />
+        </mesh>
+      </group>
+    );
   if (prop === 'mallet')
     return (
       <group rotation={[Math.PI / 2, 0, 0]}>
@@ -363,24 +394,78 @@ function PropMesh({ prop, M }: { prop: Prop; M: Mats }) {
   return null;
 }
 
-/** 甲板上的一对船员。sceneId 决定他们是谁。 */
+/**
+ * 甲板上的人：右边是船员（那个时代的活），左边是玩家自己（那个时代的衣服）。
+ * 玩家头顶浮着自己的名字——这一程是你的。
+ */
 export function EraDeckCrew({
   crew,
+  player,
   deckY,
   reduceMotion,
 }: {
   crew: [Look, Look];
+  player?: { name: string; look: Look } | null;
   deckY: number;
   reduceMotion?: boolean;
 }) {
   return (
     <group>
-      <group position={[1.58, deckY, -1.55]} rotation={[0, -0.5, 0]} scale={1.28}>
-        <Person look={crew[0]} reduceMotion={reduceMotion} phase={0.3} />
+      {player && (
+        <group position={[-1.62, deckY, -0.9]} rotation={[0, 0.5, 0]} scale={1.3}>
+          <Person look={player.look} action="idle" reduceMotion={reduceMotion} phase={0.9} />
+          <NameTag text={player.name} y={2.28} />
+        </group>
+      )}
+      {/* 大副与二副：戴着这个时代的帽子，站在船的右舷。两人会互相看 */}
+      <group position={[1.58, deckY, -1.55]} rotation={[0, -0.5, 0]} scale={1.45}>
+        <Mascot kind="claude" hat={crew[0].hat} reduceMotion={reduceMotion} phase={0.3} buddy={[-0.2, 0, 2.6]} />
       </group>
-      <group position={[1.48, deckY, 1.05]} rotation={[0, -0.9, 0]} scale={1.22}>
-        <Person look={crew[1]} reduceMotion={reduceMotion} phase={1.7} />
+      <group position={[1.48, deckY, 1.05]} rotation={[0, -0.9, 0]} scale={1.45}>
+        <Mascot kind="gpt" hat={crew[1].hat} reduceMotion={reduceMotion} phase={1.7} buddy={[0.2, 0, -2.6]} />
       </group>
+    </group>
+  );
+}
+
+/** 头顶的名字：一块小小的铜牌，随船轻轻晃 */
+function NameTag({ text, y }: { text: string; y: number }) {
+  const g = useRef<THREE.Group>(null);
+  const map = useMemo(() => {
+    const c = document.createElement('canvas');
+    c.width = 256;
+    c.height = 64;
+    const ctx = c.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, 256, 64);
+      ctx.fillStyle = 'rgba(18,16,12,0.72)';
+      ctx.roundRect?.(6, 8, 244, 48, 10);
+      if (!ctx.roundRect) ctx.fillRect(6, 8, 244, 48);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(201,161,90,0.7)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(8, 10, 240, 44);
+      ctx.fillStyle = '#f6efe0';
+      ctx.font = '500 30px "Noto Serif SC", serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text.slice(0, 8), 128, 34);
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }, [text]);
+  useFrame(({ clock, camera }) => {
+    if (!g.current) return;
+    g.current.position.y = y + Math.sin(clock.elapsedTime * 1.4) * 0.02;
+    g.current.quaternion.copy(camera.quaternion);
+  });
+  return (
+    <group ref={g} position={[0, y, 0]}>
+      <mesh>
+        <planeGeometry args={[1.0, 0.25]} />
+        <meshBasicMaterial map={map} transparent depthWrite={false} toneMapped={false} />
+      </mesh>
     </group>
   );
 }
@@ -427,6 +512,187 @@ export function LaneKeeper({
       </mesh>
       <group position={[0, 0.28, -0.2]} scale={1.3}>
         <Person look={look} reduceMotion={reduceMotion} talking={active} />
+      </group>
+    </group>
+  );
+}
+
+/* ================= 两个伙伴：大副与二副 ================= */
+
+export type MascotKind = 'claude' | 'gpt';
+
+/**
+ * 陪着主角的两个卡通伙伴。致敬两家模型的气质，不照抄任何商标图形：
+ *   大副「克劳德」——暖橙、圆润，胸口一枚星芒，爱看海图、爱点头
+ *   二副「小吉」——深青、修长，胸口一枚圆结，爱数东西、爱东张西望
+ * 戴着那个时代的帽子：草帽、鸭舌帽、耳机、护目镜。
+ */
+export function Mascot({
+  kind,
+  hat = 'none',
+  reduceMotion = false,
+  phase = 0,
+  talking = false,
+  /** 另一个伙伴在哪：会时不时转头看他 */
+  buddy = null,
+}: {
+  kind: MascotKind;
+  hat?: Hat;
+  reduceMotion?: boolean;
+  phase?: number;
+  talking?: boolean;
+  buddy?: [number, number, number] | null;
+}) {
+  const root = useRef<THREE.Group>(null);
+  const body = useRef<THREE.Group>(null);
+  const head = useRef<THREE.Group>(null);
+  const eyes = useRef<THREE.Group>(null);
+  const armL = useRef<THREE.Group>(null);
+  const armR = useRef<THREE.Group>(null);
+  const emblem = useRef<THREE.Group>(null);
+
+  const C = kind === 'claude'
+    ? { body: '#d97b4a', belly: '#f0a878', trim: '#f6e0c8', eye: '#2a1a12', glow: '#ffb070' }
+    : { body: '#1e3a3e', belly: '#2f5a5e', trim: '#bfe8e0', eye: '#0a1414', glow: '#8fe0c8' };
+
+  const M = useMemo(() => {
+    const m = (c: string, r = 0.7, metal = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: metal });
+    return {
+      body: m(C.body, 0.6),
+      belly: m(C.belly, 0.7),
+      trim: m(C.trim, 0.5, 0.2),
+      eyeW: m('#fff8ee', 0.3),
+      eye: m(C.eye, 0.3),
+      dark: m('#1a1612', 0.9),
+      straw: m('#c8a868', 0.95),
+      paper: m('#e8dcc4', 0.9),
+      wood: m('#6a5034', 0.9),
+      iron: m('#4a4d50', 0.45, 0.7),
+      glow: new THREE.MeshStandardMaterial({ color: C.glow, emissive: C.glow, emissiveIntensity: 1.6, toneMapped: false }),
+    };
+  }, [C.body, C.belly, C.trim, C.eye, C.glow]);
+
+  useFrame(({ clock }, dt) => {
+    if (reduceMotion) return;
+    const t = clock.elapsedTime + phase;
+    const k = Math.min(1, dt * 6);
+    // 一上一下地呼吸；说话时跳得欢一点
+    if (root.current) root.current.position.y = Math.sin(t * (talking ? 4 : 1.6)) * (talking ? 0.05 : 0.025);
+    if (body.current) body.current.scale.set(1 + Math.sin(t * 1.6) * 0.015, 1 - Math.sin(t * 1.6) * 0.015, 1);
+    // 眨眼：每三四秒一次
+    if (eyes.current) {
+      const blink = ((t * 0.9) % 3.6) < 0.12 ? 0.08 : 1;
+      eyes.current.scale.y += (blink - eyes.current.scale.y) * Math.min(1, dt * 30);
+    }
+    // 转头：时不时看看伙伴，看看海
+    if (head.current) {
+      const look = buddy ? Math.atan2(buddy[0], buddy[2]) : 0;
+      const phaseLook = Math.sin(t * 0.35) > 0.6 ? look : Math.sin(t * 0.22) * 0.35;
+      head.current.rotation.y += (phaseLook - head.current.rotation.y) * k;
+      head.current.rotation.x += ((talking ? Math.sin(t * 5) * 0.08 : Math.sin(t * 0.9) * 0.03) - head.current.rotation.x) * k;
+      head.current.rotation.z += (Math.sin(t * 0.7) * 0.04 - head.current.rotation.z) * k;
+    }
+    // 手：大副拿着海图上下看；二副掰着指头数。偶尔挥一下手
+    const wave = ((t * 0.5) % 9) < 1.2 ? Math.sin(t * 14) * 0.5 : 0;
+    if (armR.current) {
+      const base = kind === 'claude' ? -1.1 + Math.sin(t * 1.3) * 0.12 : -0.5 + Math.abs(Math.sin(t * 2.2)) * 0.5;
+      armR.current.rotation.x += (base - armR.current.rotation.x) * k;
+      armR.current.rotation.z += (-0.3 - wave - armR.current.rotation.z) * k;
+    }
+    if (armL.current) {
+      const base = kind === 'claude' ? -1.0 + Math.sin(t * 1.3) * 0.12 : -0.2;
+      armL.current.rotation.x += (base - armL.current.rotation.x) * k;
+      armL.current.rotation.z += (0.3 - armL.current.rotation.z) * k;
+    }
+    if (emblem.current) emblem.current.rotation.z = kind === 'claude' ? t * 0.4 : Math.sin(t * 0.8) * 0.2;
+  });
+
+  const tall = kind === 'gpt';
+  const bodyH = tall ? 0.78 : 0.62;
+  const bodyR = tall ? 0.26 : 0.32;
+
+  return (
+    <group ref={root}>
+      <group ref={body}>
+        {/* 脚 */}
+        {[-0.13, 0.13].map((x) => (
+          <mesh key={x} position={[x, 0.07, 0.04]} material={M.dark}>
+            <sphereGeometry args={[0.1, 10, 8]} />
+          </mesh>
+        ))}
+        {/* 身子：一只圆圆的胶囊 */}
+        <mesh position={[0, bodyH / 2 + 0.12, 0]} material={M.body} castShadow>
+          <capsuleGeometry args={[bodyR, bodyH - bodyR * 2 + 0.1, 6, 16]} />
+        </mesh>
+        {/* 肚皮 */}
+        <mesh position={[0, bodyH / 2 + 0.06, bodyR * 0.72]} scale={[0.8, 1, 0.5]} material={M.belly}>
+          <sphereGeometry args={[bodyR * 0.75, 14, 10]} />
+        </mesh>
+        {/* 胸口的记号 */}
+        <group ref={emblem} position={[0, bodyH / 2 + 0.16, bodyR + 0.03]}>
+          {kind === 'claude'
+            ? Array.from({ length: 8 }, (_, i) => (
+                <mesh key={i} rotation={[0, 0, (i / 8) * Math.PI]} material={M.glow}>
+                  <boxGeometry args={[0.2, 0.028, 0.02]} />
+                </mesh>
+              ))
+            : (
+              <>
+                <mesh material={M.glow}>
+                  <torusGeometry args={[0.085, 0.022, 8, 20]} />
+                </mesh>
+                <mesh rotation={[0, 0, Math.PI / 3]} material={M.glow}>
+                  <torusGeometry args={[0.05, 0.016, 8, 16]} />
+                </mesh>
+              </>
+            )}
+        </group>
+        {/* 手臂 */}
+        {([[-1, armL], [1, armR]] as const).map(([s, ref]) => (
+          <group key={s} ref={ref} position={[s * (bodyR + 0.02), bodyH * 0.72, 0]}>
+            <mesh position={[0, -0.16, 0]} material={M.body}>
+              <capsuleGeometry args={[0.055, 0.22, 4, 8]} />
+            </mesh>
+            <mesh position={[0, -0.32, 0]} material={M.trim}>
+              <sphereGeometry args={[0.065, 10, 8]} />
+            </mesh>
+            {/* 大副右手拿着一卷海图 */}
+            {kind === 'claude' && s === 1 && (
+              <mesh position={[0, -0.34, 0.1]} rotation={[-0.8, 0, 0]} material={M.paper}>
+                <boxGeometry args={[0.22, 0.28, 0.02]} />
+              </mesh>
+            )}
+          </group>
+        ))}
+        {/* 头：和身子连在一起的圆 */}
+        <group ref={head} position={[0, bodyH + 0.2, 0]}>
+          <mesh position={[0, 0.1, 0]} material={M.body} castShadow>
+            <sphereGeometry args={[tall ? 0.24 : 0.28, 18, 14]} />
+          </mesh>
+          {/* 大眼睛 */}
+          <group ref={eyes} position={[0, 0.12, (tall ? 0.24 : 0.28) - 0.04]}>
+            {[-0.09, 0.09].map((x) => (
+              <group key={x} position={[x, 0, 0]}>
+                <mesh material={M.eyeW}>
+                  <sphereGeometry args={[0.065, 12, 10]} />
+                </mesh>
+                <mesh position={[0, 0, 0.045]} material={M.eye}>
+                  <sphereGeometry args={[0.035, 10, 8]} />
+                </mesh>
+                <mesh position={[0.012, 0.014, 0.075]} material={M.eyeW}>
+                  <sphereGeometry args={[0.012, 6, 6]} />
+                </mesh>
+              </group>
+            ))}
+          </group>
+          {/* 嘴：一道小弧 */}
+          <mesh position={[0, 0.02, (tall ? 0.24 : 0.28) - 0.02]} rotation={[0.2, 0, 0]} material={M.dark}>
+            <torusGeometry args={[0.04, 0.008, 6, 10, Math.PI]} />
+          </mesh>
+          <group position={[0, (tall ? 0.24 : 0.28) - 0.1, 0]} scale={tall ? 1.6 : 1.85}>
+            <HatMesh hat={hat} M={M as never} />
+          </group>
+        </group>
       </group>
     </group>
   );

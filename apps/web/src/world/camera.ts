@@ -111,16 +111,16 @@ export function desiredPose(
   const L = SHIP_L * scale;
 
   if (mode === 'embark') {
-    const dist = L * 1.82;
-    const yaw = (52 * Math.PI) / 180;
-    const pitch = (8 * Math.PI) / 180;
+    // 大殿里：机位在船的右舷外、略偏船头，低而宽，越过船看向左舷的后殿与穹顶
+    const dist = L * 2.2;
+    const toward = (16 * Math.PI) / 180;
     pos
       .copy(shipPos)
-      .addScaledVector(fwd, dist * Math.cos(yaw) * Math.cos(pitch))
-      .addScaledVector(right, dist * Math.sin(yaw) * Math.cos(pitch))
-      .addScaledVector(UP, dist * Math.sin(pitch) + 0.35);
-    look.copy(shipPos).setY(2.7);
-    fov = 34;
+      .addScaledVector(right, dist * Math.cos(toward))
+      .addScaledVector(fwd, dist * Math.sin(toward))
+      .addScaledVector(UP, 2.2);
+    look.copy(shipPos).addScaledVector(right, -L * 0.5).setY(10);
+    fov = 48;
   } else if (mode === 'cockpit') {
     // 座位在舱室后部，眼位比桌面高一个头；视线穿过前窗落到船头外的海面
     pos.copy(shipPos).addScaledVector(fwd, -STERN_HALL.seatZ).addScaledVector(UP, STERN_HALL.eyeY);

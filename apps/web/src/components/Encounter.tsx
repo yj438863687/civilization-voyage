@@ -285,6 +285,8 @@ function RhythmGame({
       s.marks = [...s.marks, kind];
       if (kind === 'hit') s.hits += 1;
       setMarks(s.marks);
+      // 岛上的景跟着进度走：刻了几刀，石上就出现几个字
+      fableLive.value = s.hits / g.beats;
       setFlash(kind);
       window.setTimeout(() => setFlash(null), 220);
       s.beat += 1;
@@ -420,6 +422,7 @@ function CatchGame({
       }
       s.drops = keep;
       s.pop = s.pop.filter((p) => s.t - p.t < 0.5);
+      fableLive.value = Math.min(1, s.got / g.need);
       force((n) => n + 1);
       if (s.t >= g.secs) {
         s.done = true;

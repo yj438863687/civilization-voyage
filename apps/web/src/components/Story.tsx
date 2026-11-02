@@ -202,7 +202,7 @@ export function StoryPage({
       <div className="page-paper">
         <span className="page-kicker">这一程的故事</span>
         <h2 className="page-title">{story.title}</h2>
-        {storyId === 'A-near' && <GateTale state={state} />}
+        {storyId === 'A-near' ? <GateTale state={state} /> : story.art && story.artNames && <TaleArt story={story} state={state} />}
         <div className="page-lines">
           {lines.map((l, i) => (
             <p key={i} style={{ animationDelay: `${0.8 + i * 1.1}s` }}>
@@ -286,6 +286,43 @@ function GateTale({ state }: { state: FableState }) {
       <g className="pg-fade" style={{ animationDelay: '0.2s' }}>
         <path d="M30 80 L60 80 L54 88 L36 88 Z" fill="#3a2a1e" />
         <path d="M44 80 L44 62 L56 78 Z" fill="#e8dcc4" stroke="#6a5034" strokeWidth="0.8" />
+      </g>
+    </svg>
+  );
+}
+
+/** 通用的绘本插图：一条航线，三座岛，每座岛上写着那里发生了什么；终点是岸上的人 */
+function TaleArt({ story, state }: { story: Story; state: FableState }) {
+  const tags = story.art!(state);
+  const names = story.artNames!;
+  const stops = [
+    { x: 110, y: 118 },
+    { x: 250, y: 92 },
+    { x: 390, y: 126 },
+  ];
+  return (
+    <svg viewBox="0 0 520 200" className="page-art" aria-hidden>
+      <path className="pg-draw" d="M20 70 C 80 80, 90 120, 110 118 S 200 80, 250 92 S 340 140, 390 126 S 470 100, 500 96" fill="none" stroke="#8a6a42" strokeWidth="2" strokeDasharray="5 5" />
+      {stops.map((p, i) => (
+        <g key={i} className="pg-fade" style={{ animationDelay: `${0.4 + i * 0.7}s` }}>
+          <ellipse cx={p.x} cy={p.y} rx="46" ry="20" fill={i === 2 ? '#d8c09a' : '#c8b48a'} stroke="#6a5034" strokeWidth="1.5" />
+          <text x={p.x} y={p.y + 5} textAnchor="middle" className="pg-name">
+            {names[i]}
+          </text>
+          <text x={p.x} y={p.y + 40} textAnchor="middle" className="pg-label">
+            {tags[i]}
+          </text>
+        </g>
+      ))}
+      <g className="pg-fade" style={{ animationDelay: '2.6s' }}>
+        <circle cx="500" cy="96" r="6" fill="#8a3a22" />
+        <text x="500" y="122" textAnchor="end" className="pg-label">
+          {story.figure.name}
+        </text>
+      </g>
+      <g className="pg-fade" style={{ animationDelay: '0.2s' }}>
+        <path d="M14 62 L40 62 L35 69 L19 69 Z" fill="#3a2a1e" />
+        <path d="M27 62 L27 46 L37 60 Z" fill="#e8dcc4" stroke="#6a5034" strokeWidth="0.8" />
       </g>
     </svg>
   );

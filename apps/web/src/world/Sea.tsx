@@ -7,7 +7,8 @@ import type { Lane, PortPlace, WorldConfig } from './world.config';
 import { Relic, relicKindOf } from './relics';
 import { encounterFor } from './encounters';
 import { SPAWN, storyFor } from './stories';
-import { ShoreFigure, StoryProps } from './StoryProps';
+import { ShoreFigure } from './ShoreFigure';
+import { CrisisScene } from './IslandStages';
 import { FableIsland, FloodVillage } from './FableStage';
 import { TaoyuanScene } from './TaoyuanScene';
 import { ISLAND_OFFSET, VILLAGE_OFFSET, fableLive, type FableState } from './fable';
@@ -1060,12 +1061,15 @@ export function Atmosphere({
         const fig = { x: port.x - 3.5, z: port.z + 4.5 };
         return (
           <>
-            {story.crisis.cause && (
+            {story.crisis.stage && (
               <group position={[story.crisis.at.x + VILLAGE_OFFSET.x, 0, story.crisis.at.z + VILLAGE_OFFSET.z]}>
-                <FloodVillage state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
+                {story.crisis.stage === 'flood' ? (
+                  <FloodVillage state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
+                ) : (
+                  <CrisisScene stage={story.crisis.stage} state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
+                )}
               </group>
             )}
-            <StoryProps beats={story.beats} era={sceneId} reduceMotion={reduceMotion} />
             <ShoreFigure
               figure={story.figure}
               at={fig}
@@ -1079,8 +1083,8 @@ export function Atmosphere({
         .filter((f) => !collectedIds.includes(f.id) && (f.lane === 'both' || f.lane === laneId))
         .map((f) => (
           <group key={f.id} position={[f.x, 0, f.z]}>
-            <Relic kind={relicKindOf(f.id)} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
-            {/* 守着它的人：在物件旁边的一只舢板上，面朝来船的方向 */}
+            {/* 四段航线上只留故事：漂着的实物只在启航港这片练习海域里 */}
+            {!encounterFor(f.id)?.stage && <Relic kind={relicKindOf(f.id)} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />}
             {encounterFor(f.id)?.stage ? (
               // 童话小岛：一个人、一件执念，你做过的事会留在岛上
               <group position={[ISLAND_OFFSET.x, 0, ISLAND_OFFSET.z]}>

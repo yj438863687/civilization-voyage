@@ -2311,3 +2311,102 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 .enc.is-secret .talk-line.is-them { color: #fbe4e0; }
 .finale-tao { display: grid; gap: 6px; color: #f4c8d0; }
 .finale-tao span { font-size: 12px; line-height: 1.8; color: rgb(244 200 208 / 0.7); }
+.pg-name { font-family: var(--cv-font-display); font-size: 15px; letter-spacing: 0.2em; fill: #3a2c1e; }
+
+/* ================= 登船：名字与口令只在本机 ================= */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 20);
+  display: grid;
+  place-items: center;
+  padding: 6vh 16px;
+  background:
+    radial-gradient(ellipse 60% 60% at 50% 30%, rgb(34 52 58 / 0.9), rgb(8 10 12 / 0.97) 70%);
+  overflow-y: auto;
+}
+.gate-plate {
+  width: min(460px, 94vw);
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  padding: 32px clamp(20px, 5vw, 36px) 28px;
+  text-align: center;
+  color: #efe6d4;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgb(90 74 50 / 0.35), transparent 60%),
+    linear-gradient(180deg, rgb(28 34 38 / 0.96), rgb(16 20 24 / 0.98));
+  border: 1px solid rgb(201 161 90 / 0.35);
+  border-radius: 4px;
+  box-shadow: 0 30px 90px rgb(0 0 0 / 0.7), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+}
+.gate-kicker { font-size: 11px; letter-spacing: 0.6em; color: var(--cv-brass-300); }
+.gate-title { margin: 0; font-family: var(--cv-font-display); font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: 0.14em; }
+.gate-name { margin: 0; font-family: var(--cv-font-display); font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: 0.2em; color: #fff1d0; }
+.gate-id { font-family: var(--cv-font-mono, monospace); font-size: 11px; letter-spacing: 0.3em; color: rgb(232 226 210 / 0.5); }
+.gate-sub, .gate-note { margin: 0; font-size: var(--cv-text-sm); line-height: 1.8; color: rgb(232 226 210 / 0.7); }
+.gate-field { display: grid; gap: 6px; width: 100%; text-align: left; }
+.gate-field span { font-size: 11px; letter-spacing: 0.3em; color: rgb(232 226 210 / 0.55); }
+.gate-field input, .gate-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #f6efe0;
+  background: rgb(10 14 16 / 0.8);
+  border: 1px solid rgb(201 161 90 / 0.35);
+  border-radius: 3px;
+  outline: none;
+}
+.gate-field input:focus, .gate-field textarea:focus { border-color: var(--cv-brass-300); }
+.gate-code {
+  display: block;
+  width: 100%;
+  max-height: 120px;
+  overflow: auto;
+  padding: 10px;
+  font-family: var(--cv-font-mono, monospace);
+  font-size: 10px;
+  line-height: 1.6;
+  word-break: break-all;
+  text-align: left;
+  color: rgb(232 226 210 / 0.75);
+  background: rgb(8 10 12 / 0.8);
+  border: 1px dashed rgb(201 161 90 / 0.3);
+}
+.gate-err { margin: 0; font-size: 13px; color: #e07a62; }
+.gate-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 18px; margin-top: 4px; }
+.gate-btn {
+  padding: 9px 22px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+  color: #f6efe0;
+  background: transparent;
+  border: 1px solid rgb(201 161 90 / 0.5);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.gate-btn.is-primary { color: #1b1712; background: var(--cv-brass-300); border-color: var(--cv-brass-300); }
+.gate-btn:disabled { opacity: 0.5; cursor: default; }
+.gate-link, .cine-link { background: none; border: none; font: inherit; color: rgb(232 226 210 / 0.6); letter-spacing: 0.16em; cursor: pointer; }
+.gate-link:hover, .cine-link:hover { color: var(--cv-brass-300); }
+/* 没登船之前，后面的界面不响应点击 */
+.is-gated { pointer-events: none; }
+.cine-player { display: flex; gap: 14px; align-items: baseline; justify-content: center; font-size: 12px; letter-spacing: 0.24em; color: rgb(232 226 210 / 0.6); }
+.hud-player { display: flex; flex-direction: column; gap: 2px; padding-bottom: 6px; font-size: 11px; letter-spacing: 0.24em; color: rgb(232 226 210 / 0.5); }
+.hud-player b { font-family: var(--cv-font-display); font-weight: 500; font-size: 1rem; letter-spacing: 0.14em; color: #f6efe0; }
+
+/* 开局：选中的那扇窗，在标题下面说一句 */
+.cine-embark-era {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  font-family: var(--cv-font-display);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.7;
+  color: #f6efe0;
+  text-shadow: 0 2px 20px rgb(0 0 0 / 0.9);
+  animation: cine-rise 700ms ease both;
+}
+.cine-embark-era span { font-size: 11px; letter-spacing: 0.5em; color: var(--cv-brass-300); }

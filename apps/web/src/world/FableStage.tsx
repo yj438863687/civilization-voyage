@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import type { Encounter } from './encounters';
 import { fableLive, type FableState } from './fable';
 import { Person } from './People';
+import { IslandStage } from './IslandStages';
 
 /**
  * 童话里的小岛：每座岛只住一个人，岛上的景就是他的执念。
@@ -233,8 +234,20 @@ export function FableIsland({
       <Mound />
       {enc.stage === 'gate' && <GateIsland id={id} state={state} reduceMotion={reduceMotion} />}
       {enc.stage === 'stakes' && <StakesIsland state={state} reduceMotion={reduceMotion} />}
-      <group position={enc.stage === 'gate' ? [1.6, 1.2, -1.4] : [-1.6, 1.2, 1.8]} scale={1.35}>
-        <Person look={enc.look} action={enc.action ?? 'idle'} talking={active} reduceMotion={reduceMotion} lookAt={shipAt} />
+      {enc.stage && enc.stage !== 'gate' && enc.stage !== 'stakes' && <IslandStage stage={enc.stage} id={id} state={state} reduceMotion={reduceMotion} />}
+      <group
+        position={enc.stage === 'gate' ? [1.6, 1.2, -1.4] : [-1.6, 1.2, 1.8]}
+        // 洞里的人转过身就面朝洞口；浑沌被凿了七窍，倒在地上
+        rotation={state.cave === 'turned' && enc.stage === 'cave' ? [0, Math.PI, 0] : state.hundun === 'carved' && enc.stage === 'hundun' ? [-Math.PI / 2, 0, 0] : [0, 0, 0]}
+        scale={1.35}
+      >
+        <Person
+          look={enc.look}
+          action={enc.action ?? 'idle'}
+          talking={active && !(state.hundun === 'carved' && enc.stage === 'hundun')}
+          reduceMotion={reduceMotion}
+          lookAt={state.hundun === 'carved' && enc.stage === 'hundun' ? null : shipAt}
+        />
       </group>
       {/* 岛上一盏灯：远远看见有人住 */}
       <mesh position={[-3.4, 2.6, -2.4]}>

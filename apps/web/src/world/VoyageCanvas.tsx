@@ -7,8 +7,9 @@ import { Relic, relicKindOf } from './relics';
 import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
 import { HULL_STYLES, STYLE_BY_SCENE } from './hull';
-import { DECK_CREW } from './encounters';
+import { DECK_CREW, PLAYER_LOOK } from './encounters';
 import { Bloom, EffectComposer, ToneMapping, Vignette } from '@react-three/postprocessing';
+import { Hall, type EraKey } from './Hall';
 import { ToneMappingMode } from 'postprocessing';
 import { fableLive, type FableState } from './fable';
 import type { WorldConfig } from './world.config';
@@ -59,6 +60,10 @@ interface Props {
   /** 镜头推到这座岛上：遭遇或危机进行中 */
   stageAt?: { x: number; z: number; dist?: number; h?: number } | null;
   taoyuanFound?: boolean;
+  /** 玩家名字：浮在甲板上他头顶 */
+  player?: string | null;
+  /** 开局大殿里亮着的那扇窗 */
+  highlightEra?: EraKey | null;
   /** 这场戏的主角：从水里提上来的那件东西 */
   landingRelic?: string | null;
   input: ControlInput;
@@ -404,6 +409,7 @@ function Rig({
   landingRelic = null,
   autopilot = false,
   stageAt = null,
+  player: playerName = null,
 }: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
@@ -871,6 +877,7 @@ function Rig({
                 reduceMotion={reduceMotion}
                 style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']}
                 crew={DECK_CREW[propsScene] ?? DECK_CREW.test}
+                player={playerName ? { name: playerName, look: PLAYER_LOOK[propsScene] ?? PLAYER_LOOK.test } : null}
               />
             </Suspense>
             <Wake speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
@@ -953,6 +960,14 @@ export function VoyageCanvas(props: Props) {
           crisisDone={props.crisisDone}
           taoyuanFound={props.taoyuanFound}
         />
+        {props.mode === 'embark' && (
+          <Hall
+            center={{ x: props.restored?.x ?? props.world.spawn.x, z: props.restored?.z ?? props.world.spawn.z }}
+            yaw={props.restored?.yaw ?? props.world.spawn.yaw}
+            highlight={props.highlightEra ?? null}
+            reduceMotion={props.reduceMotion}
+          />
+        )}
         <Rig {...props} />
         {/* 后期：灯火与光柱真正发光，暗角把视线收向画面中心。参考 pmndrs/react-postprocessing */}
         <EffectComposer multisampling={4} enableNormalPass={false}>
