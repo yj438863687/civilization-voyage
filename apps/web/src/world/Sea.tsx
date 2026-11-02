@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import type { Lane, PortPlace, WorldConfig } from './world.config';
 import { Relic, relicKindOf } from './relics';
+import { encounterFor } from './encounters';
+import { LaneKeeper } from './People';
 import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
 
 function cssVar(name: string, fallback: string) {
@@ -1033,6 +1035,12 @@ export function Atmosphere({
         .map((f) => (
           <group key={f.id} position={[f.x, 0, f.z]}>
             <Relic kind={relicKindOf(f.id)} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
+            {/* 守着它的人：在物件旁边的一只舢板上，面朝来船的方向 */}
+            {encounterFor(f.id) && (
+              <group position={[2.6, 0, 0.6]} rotation={[0, Math.atan2(-f.x, 22 - f.z) - 0.4, 0]}>
+                <LaneKeeper look={encounterFor(f.id)!.look} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
+              </group>
+            )}
           </group>
         ))}
     </group>

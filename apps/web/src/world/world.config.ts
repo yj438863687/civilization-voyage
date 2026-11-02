@@ -140,6 +140,7 @@ const TEST_SRC: Source = {
 const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   test: {
     ...SHARED,
+    ship: { maxSpeed: 10, reverseSpeed: 3.5, accel: 1.6, turn: 0.66, radius: 6 }, // 帆船：中速，好上手
     ports: [
       {
         id: 'test-port',
@@ -209,6 +210,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   A: {
     ...SHARED,
+    ship: { maxSpeed: 7.5, reverseSpeed: 3, accel: 1.3, turn: 0.6, radius: 6 }, // 木船靠桨与风：慢，但转得动
     ports: [
       {
         id: 'riverbank-port',
@@ -304,6 +306,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   B: {
     ...SHARED,
+    ship: { maxSpeed: 15, reverseSpeed: 4.5, accel: 0.7, turn: 0.44, radius: 6 }, // 蒸汽船：起步沉，跑起来最快，转弯笨
     ports: [
       {
         id: 'steam-port',
@@ -399,6 +402,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   C: {
     ...SHARED,
+    ship: { maxSpeed: 13, reverseSpeed: 5, accel: 1.5, turn: 0.62, radius: 6 }, // 电报时代的轮船：快而稳
     ports: [
       {
         id: 'signal-port',
@@ -494,6 +498,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   D: {
     ...SHARED,
+    ship: { maxSpeed: 16, reverseSpeed: 7, accel: 3.0, turn: 0.95, radius: 6 }, // 自主船：几乎没有惯性
     ports: [
       {
         id: 'auto-port',

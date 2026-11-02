@@ -7,6 +7,8 @@ import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from
 import { laneStops, worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
 import { chartSummary } from './world/chart';
+import { BOOST_NAME, applyOutcome, encounterFor, loadStats, saveStats, type Outcome, type VoyageStats } from './world/encounters';
+import { EncounterOverlay } from './components/Encounter';
 
 
 /** 每段入海的开场：时代、一句立意、这一程的问题。字随时间一层层浮出来。 */
@@ -224,7 +226,7 @@ function guide(view: View, ctx: GuideCtx) {
       step: '第 4 拍 · 行',
       title: '选一条路，去港口做事',
       body: '问题已经落下。两条路线粗细颜色一样。步骤多不等于更对，费用高也不等于更文明。没接入计价时显示「尚未接入」。',
-      next: '选一条，按「按此航线启航」。出海后按 E 拾取、F 靠港。',
+      next: '选一条，按「按此航线启航」。出海后按 E 靠过去、F 靠港。',
     };
   }
   if (view === 'world') {
@@ -233,7 +235,7 @@ function guide(view: View, ctx: GuideCtx) {
     const next = ctx.nearPort
       ? '按 F 靠港'
       : ctx.nearFragment
-        ? '按 E 拾取。'
+        ? '按 E 靠过去，和守着它的人打个照面。'
         : misaligned
           ? `转动船头，让铜针对准船头（偏 ${Math.round(Math.abs(ctx.relDeg ?? 0))}°）。`
           : approaching
@@ -341,7 +343,22 @@ export function App() {
   /** 靠港戏：0..1 的时间轴，和镜头对齐；面板要等它走到 1 才出现 */
   const [landing, setLanding] = useState(0);
   const [pickupFlash, setPickupFlash] = useState<string | null>(null);
-  const keys = useRef({ w: false, a: false, s: false, d: false });
+  const keys = useRef({ w: false, a: false, s: false, d: false, shift: false });
+  /** 补给与人心：遭遇改变它们，全速会烧补给。一程一程带下去 */
+  const [stats, setStats] = useState<VoyageStats>(loadStats);
+  const statsRef = useRef(stats);
+  statsRef.current = stats;
+  const updateStats = useCallback((fn: (s: VoyageStats) => VoyageStats) => {
+    setStats((prev) => {
+      const next = fn(prev);
+      saveStats(next);
+      return next;
+    });
+  }, []);
+  /** 正在进行的遭遇：材料 id */
+  const [enc, setEnc] = useState<string | null>(null);
+  const encRef = useRef<string | null>(null);
+  encRef.current = enc;
   const shipRef = useRef<ShipSnapshot | null>(null);
 
   const connected = models.length > 0;
@@ -523,6 +540,7 @@ export function App() {
       if (k === 's' || k === 'arrowdown') keys.current.s = true;
       if (k === 'a' || k === 'arrowleft') keys.current.a = true;
       if (k === 'd' || k === 'arrowright') keys.current.d = true;
+      if (e.key === 'Shift') keys.current.shift = true;
     };
     const up = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
@@ -530,18 +548,42 @@ export function App() {
       if (k === 's' || k === 'arrowdown') keys.current.s = false;
       if (k === 'a' || k === 'arrowleft') keys.current.a = false;
       if (k === 'd' || k === 'arrowright') keys.current.d = false;
+      if (e.key === 'Shift') keys.current.shift = false;
     };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
+    let burn = 0;
+    const blur = () => {
+      keys.current = { w: false, a: false, s: false, d: false, shift: false };
+    };
+    window.addEventListener('blur', blur);
     const id = window.setInterval(() => {
-      const forward = (keys.current.w ? 1 : 0) + (keys.current.s ? -1 : 0);
+      // 遭遇进行中：键盘交给小游戏，船停着
+      const busyHands = encRef.current != null;
+      const forward = busyHands ? 0 : (keys.current.w ? 1 : 0) + (keys.current.s ? -1 : 0);
       // Three.js +yaw turns bow west; A (port) is +yaw, D (starboard) is −yaw.
-      const turn = (keys.current.a ? 1 : 0) + (keys.current.d ? -1 : 0);
-      setInput((prev) => (prev.forward === forward && prev.turn === turn ? prev : { forward, turn }));
+      const turn = busyHands ? 0 : (keys.current.a ? 1 : 0) + (keys.current.d ? -1 : 0);
+      // 全速：要往前开、还有补给才行。每秒烧约 1 点
+      const boost = !busyHands && keys.current.shift && forward > 0 && statsRef.current.supply > 0 ? 1 : 0;
+      if (boost) {
+        burn += 0.048;
+        if (burn >= 1) {
+          burn -= 1;
+          setStats((prev) => {
+            const next = { ...prev, supply: Math.max(0, prev.supply - 1) };
+            saveStats(next);
+            return next;
+          });
+        }
+      }
+      setInput((prev) =>
+        prev.forward === forward && prev.turn === turn && (prev.boost ?? 0) === boost ? prev : { forward, turn, boost },
+      );
     }, 48);
     return () => {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', blur);
       window.clearInterval(id);
     };
   }, []);
@@ -567,7 +609,7 @@ export function App() {
       const t = e.target;
       if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) return;
       const a = actRef.current;
-      if (a.view !== 'world' || a.busy) return;
+      if (a.view !== 'world' || a.busy || encRef.current) return;
       const k = e.key.toLowerCase();
       if (k === 'e' && a.nearFragment && !a.collected.has(a.nearFragment)) {
         e.preventDefault();
@@ -822,9 +864,9 @@ export function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [landing > 0, reduceMotion]);
 
-  async function collectFragment() {
-    if (!voyage || !nearFragment) return;
-    const frag = sea.fragments.find((f) => f.id === nearFragment);
+  async function collectFragment(fragId: string | null = nearFragment, note?: string) {
+    if (!voyage || !fragId) return;
+    const frag = sea.fragments.find((f) => f.id === fragId);
     if (!frag) return;
     if (records.some((r) => r.material_ids.includes(frag.id))) return;
     setBusy(true);
@@ -832,7 +874,7 @@ export function App() {
     try {
       await api.addRecord(voyage.id, {
         kind: 'fragment',
-        text: `${frag.title}\n${frag.text}`,
+        text: note ? `${frag.title}\n${frag.text}\n${note}` : `${frag.title}\n${frag.text}`,
         classification: frag.classification,
         sources: frag.sources,
         material_ids: [frag.id],
@@ -853,8 +895,23 @@ export function App() {
     void dock();
   };
   actRef.current.collect = () => {
-    void collectFragment();
+    startEncounter();
   };
+
+  /** 靠近一件东西：有人守着就先打照面、做一件事；没人守着就直接收 */
+  function startEncounter() {
+    if (!nearFragment || enc) return;
+    if (encounterFor(nearFragment)) setEnc(nearFragment);
+    else void collectFragment();
+  }
+
+  function finishEncounter(id: string, o: Outcome, summary: string) {
+    const e = encounterFor(id);
+    const tag = `${e?.who ?? '海上'}（${summary}）`;
+    updateStats((s) => applyOutcome(s, o, tag));
+    setEnc(null);
+    void collectFragment(id, `遭遇 · ${tag}：${o.text}`);
+  }
 
   async function goReflect() {
     if (!voyage) return;
@@ -969,7 +1026,7 @@ export function App() {
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !sealBeat}
+          canSail={view === 'world' && !sealBeat && !enc}
           sceneId={voyage?.scene_id ?? scenePick?.id ?? 'test'}
           world={sea}
           collectedIds={[...collectedIds]}
@@ -1053,7 +1110,7 @@ export function App() {
             <Ledgers
               connected={connected}
               usage={usage}
-              balance={voyage?.balance ?? null}
+              balance={view === 'world' ? stats.supply : voyage?.balance ?? null}
               inventory={voyage?.inventory ?? null}
               capacity={voyage?.capacity ?? null}
               materials={unusedFragments}
@@ -1125,7 +1182,21 @@ export function App() {
                     }}
                   />
                 </div>
-                <div className="faint">WASD 航行 · E 拾取 · F 靠港</div>
+                <div className="hud-stats" aria-label="补给与人心">
+                  <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`}>
+                    补给 <b>{stats.supply}</b>
+                    <i style={{ width: `${stats.supply}%` }} />
+                  </span>
+                  <span className="hud-stat is-trust">
+                    人心 <b>{stats.trust}</b>
+                    <i style={{ width: `${stats.trust}%` }} />
+                  </span>
+                </div>
+                <div className={`faint${input.boost ? ' is-boost' : ''}`}>
+                  Shift {BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}
+                  {input.boost ? ' · 正在烧补给' : stats.supply <= 0 ? ' · 补给已空' : ''}
+                </div>
+                <div className="faint">WASD 航行 · E 靠过去 · F 靠港</div>
                 <div className="faint">滚轮缩放 · 拖动环视 · 双击复位</div>
               </div>
             )}
@@ -1201,8 +1272,8 @@ export function App() {
       )}
 
       {/* 靠近传送门：门后是哪一段，字从画面里浮出来 */}
-      {view === 'world' && sea.portal && ship && !portalCross &&
-        Math.hypot(sea.portal.x - ship.x, sea.portal.z - ship.z) < 40 && (
+      {view === 'world' && sea.portal && ship && !portalCross && !enc &&
+        Math.hypot(sea.portal.x - ship.x, sea.portal.z - ship.z) < 26 && (
           <div className="portal-hint" aria-live="polite">
             <span className="portal-hint-kicker">{sealedHere ? '门已开' : '还没落印'}</span>
             <span className="portal-hint-name">{sea.portal.label}</span>
@@ -1211,6 +1282,17 @@ export function App() {
             </span>
           </div>
         )}
+
+      {/* 遭遇：海上的人和他手上的事 */}
+      {view === 'world' && enc && encounterFor(enc) && (
+        <EncounterOverlay
+          key={enc}
+          enc={encounterFor(enc)!}
+          title={sea.fragments.find((f) => f.id === enc)?.title ?? ''}
+          reduceMotion={reduceMotion}
+          onDone={(o, summary) => finishEncounter(enc, o, summary)}
+        />
+      )}
 
       {/* 穿门：整屏压黑一瞬，换段从这里过去 */}
       {portalCross && (
@@ -1369,11 +1451,15 @@ export function App() {
         </div>
       )}
 
-      {view === 'world' && nearFragment && nearFrag && !nearFragCollected && (
-        <button className={`interact-prompt${nearPort ? ' interact-prompt-with-port' : ''}`} type="button" disabled={busy} onClick={() => void collectFragment()}>
+      {view === 'world' && nearFragment && nearFrag && !nearFragCollected && !enc && (
+        <button className={`interact-prompt${nearPort ? ' interact-prompt-with-port' : ''}`} type="button" disabled={busy} onClick={() => startEncounter()}>
           <span className="interact-key">E</span>
           <span className="interact-copy">
-            <strong>收入货舱 · {nearFrag.title}</strong>
+            <strong>
+              {encounterFor(nearFrag.id)
+                ? `靠过去 · ${encounterFor(nearFrag.id)!.who}守着「${nearFrag.title}」`
+                : `收入货舱 · ${nearFrag.title}`}
+            </strong>
             <Stamp kind={contentStamp(nearFrag.classification, nearFrag.sources).kind}>
               {contentStamp(nearFrag.classification, nearFrag.sources).label}
             </Stamp>

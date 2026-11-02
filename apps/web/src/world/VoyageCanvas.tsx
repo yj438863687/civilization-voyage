@@ -7,6 +7,7 @@ import { Relic, relicKindOf } from './relics';
 import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
 import { HULL_STYLES, STYLE_BY_SCENE } from './hull';
+import { DECK_CREW } from './encounters';
 import type { WorldConfig } from './world.config';
 import { BLEND_SEC, DEST_TRAIL, FOLLOW_TAU, HARBOR_APPROACH, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, PORT_BEACON, PORT_BERTH, SHIP_MOTION } from './voyageConstants';
 
@@ -25,6 +26,8 @@ export interface ShipSnapshot {
 export interface ControlInput {
   forward: number;
   turn: number;
+  /** Shift 全速：0 或 1。烧补给 */
+  boost?: number;
 }
 
 interface Props {
@@ -610,7 +613,7 @@ function Rig({
           capMul *= 1 - (1 - HARBOR_APPROACH.misalignCap) * t;
         }
       }
-      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul);
+      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0));
       // 收帆：不再听玩家的，匀速往前，一点点偏向外海
       if (autopilot) autoT.current += clamped;
       else autoT.current = 0;
@@ -833,7 +836,11 @@ function Rig({
           {/* 靠港戏与驾驶舱都不需要船体外壳：一个会挡住主角，一个会穿进镜头 */}
           <group ref={exterior} visible={mode !== 'cockpit' && mode !== 'landing'}>
             <Suspense fallback={null}>
-              <TreasureShip reduceMotion={reduceMotion} style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']} />
+              <TreasureShip
+                reduceMotion={reduceMotion}
+                style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']}
+                crew={DECK_CREW[propsScene] ?? DECK_CREW.test}
+              />
             </Suspense>
             <Wake speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />
             <BowSpray speedRef={speed} reduceMotion={reduceMotion} maxSpeed={world.ship.maxSpeed} />

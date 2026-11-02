@@ -2,7 +2,8 @@ import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { DeckCrew } from './CrewFigures';
+import { EraDeckCrew } from './People';
+import type { Look } from './encounters';
 import {
   buildBulwarkGeometry,
   buildDeckGeometry,
@@ -282,9 +283,12 @@ function Lantern({
 export function TreasureShip({
   reduceMotion = false,
   style = HULL_STYLES.junk,
+  crew,
 }: {
   reduceMotion?: boolean;
   style?: HullStyle;
+  /** 甲板上的两个人：每个时代不同 */
+  crew: [Look, Look];
 }) {
   const sailMap = useTexture('/textures/sail-canvas.jpg');
   useLayoutEffect(() => {
@@ -555,7 +559,7 @@ export function TreasureShip({
         />
       ))}
       <Rigging masts={masts} />
-      <DeckCrew />
+      <EraDeckCrew crew={crew} deckY={DECK_Y} reduceMotion={reduceMotion} />
 
       {/* 主帆旁的旗：场景唯一可换的点缀 */}
       <mesh position={[0.9, DECK_Y + mainH * 0.99 - 0.6, 0.5]} material={M.banner}>
