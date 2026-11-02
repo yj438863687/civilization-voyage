@@ -12,7 +12,7 @@ import { CrisisScene } from './IslandStages';
 import { FableIsland, FloodVillage } from './FableStage';
 import { TaoyuanScene } from './TaoyuanScene';
 import { ISLAND_OFFSET, VILLAGE_OFFSET, fableLive, type FableState } from './fable';
-import { LaneKeeper } from './People';
+import { LaneKeeper } from './Figure';
 import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
 
 function cssVar(name: string, fallback: string) {

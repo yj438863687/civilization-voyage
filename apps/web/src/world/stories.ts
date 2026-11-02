@@ -114,22 +114,22 @@ const FP = { p1: { x: -12, z: 28 }, p2: { x: -22, z: 18 }, p3: { x: -32, z: -2 }
 /* ---------------- 岸上人物的穿着 ---------------- */
 
 const FIG = {
-  libing: { coat: '#4a3a2a', trim: '#b08a4a', skin: '#b58a64', pants: '#2e241a', hat: 'wrap', prop: 'pole' },
-  jia: { coat: '#6a5236', trim: '#c9a15a', skin: '#b98d66', pants: '#3a2c1e', hat: 'wrap', prop: 'ledger' },
-  watt: { coat: '#2a2d33', trim: '#c9a15a', skin: '#d2a789', pants: '#1e2025', hat: 'none', prop: 'ledger' },
-  zhan: { coat: '#2c3038', trim: '#a8b2c0', skin: '#c49a76', pants: '#1c1f24', hat: 'bowler', prop: 'pole' },
-  shannon: { coat: '#3a4048', trim: '#d7c59a', skin: '#d4ab8c', pants: '#24282e', hat: 'none', prop: 'ledger' },
-  morse: { coat: '#232a33', trim: '#c9a15a', skin: '#d6ad90', pants: '#181c22', hat: 'none', prop: 'key' },
-  wiener: { coat: '#4a4a50', trim: '#c8d2f5', skin: '#d2a98a', pants: '#2a2a2e', hat: 'none', prop: 'ledger', glow: '#c8d2f5' },
-  turing: { coat: '#5a5448', trim: '#c8d2f5', skin: '#d6b094', pants: '#33302a', hat: 'none', prop: 'tablet', glow: '#9fb4ff' },
+  libing: { coat: '#4a3a2a', trim: '#b08a4a', skin: '#b58a64', pants: '#2e241a', hat: 'wrap', prop: 'pole', model: 'mage' },
+  jia: { coat: '#6a5236', trim: '#c9a15a', skin: '#b98d66', pants: '#3a2c1e', hat: 'wrap', prop: 'ledger', model: 'mage' },
+  watt: { coat: '#2a2d33', trim: '#c9a15a', skin: '#d2a789', pants: '#1e2025', hat: 'none', prop: 'ledger', model: 'rogue' },
+  zhan: { coat: '#2c3038', trim: '#a8b2c0', skin: '#c49a76', pants: '#1c1f24', hat: 'bowler', prop: 'pole', model: 'rogue' },
+  shannon: { coat: '#3a4048', trim: '#d7c59a', skin: '#d4ab8c', pants: '#24282e', hat: 'none', prop: 'ledger', model: 'rogue' },
+  morse: { coat: '#232a33', trim: '#c9a15a', skin: '#d6ad90', pants: '#181c22', hat: 'none', prop: 'key', model: 'rogue' },
+  wiener: { coat: '#4a4a50', trim: '#c8d2f5', skin: '#d2a98a', pants: '#2a2a2e', hat: 'none', prop: 'ledger', glow: '#c8d2f5', model: 'rogue' },
+  turing: { coat: '#5a5448', trim: '#c8d2f5', skin: '#d6b094', pants: '#33302a', hat: 'none', prop: 'tablet', glow: '#9fb4ff', model: 'rogue' },
 } satisfies Record<string, Look>;
 
 const LOOK_CRISIS = {
-  villager: { coat: '#7a5c3c', trim: '#4a3624', skin: '#b38660', pants: '#45331f', hat: 'straw', prop: 'none' },
-  foreman: { coat: '#3a3a3a', trim: '#8a7448', skin: '#a98770', pants: '#262626', hat: 'cap', prop: 'none' },
-  worker: { coat: '#4a4038', trim: '#1e1e1d', skin: '#a98770', pants: '#2b2b2a', hat: 'cap', prop: 'shovel' },
-  operator: { coat: '#2f4a56', trim: '#d7c59a', skin: '#c79c7e', pants: '#1f2d34', hat: 'headset', prop: 'key' },
-  system: { coat: '#1d2438', trim: '#c8d2f5', skin: '#bf9677', pants: '#141a2a', hat: 'visor', prop: 'none', glow: '#c8d2f5' },
+  villager: { coat: '#7a5c3c', trim: '#4a3624', skin: '#b38660', pants: '#45331f', hat: 'straw', prop: 'none', model: 'barbarian' },
+  foreman: { coat: '#3a3a3a', trim: '#8a7448', skin: '#a98770', pants: '#262626', hat: 'cap', prop: 'none', model: 'rogue' },
+  worker: { coat: '#4a4038', trim: '#1e1e1d', skin: '#a98770', pants: '#2b2b2a', hat: 'cap', prop: 'shovel', model: 'rogue' },
+  operator: { coat: '#2f4a56', trim: '#d7c59a', skin: '#c79c7e', pants: '#1f2d34', hat: 'headset', prop: 'key', model: 'rogue' },
+  system: { coat: '#1d2438', trim: '#c8d2f5', skin: '#bf9677', pants: '#141a2a', hat: 'visor', prop: 'none', glow: '#c8d2f5', model: 'rogue' },
 } satisfies Record<string, Look>;
 
 /* ---------------- 八条航线 ---------------- */

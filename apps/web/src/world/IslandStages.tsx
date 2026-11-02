@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import * as THREE from 'three';
 import type { Look, Stage } from './encounters';
 import { fableLive, type FableState } from './fable';
-import { Person } from './People';
+import { Figure } from './Figure';
 import type { CrisisStage } from './stories';
 
 /**
@@ -681,7 +681,7 @@ export function CrisisScene({
   const people = (look: Look, n: number, at: [number, number], spread = 1.2, faceAway = false) =>
     Array.from({ length: n }, (_, i) => (
       <group key={i} position={[at[0] + (i - (n - 1) / 2) * spread, 1.2, at[1] + (i % 2) * 0.6]} rotation={[0, faceAway ? Math.PI : 0, 0]} scale={1.3}>
-        <Person look={look} action={look.prop === 'shovel' ? 'idle' : 'idle'} reduceMotion={reduceMotion} phase={i} />
+        <Figure look={look} action="idle" reduceMotion={reduceMotion} phase={i} />
       </group>
     ));
 

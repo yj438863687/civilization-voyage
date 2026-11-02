@@ -777,9 +777,9 @@ function Rig({
       toShip.divideScalar(dist);
       const side = new THREE.Vector3(-toShip.z, 0, toShip.x);
       const want = new THREE.Vector3(stageAt.x, 0, stageAt.z)
-        .addScaledVector(toShip, stageAt.dist ?? 10.5)
-        .addScaledVector(side, (stageAt.dist ?? 10.5) * 0.3)
-        .setY(stageAt.h ?? 5.2);
+        .addScaledVector(toShip, stageAt.dist ?? 12.5)
+        .addScaledVector(side, (stageAt.dist ?? 12.5) * 0.32)
+        .setY(stageAt.h ?? 6.0);
       const k = 1 - Math.exp(-clamped / (reduceMotion ? 0.01 : 0.55));
       camera.position.lerp(want, k);
       look.lerp(new THREE.Vector3(stageAt.x, 2.4, stageAt.z), k);
@@ -924,7 +924,7 @@ export function VoyageCanvas(props: Props) {
         onCreated={({ gl }) => {
           gl.domElement.addEventListener('webglcontextlost', (e) => {
             e.preventDefault();
-            props.onGl?.('lost');
+            if (gl.domElement.isConnected) props.onGl?.('lost');
           });
           gl.domElement.addEventListener('webglcontextrestored', () => props.onGl?.('restored'));
           gl.setClearColor(sky, 1);

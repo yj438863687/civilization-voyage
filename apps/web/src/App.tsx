@@ -1036,6 +1036,8 @@ export function App() {
 
   // 换了航程：读回这一程已经看过的戏
   useEffect(() => {
+    // 换航程会重建画布：上一块画布的「上下文丢失」不算数
+    setGlLost(false);
     setProgress(loadProgress(voyage?.id));
     setCaption(null);
     setCrisis(null);
@@ -1088,7 +1090,7 @@ export function App() {
     if (!story) return;
     for (const b of story.beats) {
       if (progress.beats.includes(b.id)) continue;
-      if (Math.hypot(ship.x - b.at.x, ship.z - b.at.z) < 7.5) {
+      if (Math.hypot(ship.x - b.at.x, ship.z - b.at.z) < 9.5) {
         setCaption(b);
         markProgress((p) => ({ ...p, beats: [...p.beats, b.id] }));
         return;

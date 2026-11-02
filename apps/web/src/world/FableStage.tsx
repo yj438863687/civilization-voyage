@@ -3,7 +3,7 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { Encounter } from './encounters';
 import { fableLive, type FableState } from './fable';
-import { Person } from './People';
+import { Figure } from './Figure';
 import { IslandStage } from './IslandStages';
 
 /**
@@ -235,8 +235,8 @@ export function FableIsland({
       {enc.stage === 'gate' && <GateIsland id={id} state={state} reduceMotion={reduceMotion} />}
       {enc.stage === 'stakes' && <StakesIsland state={state} reduceMotion={reduceMotion} />}
       {enc.stage && enc.stage !== 'gate' && enc.stage !== 'stakes' && <IslandStage stage={enc.stage} id={id} state={state} reduceMotion={reduceMotion} />}
-      <group position={enc.stage === 'gate' ? [1.6, 1.2, -1.4] : [-1.6, 1.2, 1.8]} scale={1.35}>
-        <Person look={enc.look} action={enc.action ?? 'idle'} talking={active} reduceMotion={reduceMotion} lookAt={shipAt} />
+      <group position={enc.stage === 'gate' ? [1.4, 1.2, -1.0] : [-1.2, 1.2, 0.6]} rotation={[0, Math.PI * 0.75, 0]} scale={1.3}>
+        <Figure look={enc.look} action={enc.action ?? 'idle'} talking={active} reduceMotion={reduceMotion} lookAt={shipAt} />
       </group>
       {/* 岛上一盏灯：远远看见有人住 */}
       <mesh position={[-3.4, 2.6, -2.4]}>

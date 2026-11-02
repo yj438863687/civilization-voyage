@@ -2,7 +2,7 @@ import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { EraDeckCrew } from './People';
+import { EraDeckCrew } from './Figure';
 import type { Look } from './encounters';
 import {
   buildBulwarkGeometry,
