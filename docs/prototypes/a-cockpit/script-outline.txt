@@ -1,0 +1,93 @@
+文化航程 A 岗交付包 · 使用说明与中英讲稿
+v1.1（K3 升级版）· 2026.11.02
+
+一、先做什么
+1. 阅读《文化航程_A_玄览玄通提案.pdf》，重点看原典边界、三张材料卡、问题卡示例和给 B/D/E 的交接说明。
+2. 将《文化航程_A_文化驾驶舱.html》下载到电脑，用 Edge / Chrome / Safari 等现代浏览器打开。页面主流程无需联网；点击原文链接需要联网。
+3. 可以从空白开始，也可载入"团圆微展"设计示例（30 分钟中英双语微展、300 元示例预算，均为设计示例，不代表真实用户调查）。
+4. 完成填写后导出 JSON / 文本问题卡。JSON 是给 D 整合的数据样例（结构示例见《问题卡_整合示例.json》），不会自动传给其他人。
+5. 草稿保存在当前浏览器本机。更换浏览器、隐私模式或清除浏览器数据可能失去草稿，重要内容请导出。不要在公用电脑记录私人家庭经历。
+6. 微信等应用内可能无法直接运行 HTML，先下载并在浏览器打开；需要时发 ZIP。没有上传、部署或群发。
+
+本 ZIP（文化航程_A_发群交付包_k3.zip）内文件清单：
+- 文化航程_A_玄览玄通提案.pdf
+- 文化航程_A_文化驾驶舱.html
+- 使用说明与中英讲稿.txt（本文件）
+- 问题卡_整合示例.json
+- CHANGES.md
+
+二、可直接发群的说明
+我把 A 的"玄览玄通"更新到了 v1.1（K3 升级版），打包为《文化航程_A_发群交付包_k3.zip》：一份提案 PDF、一个可以离线打开的文化驾驶舱原型 HTML、一份问题卡 JSON 整合示例和本讲稿。原型保留了航海入口，用"团圆微展"演示：写下原先理解，阅读三张带来源和边界的材料卡，再形成带修订理由的问题卡。建议优先看"材料证明范围、判断贴签、理解修订记录"这三个机制；B 可以接着讨论差异，D 可以复用导出的数据串联页面，E 可以引用"学生为什么需要这种学习方式"的论据。船员提示目前是预设脚本，方便讨论交互，尚未接真实 AI；场景与问题卡均为设计示例，不代表真实访谈或学习效果。大家可以先挑值得融合的点子。
+
+三、A 到底怎么讲
+你的主线：熟悉 ≠ 已经理解所有人的经验。文化驾驶舱让学生看清自己的出发点。
+你负责原典与材料、文化问题、第一子应用和开场。
+你不需要独自包办 B 的跨文明论证、C 的作品评价、D 的整链演示、E 的商业计划。
+按组内分工稿安排：3.5 分钟文化开场（思想段）、1.5 分钟子应用演示（产品段）、1 分钟价值回应（商业段）。实际时间以小组排练为准。
+
+四、中文可念提纲（三段，带时间码，口语化要点）
+
+（一）文化开场 · 3.5 分钟
+0:00–0:35 ｜ 先抛一个问题：团圆，是不是就等于所有人回家？回家对很多同学确实重要。但我们还不知道：这句话，能不能代表教室里的每一个人？这个"不知道"，就是我这一部分的起点。
+0:35–1:25 ｜ 我们这个模块叫"玄览玄通"。说清楚：这是我们项目自己起的组合名，取意《道德经》第 10 章和第 15 章，引用统一用王弼本。我们把"省察自己、谨慎下结论"的启发，转译成现代的学习操作。它不是老子原本的教学流程——这句话我们不这么说。
+1:25–2:30 ｜ 看三张材料卡。苏轼的词，写的是隔着千里的思念与祝愿。中秋博饼，是闽南及台湾地区以家庭或社团组织的地方活动。大坑舞火龙，是一个社区祈求平安的传统。边界也要讲：一首诗不是问卷调查；一个地方习俗不能外推成全国统一；驱瘟的传说要贴着"传说"的标签，不能当科学事实。
+2:30–3:15 ｜ 页面会留下三样东西：你最早的想法、你修订的理由、你还没弄清的问题。学生也可以维持原来的判断，只要能说清依据和边界。我们不逼人改成"标准答案"。
+3:15–3:30 ｜ 这张个人问题卡，接下来交给 B。他负责比较大家的理由，把异议留下来。
+
+（二）子应用演示 · 1.5 分钟
+0:00–0:15 ｜ 打开第一页。载入"团圆微展"示例，或者现场输入"团圆就是所有人回家"。强调：这是个人理解，不是结论。
+0:15–0:35 ｜ 读第一张材料卡。它有原文链接，写明这条材料能支持什么、不能支持什么。觉得有用，就勾选。
+0:35–0:50 ｜ 给判断贴签：材料直接写到 / 我的解释 / 仍待核实。提醒一句：标签只是记录我的判断，不保证我判断得对。
+0:50–1:05 ｜ 点一位船员。先说清楚：这是预设提示，没有接真实 AI。顺着提示写下修订后的理解和原因。
+1:05–1:30 ｜ 预览个人问题卡，点确认，导出。注意小组状态仍然是"待讨论"。离线演示时不点外部网页。
+
+（三）价值回应 · 1 分钟
+0:00–0:20 ｜ 我们想验证的是：老师能不能看见"有依据的理解变化"——而不是学生写了多少字。
+0:20–0:40 ｜ 可能的价值点有三个：内容审核、可追溯的记录、教学任务包。但值不值，要和普通文档、通用 AI 做同一道题的对比才知道。
+0:40–1:00 ｜ 现在交底：我们手上是一个原型和一个可检验的想法。它已经提升学习效果了吗？没有证据，这话我们不说。
+
+五、英文文化开场稿（按 3.5 分钟排练）
+Let me start with one question: does reunion mean that everyone goes home? For some of us it describes an important experience, but we do not know whether it describes everyone here. That gap is where my part begins.
+
+My module is the cultural cockpit, named Xuanlan Xuantong. The name combines expressions from Chapters Ten and Fifteen of the Dao De Jing, in the Wang Bi edition. Chapter Ten asks about clearing one's deep perception; Chapter Fifteen describes understanding that is hard to grasp. These English phrases are our working paraphrases, not quotations from an established translation. Our learning process is a modern design inspired by the text, not an ancient teaching method.
+
+A student first records a personal view, then reads three kinds of source material. Su Shi's lyric expresses affection across distance. A record of Mid-Autumn bobing describes a local custom organised by families or associations. The Tai Hang Fire Dragon record presents a community tradition connected with wishes for peace. Each card also states its limits: a poem is not a survey of what everyone feels; a local custom cannot represent every region; a traditional story about disease remains a story, not scientific evidence.
+
+After reading, the student may revise "everyone must go home" into a more open question, recording what changed, which source contributed, and what still needs asking. The output is an individual question card that preserves the first view, the evidence, the revised understanding and one unresolved question. Students may keep their original view if they explain their reasons and limits.
+
+I bring the sources and questions; Member B will compare our reasons and preserve disagreements. Our journey begins with a better question.
+
+【实际词数：280 词（v0.1 约 400 词，已按 ≤280 词要求压缩；词数由脚本统计，仅计英文字词）】
+
+六、英文 90 秒演示稿（可在已填写示例上操作，避免现场赶打字）
+This is the cultural cockpit. The crew prompts in this prototype are prewritten demonstrations. No live model is being called.
+
+I begin with a personal view: reunion means everyone goes home. Now I open a source card. It shows the passage, its source, what it can support, and what it cannot establish.
+
+Here I label a claim as evidence, interpretation, or something still to be checked. The label records my judgment; it does not prove that I am right.
+
+A crew prompt asks me to consider people who cannot go home. I revise my understanding and explain which material changed my thinking.
+
+Finally, I confirm my own question card and export it. The unresolved question and participation boundaries travel with it. The group is still marked as pending discussion. This gives Member B a clear starting point, and gives Member D data that can connect to the rest of the journey.
+
+七、常见追问（FAQ，4 条）
+问：玄览玄通是老子原话吗？
+答：两个词分别取意《道德经》第 10、15 章，引用统一用王弼本；四字连用是项目的组合命名，操作流程是现代设计转译。
+问：和普通聊天有什么不同？
+答：区别在于结构化保留来源、判断边界和理解变化；船员提示目前是预设脚本，未接真实 AI。这是待验证的产品假设，并不保证一定比通用工具更好。
+问：点确认代表全组同意吗？
+答：只代表本人核对了个人问题卡，group_status 仍是 pending。组内确认与异议由后续模块处理。
+问：你们做了真实访谈或实测学习提升吗？
+答：没有。本轮场景与问题卡是设计示例，学习量表也是拟议方案，没有学习效果证据。
+
+八、给 D 的整合说明
+HTML 是独立演示文件。《问题卡_整合示例.json》包含版本、场景、初始理解、选择材料、判断贴签、修订理解、问题、原因、参与边界、船员提示记录、个人确认、小组待讨论、原型声明，以及本次新增的 integration_note（整合字段口径）。
+整合时以实际导出字段为准。保留材料的 id / title / kind / context / quote / support / limit / url；未选材料不能成为引用。编辑已确认内容须先撤销确认（personal_confirmation 退回未确认状态）再修改。若接多人服务，必须增加真实身份、版本冲突处理与成员独立确认，不能复用本机布尔值当团队共识。
+
+九、来源
+组内职责：用户提供分工稿 PDF 第 4–5 页；产品框架 PPT 第 3、10 页。两者均为讨论稿，未假定版本先后。
+王弼本《道德经》第 10、15 章：https://zh.wikisource.org/wiki/道德經_(王弼本)
+苏轼《水调歌头》：https://www.gutenberg.org/cache/epub/27123/pg27123.html
+中秋博饼（中国非物质文化遗产网，项目编号Ⅹ-5）：https://www.ihchina.cn/project_details/14932/
+大坑舞火龙（香港非物质文化遗产办事处）：https://www.icho.hk/sc/web/icho/representative_list_taihang.html
+来源沿用 v0.1 已核对清单，网页核对日期为 2026-10-26，本轮未新增来源。提案 PDF 和 HTML 均包含来源入口与使用边界。

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "product": "文化航程",
+  "module": "A_玄览玄通_文化驾驶舱",
+  "deliverable_version": "v1.1（K3 升级版）",
+  "scenario_id": "reunion_micro_exhibition",
+  "scenario": {
+    "name": "团圆微展",
+    "duration_minutes": 30,
+    "budget_example_cny": 300,
+    "note": "场景与预算均为设计示例"
+  },
+  "created_at": "2026-11-02T10:05:18.412Z",
+  "updated_at": "2026-11-02T10:06:47.205Z",
+  "initial_view": "我原先觉得，团圆就是所有人都回家。",
+  "confidence": {
+    "value": "sure",
+    "label": "比较确信",
+    "meaning": "自评，不是正确性或学习成绩"
+  },
+  "classification": {
+    "statement": "我把苏轼词中的祝愿理解为：相隔千里也可以表达联结。",
+    "tag": "interpretation",
+    "tag_label": "我的解释",
+    "reason": "M1 的“千里”与“共婵娟”是文本依据，“表达联结”是我的解释；不据此推断所有人的生活。"
+  },
+  "revised_view": "团圆可以包含相聚的愿望，也可能通过异地的祝愿与联系来表达。我还不能替当代同学定义它。",
+  "unknown": "参加微展的同学希望怎样表达团圆？哪些参与方式会让他们不自在？",
+  "revised_question": "在校园团圆微展里，怎样同时呈现相聚与异地联系，并让不愿公开家庭经历的同学也能自主参与？",
+  "revision_reason": "M1 中“千里共婵娟”的祝愿让我修订了“团圆只能是所有人回家”的预设；M2 的社团博饼提供了另一种共同参与的参考。两者都不能代表每位同学的想法，所以仍需询问参与者。",
+  "participation_boundaries": "不要求公开家庭照片或经历。可匿名写一句祝愿，也可只观看。",
+  "sources": [
+    {
+      "id": "M1",
+      "title": "苏轼《水调歌头·明月几时有》",
+      "kind": "文学文本",
+      "context": "北宋词作；采用 Project Gutenberg #27123《水调歌头》所录文本。",
+      "quote": "但愿人长久，千里共婵娟。",
+      "support": "词中把相隔千里的思念与共同望月联系起来。",
+      "limit": "文学表达不等于所有人的生活经验，也不能证明现代学生都认同某种团圆方式。",
+      "question": "空间上没有相聚，是否仍可表达联结？需要问哪些参与者？",
+      "url": "https://www.gutenberg.org/cache/epub/27123/pg27123.html",
+      "student_note": "注意区分词中的祝愿与现实中的普遍事实。"
+    },
+    {
+      "id": "M2",
+      "title": "中秋节（中秋博饼）",
+      "kind": "非遗项目记录",
+      "context": "中国非物质文化遗产网；福建厦门申报，项目编号Ⅹ-5。节选只用于地方活动形式。",
+      "quote": "以家庭或社团为单位",
+      "support": "项目记录描述了闽南及台湾地区以家庭或社团组织博饼的活动形式。",
+      "limit": "地方项目不能外推为全国统一习俗；参与活动不能自动等于每个人都感到归属。",
+      "question": "我们的微展能否提供不依赖家庭叙事的共同参与方式？",
+      "url": "https://www.ihchina.cn/project_details/14932/",
+      "student_note": "社团参与提供活动形式的参考，不代表每个人的主观感受。"
+    }
+  ],
+  "crew_records": [
+    {
+      "crew_id": "inquirer",
+      "crew_name": "追问员",
+      "origin": "preset_script",
+      "prompt": "如果团圆不一定是回家，还有哪些同学的经验没有被你的设想看到？",
+      "user_response": "我据此把“团圆就是所有人回家”修订为更开放的问题，并把“参与方式是否让人不自在”列为未知。",
+      "note": "预设追问脚本示例，未接入真实 AI；记录的是提示与本人回应，不代表模型生成内容。"
+    }
+  ],
+  "personal_confirmation": {
+    "status": "confirmed",
+    "confirmed_at": "2026-11-02T10:06:47.205Z"
+  },
+  "group_status": "pending",
+  "handoff": "B负责成员观点与异议确认；D负责页面整合与状态传递。",
+  "prototype_disclosure": "交互提案；船员提示为预设脚本；未接入真实AI；不代表真实访谈、全组共识或学习效果证明。",
+  "integration_note": "给 B/D 整合的字段口径：①引用仅限 sources 中已选材料，未选材料不得成为引用；②personal_confirmation 仅代表本人核对了个人问题卡，编辑已确认内容须先将 status 撤销（退回未确认）再修改，改完重新确认并更新 confirmed_at；③group_status 恒为 pending，本机布尔确认不能当作全组共识，多人共识须由 B 的模块另行处理；④crew_records 中 origin=preset_script 的条目是预设提示，不应被引用为真实 AI 输出。"
+}
