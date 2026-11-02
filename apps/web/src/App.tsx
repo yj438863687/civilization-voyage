@@ -717,8 +717,7 @@ export function App() {
   const [portalCross, setPortalCross] = useState(false);
   useEffect(() => {
     if (!nearPortal || portalCross) return;
-    // 没落印就走进门，不换段：这一段还没做完
-    if (!sealedHere) return;
+    // 开进门就换段。没落印也放行：海图上这一段留白，过门时说清楚
     setPortalCross(true);
     const t = window.setTimeout(() => {
       const carried = carryForward();
@@ -726,7 +725,7 @@ export function App() {
     }, 1100);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nearPortal, sealedHere]);
+  }, [nearPortal]);
 
   /** 这一段的下一段是谁。neutral-test 不进主线。 */
   function nextEpochId(cur: string): string | null {
@@ -1205,10 +1204,10 @@ export function App() {
       {view === 'world' && sea.portal && ship && !portalCross &&
         Math.hypot(sea.portal.x - ship.x, sea.portal.z - ship.z) < 40 && (
           <div className="portal-hint" aria-live="polite">
-            <span className="portal-hint-kicker">{sealedHere ? '门已开' : '门锁着'}</span>
+            <span className="portal-hint-kicker">{sealedHere ? '门已开' : '还没落印'}</span>
             <span className="portal-hint-name">{sea.portal.label}</span>
             <span className="portal-hint-sub">
-              {sealedHere ? '驶入门内，这一段就结束' : '先在港口落印，门才会开'}
+              {sealedHere ? '驶入门内，这一段就结束' : '驶入就直接去下一段，这一段在海图上留白'}
             </span>
           </div>
         )}
@@ -1216,7 +1215,7 @@ export function App() {
       {/* 穿门：整屏压黑一瞬，换段从这里过去 */}
       {portalCross && (
         <div className="portal-cross" aria-hidden>
-          <span className="portal-cross-word">过门</span>
+          <span className="portal-cross-word">{sealedHere ? '过门' : '过门 · 这一段留白'}</span>
         </div>
       )}
       {(view === 'embark' || cine) && <div className="letterbox" aria-hidden />}
