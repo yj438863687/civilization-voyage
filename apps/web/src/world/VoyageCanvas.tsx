@@ -28,6 +28,8 @@ export interface ControlInput {
   turn: number;
   /** Shift 全速：0 或 1。烧补给 */
   boost?: number;
+  /** 补给见底：船速打七折 */
+  ration?: boolean;
 }
 
 interface Props {
@@ -613,7 +615,7 @@ function Rig({
           capMul *= 1 - (1 - HARBOR_APPROACH.misalignCap) * t;
         }
       }
-      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0));
+      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0)) * (input.ration && !autopilot ? 0.7 : 1);
       // 收帆：不再听玩家的，匀速往前，一点点偏向外海
       if (autopilot) autoT.current += clamped;
       else autoT.current = 0;

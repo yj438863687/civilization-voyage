@@ -386,6 +386,8 @@ export interface VoyageStats {
   supply: number;
   trust: number;
   log: string[];
+  /** 一路上遇见过的人：哪个时代、是谁、你怎么对他的 */
+  met: { era: string; who: string; trust: number }[];
 }
 
 const KEY = 'cv.stats.v1';
@@ -395,12 +397,17 @@ export function loadStats(): VoyageStats {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const v = JSON.parse(raw) as VoyageStats;
-      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [] };
+      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [] };
     }
   } catch {
     /* 私密窗口等情况：从默认值开始 */
   }
-  return { supply: 80, trust: 50, log: [] };
+  return freshStats();
+}
+
+/** 新开一局：从启航港出发时，补给与人心回到起点 */
+export function freshStats(): VoyageStats {
+  return { supply: 80, trust: 50, log: [], met: [] };
 }
 
 export function saveStats(s: VoyageStats) {
@@ -411,11 +418,37 @@ export function saveStats(s: VoyageStats) {
   }
 }
 
-export function applyOutcome(s: VoyageStats, o: Outcome, tag: string): VoyageStats {
-  const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
+const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
+
+export function applyOutcome(s: VoyageStats, o: Outcome, tag: string, era: string, who: string): VoyageStats {
   return {
     supply: clamp(s.supply + o.supply),
     trust: clamp(s.trust + o.trust),
     log: [...s.log, `${tag}：${o.text}`].slice(-40),
+    met: [...s.met, { era, who, trust: o.trust }].slice(-24),
   };
+}
+
+export function addSupply(s: VoyageStats, n: number): VoyageStats {
+  return { ...s, supply: clamp(s.supply + n) };
+}
+
+/** 人心落在哪一档：结局的最后一句由它决定 */
+export function trustLine(trust: number): string {
+  if (trust >= 75) return '一路上被你问过的人，都还记得这条船。';
+  if (trust >= 50) return '有人被你问过，有人没有。你记得是哪几个。';
+  if (trust >= 30) return '船开得很快。岸上的人，大多没被问过。';
+  return '你到得最远，也走得最孤单。图上很多地方，没有一个人的名字。';
+}
+
+/** 这一程遇见了谁：落印的回响里点一句 */
+export function metLine(s: VoyageStats, era: string): string | null {
+  const here = s.met.filter((m) => m.era === era);
+  if (!here.length) return null;
+  const warm = here.filter((m) => m.trust > 0).map((m) => m.who);
+  const cold = here.filter((m) => m.trust < 0).map((m) => m.who);
+  const names = here.map((m) => m.who).join('、');
+  if (cold.length && !warm.length) return `这一程你遇见了${names}。他们没有被你放在心上。`;
+  if (cold.length) return `这一程你遇见了${names}。${warm.join('、')}会记得你；${cold.join('、')}不会。`;
+  return `这一程你遇见了${names}。`;
 }

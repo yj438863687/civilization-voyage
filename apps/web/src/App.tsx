@@ -7,7 +7,7 @@ import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from
 import { laneStops, worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
 import { chartSummary } from './world/chart';
-import { BOOST_NAME, applyOutcome, encounterFor, loadStats, saveStats, type Outcome, type VoyageStats } from './world/encounters';
+import { BOOST_NAME, addSupply, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
 import { EncounterOverlay } from './components/Encounter';
 
 
@@ -328,7 +328,7 @@ export function App() {
   /** 已经开进传送门：值是下一段的场景 id */
   const [nearPortal, setNearPortal] = useState<string | null>(null);
   /** 落印后的回响：几秒钟的字，然后回到海上 */
-  const [sealBeat, setSealBeat] = useState<{ pick: string; cost: string; epilogue: string } | null>(null);
+  const [sealBeat, setSealBeat] = useState<{ pick: string; cost: string; epilogue: string; met?: string | null } | null>(null);
   /** 每段入海的开场字幕 */
   const [intro, setIntro] = useState<string | null>(null);
   /** 第四段落印后：收帆 */
@@ -576,8 +576,12 @@ export function App() {
           });
         }
       }
+      // 补给见底：定量配给，船慢下来
+      const ration = statsRef.current.supply <= 0;
       setInput((prev) =>
-        prev.forward === forward && prev.turn === turn && (prev.boost ?? 0) === boost ? prev : { forward, turn, boost },
+        prev.forward === forward && prev.turn === turn && (prev.boost ?? 0) === boost && !!prev.ration === ration
+          ? prev
+          : { forward, turn, boost, ration },
       );
     }, 48);
     return () => {
@@ -665,6 +669,8 @@ export function App() {
     try {
       const scene = seed ? scenes.find((s) => s.id === seed.sceneId) : scenePick ?? scenes.find((s) => s.status === 'test');
       if (!scene) throw new Error('没有可用场景');
+      // 从标题页重新开一局：补给与人心回到起点；过门换段则一路带下去
+      if (!seed) updateStats(() => freshStats());
       const seedQuestion = scene.questions[0] ?? '';
       const created = await api.createVoyage({
         title: title.trim() || TITLE_PRESETS[scene.id] || '未命名航程',
@@ -908,7 +914,7 @@ export function App() {
   function finishEncounter(id: string, o: Outcome, summary: string) {
     const e = encounterFor(id);
     const tag = `${e?.who ?? '海上'}（${summary}）`;
-    updateStats((s) => applyOutcome(s, o, tag));
+    updateStats((s) => applyOutcome(s, o, tag, voyage?.scene_id ?? 'test', e?.who ?? '海上的人'));
     setEnc(null);
     void collectFragment(id, `遭遇 · ${tag}：${o.text}`);
   }
@@ -1194,7 +1200,7 @@ export function App() {
                 </div>
                 <div className={`faint${input.boost ? ' is-boost' : ''}`}>
                   Shift {BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}
-                  {input.boost ? ' · 正在烧补给' : stats.supply <= 0 ? ' · 补给已空' : ''}
+                  {input.boost ? ' · 正在烧补给' : stats.supply <= 0 ? ' · 补给已空，船在定量配给中减速' : ''}
                 </div>
                 <div className="faint">WASD 航行 · E 靠过去 · F 靠港</div>
                 <div className="faint">滚轮缩放 · 拖动环视 · 双击复位</div>
@@ -1248,6 +1254,8 @@ export function App() {
           <span className="seal-beat-pick">{sealBeat.pick}</span>
           <span className="seal-beat-cost">代价落在：{sealBeat.cost}</span>
           <span className="seal-beat-epi">{sealBeat.epilogue}</span>
+          {sealBeat.met && <span className="seal-beat-met">{sealBeat.met}</span>}
+          <span className="seal-beat-supply">港口补给 +15</span>
           {voyage?.scene_id !== 'D' && sea.portal && <span className="seal-beat-next">门开了 · {sea.portal.label}</span>}
         </div>
       )}
@@ -1259,10 +1267,19 @@ export function App() {
             <p style={{ animationDelay: '1.2s' }}>你把目的地交了出去。</p>
             <p style={{ animationDelay: '4.2s' }}>农业画下第一个圈。工业把它连成线。</p>
             <p style={{ animationDelay: '7.2s' }}>信息在线上留下一处断点。智能点上了一颗它自己算出来的星。</p>
-            <p style={{ animationDelay: '10.8s' }} className="finale-big">这张图上没有终点港。</p>
-            <p style={{ animationDelay: '14s' }}>终点，是人能把自己的能力伸到多远 —— 以及伸出去的时候，还记不记得问一句：这是谁的地方。</p>
+            {stats.met.length > 0 && (
+              <p style={{ animationDelay: '9.6s' }} className="finale-met">
+                你在海上遇见过：{[...new Set(stats.met.map((m) => m.who))].join('、')}。
+              </p>
+            )}
+            <p style={{ animationDelay: '12.4s' }} className="finale-big">这张图上没有终点港。</p>
+            <p style={{ animationDelay: '15.2s' }}>终点，是人能把自己的能力伸到多远 —— 以及伸出去的时候，还记不记得问一句：这是谁的地方。</p>
+            <p style={{ animationDelay: '18.4s' }} className="finale-trust">
+              {trustLine(stats.trust)}
+              <span>人心 {stats.trust} · 补给 {stats.supply}</span>
+            </p>
           </div>
-          <div className="finale-chart" style={{ animationDelay: '17.5s' }}>
+          <div className="finale-chart" style={{ animationDelay: '21.5s' }}>
             <ChartMap struck={['A', 'B', 'C', 'D']} activeEpoch="D" />
             <button className="cine-link" type="button" onClick={() => { setFinale(false); void goReflect(); }}>
               看这张图
@@ -1574,7 +1591,14 @@ export function App() {
                         .then(async () => {
                           setRecords(await api.records(voyage.id));
                           // 印落下：先让这一下被看见，再把人送回海上去找门
-                          setSealBeat({ pick: pick.label, cost: own.label, epilogue: stance.epilogue });
+                          setSealBeat({
+                            pick: pick.label,
+                            cost: own.label,
+                            epilogue: stance.epilogue,
+                            met: metLine(statsRef.current, voyage?.scene_id ?? 'test'),
+                          });
+                          // 港口给这一程补一次给养
+                          updateStats((st) => addSupply(st, 15));
                         })
                         .catch((e) => setError(errText(e)));
                     }}

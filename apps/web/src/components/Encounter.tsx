@@ -221,7 +221,7 @@ function RhythmGame({
 
   useEffect(() => {
     const target = 0.78;
-    const win = 0.075;
+    const win = 0.09;
     const settle = (kind: 'hit' | 'miss') => {
       const s = st.current;
       s.marks = [...s.marks, kind];
@@ -260,7 +260,7 @@ function RhythmGame({
       const s = st.current;
       if (s.done) return;
       // 每一拍略快一点
-      s.x += dt * g.speed * (0.55 + s.beat * 0.05);
+      s.x += dt * g.speed * (0.55 + s.beat * 0.035);
       if (s.x > 1) settle('miss');
       setX(s.x);
       raf = requestAnimationFrame(tick);

@@ -2093,3 +2093,21 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 .hud-stat.is-low { color: #e07a62; }
 .hud-stat.is-low i { background: #c2604a; }
 .faint.is-boost { color: #ffe1a6; }
+
+/* 回响与结局里的人 */
+.seal-beat-met {
+  max-width: 34em;
+  font-size: var(--cv-text-sm);
+  line-height: 1.7;
+  color: rgb(232 226 210 / 0.78);
+  animation: cine-rise 900ms ease 1.6s both;
+}
+.seal-beat-supply {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--cv-brass-300);
+  animation: cine-rise 900ms ease 2s both;
+}
+.finale-met { color: rgb(232 226 210 / 0.8); }
+.finale-trust { display: grid; gap: 6px; color: #ffe1a6; }
+.finale-trust span { font-size: 11px; letter-spacing: 0.3em; color: rgb(232 226 210 / 0.55); }
