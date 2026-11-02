@@ -21,6 +21,7 @@ export function newDraft(s) {
 }
 
 const entered = value => typeof value === "string" && value.trim().length > 0;
+const validTimestamp = value => typeof value === "string" && Number.isFinite(Date.parse(value));
 const owns = (obj, key) => Object.hasOwn(obj, key);
 const validIds = (s, ids) => Array.isArray(ids) && new Set(ids).size === ids.length &&
   ids.every(id => typeof id === "string" && owns(s.materials, id));
@@ -173,6 +174,7 @@ export function restore(s, raw) {
   requireValue(d.reflectionDraft.decision === "" || decisions.includes(d.reflectionDraft.decision));
   requireValue(Array.isArray(d.planRecords) && Array.isArray(d.maintenanceObservations) && Array.isArray(d.reflections));
   const records = d.planRecords, first = records[0], last = records.at(-1);
+  requireValue(records.every(p => p && typeof p === "object" && !Array.isArray(p)));
   const finished = d.stage === "v2preview" || d.stage === "final";
   const hasPlan = !["materials","plan"].includes(d.stage);
   requireValue(hasPlan ? records.length >= 1 && records.length <= 2 && entered(d.initialGoal) && d.goal === d.initialGoal :
@@ -181,7 +183,7 @@ export function restore(s, raw) {
   for (const [i, p] of records.entries()) {
     requireValue(p && entered(p.id) && p.id.startsWith("plan-") && p.version === i + 1 && p.previousPlanRecordId === (i ? first.id : null));
     requireValue(validForm(s, p) && owns(s.plans, p.planId) && !planErrors(s, { stage: "plan", form: p, goal: d.goal }).length);
-    requireValue(Number.isFinite(Date.parse(p.createdAt)) && equal(p.ruleInputs, inputs(s, p.planId)) && equal(p.effects, effects(s, p.planId)));
+    requireValue(validTimestamp(p.createdAt) && equal(p.ruleInputs, inputs(s, p.planId)) && equal(p.effects, effects(s, p.planId)));
   }
   requireValue(d.maintenanceRevealed ? hasPlan && d.maintenanceObservations.length === records.length :
     d.maintenanceObservations.length === 0 && ["materials","plan","preview"].includes(d.stage));
@@ -193,7 +195,7 @@ export function restore(s, raw) {
   if (d.stage === "revise") requireValue(d.reflectionDraft.decision === "revise" && !reflectionErrors(d.reflectionDraft).length);
   if (finished) {
     const r = d.reflections[0];
-    requireValue(r && entered(r.id) && r.id.startsWith("reflection-") && Number.isFinite(Date.parse(r.createdAt)) && !reflectionErrors(r).length);
+    requireValue(r && entered(r.id) && r.id.startsWith("reflection-") && validTimestamp(r.createdAt) && !reflectionErrors(r).length);
     requireValue(r.basedOnPlanRecordId === first.id && r.resultPlanRecordId === last.id && (r.decision === "revise") === (records.length === 2));
     const pending = issues(last, d.maintenanceObservations.at(-1));
     if (r.decision === "insufficient") pending.push("待补材料：" + r.response);

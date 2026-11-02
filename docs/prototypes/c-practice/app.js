@@ -155,7 +155,8 @@ document.addEventListener("click", event=>{
   if (button.id==="cancel-reset") { resetDialog.close(); return; }
   if (button.id==="confirm-reset") {
     try {
-      if (!memoryOnly && diskChanged(localStorage.getItem(DRAFT_KEY))) return;
+      // A failed write does not give this tab permission to delete a newer disk version.
+      if (diskChanged(localStorage.getItem(DRAFT_KEY))) return;
       localStorage.removeItem(DRAFT_KEY);
       memoryOnly=false;
       storageNotice("");
