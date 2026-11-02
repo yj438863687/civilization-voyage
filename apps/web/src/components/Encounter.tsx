@@ -12,12 +12,15 @@ export function EncounterOverlay({
   title,
   reduceMotion,
   onDone,
+  crisis = false,
 }: {
   enc: Encounter;
-  /** 这件东西叫什么 */
+  /** 这件东西叫什么；危机时是那一幕的名字 */
   title: string;
   reduceMotion: boolean;
   onDone: (o: Outcome, summary: string) => void;
+  /** 危机：不是捡东西，是一件躲不开的事 */
+  crisis?: boolean;
 }) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [out, setOut] = useState<{ o: Outcome; summary: string } | null>(null);
@@ -66,8 +69,9 @@ export function EncounterOverlay({
 
   const g = enc.game;
   return (
-    <div className="enc" role="dialog" aria-label={`${enc.who}：${title}`}>
+    <div className={`enc${crisis ? ' is-crisis' : ''}`} role="dialog" aria-label={`${enc.who}：${title}`}>
       <div className="enc-scrim" aria-hidden />
+      {crisis && <span className="enc-crisis">{title}</span>}
       <div className="enc-who">
         <span className="enc-name">{enc.who}</span>
         <span className="enc-role">{enc.role}</span>
@@ -96,7 +100,7 @@ export function EncounterOverlay({
           <p className="enc-result-delta">
             <Delta label="补给" v={out.o.supply} />
             <Delta label="人心" v={out.o.trust} />
-            <span className="enc-got">收入货舱 · {title}</span>
+            {!crisis && <span className="enc-got">收入货舱 · {title}</span>}
           </p>
         </div>
       )}

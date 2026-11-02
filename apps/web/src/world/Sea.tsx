@@ -6,6 +6,8 @@ import { Water } from 'three/examples/jsm/objects/Water.js';
 import type { Lane, PortPlace, WorldConfig } from './world.config';
 import { Relic, relicKindOf } from './relics';
 import { encounterFor } from './encounters';
+import { SPAWN, storyFor } from './stories';
+import { ShoreFigure, StoryProps } from './StoryProps';
 import { LaneKeeper } from './People';
 import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
 
@@ -527,7 +529,7 @@ function SeaLane({
   // 航道从出生点出发，经分叉点，到自己的转折点，再汇向港口
   const curve = useMemo(() => {
     const pts = [
-      new THREE.Vector3(0, 0.34, 22),
+      new THREE.Vector3(SPAWN.x, 0.34, SPAWN.z),
       ...lane.waypoints.map((w) => new THREE.Vector3(w.x, 0.34, w.z)),
       new THREE.Vector3(26, 0.34, -16),
     ];
@@ -1030,6 +1032,24 @@ export function Atmosphere({
       {world.ports.map((p) => (
         <PortSilhouette key={p.id} port={p} sceneId={sceneId} />
       ))}
+      {/* 这条航线的戏：沿途岸上的景，和码头上等着你的那个人 */}
+      {(() => {
+        const story = storyFor(sceneId, laneId);
+        const port = world.ports[0];
+        if (!story || !port) return null;
+        const fig = { x: port.x - 3.5, z: port.z + 4.5 };
+        return (
+          <>
+            <StoryProps beats={story.beats} era={sceneId} reduceMotion={reduceMotion} />
+            <ShoreFigure
+              figure={story.figure}
+              at={fig}
+              face={Math.atan2(story.crisis.at.x - fig.x, story.crisis.at.z - fig.z)}
+              reduceMotion={reduceMotion}
+            />
+          </>
+        );
+      })()}
       {world.fragments
         .filter((f) => !collectedIds.includes(f.id) && (f.lane === 'both' || f.lane === laneId))
         .map((f) => (

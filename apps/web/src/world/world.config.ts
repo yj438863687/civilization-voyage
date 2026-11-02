@@ -72,7 +72,7 @@ export type WorldConfig = {
 const SHARED = {
   bounds: { minX: -70, maxX: 70, minZ: -70, maxZ: 70 },
   ship: { maxSpeed: 11, reverseSpeed: 4, accel: 6, turn: 0.7, radius: 6 },
-  spawn: { x: 0, z: 22, yaw: 0 },
+  spawn: { x: SPAWN.x, z: SPAWN.z, yaw: 0 },
   camera: {
     followDistance: 27,
     followHeight: 9.5,
@@ -87,9 +87,8 @@ const SHARED = {
  * 港口对所有纪元都在 (26,-16)，所以分叉与转折点可以共用；只有名字和承诺各自不同。
  * 概念设计，不是任何真实航路。
  */
-const FORK = { x: 2, z: 8 };
-const NEAR_STOP = { x: 13, z: -5 };
-const FAR_STOP = { x: -12, z: -12 };
+// 几何与故事共用：故事里的旁白点、危机点都沿着这几段线走
+import { FAR_CRISIS, FAR_MID, FAR_STOP, FORK, NEAR_CRISIS, NEAR_MID, NEAR_STOP, SPAWN } from './stories';
 
 function LANES(
   nearLabel: string,
@@ -106,7 +105,9 @@ function LANES(
       promise: nearPromise,
       waypoints: [
         { x: FORK.x, z: FORK.z, label: nearLabel },
+        { x: NEAR_MID.x, z: NEAR_MID.z, label: '' },
         { x: NEAR_STOP.x, z: NEAR_STOP.z, label: '' },
+        { x: NEAR_CRISIS.x, z: NEAR_CRISIS.z, label: '' },
       ],
     },
     {
@@ -115,7 +116,9 @@ function LANES(
       promise: farPromise,
       waypoints: [
         { x: FORK.x, z: FORK.z, label: farLabel },
+        { x: FAR_MID.x, z: FAR_MID.z, label: '' },
         { x: FAR_STOP.x, z: FAR_STOP.z, label: '' },
+        { x: FAR_CRISIS.x, z: FAR_CRISIS.z, label: '' },
       ],
     },
   ];
@@ -140,7 +143,7 @@ const TEST_SRC: Source = {
 const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   test: {
     ...SHARED,
-    ship: { maxSpeed: 10, reverseSpeed: 3.5, accel: 1.6, turn: 0.66, radius: 6 }, // 帆船：中速，好上手
+    ship: { maxSpeed: 10, reverseSpeed: 3.5, accel: 1.6, turn: 0.95, radius: 6 }, // 帆船：中速，好上手
     ports: [
       {
         id: 'test-port',
@@ -210,7 +213,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   A: {
     ...SHARED,
-    ship: { maxSpeed: 7.5, reverseSpeed: 3, accel: 1.3, turn: 0.6, radius: 6 }, // 木船靠桨与风：慢，但转得动
+    ship: { maxSpeed: 7.5, reverseSpeed: 3, accel: 1.3, turn: 0.95, radius: 6 }, // 木船靠桨与风：慢，但转得动
     ports: [
       {
         id: 'riverbank-port',
@@ -253,19 +256,6 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         sources: [],
       },
       {
-        id: 'A-seed',
-        title: '第一粒种子',
-        x: 4,
-        z: 6,
-        pickupRadius: 7.5,
-        lane: 'both',
-        classification: 'creative',
-        what: '一把炭化的谷粒',
-        why: '新石器时代的遗址里常有炭化谷粒，它证明的不是"种了地"，而是"留下的种子够过一冬"。',
-        text: '把种子埋进土里，意味着你要在这里等一季。等不等得起，是这一程真正的问题。这一条为体验而写，不作农业起源的考古结论。',
-        sources: [TEST_SRC],
-      },
-      {
         id: 'A-stake',
         title: '河岸泥板',
         x: 12,
@@ -306,7 +296,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   B: {
     ...SHARED,
-    ship: { maxSpeed: 15, reverseSpeed: 4.5, accel: 0.7, turn: 0.44, radius: 6 }, // 蒸汽船：起步沉，跑起来最快，转弯笨
+    ship: { maxSpeed: 15, reverseSpeed: 4.5, accel: 0.7, turn: 0.72, radius: 6 }, // 蒸汽船：起步沉，跑起来最快，转弯笨
     ports: [
       {
         id: 'steam-port',
@@ -374,19 +364,6 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         text: '若把航程缩短一半：省下的是煤，还是一班人的睡眠？这是推演，不是某家船公司的档案。',
         sources: [],
       },
-      {
-        id: 'B-rail',
-        title: '铁轨测量桩',
-        x: 20,
-        z: -14,
-        pickupRadius: 6,
-        lane: 'both',
-        classification: 'historical_claim',
-        what: '铁轨与测量桩',
-        why: '铁轨先铺到哪里，哪座镇就先被连上。选线与设站的具体史料待核实。',
-        text: '铁轨先铺到哪里，哪座镇就被连上。选线与设站的具体史料待核实，本条只作空间线索。',
-        sources: [UNESCO_Q],
-      },
     ],
     coach: {
       sea: '朝烟囱的灯航行。按 E 收下沿途的东西，靠港按 F。',
@@ -402,7 +379,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   C: {
     ...SHARED,
-    ship: { maxSpeed: 13, reverseSpeed: 5, accel: 1.5, turn: 0.62, radius: 6 }, // 电报时代的轮船：快而稳
+    ship: { maxSpeed: 13, reverseSpeed: 5, accel: 1.5, turn: 0.9, radius: 6 }, // 电报时代的轮船：快而稳
     ports: [
       {
         id: 'signal-port',
@@ -445,19 +422,6 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         sources: [],
       },
       {
-        id: 'C-cable',
-        title: '海底电缆接头',
-        x: 4,
-        z: 6,
-        pickupRadius: 7.5,
-        lane: 'both',
-        classification: 'historical_claim',
-        what: '海底电缆接头',
-        why: '电缆把两端的时差压成零；接头只落在有人出钱铺线的地方。',
-        text: '电缆把两端的时差压成零，但接头只落在有资本铺线的地方。具体线路与年代待核实。',
-        sources: [UNESCO_Q],
-      },
-      {
         id: 'C-tz',
         title: '时区分界',
         x: 12,
@@ -498,7 +462,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   D: {
     ...SHARED,
-    ship: { maxSpeed: 16, reverseSpeed: 7, accel: 3.0, turn: 0.95, radius: 6 }, // 自主船：几乎没有惯性
+    ship: { maxSpeed: 16, reverseSpeed: 7, accel: 3.0, turn: 1.25, radius: 6 }, // 自主船：几乎没有惯性
     ports: [
       {
         id: 'auto-port',
@@ -553,19 +517,6 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
         sources: [TEST_SRC],
       },
       {
-        id: 'D-dest',
-        title: '目的地的定义',
-        x: 12,
-        z: -6,
-        pickupRadius: 6.5,
-        lane: 'both',
-        classification: 'counterfactual',
-        what: '一个坐标框',
-        why: '当"目的地"由它解释，是它更懂你的意思，还是它替你改了意思。',
-        text: '当你要它去的地方由它来解释：是它更懂你的意思，还是它替你改了意思？这是推演。',
-        sources: [],
-      },
-      {
         id: 'D-skip',
         title: '被略过的港',
         x: 20,
@@ -598,8 +549,22 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
  * 外海的落在外海转折点。之前三件东西排成一条直线，外海那条路根本碰不到外海的东西。
  */
 // 每条航道上依次排开：先是分叉点与转折点之间的中途，再是转折点本身
-const NEAR_MID = { x: (FORK.x + NEAR_STOP.x) / 2, z: (FORK.z + NEAR_STOP.z) / 2 - 1 };
-const FAR_MID = { x: (FORK.x + FAR_STOP.x) / 2 - 1, z: (FORK.z + FAR_STOP.z) / 2 };
+// 启航港是练习：三件东西都摆在两条线共用的那一段上，再往前就各走各的
+{
+  const at: Record<string, { x: number; z: number }> = {
+    'chart-scrap': { x: 0, z: 29 },
+    'seal-maxim': { x: 0, z: 23.5 },
+    'unseen-name': { x: FORK.x, z: FORK.z },
+  };
+  for (const f of WORLDS.test.fragments) {
+    const p = at[f.id];
+    if (p) {
+      f.x = p.x;
+      f.z = p.z;
+      f.pickupRadius = 3.6;
+    }
+  }
+}
 for (const id of ['A', 'B', 'C', 'D'] as const) {
   const seen: Record<string, number> = { near: 0, far: 0, both: 0 };
   for (const f of WORLDS[id].fragments) {
@@ -612,7 +577,7 @@ for (const id of ['A', 'B', 'C', 'D'] as const) {
           : n === 0 ? FAR_MID : FAR_STOP;
     f.x = at.x;
     f.z = at.z;
-    f.pickupRadius = 6;
+    f.pickupRadius = 7;
   }
 }
 

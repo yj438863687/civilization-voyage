@@ -1747,7 +1747,6 @@ html[data-cine='reflection'] .coach-bar {
   to { opacity: 1; transform: scale(1) rotate(-6deg); }
 }
 .seal-beat-pick { font-family: var(--cv-font-display); font-size: clamp(1.6rem, 3.6vw, 2.4rem); color: #f6efe0; animation-delay: 0.5s !important; }
-.seal-beat-cost { font-size: var(--cv-text-sm); color: rgb(232 226 210 / 0.72); animation-delay: 1s !important; }
 .seal-beat-epi { font-size: var(--cv-text-md); color: rgb(240 214 170 / 0.9); max-width: 34ch; line-height: 1.8; animation-delay: 1.7s !important; }
 .seal-beat-next { margin-top: 12px; font-size: 12px; letter-spacing: 0.4em; color: var(--cv-brass-300); animation-delay: 2.6s !important; }
 
@@ -1784,17 +1783,6 @@ html[data-cine='finale'] .coach-bar,
 html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 
 /* 靠港：两种读法，折叠在画面里 */
-.cine-readings {
-  margin-top: 6px;
-}
-.cine-readings summary {
-  cursor: pointer;
-  font-size: var(--cv-text-xs);
-  letter-spacing: 0.12em;
-  color: rgb(220 200 160 / 0.72);
-  padding: 4px 0;
-}
-.cine-readings-list { display: grid; gap: 10px; margin-top: 8px; }
 .cine-reading {
   padding-left: 12px;
   border-left: 1px solid rgb(220 200 160 / 0.3);
@@ -2102,12 +2090,137 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
   color: rgb(232 226 210 / 0.78);
   animation: cine-rise 900ms ease 1.6s both;
 }
-.seal-beat-supply {
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  color: var(--cv-brass-300);
-  animation: cine-rise 900ms ease 2s both;
-}
 .finale-met { color: rgb(232 226 210 / 0.8); }
 .finale-trust { display: grid; gap: 6px; color: #ffe1a6; }
 .finale-trust span { font-size: 11px; letter-spacing: 0.3em; color: rgb(232 226 210 / 0.55); }
+
+/* ================= 故事：旁白 · 危机 · 岸上的人 · 精神图谱 ================= */
+.story-cap {
+  position: fixed;
+  left: 50%;
+  top: 19%;
+  transform: translateX(-50%);
+  z-index: calc(var(--cv-z-panel) + 1);
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: min(640px, 90vw);
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 2px 22px rgb(0 0 0 / 0.95), 0 0 2px rgb(0 0 0 / 0.8);
+  animation: story-cap 7s ease both;
+}
+@keyframes story-cap {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  84% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -6px); }
+}
+.story-cap-title { font-size: 11px; letter-spacing: 0.4em; color: rgb(232 226 210 / 0.55); }
+.story-cap-kicker { font-size: 12px; letter-spacing: 0.5em; color: var(--cv-brass-300); }
+.story-cap-text {
+  margin: 0;
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.1rem, 2.2vw, 1.55rem);
+  line-height: 1.7;
+  color: #f6efe0;
+}
+
+.enc-crisis {
+  font-size: 12px;
+  letter-spacing: 0.6em;
+  color: #e07a62;
+  text-shadow: 0 0 16px rgb(224 122 98 / 0.6);
+}
+.enc.is-crisis .enc-scrim {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 80%, rgb(40 8 4 / 0.55), rgb(6 8 10 / 0) 72%),
+    linear-gradient(to top, rgb(10 6 6 / 0.94) 0%, rgb(10 6 6 / 0.74) 32%, rgb(10 6 6 / 0.34) 55%, rgb(10 6 6 / 0) 74%);
+}
+
+.shore {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 4);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 18px;
+  padding: 6vh 24px;
+  text-align: center;
+  overflow-y: auto;
+}
+.shore > * { position: relative; }
+.shore-scrim {
+  position: fixed !important;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 45%, rgb(8 10 12 / 0.72), rgb(8 10 12 / 0.9) 80%);
+  animation: fade-in 900ms ease both;
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.shore-arrival { margin: 0; font-size: 13px; letter-spacing: 0.2em; color: rgb(232 226 210 / 0.55); animation: cine-rise 900ms ease both; }
+.shore-who { display: grid; gap: 6px; justify-items: center; animation: cine-rise 1100ms ease 300ms both; }
+.shore-name {
+  font-family: var(--cv-font-display);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  letter-spacing: 0.12em;
+  color: #f6efe0;
+}
+.shore-years { font-size: 12px; letter-spacing: 0.4em; color: var(--cv-brass-300); }
+.shore-deed { max-width: 36em; font-size: var(--cv-text-sm); line-height: 1.7; color: rgb(232 226 210 / 0.7); }
+.shore-mono { display: grid; gap: 10px; max-width: 34em; }
+.shore-line, .shore-quote, .shore-meaning, .shore-tag {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 900ms ease, transform 900ms ease;
+}
+.shore-line.is-in, .shore-quote.is-in, .shore-meaning.is-in, .shore-tag.is-in { opacity: 1; transform: none; }
+.shore-line {
+  margin: 0;
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.02rem, 1.9vw, 1.3rem);
+  line-height: 1.8;
+  color: #f0e8d6;
+}
+.shore-tag { justify-self: center; font-size: 10px; letter-spacing: 0.3em; color: rgb(232 226 210 / 0.38); }
+.shore-quote {
+  margin: 0;
+  max-width: 36em;
+  padding: 10px 0;
+  border-top: 1px solid rgb(201 161 90 / 0.3);
+  border-bottom: 1px solid rgb(201 161 90 / 0.3);
+}
+.shore-quote p { margin: 0 0 6px; font-family: var(--cv-font-display); font-size: clamp(0.98rem, 1.7vw, 1.15rem); line-height: 1.7; color: #ffe1a6; }
+.shore-quote cite { font-style: normal; font-size: 11px; letter-spacing: 0.12em; color: rgb(232 226 210 / 0.5); }
+.shore-meaning { display: grid; gap: 6px; justify-items: center; max-width: 32em; }
+.shore-spirit {
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: 0.6em;
+  padding-left: 0.6em;
+  color: #fff1d0;
+  text-shadow: 0 0 24px rgb(255 220 160 / 0.5);
+}
+.shore-meaning p { margin: 0; font-size: var(--cv-text-sm); line-height: 1.8; color: rgb(240 232 214 / 0.85); }
+.shore-go { margin-top: 6px; }
+
+.cine-cost-story { font-style: normal; color: var(--cv-brass-300); }
+.epoch-intro-story { font-size: 13px; letter-spacing: 0.3em; color: var(--cv-brass-300); }
+
+.finale-path { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; }
+.finale-path span { display: grid; gap: 2px; }
+.finale-path b { font-family: var(--cv-font-display); font-weight: 500; font-size: 1.25rem; letter-spacing: 0.3em; color: #fff1d0; }
+.finale-path i { font-style: normal; font-size: 11px; letter-spacing: 0.2em; color: rgb(232 226 210 / 0.55); }
+
+.spirit-map { width: min(460px, 90vw); height: auto; }
+.spirit-title { font-size: 11px; letter-spacing: 0.5em; fill: var(--cv-brass-300); }
+.spirit-era { font-size: 10px; letter-spacing: 0.3em; fill: rgb(232 226 210 / 0.5); }
+.spirit-word { font-size: 12px; letter-spacing: 0.2em; fill: rgb(232 226 210 / 0.6); }
+.spirit-word.is-on { fill: #fff1d0; font-size: 13px; }
+.spirit-fig { font-size: 9px; letter-spacing: 0.12em; fill: rgb(232 226 210 / 0.5); }
+
+/* 摇杆只给触屏：有键盘就不占这块地方 */
+@media (pointer: fine) {
+  .joystick { display: none; }
+}

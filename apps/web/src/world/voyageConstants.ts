@@ -60,10 +60,11 @@ export const PORT_LAMP_SHAPES: Array<'sphere' | 'box' | 'tube'> = ['sphere', 'bo
 
 /** Harbor approach bands, as radius multipliers. Caps keep F reachable at treasure-ship speed. */
 export const HARBOR_APPROACH = {
-  outer: 4.0,
-  mid: 2.4,
+  // 减速区只罩住港口附近。原来是 4 倍半径（48），几乎整张海图都在减速
+  outer: 2.0,
+  mid: 1.5,
   exit: 2.6,
-  inner: 1.35,
+  inner: 1.1,
   outerCap: 0.62,
   midCap: 0.34,
   innerCap: 0.18,

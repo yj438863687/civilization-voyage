@@ -162,20 +162,6 @@ export const ENCOUNTERS: Record<string, Encounter> = {
   },
 
   /* ---------- A 农业 ---------- */
-  'A-seed': {
-    who: '老农',
-    role: '第一年留下来的人',
-    look: LOOK.elder,
-    line: '这一把谷子，吃掉能过三天；种下去，要等一个夏天。',
-    game: {
-      kind: 'choice',
-      ask: '一把谷子',
-      options: [
-        { label: '留作种子', note: '先饿着，赌一个收成', out: { text: '你把谷子埋进河滩。船上这几天吃得很省，但河滩上有了第一行绿。', supply: -10, trust: 10 } },
-        { label: '分给大家吃', note: '现在就有力气划船', out: { text: '大家吃饱了。谷子没了，下一年还要再找。', supply: 10, trust: -2 } },
-      ],
-    },
-  },
   'A-water': {
     who: '守闸的人',
     role: '把水分给每块地',
@@ -214,21 +200,6 @@ export const ENCOUNTERS: Record<string, Encounter> = {
   },
 
   /* ---------- B 工业 ---------- */
-  'B-rail': {
-    who: '测量员',
-    role: '替公司选线的人',
-    look: LOOK.surveyor,
-    line: '铁轨只够先铺到一个镇。你说先连哪个？',
-    game: {
-      kind: 'choice',
-      ask: '铁轨先连哪个镇',
-      options: [
-        { label: '连煤矿镇', note: '煤运得出来，船就跑得更快', out: { text: '铁轨先到了煤矿。船上的煤从此不缺，镇上的天也从此是灰的。', supply: 14, trust: -6 },
-        },
-        { label: '连渔村', note: '人能出来，鱼能卖出去', out: { text: '铁轨先到了渔村。煤价没降，可第一趟车上挤满了出门的人。', supply: -4, trust: 10 } },
-      ],
-    },
-  },
   'B-coal': {
     who: '司炉',
     role: '炉前的人',
@@ -267,20 +238,6 @@ export const ENCOUNTERS: Record<string, Encounter> = {
   },
 
   /* ---------- C 信息 ---------- */
-  'C-cable': {
-    who: '铺缆船长',
-    role: '决定缆落在哪里',
-    look: LOOK.lineman,
-    line: '这卷缆只够铺到一个岛。出钱的人说铺大的那个。',
-    game: {
-      kind: 'choice',
-      ask: '电缆铺到哪',
-      options: [
-        { label: '铺到大岛', note: '出钱的人满意，回本快', out: { text: '大岛亮了。小岛还在等下一卷缆，没人说是哪一年。', supply: 12, trust: -6 } },
-        { label: '铺到小岛', note: '那里还没有一根线', out: { text: '小岛第一次收到电报。出钱的人发来一封很长的信，问你为什么。', supply: -6, trust: 12 } },
-      ],
-    },
-  },
   'C-screen': {
     who: '值守员',
     role: '盯着整面屏幕墙',
@@ -319,20 +276,6 @@ export const ENCOUNTERS: Record<string, Encounter> = {
   },
 
   /* ---------- D 智能 ---------- */
-  'D-dest': {
-    who: '舵机',
-    role: '不是人，但会说话',
-    look: LOOK.pilot,
-    line: '请定义目的地。你可以给我坐标，也可以只告诉我你想要什么。',
-    game: {
-      kind: 'choice',
-      ask: '怎么告诉它目的地',
-      options: [
-        { label: '给它一个坐标', note: '它只去那里，不多想', out: { text: '它准确地朝坐标开去。路上的事，它一件也没问你。', supply: 10, trust: -2 } },
-        { label: '告诉它你想要什么', note: '它会自己解释', out: { text: '它想了一秒，换了一条你没见过的航线。你不确定这是不是你的意思。', supply: 4, trust: 6 } },
-      ],
-    },
-  },
   'D-log': {
     who: '值守工程师',
     role: '唯一读日志的人',
@@ -388,6 +331,8 @@ export interface VoyageStats {
   log: string[];
   /** 一路上遇见过的人：哪个时代、是谁、你怎么对他的 */
   met: { era: string; who: string; trust: number }[];
+  /** 走过的航线：精神图谱上亮起的那几颗星 */
+  path: { era: string; lane: string; word: string; figure: string }[];
 }
 
 const KEY = 'cv.stats.v1';
@@ -397,7 +342,7 @@ export function loadStats(): VoyageStats {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const v = JSON.parse(raw) as VoyageStats;
-      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [] };
+      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [] };
     }
   } catch {
     /* 私密窗口等情况：从默认值开始 */
@@ -407,7 +352,7 @@ export function loadStats(): VoyageStats {
 
 /** 新开一局：从启航港出发时，补给与人心回到起点 */
 export function freshStats(): VoyageStats {
-  return { supply: 80, trust: 50, log: [], met: [] };
+  return { supply: 80, trust: 50, log: [], met: [], path: [] };
 }
 
 export function saveStats(s: VoyageStats) {
@@ -425,8 +370,14 @@ export function applyOutcome(s: VoyageStats, o: Outcome, tag: string, era: strin
     supply: clamp(s.supply + o.supply),
     trust: clamp(s.trust + o.trust),
     log: [...s.log, `${tag}：${o.text}`].slice(-40),
-    met: [...s.met, { era, who, trust: o.trust }].slice(-24),
+    met: [...s.met, { era, who, trust: o.trust }].slice(-40),
+    path: s.path,
   };
+}
+
+/** 落印时记下这一段走的是哪条线：同一时代只留最后一次 */
+export function addPath(s: VoyageStats, step: VoyageStats['path'][number]): VoyageStats {
+  return { ...s, path: [...s.path.filter((p) => p.era !== step.era), step] };
 }
 
 export function addSupply(s: VoyageStats, n: number): VoyageStats {

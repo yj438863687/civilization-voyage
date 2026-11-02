@@ -7,8 +7,10 @@ import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from
 import { laneStops, worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
 import { chartSummary } from './world/chart';
-import { BOOST_NAME, addSupply, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
+import { BOOST_NAME, addPath, addSupply, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
 import { EncounterOverlay } from './components/Encounter';
+import { ShoreOverlay, SpiritMap, StoryCaption } from './components/Story';
+import { loadProgress, saveProgress, storyFor, type Beat, type StoryProgress } from './world/stories';
 
 
 /** 每段入海的开场：时代、一句立意、这一程的问题。字随时间一层层浮出来。 */
@@ -318,8 +320,6 @@ export function App() {
   const [dissent, setDissent] = useState('');
   /** 站位：这一程真正要拨的那根刻度。null = 还没表态 */
   const [stanceIdx, setStanceIdx] = useState<number | null>(null);
-  /** 代价落在谁身上。必须点名，不让写「社会」 */
-  const [costIdx, setCostIdx] = useState<number | null>(null);
   const [routeId, setRouteId] = useState('simple');
   /** 实际走的航道。和 routeId 是一回事，但 world 里按 near/far 存，方便渲染。 */
   const [laneId, setLaneId] = useState<string>('near');
@@ -328,7 +328,7 @@ export function App() {
   /** 已经开进传送门：值是下一段的场景 id */
   const [nearPortal, setNearPortal] = useState<string | null>(null);
   /** 落印后的回响：几秒钟的字，然后回到海上 */
-  const [sealBeat, setSealBeat] = useState<{ pick: string; cost: string; epilogue: string; met?: string | null } | null>(null);
+  const [sealBeat, setSealBeat] = useState<{ pick: string; epilogue: string; met?: string | null } | null>(null);
   /** 每段入海的开场字幕 */
   const [intro, setIntro] = useState<string | null>(null);
   /** 第四段落印后：收帆 */
@@ -357,8 +357,16 @@ export function App() {
   }, []);
   /** 正在进行的遭遇：材料 id */
   const [enc, setEnc] = useState<string | null>(null);
+  /** 转：危机。开到那里就发生 */
+  const [crisis, setCrisis] = useState<string | null>(null);
+  /** 承：沿途旁白，浮一会儿就散 */
+  const [caption, setCaption] = useState<Beat | null>(null);
+  /** 合：岸上的人 */
+  const [shoreOpen, setShoreOpen] = useState(false);
+  const [progress, setProgress] = useState<StoryProgress>({ beats: [], crisis: [], shore: [] });
   const encRef = useRef<string | null>(null);
-  encRef.current = enc;
+  // 遭遇和危机都占住双手：船停下，键盘交给小游戏
+  encRef.current = enc ?? crisis;
   const shipRef = useRef<ShipSnapshot | null>(null);
 
   const connected = models.length > 0;
@@ -716,10 +724,9 @@ export function App() {
     const last = sealed[sealed.length - 1];
     if (!last) return [] as string[];
     const line = last.text.split('\n').find((l) => l.startsWith('站位：'));
-    const costLine = last.text.split('\n').find((l) => l.startsWith('代价落在：'));
-    if (!line || !costLine) return [] as string[];
+    if (!line) return [] as string[];
     return [
-      `上一程（${voyage.scene_id}）留下的：${line.replace('站位：', '站位「')}」，${costLine}`,
+      `上一程（${voyage.scene_id}）留下的：${line.replace('站位：', '站位「')}」`,
       `上一程的原话：${voyage.question}`,
     ];
   }
@@ -831,7 +838,13 @@ export function App() {
   }
 
   async function dock() {
-    if (!voyage || !nearPort || landing > 0) return;
+    if (!voyage || !nearPort || landing > 0 || crisis) return;
+    // 「转」不能跳过：那件事还没发生，就先让它发生
+    if (story && !progress.crisis.includes(story.crisis.id)) {
+      setCaption(null);
+      setCrisis(story.crisis.id);
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -990,12 +1003,92 @@ export function App() {
    * 铜针指向哪里，就是这一程下一步该去哪里：
    * 航道上还没收的东西 → 港口 → 落印后指向门。
    */
+  const story = storyFor(voyage?.scene_id, laneId);
+
+  // 换了航程：读回这一程已经看过的戏
+  useEffect(() => {
+    setProgress(loadProgress(voyage?.id));
+    setCaption(null);
+    setCrisis(null);
+    setShoreOpen(false);
+    // 靠港戏的时间轴属于上一程：不归零，下一程就再也靠不了港
+    setLanding(0);
+  }, [voyage?.id]);
+
+  // 从港口回到海上：靠港戏已经演完，时间轴归零，下次靠港还能再演
+  useEffect(() => {
+    if (view === 'world' && landing >= 1) setLanding(0);
+  }, [view, landing]);
+
+  const markProgress = useCallback(
+    (fn: (p: StoryProgress) => StoryProgress) => {
+      setProgress((prev) => {
+        const next = fn(prev);
+        saveProgress(voyage?.id, next);
+        return next;
+      });
+    },
+    [voyage?.id],
+  );
+
+  // 船经过旁白点、危机点：戏自己发生
+  useEffect(() => {
+    if (view !== 'world' || !story || !ship || enc || crisis || landing > 0 || intro) return;
+    for (const b of story.beats) {
+      if (progress.beats.includes(b.id)) continue;
+      if (Math.hypot(ship.x - b.at.x, ship.z - b.at.z) < 7.5) {
+        setCaption(b);
+        markProgress((p) => ({ ...p, beats: [...p.beats, b.id] }));
+        return;
+      }
+    }
+    const c = story.crisis;
+    if (!progress.crisis.includes(c.id) && Math.hypot(ship.x - c.at.x, ship.z - c.at.z) < 7) {
+      setCaption(null);
+      setCrisis(c.id);
+    }
+  }, [view, story, ship, enc, crisis, landing, intro, progress, markProgress]);
+
+  useEffect(() => {
+    if (!caption) return;
+    const t = window.setTimeout(() => setCaption(null), reduceMotion ? 4000 : 7000);
+    return () => window.clearTimeout(t);
+  }, [caption, reduceMotion]);
+
+  // 靠岸后，先见岸上的人，再落印
+  useEffect(() => {
+    if (view === 'port' && story && voyage && !progress.shore.includes(voyage.id)) setShoreOpen(true);
+  }, [view, story, voyage, progress]);
+
+  function finishCrisis(o: Outcome, summary: string) {
+    if (!story || !voyage) return;
+    const c = story.crisis;
+    const tag = `${c.kicker} · ${c.enc.who}（${summary}）`;
+    updateStats((st) => applyOutcome(st, o, tag, voyage.scene_id, c.enc.who));
+    markProgress((p) => ({ ...p, crisis: [...p.crisis, c.id] }));
+    setCrisis(null);
+    void api
+      .addRecord(voyage.id, {
+        kind: 'log',
+        text: `${story.title} · ${c.kicker}\n${tag}：${o.text}`,
+        classification: 'creative',
+        sources: [],
+        material_ids: [],
+        version: 1,
+        access: 'private',
+      })
+      .then(async () => setRecords(await api.records(voyage.id)))
+      .catch((e) => setError(errText(e)));
+  }
+
   const guideTarget = useMemo(() => {
     if (sealedHere && sea.portal) return { x: sea.portal.x, z: sea.portal.z };
     const next = laneStops(sea, laneId).find((f) => !collectedIds.has(f.id));
     if (next) return { x: next.x, z: next.z };
+    // 东西收齐了，还有一场躲不开的事在前面
+    if (story && !progress.crisis.includes(story.crisis.id)) return story.crisis.at;
     return portPlace ?? null;
-  }, [sealedHere, sea, laneId, collectedIds, portPlace]);
+  }, [sealedHere, sea, laneId, collectedIds, portPlace, story, progress]);
 
   const relNow = ship && guideTarget ? portRelDeg(ship, guideTarget) : null;
   const gateRel = ship && sea.portal ? portRelDeg(ship, sea.portal) : null;
@@ -1032,7 +1125,7 @@ export function App() {
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !sealBeat && !enc}
+          canSail={view === 'world' && !sealBeat && !enc && !crisis}
           sceneId={voyage?.scene_id ?? scenePick?.id ?? 'test'}
           world={sea}
           collectedIds={[...collectedIds]}
@@ -1098,10 +1191,9 @@ export function App() {
                     <span className="hud-relic-key">E</span>
                     <span className="hud-relic-name">{nearFrag.title}</span>
                   </div>
-                ) : (
-                  <StageBar current={beat.current} reached={beat.reached} compact />
-                )}
-                {status.kind !== 'idle' && <StatusBanner kind={status.kind} text={status.text} compact />}
+                ) : null}
+                {/* 「模型未接入」右上角已标出，海上只在真的出错或在执行时提示 */}
+                {(status.kind === 'failed' || status.kind === 'running') && <StatusBanner kind={status.kind} text={status.text} compact />}
               </div>
             ) : (
               <>
@@ -1199,11 +1291,12 @@ export function App() {
                   </span>
                 </div>
                 <div className={`faint${input.boost ? ' is-boost' : ''}`}>
-                  Shift {BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}
-                  {input.boost ? ' · 正在烧补给' : stats.supply <= 0 ? ' · 补给已空，船在定量配给中减速' : ''}
+                  {input.boost
+                    ? `${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'} · 正在烧补给`
+                    : stats.supply <= 0
+                      ? '补给已空 · 船在减速'
+                      : `WASD 航行 · Shift ${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}`}
                 </div>
-                <div className="faint">WASD 航行 · E 靠过去 · F 靠港</div>
-                <div className="faint">滚轮缩放 · 拖动环视 · 双击复位</div>
               </div>
             )}
           </div>
@@ -1228,7 +1321,8 @@ export function App() {
       )}
 
       {/* 出发页只剩画面字，不挂提示条 */}
-      {!['embark', 'reflection', 'cockpit'].includes(view) && (
+      {/* 海上不再挂教练条：铜针、旁白和门的光柱已经在指路 */}
+      {!['embark', 'reflection', 'cockpit', 'world'].includes(view) && (
         <div className={`coach-bar ${view === 'world' || view === 'cockpit' ? 'coach-bar-top' : ''}`}>
           <div className="scrim">
             <div className="label">{tip.step}</div>
@@ -1244,6 +1338,7 @@ export function App() {
           <span className="epoch-intro-title">{EPOCH_INTRO[intro].title}</span>
           <span className="epoch-intro-line">{EPOCH_INTRO[intro].line}</span>
           <span className="epoch-intro-q">{voyage?.question}</span>
+          {story && <span className="epoch-intro-story">这一程 · 「{story.title}」</span>}
         </div>
       )}
 
@@ -1252,10 +1347,8 @@ export function App() {
         <div className="seal-beat" aria-live="polite">
           <span className="seal-beat-mark">印</span>
           <span className="seal-beat-pick">{sealBeat.pick}</span>
-          <span className="seal-beat-cost">代价落在：{sealBeat.cost}</span>
           <span className="seal-beat-epi">{sealBeat.epilogue}</span>
           {sealBeat.met && <span className="seal-beat-met">{sealBeat.met}</span>}
-          <span className="seal-beat-supply">港口补给 +15</span>
           {voyage?.scene_id !== 'D' && sea.portal && <span className="seal-beat-next">门开了 · {sea.portal.label}</span>}
         </div>
       )}
@@ -1265,8 +1358,21 @@ export function App() {
         <div className="finale" aria-live="polite">
           <div className="finale-lines">
             <p style={{ animationDelay: '1.2s' }}>你把目的地交了出去。</p>
-            <p style={{ animationDelay: '4.2s' }}>农业画下第一个圈。工业把它连成线。</p>
-            <p style={{ animationDelay: '7.2s' }}>信息在线上留下一处断点。智能点上了一颗它自己算出来的星。</p>
+            {stats.path.length > 0 ? (
+              <p style={{ animationDelay: '4.2s' }} className="finale-path">
+                {stats.path.map((p) => (
+                  <span key={p.era}>
+                    <b>{p.word}</b>
+                    <i>{p.figure}</i>
+                  </span>
+                ))}
+              </p>
+            ) : (
+              <>
+                <p style={{ animationDelay: '4.2s' }}>农业画下第一个圈。工业把它连成线。</p>
+                <p style={{ animationDelay: '7.2s' }}>信息在线上留下一处断点。智能点上了一颗它自己算出来的星。</p>
+              </>
+            )}
             {stats.met.length > 0 && (
               <p style={{ animationDelay: '9.6s' }} className="finale-met">
                 你在海上遇见过：{[...new Set(stats.met.map((m) => m.who))].join('、')}。
@@ -1280,7 +1386,7 @@ export function App() {
             </p>
           </div>
           <div className="finale-chart" style={{ animationDelay: '21.5s' }}>
-            <ChartMap struck={['A', 'B', 'C', 'D']} activeEpoch="D" />
+            <SpiritMap path={stats.path} />
             <button className="cine-link" type="button" onClick={() => { setFinale(false); void goReflect(); }}>
               看这张图
             </button>
@@ -1299,6 +1405,33 @@ export function App() {
             </span>
           </div>
         )}
+
+      {/* 承：沿途的旁白，从画面里浮出来 */}
+      {view === 'world' && caption && !enc && !crisis && <StoryCaption beat={caption} title={story?.title ?? ''} />}
+
+      {/* 转：躲不开的那件事 */}
+      {view === 'world' && crisis && story && (
+        <EncounterOverlay
+          key={crisis}
+          enc={story.crisis.enc}
+          title={story.crisis.kicker}
+          reduceMotion={reduceMotion}
+          onDone={(o, summary) => finishCrisis(o, summary)}
+          crisis
+        />
+      )}
+
+      {/* 合：岸上的人 */}
+      {view === 'port' && shoreOpen && story && (
+        <ShoreOverlay
+          story={story}
+          reduceMotion={reduceMotion}
+          onDone={() => {
+            setShoreOpen(false);
+            if (voyage) markProgress((p) => ({ ...p, shore: [...p.shore, voyage.id] }));
+          }}
+        />
+      )}
 
       {/* 遭遇：海上的人和他手上的事 */}
       {view === 'world' && enc && encounterFor(enc) && (
@@ -1408,8 +1541,11 @@ export function App() {
                     onClick={() => setLaneId(lane.id)}
                     aria-pressed={on}
                   >
-                    <span className="cine-cost-name">{lane.name}</span>
-                    <span className="cine-cost-note">{lane.promise}</span>
+                    <span className="cine-cost-name">
+                      {lane.name}
+                      {storyFor(voyage.scene_id, lane.id) && <em className="cine-cost-story"> · {storyFor(voyage.scene_id, lane.id)!.title}</em>}
+                    </span>
+                    <span className="cine-cost-note">{storyFor(voyage.scene_id, lane.id)?.logline ?? lane.promise}</span>
                   </button>
                 );
               })}
@@ -1499,7 +1635,7 @@ export function App() {
       )}
 
       {/* 靠港：没有卡片。文字浮在画面上，刻度直接在画面上拨 */}
-      {view === 'port' && voyage && !sealBeat && (
+      {view === 'port' && voyage && !sealBeat && !shoreOpen && (
         <div className="cine-panel" aria-live="polite">
           <div className="cine-inner">
             <div className="cine-kicker">
@@ -1538,50 +1674,19 @@ export function App() {
                 </div>
                 {stanceIdx != null && <p className="cine-line cine-note">{stance.axis.choices[stanceIdx].note}</p>}
 
-                {/* 两种读法：落印之前先摆在眼前，各自带一句"看不到" */}
-                <details className="cine-readings">
-                  <summary>两种读法 · 各自看不到什么</summary>
-                  <div className="cine-readings-list">
-                    {stance.crew.map((c) => (
-                      <div key={c.who} className="cine-reading">
-                        <span className="cine-reading-who">{c.who}</span>
-                        <p className="cine-reading-main">{c.reads}</p>
-                        <p className="cine-reading-blind">看不到：{c.blind}</p>
-                      </div>
-                    ))}
-                  </div>
-                </details>
-
-                <p className="cine-line cine-prompt">这一步的代价落在谁身上</p>
-                <div className="cine-costs">
-                  {stance.costs.map((c, i) => (
-                    <button
-                      key={c.label}
-                      type="button"
-                      className={`cine-cost${costIdx === i ? ' is-on' : ''}`}
-                      aria-pressed={costIdx === i}
-                      onClick={() => setCostIdx(i)}
-                    >
-                      <span className="cine-cost-name">{c.label}</span>
-                      <span className="cine-cost-note">{c.note}</span>
-                    </button>
-                  ))}
-                </div>
-
                 <div className="cine-actions">
                   <SealButton
                     label="按住落印"
-                    disabled={busy || stanceIdx == null || costIdx == null}
-                    hint="在刻度上选一个位置，再点名谁承担。"
+                    disabled={busy || stanceIdx == null}
+                    hint="在刻度上选一个位置。"
                     onSeal={() => {
-                      if (!voyage || stanceIdx == null || costIdx == null) return;
+                      if (!voyage || stanceIdx == null) return;
                       const pick = stance.axis.choices[stanceIdx];
-                      const own = stance.costs[costIdx];
                       const used = records.filter((r) => r.kind === 'fragment' || r.kind === 'material');
                       void api
                         .addRecord(voyage.id, {
                           kind: 'choice',
-                          text: [`站位：${pick.label}`, `轴：${stance.axis.left} ↔ ${stance.axis.right}`, `代价落在：${own.label}`].join('\n'),
+                          text: [`站位：${pick.label}`, `轴：${stance.axis.left} ↔ ${stance.axis.right}`].join('\n'),
                           classification: 'counterfactual',
                           sources: [],
                           material_ids: used.map((r) => r.id),
@@ -1593,12 +1698,16 @@ export function App() {
                           // 印落下：先让这一下被看见，再把人送回海上去找门
                           setSealBeat({
                             pick: pick.label,
-                            cost: own.label,
                             epilogue: stance.epilogue,
                             met: metLine(statsRef.current, voyage?.scene_id ?? 'test'),
                           });
-                          // 港口给这一程补一次给养
-                          updateStats((st) => addSupply(st, 15));
+                          // 港口给这一程补一次给养；这条航线在精神图谱上亮起
+                          updateStats((st) => {
+                            const withSupply = addSupply(st, 15);
+                            return story
+                              ? addPath(withSupply, { era: voyage?.scene_id ?? '', lane: laneId, word: story.spirit.word, figure: story.figure.name })
+                              : withSupply;
+                          });
                         })
                         .catch((e) => setError(errText(e)));
                     }}

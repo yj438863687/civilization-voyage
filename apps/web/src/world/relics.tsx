@@ -34,17 +34,13 @@ export type RelicKind =
 export function relicKindOf(id: string): RelicKind {
   const map: Record<string, RelicKind> = {
     'chart-scrap': 'chart-scrap',
-    'A-seed': 'seed',
     'A-stake': 'clay-tablet',
     'A-granary': 'granary',
     'B-gauge': 'gauge',
     'B-shift': 'shift',
-    'B-rail': 'spike',
-    'C-cable': 'cable',
     'C-tz': 'clock',
     'C-dark': 'broken-line',
     'D-star': 'starchart',
-    'D-dest': 'dest',
     'D-skip': 'skipped',
     // 每条航道上的第二件
     'A-water': 'spike',
