@@ -90,6 +90,8 @@ v1 的 `previousPlanRecordId` 为 `null`，v2 指向 v1 的唯一记录 ID。反
 
 ## 补测与集成复核
 
+第二轮结果、修复范围、文化依据及遗留项见 [E2E-ROUND2.md](E2E-ROUND2.md)。其中 45 PASS、0 FAIL、5 NOT TESTED 为第二轮报告结果；本次没有重跑首轮全部 41 项。
+
 恢复、存储冲突及版本关系的可重复测试见 [TESTING.md](TESTING.md)。保留原始坏存档供下载，不静默补齐或清除；重置在仅本页暂存时仍检查其他页面是否更新了存档。
 
 与 A/B/D/E 的边界、已核对源码快照和未联调功能见 [INTEGRATION.md](INTEGRATION.md)。静态契约核对不表示跨模块接入已经实现。
