@@ -1,3 +1,5 @@
+> **后续（墨海铜灯）**：视觉已按 `design/voyage-art-direction` 重对齐，见同目录 `UI_ALIGN_墨海铜灯.md`。本文件保留 taste 主题 33 的第一次润色记录。
+
 # UI 定向修改 · 文化驾驶舱（taste topic 33）
 
 范围：单文件离线 HTML 原型视觉/触感润色。未换业务逻辑、材料数据、导出 schema，也未套用 Hallmark / 落地页 / B 端后台整套模板。
