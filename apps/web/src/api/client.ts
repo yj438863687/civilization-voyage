@@ -14,7 +14,12 @@ import {
   type VoyageUpdate,
 } from './types';
 
-export const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8010';
+/**
+ * 端口 5180 是打包后的本地应用：它自己的静态服务器顺便把 /api 反代到后端，
+ * 于是请求同源，不受 CORS 限制，双击图标就能直接玩。开发时仍走 8010。
+ */
+const SAME_ORIGIN = typeof location !== 'undefined' && location.port === '5180';
+export const API_BASE = import.meta.env.VITE_API_BASE ?? (SAME_ORIGIN ? '/api' : 'http://127.0.0.1:8010');
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(API_BASE + path, {
