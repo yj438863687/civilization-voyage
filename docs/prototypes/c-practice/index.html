@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102027">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>蒸汽港的下一班 · 文明航程</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./port.css">
+</head>
+<body>
+  <a class="skip" href="#main">跳到当前步骤</a>
+  <header class="mast"><div class="mast-inner">
+    <div class="brand"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="currentColor"/><path d="M22 5v5m0 24v5M5 22h5m24 0h5m-19-7 4 9 9 5-5-10z" fill="none" stroke="currentColor"/><path d="m28 13-3 12-11 5 5-12z" fill="currentColor"/><circle cx="22" cy="22" r="2" fill="#142830"/></svg><div><strong>文明航程</strong><small>CIVILIZATION VOYAGE</small></div></div>
+    <div class="mast-actions"><span id="save-state">本机演练</span><button id="reset" type="button" class="mast-btn" hidden>重新开始</button></div>
+  </div></header>
+  <div class="frame">
+    <nav id="steps" aria-label="演练进度"></nav>
+    <div id="storage-note" class="storage-note" role="status" hidden></div>
+    <main id="main" tabindex="-1"><p class="startup">正在打开港务交接簿…… 若页面停在此处，请按 README 启动本地 HTTP 服务并通过本机地址进入。</p></main>
+    <footer><span>文明航程　/　成员 C · 实践与反思</span><span>教学创作模拟 · 本地演练</span></footer>
+  </div>
+  <dialog id="reset-dialog" aria-labelledby="reset-title"><h2 id="reset-title">清除本次交接簿？</h2><p>本机保存的目标、安排和反思将被清除。你可以先导出 JSON 留存。</p><div class="dialog-actions"><button type="button" id="cancel-reset" class="secondary" autofocus>保留草稿</button><button type="button" id="confirm-reset" class="primary">清除并重新开始</button></div></dialog>
+  <noscript><p>请启用 JavaScript，通过本地 HTTP 服务打开此演练。</p></noscript>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
