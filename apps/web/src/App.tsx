@@ -936,6 +936,7 @@ export function App() {
   }, [sealedHere, sea, laneId, collectedIds, portPlace]);
 
   const relNow = ship && guideTarget ? portRelDeg(ship, guideTarget) : null;
+  const gateRel = ship && sea.portal ? portRelDeg(ship, sea.portal) : null;
   const portDistNow = ship && portPlace ? Math.hypot(portPlace.x - ship.x, portPlace.z - ship.z) : null;
   const tip = guide(view, {
     connected,
@@ -957,7 +958,7 @@ export function App() {
   });
   // 落印之后，这一段剩下的事只有一件：去门那里
   if (view === 'world' && sealedHere && sea.portal) {
-    tip.next = `门开了。它在港口的右舷外海，一根光柱立在海上——驶进去就是「${sea.portal.label}」。`;
+    tip.next = `门开了。跟着光柱和罗盘上的「门」，驶进去就是下一段。`;
   } else if (view === 'world' && sealedHere && !sea.portal) {
     tip.next = '这一段没有门。';
   }
@@ -1107,6 +1108,12 @@ export function App() {
                   >
                     <span className="compass-port-tip" />
                   </div>
+                  {/* 门的方位：一直在罗盘边上，锁着是暗点，开了是亮点 */}
+                  {gateRel != null && (
+                    <div className={`compass-gate${sealedHere ? ' is-open' : ''}`} style={{ transform: `rotate(${gateRel}deg)` }}>
+                      <span>门</span>
+                    </div>
+                  )}
                   <div className="compass-needle" />
                   <span className={`compass-key compass-key-a${relNow != null && relNow < -32 ? ' is-on' : ''}`}>A</span>
                   <span className={`compass-key compass-key-d${relNow != null && relNow > 32 ? ' is-on' : ''}`}>D</span>

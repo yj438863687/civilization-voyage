@@ -685,7 +685,8 @@ function Portal({
   useFrame(({ clock }) => {
     if (reduceMotion) return;
     const t = clock.elapsedTime;
-    if (veil.current) veil.current.opacity = open ? 0.16 + Math.sin(t * 1.3) * 0.05 : 0.05;
+    // 锁着的时候也要看得见：一块很暗、但在呼吸的门，像还没点起来的灯
+    if (veil.current) veil.current.opacity = open ? 0.16 + Math.sin(t * 1.3) * 0.05 : 0.07 + Math.sin(t * 0.9) * 0.02;
     if (rim.current) rim.current.opacity = open ? 0.9 : 0.16;
     if (halo.current) halo.current.opacity = open ? 0.42 + Math.sin(t * 1.1) * 0.08 : 0.1;
     if (group.current) group.current.position.y = Math.sin(t * 0.5) * 0.1;
@@ -741,7 +742,7 @@ function Portal({
       </mesh>
       <mesh position={[0, H + 0.5, 1.12]}>
         <boxGeometry args={[W + 2.4, 0.3, 0.12]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={open ? 1.5 : 0.12} toneMapped={!open} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={open ? 1.5 : 0.32} toneMapped={!open} />
       </mesh>
 
       {/* 门内的光：下一段的海色。落印前是一块暗石，落印后是一整面会呼吸的光 */}
@@ -749,7 +750,7 @@ function Portal({
         <planeGeometry args={[W, H]} />
         <meshBasicMaterial
           ref={veil}
-          color={open ? color : '#15130f'}
+          color={open ? color : '#2a2418'}
           transparent
           opacity={0.06}
           side={THREE.DoubleSide}
@@ -774,14 +775,14 @@ function Portal({
       </mesh>
 
       {/* 光柱：落印之后，这道门从任何方向都看得见。不是科幻，是灯塔的道理 */}
-      {open && (
-        <group>
+      {/* 锁着时也有一道很淡的光柱：从出海第一眼起，玩家就知道远处有一道门 */}
+      <group>
           <mesh position={[0, 34, 0]}>
             <cylinderGeometry args={[0.9, 2.2, 68, 16, 1, true]} />
             <meshBasicMaterial
               color={color}
               transparent
-              opacity={0.07}
+              opacity={open ? 0.07 : 0.03}
               depthWrite={false}
               side={THREE.DoubleSide}
               blending={THREE.AdditiveBlending}
@@ -793,15 +794,14 @@ function Portal({
             <meshBasicMaterial
               color="#fff4dc"
               transparent
-              opacity={0.18}
+              opacity={open ? 0.18 : 0.06}
               depthWrite={false}
               side={THREE.DoubleSide}
               blending={THREE.AdditiveBlending}
               fog={false}
             />
           </mesh>
-        </group>
-      )}
+      </group>
 
       {/* 夜里从远处看：门楣下方悬着一点光，是这一带的唯一航标 */}
       <mesh position={[0, H - 0.2, 0]}>
