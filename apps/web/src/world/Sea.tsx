@@ -8,6 +8,9 @@ import { Relic, relicKindOf } from './relics';
 import { encounterFor } from './encounters';
 import { SPAWN, storyFor } from './stories';
 import { ShoreFigure, StoryProps } from './StoryProps';
+import { FableIsland, FloodVillage } from './FableStage';
+import { TaoyuanScene } from './TaoyuanScene';
+import { ISLAND_OFFSET, VILLAGE_OFFSET, fableLive, type FableState } from './fable';
 import { LaneKeeper } from './People';
 import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
 
@@ -931,6 +934,9 @@ export function Atmosphere({
   nearFragmentId,
   laneId,
   portalOpen = false,
+  fableState = {},
+  crisisDone = false,
+  taoyuanFound = false,
 }: {
   reduceMotion: boolean;
   sceneId: string;
@@ -939,6 +945,11 @@ export function Atmosphere({
   nearFragmentId: string | null;
   laneId: string;
   portalOpen?: boolean;
+  /** 这条航线上已经发生的事 */
+  fableState?: FableState;
+  crisisDone?: boolean;
+  /** 暗线：进过桃花源的人，后来的时代才看得见它的回声 */
+  taoyuanFound?: boolean;
 }) {
   // 夜空：竖向渐变 + 地平线暖带。不做体积云，行高处的雾由 fog 负责。
   const sky = useMemo(() => {
@@ -1033,6 +1044,15 @@ export function Atmosphere({
         <PortSilhouette key={p.id} port={p} sceneId={sceneId} />
       ))}
       {/* 这条航线的戏：沿途岸上的景，和码头上等着你的那个人 */}
+      <TaoyuanScene era={sceneId} found={taoyuanFound} reduceMotion={reduceMotion} />
+      {/* 收过东西的岛还在：岛上留着你做过的事 */}
+      {world.fragments
+        .filter((f) => collectedIds.includes(f.id) && f.lane === laneId && encounterFor(f.id)?.stage)
+        .map((f) => (
+          <group key={`isle-${f.id}`} position={[f.x + ISLAND_OFFSET.x, 0, f.z + ISLAND_OFFSET.z]}>
+            <FableIsland id={f.id} enc={encounterFor(f.id)!} state={fableState} active={false} shipAt={fableLive.ship} reduceMotion={reduceMotion} />
+          </group>
+        ))}
       {(() => {
         const story = storyFor(sceneId, laneId);
         const port = world.ports[0];
@@ -1040,6 +1060,11 @@ export function Atmosphere({
         const fig = { x: port.x - 3.5, z: port.z + 4.5 };
         return (
           <>
+            {story.crisis.cause && (
+              <group position={[story.crisis.at.x + VILLAGE_OFFSET.x, 0, story.crisis.at.z + VILLAGE_OFFSET.z]}>
+                <FloodVillage state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
+              </group>
+            )}
             <StoryProps beats={story.beats} era={sceneId} reduceMotion={reduceMotion} />
             <ShoreFigure
               figure={story.figure}
@@ -1056,10 +1081,24 @@ export function Atmosphere({
           <group key={f.id} position={[f.x, 0, f.z]}>
             <Relic kind={relicKindOf(f.id)} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
             {/* 守着它的人：在物件旁边的一只舢板上，面朝来船的方向 */}
-            {encounterFor(f.id) && (
-              <group position={[2.6, 0, 0.6]} rotation={[0, Math.atan2(-f.x, 22 - f.z) - 0.4, 0]}>
-                <LaneKeeper look={encounterFor(f.id)!.look} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
+            {encounterFor(f.id)?.stage ? (
+              // 童话小岛：一个人、一件执念，你做过的事会留在岛上
+              <group position={[ISLAND_OFFSET.x, 0, ISLAND_OFFSET.z]}>
+                <FableIsland
+                  id={f.id}
+                  enc={encounterFor(f.id)!}
+                  state={fableState}
+                  active={nearFragmentId === f.id}
+                  shipAt={fableLive.ship}
+                  reduceMotion={reduceMotion}
+                />
               </group>
+            ) : (
+              encounterFor(f.id) && (
+                <group position={[2.6, 0, 0.6]} rotation={[0, Math.atan2(-f.x, 22 - f.z) - 0.4, 0]}>
+                  <LaneKeeper look={encounterFor(f.id)!.look} active={nearFragmentId === f.id} reduceMotion={reduceMotion} />
+                </group>
+              )
             )}
           </group>
         ))}

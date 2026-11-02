@@ -2224,3 +2224,90 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 @media (pointer: fine) {
   .joystick { display: none; }
 }
+
+/* ================= 童话：一问一答 · 来由 · 绘本尾页 ================= */
+.enc-talk { display: grid; gap: 8px; width: min(620px, 92vw); transition: opacity 500ms ease; }
+.enc-talk.is-done { opacity: 0.38; }
+.talk-line {
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--cv-font-display);
+  line-height: 1.7;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.95);
+}
+.talk-line.is-new { animation: cine-rise 600ms ease both; }
+.talk-line.is-you { justify-content: flex-end; color: #ffe1a6; font-size: clamp(0.98rem, 1.7vw, 1.15rem); }
+.talk-line.is-them { justify-content: center; color: #f6efe0; font-size: clamp(1.05rem, 1.9vw, 1.3rem); }
+.talk-who { font-family: var(--cv-font-body, sans-serif); font-size: 11px; letter-spacing: 0.3em; color: rgb(232 226 210 / 0.5); flex: none; }
+.talk-line.is-you .talk-who { order: 2; }
+.enc-cause {
+  max-width: 36em;
+  margin: 0;
+  font-family: var(--cv-font-display);
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.8;
+  color: #e8b89a;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.95);
+  transition: opacity 500ms ease;
+}
+.enc-cause.is-up { opacity: 0.55; }
+
+.page {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 5);
+  display: grid;
+  place-items: center;
+  padding: 4vh 16px;
+  background: radial-gradient(ellipse at 50% 40%, rgb(16 14 10 / 0.72), rgb(8 7 5 / 0.92));
+  animation: fade-in 800ms ease both;
+  overflow-y: auto;
+}
+.page-paper {
+  position: relative;
+  width: min(640px, 94vw);
+  padding: 32px clamp(20px, 5vw, 44px) 26px;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  text-align: center;
+  color: #3a2c1e;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgb(255 250 236 / 0.9), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgb(200 176 130 / 0.35), transparent 60%),
+    #ece0c4;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.55), inset 0 0 60px rgb(120 90 50 / 0.25);
+  animation: page-open 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes page-open { from { opacity: 0; transform: translateY(18px) rotate(-0.6deg) scale(0.98); } to { opacity: 1; transform: none; } }
+.page-kicker { font-size: 11px; letter-spacing: 0.5em; color: #8a6a42; }
+.page-title { margin: 0; font-family: var(--cv-font-display); font-weight: 600; font-size: clamp(1.6rem, 4vw, 2.3rem); letter-spacing: 0.2em; color: #2a1e14; }
+.page-art { width: 100%; height: auto; }
+.page-lines { display: grid; gap: 8px; }
+.page-lines p, .page-concept {
+  margin: 0;
+  opacity: 0;
+  animation: cine-rise 800ms ease forwards;
+}
+.page-lines p { font-family: var(--cv-font-display); font-size: clamp(0.98rem, 1.8vw, 1.12rem); line-height: 1.85; color: #3a2c1e; }
+.page-concept { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid rgb(90 68 40 / 0.3); max-width: 34em; }
+.page-concept-name { font-family: var(--cv-font-display); font-size: 1.5rem; letter-spacing: 0.6em; padding-left: 0.6em; color: #8a3a22; }
+.page-concept p { margin: 0; font-size: var(--cv-text-sm); line-height: 1.8; color: #5a4430; }
+.page-go { color: #8a6a42 !important; }
+.pg-label { font-size: 11px; letter-spacing: 0.2em; fill: #5a4430; }
+.pg-draw { stroke-dasharray: 600; stroke-dashoffset: 600; animation: pg-draw 2.4s ease forwards; }
+@keyframes pg-draw { to { stroke-dashoffset: 0; } }
+.pg-fade { opacity: 0; animation: fade-in 900ms ease forwards; }
+
+/* 暗线 · 桃花源：字是暖的，像从山口透出来的光 */
+.enc-secret { font-size: 11px; letter-spacing: 0.4em; color: #f4b8c4; text-shadow: 0 0 14px rgb(244 184 196 / 0.6); }
+.enc.is-secret .enc-scrim {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 70%, rgb(60 30 30 / 0.45), rgb(6 8 10 / 0) 72%),
+    linear-gradient(to top, rgb(14 10 10 / 0.92) 0%, rgb(14 10 10 / 0.7) 34%, rgb(14 10 10 / 0.3) 58%, rgb(14 10 10 / 0) 76%);
+}
+.enc.is-secret .talk-line.is-them { color: #fbe4e0; }
+.finale-tao { display: grid; gap: 6px; color: #f4c8d0; }
+.finale-tao span { font-size: 12px; line-height: 1.8; color: rgb(244 200 208 / 0.7); }

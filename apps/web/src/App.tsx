@@ -9,7 +9,9 @@ import { stanceFor } from './world/stances';
 import { chartSummary } from './world/chart';
 import { BOOST_NAME, addPath, addSupply, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
 import { EncounterOverlay } from './components/Encounter';
-import { ShoreOverlay, SpiritMap, StoryCaption } from './components/Story';
+import { ShoreOverlay, SpiritMap, StoryCaption, StoryPage } from './components/Story';
+import { ISLAND_OFFSET, VILLAGE_OFFSET, fableLive } from './world/fable';
+import { TAOYUAN, TAOYUAN_ECHO, TAOYUAN_ENC, TAOYUAN_FINALE, TAOYUAN_HINT } from './world/taoyuan';
 import { loadProgress, saveProgress, storyFor, type Beat, type StoryProgress } from './world/stories';
 
 
@@ -363,10 +365,14 @@ export function App() {
   const [caption, setCaption] = useState<Beat | null>(null);
   /** 合：岸上的人 */
   const [shoreOpen, setShoreOpen] = useState(false);
-  const [progress, setProgress] = useState<StoryProgress>({ beats: [], crisis: [], shore: [] });
+  const [progress, setProgress] = useState<StoryProgress>({ beats: [], crisis: [], shore: [], state: {} });
+  /** 最后那一页绘本 */
+  const [storyPage, setStoryPage] = useState(false);
+  /** 暗线进行中：桃花源 */
+  const [secret, setSecret] = useState<string | null>(null);
   const encRef = useRef<string | null>(null);
-  // 遭遇和危机都占住双手：船停下，键盘交给小游戏
-  encRef.current = enc ?? crisis;
+  // 遭遇、危机、暗线都占住双手：船停下，键盘交给小游戏
+  encRef.current = enc ?? crisis ?? secret;
   const shipRef = useRef<ShipSnapshot | null>(null);
 
   const connected = models.length > 0;
@@ -420,14 +426,14 @@ export function App() {
     document.documentElement.dataset.cine =
       landing > 0 && landing < 1
         ? 'landing'
-        : finale || intro || sealBeat
+        : finale || intro || sealBeat || storyPage
           ? 'finale'
           : view === 'port'
             ? 'port'
             : view === 'reflection'
               ? 'reflection'
               : '';
-  }, [landing, view, finale, intro, sealBeat]);
+  }, [landing, view, finale, intro, sealBeat, storyPage]);
 
   useEffect(() => {
     document.documentElement.dataset.reduceMotion = reduceMotion ? 'true' : 'false';
@@ -735,11 +741,23 @@ export function App() {
     if (!sealBeat) return;
     const t = window.setTimeout(() => {
       setSealBeat(null);
+      // 这一程讲完了：先翻到那一页绘本，再回到海上
+      if (story?.page) {
+        setStoryPage(true);
+        return;
+      }
       if (voyage?.scene_id === 'D') setFinale(true);
       setView('world');
     }, reduceMotion ? 1200 : 4200);
     return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sealBeat, voyage?.scene_id, reduceMotion]);
+
+  function closeStoryPage() {
+    setStoryPage(false);
+    if (voyage?.scene_id === 'D') setFinale(true);
+    setView('world');
+  }
 
   // 每段第一次入海：开场字幕。按任意键可跳过
   const introShown = useRef<string>('');
@@ -920,14 +938,19 @@ export function App() {
   /** 靠近一件东西：有人守着就先打照面、做一件事；没人守着就直接收 */
   function startEncounter() {
     if (!nearFragment || enc) return;
-    if (encounterFor(nearFragment)) setEnc(nearFragment);
-    else void collectFragment();
+    if (encounterFor(nearFragment)) {
+      fableLive.island = nearFragment;
+      setEnc(nearFragment);
+    } else void collectFragment();
   }
 
   function finishEncounter(id: string, o: Outcome, summary: string) {
     const e = encounterFor(id);
     const tag = `${e?.who ?? '海上'}（${summary}）`;
     updateStats((s) => applyOutcome(s, o, tag, voyage?.scene_id ?? 'test', e?.who ?? '海上的人'));
+    // 你做过的事留在岛上：后面的危机、岸上的人、最后一页都会读它
+    if (o.set) markProgress((p) => ({ ...p, state: { ...p.state, ...o.set } }));
+    fableLive.island = '';
     setEnc(null);
     void collectFragment(id, `遭遇 · ${tag}：${o.text}`);
   }
@@ -1033,7 +1056,30 @@ export function App() {
 
   // 船经过旁白点、危机点：戏自己发生
   useEffect(() => {
-    if (view !== 'world' || !story || !ship || enc || crisis || landing > 0 || intro) return;
+    if (view !== 'world' || !ship || enc || crisis || secret || landing > 0 || intro) return;
+    // 暗线 · 桃花源：铜针不指它，只有顺着桃花瓣才找得到
+    const era = voyage?.scene_id ?? '';
+    const tao = stats.secrets.taoyuan;
+    if (era === 'A' && !tao) {
+      const [p0] = TAOYUAN.trail;
+      if (!progress.beats.includes('tao-hint') && Math.hypot(ship.x - p0.x, ship.z - p0.z) < 6) {
+        setCaption({ id: 'tao-hint', at: p0, prop: 'reeds', propAt: p0, kicker: TAOYUAN_HINT.kicker, text: TAOYUAN_HINT.text });
+        markProgress((p) => ({ ...p, beats: [...p.beats, 'tao-hint'] }));
+        return;
+      }
+      if (Math.hypot(ship.x - TAOYUAN.at.x, ship.z - TAOYUAN.at.z) < 10) {
+        setCaption(null);
+        setSecret('taoyuan');
+        return;
+      }
+    }
+    const echo = TAOYUAN_ECHO[era];
+    if (tao && echo && !progress.beats.includes(`tao-${era}`) && Math.hypot(ship.x - TAOYUAN.at.x, ship.z - TAOYUAN.at.z) < 16) {
+      setCaption({ id: `tao-${era}`, at: TAOYUAN.at, prop: 'reeds', propAt: TAOYUAN.at, kicker: echo.kicker, text: tao === 'marked' ? echo.marked : echo.kept });
+      markProgress((p) => ({ ...p, beats: [...p.beats, `tao-${era}`] }));
+      return;
+    }
+    if (!story) return;
     for (const b of story.beats) {
       if (progress.beats.includes(b.id)) continue;
       if (Math.hypot(ship.x - b.at.x, ship.z - b.at.z) < 7.5) {
@@ -1047,7 +1093,42 @@ export function App() {
       setCaption(null);
       setCrisis(c.id);
     }
-  }, [view, story, ship, enc, crisis, landing, intro, progress, markProgress]);
+  }, [view, story, ship, enc, crisis, secret, landing, intro, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id]);
+
+  function finishSecret(o: Outcome, summary: string) {
+    if (!voyage) return;
+    const tag = `暗线 · 桃花源（${summary}）`;
+    updateStats((st) => ({ ...applyOutcome(st, o, tag, voyage.scene_id, '桃花源中人'), secrets: { ...st.secrets, ...(o.set ?? {}) } }));
+    setSecret(null);
+    void api
+      .addRecord(voyage.id, {
+        kind: 'log',
+        text: `暗线 · 桃花源\n${o.text}`,
+        classification: 'creative',
+        sources: [],
+        material_ids: [],
+        version: 1,
+        access: 'private',
+      })
+      .then(async () => setRecords(await api.records(voyage.id)))
+      .catch((e) => setError(errText(e)));
+  }
+
+  // 危机进行中：水一点点涨上来
+  useEffect(() => {
+    if (!crisis) {
+      fableLive.flood = 0;
+      return;
+    }
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      fableLive.flood = Math.min(0.85, (now - t0) / 9000);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [crisis]);
 
   useEffect(() => {
     if (!caption) return;
@@ -1065,7 +1146,7 @@ export function App() {
     const c = story.crisis;
     const tag = `${c.kicker} · ${c.enc.who}（${summary}）`;
     updateStats((st) => applyOutcome(st, o, tag, voyage.scene_id, c.enc.who));
-    markProgress((p) => ({ ...p, crisis: [...p.crisis, c.id] }));
+    markProgress((p) => ({ ...p, crisis: [...p.crisis, c.id], state: { ...p.state, ...(o.set ?? {}) } }));
     setCrisis(null);
     void api
       .addRecord(voyage.id, {
@@ -1080,6 +1161,18 @@ export function App() {
       .then(async () => setRecords(await api.records(voyage.id)))
       .catch((e) => setError(errText(e)));
   }
+
+  /** 镜头推到哪：正在打照面的那座岛，或者正在涨水的那个村子 */
+  const stageAt = useMemo(() => {
+    if (enc && encounterFor(enc)?.stage) {
+      const f = sea.fragments.find((x) => x.id === enc);
+      if (f) return { x: f.x + ISLAND_OFFSET.x, z: f.z + ISLAND_OFFSET.z };
+    }
+    // 村子比岛大：镜头退远、抬高，才看得见水从哪里涨上来
+    if (crisis && story?.crisis.cause) return { x: story.crisis.at.x + VILLAGE_OFFSET.x, z: story.crisis.at.z + VILLAGE_OFFSET.z, dist: 21, h: 11 };
+    if (secret === 'taoyuan') return { x: TAOYUAN.at.x - 4, z: TAOYUAN.at.z, dist: 24, h: 8.5 };
+    return null;
+  }, [enc, crisis, secret, story, sea]);
 
   const guideTarget = useMemo(() => {
     if (sealedHere && sea.portal) return { x: sea.portal.x, z: sea.portal.z };
@@ -1125,7 +1218,11 @@ export function App() {
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !sealBeat && !enc && !crisis}
+          canSail={view === 'world' && !sealBeat && !enc && !crisis && !secret}
+          taoyuanFound={!!stats.secrets.taoyuan}
+          fableState={progress.state}
+          crisisDone={!!story && progress.crisis.includes(story.crisis.id)}
+          stageAt={stageAt}
           sceneId={voyage?.scene_id ?? scenePick?.id ?? 'test'}
           world={sea}
           collectedIds={[...collectedIds]}
@@ -1379,6 +1476,12 @@ export function App() {
               </p>
             )}
             <p style={{ animationDelay: '12.4s' }} className="finale-big">这张图上没有终点港。</p>
+            {stats.secrets.taoyuan && (
+              <p style={{ animationDelay: '13.8s' }} className="finale-tao">
+                图的角落里，还有一个你去过、却再也找不到的地方。
+                <span>「{TAOYUAN_FINALE.quote}」—— {TAOYUAN_FINALE.source}</span>
+              </p>
+            )}
             <p style={{ animationDelay: '15.2s' }}>终点，是人能把自己的能力伸到多远 —— 以及伸出去的时候，还记不记得问一句：这是谁的地方。</p>
             <p style={{ animationDelay: '18.4s' }} className="finale-trust">
               {trustLine(stats.trust)}
@@ -1386,7 +1489,7 @@ export function App() {
             </p>
           </div>
           <div className="finale-chart" style={{ animationDelay: '21.5s' }}>
-            <SpiritMap path={stats.path} />
+            <SpiritMap path={stats.path} taoyuan={stats.secrets.taoyuan} />
             <button className="cine-link" type="button" onClick={() => { setFinale(false); void goReflect(); }}>
               看这张图
             </button>
@@ -1418,6 +1521,19 @@ export function App() {
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishCrisis(o, summary)}
           crisis
+          cause={story.crisis.cause?.(progress.state)}
+        />
+      )}
+
+      {/* 暗线：桃花源 */}
+      {view === 'world' && secret === 'taoyuan' && (
+        <EncounterOverlay
+          key="taoyuan"
+          enc={TAOYUAN_ENC}
+          title="桃花源"
+          reduceMotion={reduceMotion}
+          onDone={(o, summary) => finishSecret(o, summary)}
+          secret
         />
       )}
 
@@ -1425,12 +1541,18 @@ export function App() {
       {view === 'port' && shoreOpen && story && (
         <ShoreOverlay
           story={story}
+          state={progress.state}
           reduceMotion={reduceMotion}
           onDone={() => {
             setShoreOpen(false);
             if (voyage) markProgress((p) => ({ ...p, shore: [...p.shore, voyage.id] }));
           }}
         />
+      )}
+
+      {/* 尾页：这一程的故事，像绘本的最后一页 */}
+      {storyPage && story?.page && (
+        <StoryPage story={story} state={progress.state} storyId={`${voyage?.scene_id}-${laneId}`} onDone={closeStoryPage} />
       )}
 
       {/* 遭遇：海上的人和他手上的事 */}
@@ -1635,7 +1757,7 @@ export function App() {
       )}
 
       {/* 靠港：没有卡片。文字浮在画面上，刻度直接在画面上拨 */}
-      {view === 'port' && voyage && !sealBeat && !shoreOpen && (
+      {view === 'port' && voyage && !sealBeat && !shoreOpen && !storyPage && (
         <div className="cine-panel" aria-live="polite">
           <div className="cine-inner">
             <div className="cine-kicker">

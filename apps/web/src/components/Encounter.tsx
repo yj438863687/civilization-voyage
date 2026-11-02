@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Encounter, Outcome } from '../world/encounters';
+import { fableLive } from '../world/fable';
 
 /**
  * 一场遭遇：人先开口 → 你做一件小事 → 结果浮上来 → 东西收进货舱。
  * 不用卡片：字浮在画面下三分之一，游戏的刻度也画在画面上。
  */
-type Phase = 'intro' | 'play' | 'result';
+type Phase = 'intro' | 'talk' | 'play' | 'result';
 
 export function EncounterOverlay({
   enc,
@@ -13,6 +14,8 @@ export function EncounterOverlay({
   reduceMotion,
   onDone,
   crisis = false,
+  cause,
+  secret = false,
 }: {
   enc: Encounter;
   /** 这件东西叫什么；危机时是那一幕的名字 */
@@ -21,15 +24,22 @@ export function EncounterOverlay({
   onDone: (o: Outcome, summary: string) => void;
   /** 危机：不是捡东西，是一件躲不开的事 */
   crisis?: boolean;
+  /** 危机的来由：前面那几件事让它变成了什么样子 */
+  cause?: string;
+  /** 暗线：桃花源。字是暖的，像从山口透出来的光 */
+  secret?: boolean;
 }) {
   const [phase, setPhase] = useState<Phase>('intro');
+  /** 对话进行到第几句 */
+  const [said, setSaid] = useState(0);
+  const dialog = enc.dialog ?? [];
   const [out, setOut] = useState<{ o: Outcome; summary: string } | null>(null);
 
   // 开场：人说完一句话，再开始
   useEffect(() => {
     if (phase !== 'intro') return;
-    const go = () => setPhase('play');
-    const t = window.setTimeout(go, reduceMotion ? 900 : 2200);
+    const go = () => setPhase(dialog.length ? 'talk' : 'play');
+    const t = window.setTimeout(go, reduceMotion ? 900 : cause ? 4200 : 2400);
     const key = (e: KeyboardEvent) => {
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
@@ -42,6 +52,35 @@ export function EncounterOverlay({
       window.removeEventListener('keydown', key);
     };
   }, [phase, reduceMotion]);
+
+  // 对话：一句一句出来。空格或点击加快
+  useEffect(() => {
+    if (phase !== 'talk') return;
+    const next = () => {
+      setSaid((n) => {
+        if (n + 1 >= dialog.length) {
+          window.setTimeout(() => setPhase('play'), reduceMotion ? 300 : 1600);
+          return dialog.length;
+        }
+        return n + 1;
+      });
+    };
+    const line = dialog[Math.min(said, dialog.length - 1)];
+    const len = (line?.you ?? line?.them ?? '').length;
+    const t = window.setTimeout(next, reduceMotion ? 700 : 900 + len * 90);
+    const key = (e: KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        next();
+      }
+    };
+    window.addEventListener('keydown', key);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('keydown', key);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, said]);
 
   const finish = (o: Outcome, summary: string) => {
     setOut({ o, summary });
@@ -69,14 +108,27 @@ export function EncounterOverlay({
 
   const g = enc.game;
   return (
-    <div className={`enc${crisis ? ' is-crisis' : ''}`} role="dialog" aria-label={`${enc.who}：${title}`}>
+    <div className={`enc${crisis ? ' is-crisis' : ''}${secret ? ' is-secret' : ''}`} role="dialog" aria-label={`${enc.who}：${title}`}>
       <div className="enc-scrim" aria-hidden />
       {crisis && <span className="enc-crisis">{title}</span>}
+      {secret && <span className="enc-secret">暗线 · {title} · 引文出自陶渊明《桃花源记》</span>}
       <div className="enc-who">
         <span className="enc-name">{enc.who}</span>
         <span className="enc-role">{enc.role}</span>
       </div>
-      <p className={`enc-line${phase === 'intro' ? ' is-in' : ' is-up'}`}>「{enc.line}」</p>
+      {cause && <p className={`enc-cause${phase === 'intro' ? ' is-in' : ' is-up'}`}>{cause}</p>}
+      <p className={`enc-line${phase === 'intro' ? ' is-in' : ' is-up'}`}>{dialog.length ? enc.line : `「${enc.line}」`}</p>
+
+      {(phase === 'talk' || (phase === 'play' && dialog.length > 0)) && (
+        <div className={`enc-talk${phase === 'play' ? ' is-done' : ''}`}>
+          {dialog.slice(0, Math.max(1, said + 1)).map((d, i) => (
+            <p key={i} className={`talk-line ${d.you ? 'is-you' : 'is-them'}${i === said ? ' is-new' : ''}`}>
+              {d.you ? <span className="talk-who">你</span> : <span className="talk-who">{enc.who}</span>}
+              {d.you ?? d.them}
+            </p>
+          ))}
+        </div>
+      )}
 
       {phase === 'play' && g.kind === 'hold' && (
         <HoldGame
@@ -100,11 +152,11 @@ export function EncounterOverlay({
           <p className="enc-result-delta">
             <Delta label="补给" v={out.o.supply} />
             <Delta label="人心" v={out.o.trust} />
-            {!crisis && <span className="enc-got">收入货舱 · {title}</span>}
+            {!crisis && !secret && <span className="enc-got">收入货舱 · {title}</span>}
           </p>
         </div>
       )}
-      {phase === 'intro' && <p className="enc-hint">空格继续</p>}
+      {(phase === 'intro' || phase === 'talk') && <p className="enc-hint">空格继续</p>}
     </div>
   );
 }
@@ -166,6 +218,8 @@ function HoldGame({
       if (s.v >= g.band[0] && s.v <= g.band[1]) s.inside += dt;
       setV(s.v);
       setInside(s.inside);
+      // 岛上的田跟着指针涨水：3D 每帧读这个值
+      fableLive.value = s.v;
       setLeft(Math.max(0, 9 - s.t));
       if (s.inside >= g.secs) {
         s.done = true;

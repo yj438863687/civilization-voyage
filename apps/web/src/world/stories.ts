@@ -12,6 +12,7 @@
  * 四段、八条航线，各留下一种「精神」。走完之后，你走过的那几条连成一张人类精神图谱。
  */
 import type { Encounter, Look } from './encounters';
+import type { FableState } from './fable';
 
 export type PropKind =
   | 'huts'
@@ -58,11 +59,25 @@ export interface Story {
   title: string;
   logline: string;
   beats: Beat[];
-  crisis: { id: string; at: { x: number; z: number }; kicker: string; enc: Encounter };
+  crisis: {
+    id: string;
+    at: { x: number; z: number };
+    kicker: string;
+    enc: Encounter;
+    /** 危机不是凭空来的：先说清楚前面那几件事，让它变成了什么样子 */
+    cause?: (s: FableState) => string;
+  };
   arrival: string;
-  figure: Figure;
+  figure: Figure & {
+    /** 岸上的人说的是你这一程的事 */
+    speak?: (s: FableState) => string[];
+  };
   /** 精神图谱上的那颗星 */
   spirit: { word: string; line: string };
+  /** 最后那一页绘本：按你做过的事，把来龙去脉讲一遍 */
+  page?: (s: FableState) => string[];
+  /** 这一程留下的文化概念 */
+  concept?: { name: string; explain: string };
 }
 
 /* ---------------- 航线几何：所有时代共用 ---------------- */
@@ -88,7 +103,7 @@ const FB = {
   b3: { x: -17.5, z: -1 },
 };
 // 景放在航线外侧：近岸线的景在东边，外海线的景在西边
-const NP = { p1: { x: 12, z: 28 }, p2: { x: 20, z: 20 }, p3: { x: 34, z: 12 } };
+const NP = { p1: { x: 12, z: 28 }, p2: { x: 20, z: 20 }, p3: { x: 44, z: 16 } };
 const FP = { p1: { x: -12, z: 28 }, p2: { x: -22, z: 18 }, p3: { x: -32, z: -2 } };
 
 /* ---------------- 岸上人物的穿着 ---------------- */
@@ -118,32 +133,38 @@ export const STORIES: Record<string, Record<'near' | 'far', Story>> = {
   A: {
     near: {
       title: '一道闸',
-      logline: '河退了，人留下。可一条河要养活两岸，水该先流向谁？',
+      logline: '河水退了，你们想留下来。可一条河要养活两岸，水该先流向谁？',
       beats: [
-        { id: 'A-n1', at: NB.b1, prop: 'reeds', propAt: NP.p1, kicker: '起 · 退水', text: '河水退了，滩上露出一片黑土。船上的人第一次没有急着走。' },
-        { id: 'A-n2', at: NB.b2, prop: 'fire', propAt: NP.p2, kicker: '承 · 烧荒', text: '沿岸有人在烧荒。草烧成灰，灰落进土里，就是明年的肥。' },
-        { id: 'A-n3', at: NB.b3, prop: 'huts', propAt: NP.p3, kicker: '承 · 第一条路', text: '第一批茅屋立起来了。屋和屋之间，被脚踩出了一条路。' },
+        { id: 'A-n1', at: NB.b1, prop: 'reeds', propAt: NP.p1, kicker: '起 · 退水', text: '河水退了，滩上露出一片黑土。船上最小的那个孩子问：「我们可以在这里留下来吗？」' },
+        { id: 'A-n2', at: NB.b2, prop: 'fire', propAt: NP.p2, kicker: '承 · 第一座小岛', text: '前面有一座很小的岛，岛上只住着一个人。他一直盯着河水，好像怕它跑掉。' },
+        { id: 'A-n3', at: NB.b3, prop: 'huts', propAt: NP.p3, kicker: '承 · 第二座小岛', text: '再往前，另一座小岛上传来一下一下的敲打声。岛的下游，有一个刚搭起来的村子。' },
       ],
       crisis: {
         id: 'A-n-flood',
         at: NEAR_CRISIS,
         kicker: '转 · 春汛',
+        cause: (st) => {
+          const gate = st.gate === 'even' ? '闸分得匀，两岸的田早就喝饱了水，土是松的' : '闸偏着，一边的田早就汪着水，另一边裂着口子';
+          const stakes = st.stakes === 'gap' ? '桩之间留着那道口子，涨起来的水有路可走' : '桩围得死死的，涨起来的水没有路，只能越积越高';
+          return `春汛来了。${gate}；${stakes}。`;
+        },
         enc: {
-          who: '上游村子的人',
+          who: '下游村子的人',
           role: '连夜划船赶来',
           look: LOOK_CRISIS.villager,
-          line: '上游涨水了！闸要是不开，我们的屋子今晚就会淹。可闸一开，下游刚种下的地就全冲了。',
+          action: 'idle',
+          line: '水还在涨！闸要是不开，上游的屋子今晚就会淹。可闸一开，我们刚种下的地就全冲了。',
           game: {
             kind: 'choice',
             ask: '春汛 · 闸开不开',
             options: [
-              { label: '开闸', note: '保住上游的人，下游的苗没了', out: { text: '闸开了。上游的屋子保住了。下游的人在冲毁的田边站了一夜，第二天又开始重新撒种。', supply: -8, trust: 6 } },
-              { label: '守闸，帮上游的人搬', note: '地保住了，所有人都要连夜搬家', out: { text: '你守住了闸，船上的人连夜帮上游搬家。屋子淹了，人都在，地也在。', supply: -12, trust: 12 } },
+              { label: '开闸', note: '保住上游的人，下游的苗没了', out: { text: '闸开了。水冲过下游刚种的地，一夜之间什么都没剩下。可上游的屋子都还在。', supply: -8, trust: 4, set: { flood: 'open' } } },
+              { label: '守闸，大家一起搬', note: '地保住，所有人都要连夜搬家', out: { text: '你守住了闸。船上的人连夜帮上游搬家，屋子淹了，人都在，地也在。', supply: -12, trust: 12, set: { flood: 'held' } } },
             ],
           },
         },
       },
-      arrival: '岸上有个人在看水。他已经看了很多年。',
+      arrival: '岸上站着一个人，他在看水。他已经看了很多年。',
       figure: {
         name: '李冰',
         years: '战国 · 约公元前三世纪',
@@ -153,10 +174,37 @@ export const STORIES: Record<string, Record<'near' | 'far', Story>> = {
           '我没有挡住岷江。我只是在江心垒了一道「鱼嘴」，把它分成两半：一半去灌田，一半照旧奔流。',
           '你今天开的那道闸，我也开过很多次。每一次，都有人在下游等着。',
         ],
+        speak: (st) => [
+          '我没有挡住岷江。我只是在江心垒了一道「鱼嘴」，把它分成两半：一半去灌田，一半照旧奔流。',
+          st.stakes === 'gap'
+            ? '你让立桩的人留了一道口子。我的堰上也有一道口子，叫「飞沙堰」：水大了，就从那里漫回江里去。'
+            : '你看见了：水被关起来，就会自己去找路。我修堰，不是为了关住水，是为了给它留一条路。',
+        ],
         quote: { text: '深淘滩，低作堰。', source: '都江堰治水「六字诀」，相传为李冰所留' },
         meaning: '定居不是征服自然，是和它订一份能续两千年的约。分水，是人第一次学会让一样东西同时养活两边。',
       },
       spirit: { word: '分享', line: '让一条河养活两岸' },
+      page: (st) => [
+        '河水退了，船上的孩子问：我们可以留下来吗？',
+        st.gate === 'even'
+          ? '看水的人教会他：水会走，要一直看着它，才能分给两边。'
+          : '他帮看水的人分水，没有分匀。看水的人说：明天再分，水每天都来。',
+        st.stakes === 'gap'
+          ? '立桩的人想把地全围起来。孩子问他：水也是你的吗？他留下了一道口子。'
+          : '立桩的人把地全围了起来，水被关在了外面。',
+        st.stakes === 'gap'
+          ? st.flood === 'held'
+            ? '春汛来时，水从那道口子流了过去。大家连夜搬家，人在，地也在。'
+            : '春汛来时，水从那道口子流了过去，可还是太大了。闸开了，下游的苗没了，上游的屋子保住了。'
+          : st.flood === 'held'
+            ? '春汛来时，水没有路走，漫进了上游的村子。大家连夜搬家，屋子淹了，人都在。'
+            : '春汛来时，水没有路走。闸开了，水冲过下游的地，什么都没剩下。',
+        '后来他在岸上遇见了李冰。两千多年前，李冰在岷江上做了同样的事：鱼嘴分水，飞沙堰泄洪。都江堰到今天还在灌溉成都平原。',
+      ],
+      concept: {
+        name: '分水',
+        explain: '人一旦定居，第一件公共的事就是分水：一样东西，怎样同时养活两边。都江堰用「鱼嘴」把岷江分成内外两江，用「飞沙堰」给洪水留路——不堵，而是疏。',
+      },
     },
     far: {
       title: '一只陶罐',
@@ -486,12 +534,14 @@ export interface StoryProgress {
   beats: string[];
   crisis: string[];
   shore: string[];
+  /** 你在这条航线上做过的事 */
+  state: FableState;
 }
 
 const PKEY = 'cv.story.v1';
 
 export function loadProgress(voyageId: string | undefined): StoryProgress {
-  const empty = { beats: [], crisis: [], shore: [] };
+  const empty: StoryProgress = { beats: [], crisis: [], shore: [], state: {} };
   if (!voyageId) return empty;
   try {
     const all = JSON.parse(localStorage.getItem(PKEY) || '{}') as Record<string, StoryProgress>;

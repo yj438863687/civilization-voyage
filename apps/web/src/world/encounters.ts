@@ -14,7 +14,7 @@
  */
 
 export type Hat = 'straw' | 'wrap' | 'cap' | 'bowler' | 'headset' | 'visor' | 'none';
-export type Prop = 'hoe' | 'pole' | 'shovel' | 'ledger' | 'key' | 'tablet' | 'none';
+export type Prop = 'hoe' | 'pole' | 'shovel' | 'ledger' | 'key' | 'tablet' | 'mallet' | 'none';
 
 export interface Look {
   coat: string;
@@ -31,7 +31,13 @@ export interface Outcome {
   text: string;
   supply: number;
   trust: number;
+  /** 这件事留下了什么：后面的危机、岸上的人、最后那一页都会读它 */
+  set?: Record<string, string>;
 }
+
+/** 岛上的人在做什么：决定他的动作和岛上的景 */
+export type Action = 'idle' | 'watch' | 'hammer' | 'shovel' | 'tap' | 'count';
+export type Stage = 'gate' | 'stakes';
 
 export type Game =
   | {
@@ -69,6 +75,12 @@ export interface Encounter {
   look: Look;
   /** 船靠过去时他说的第一句 */
   line: string;
+  /** 小王子式的一问一答：你问「为什么」，他的回答把他的执念说破 */
+  dialog?: { you?: string; them?: string }[];
+  /** 他一直在做的事 */
+  action?: Action;
+  /** 他住的那座小岛上摆着什么：会跟着你的选择改变 */
+  stage?: Stage;
   game: Game;
   /** 技巧类小游戏的两种结果；choice 用各自选项里的 out */
   win?: Outcome;
@@ -163,22 +175,51 @@ export const ENCOUNTERS: Record<string, Encounter> = {
 
   /* ---------- A 农业 ---------- */
   'A-water': {
-    who: '守闸的人',
-    role: '把水分给每块地',
+    who: '看水的人',
+    role: '第一座小岛上，只住着他一个',
     look: LOOK.farmer,
-    line: '闸板提高了，下游的地会旱；放低了，上游的地会淹。帮我稳住。',
-    game: { kind: 'hold', verb: '按住提闸', label: '两边都有水', band: [0.42, 0.62], secs: 3.2, drift: 0.42 },
-    win: { text: '水刚好漫过两边的田埂。守闸的人在闸板上刻了一道。', supply: 6, trust: 8 },
-    lose: { text: '水偏到了一边。下游的人来问，为什么今年他们的地是干的。', supply: 0, trust: -6 },
+    action: 'watch',
+    stage: 'gate',
+    line: '他站在一道木闸旁边，盯着河水，一动不动。',
+    dialog: [
+      { you: '你为什么一直看着水？' },
+      { them: '因为水会走。我一眨眼，它就只往一边流。' },
+      { you: '那你什么时候休息？' },
+      { them: '河不休息，我也就不休息。——你来帮我扶一会儿闸吧。' },
+    ],
+    game: { kind: 'hold', verb: '按住提闸', label: '两边的田都喝到水', band: [0.42, 0.62], secs: 3.2, drift: 0.42 },
+    win: { text: '两块田都喝到了水。他第一次坐了下来，说：「你看，水是可以分的。」', supply: 6, trust: 8, set: { gate: 'even' } },
+    lose: { text: '左边的田汪成一片，右边的田裂开了口子。他没有怪你：「明天再分。水每天都来。」', supply: 0, trust: -2, set: { gate: 'tilt' } },
   },
   'A-stake': {
-    who: '打桩的人',
-    role: '在河岸上划界',
-    look: LOOK.farmer,
-    line: '桩要一下一下夯进去。夯不实，一场雨就冲走了，界也就没了。',
-    game: { kind: 'rhythm', verb: '夯桩', label: '石锤落进亮圈', beats: 5, speed: 0.85 },
-    win: { text: '五根桩都立住了。从这天起，这块地有了边。', supply: 4, trust: 4 },
-    lose: { text: '有两根桩歪了。界还在，只是将来会有人为这两根桩争。', supply: 0, trust: -4 },
+    who: '立桩的人',
+    role: '第二座小岛上，只住着他一个',
+    look: LOOK.elder,
+    action: 'hammer',
+    stage: 'stakes',
+    line: '这座岛上传来一下一下的敲打声。他在钉桩，岛上已经钉满了桩。',
+    dialog: [
+      { you: '你为什么要钉这么多桩？' },
+      { them: '钉了桩，这块地就是我的。' },
+      { you: '那流过你地里的水呢？水也是你的吗？' },
+      { them: '……我还没想过。还剩最后一段，你说，围上，还是留个口子？' },
+    ],
+    game: {
+      kind: 'choice',
+      ask: '最后一段桩',
+      options: [
+        {
+          label: '围上',
+          note: '地全是他的，水路也被围在里面',
+          out: { text: '他把最后几根桩钉死。地是他的了。水被关在了桩外面，在岸边打着转。', supply: 6, trust: -6, set: { stakes: 'closed' } },
+        },
+        {
+          label: '留一道口子',
+          note: '他少一块地，水能流到下游',
+          out: { text: '他在桩之间留了一道口子。水从口子里流过去，流向下游别人的地。他看了很久，说：「原来水不是我的。」', supply: -2, trust: 10, set: { stakes: 'gap' } },
+        },
+      ],
+    },
   },
   'A-bone': {
     who: '记数的女人',
@@ -333,6 +374,8 @@ export interface VoyageStats {
   met: { era: string; who: string; trust: number }[];
   /** 走过的航线：精神图谱上亮起的那几颗星 */
   path: { era: string; lane: string; word: string; figure: string }[];
+  /** 暗线：比如桃花源（marked / kept） */
+  secrets: Record<string, string>;
 }
 
 const KEY = 'cv.stats.v1';
@@ -342,7 +385,7 @@ export function loadStats(): VoyageStats {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const v = JSON.parse(raw) as VoyageStats;
-      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [] };
+      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [], secrets: v.secrets ?? {} };
     }
   } catch {
     /* 私密窗口等情况：从默认值开始 */
@@ -352,7 +395,7 @@ export function loadStats(): VoyageStats {
 
 /** 新开一局：从启航港出发时，补给与人心回到起点 */
 export function freshStats(): VoyageStats {
-  return { supply: 80, trust: 50, log: [], met: [], path: [] };
+  return { supply: 80, trust: 50, log: [], met: [], path: [], secrets: {} };
 }
 
 export function saveStats(s: VoyageStats) {
@@ -372,6 +415,7 @@ export function applyOutcome(s: VoyageStats, o: Outcome, tag: string, era: strin
     log: [...s.log, `${tag}：${o.text}`].slice(-40),
     met: [...s.met, { era, who, trust: o.trust }].slice(-40),
     path: s.path,
+    secrets: s.secrets,
   };
 }
 

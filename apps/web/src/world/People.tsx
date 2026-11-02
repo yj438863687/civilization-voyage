@@ -1,28 +1,42 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import type { Look } from './encounters';
+import type { Action, Look, Prop } from './encounters';
 
 /**
  * 程序化的人：没有贴图，只靠体块、颜色、帽子和手里的工具认出时代。
- * 农业的草帽与锄头、工业的鸭舌帽与煤锹、信息的耳机与电键、智能额前的一道冷光。
- * 高约 1.75（世界单位 ≈ 米），脚底在 y=0。
+ * 绘本比例（头大一些、有眼睛），四肢分两节，所以能做「手搭凉棚」「抡锤」这样的动作。
+ * 他会转过头看着你的船。高约 1.75（世界单位 ≈ 米），脚底在 y=0。
  */
 export function Person({
   look,
   reduceMotion = false,
   phase = 0,
-  /** 说话时轻轻点头、抬手 */
+  /** 说话时点头、两手比划 */
   talking = false,
+  /** 他一直在做的事 */
+  action = 'idle',
+  /** 船在哪：他会转头看你 */
+  lookAt = null,
 }: {
   look: Look;
   reduceMotion?: boolean;
   phase?: number;
   talking?: boolean;
+  action?: Action;
+  lookAt?: { x: number; z: number } | null;
 }) {
   const root = useRef<THREE.Group>(null);
+  const body = useRef<THREE.Group>(null);
+  const torso = useRef<THREE.Group>(null);
   const head = useRef<THREE.Group>(null);
+  const armL = useRef<THREE.Group>(null);
+  const foreL = useRef<THREE.Group>(null);
   const armR = useRef<THREE.Group>(null);
+  const foreR = useRef<THREE.Group>(null);
+  const legL = useRef<THREE.Group>(null);
+  const legR = useRef<THREE.Group>(null);
+  const tmp = useMemo(() => new THREE.Vector3(), []);
 
   const M = useMemo(() => {
     const m = (c: string, r = 0.85, metal = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: metal });
@@ -32,6 +46,7 @@ export function Person({
       skin: m(look.skin, 0.7),
       pants: m(look.pants),
       dark: m('#1a1612', 0.9),
+      eye: m('#120e0a', 0.4),
       wood: m('#6a5034', 0.9),
       iron: m('#4a4d50', 0.45, 0.7),
       straw: m('#c8a868', 0.95),
@@ -42,69 +57,175 @@ export function Person({
     };
   }, [look]);
 
-  useFrame(({ clock }) => {
-    if (reduceMotion) return;
+  useFrame(({ clock }, dt) => {
     const t = clock.elapsedTime + phase;
-    if (root.current) root.current.rotation.z = Math.sin(t * 0.9) * 0.025;
-    if (head.current) head.current.rotation.x = talking ? Math.sin(t * 5) * 0.08 : Math.sin(t * 0.7) * 0.03;
-    if (armR.current) armR.current.rotation.x = talking ? -0.9 + Math.sin(t * 3) * 0.25 : -0.15 + Math.sin(t * 0.8) * 0.05;
+    const k = Math.min(1, dt * 6);
+    const ease = (r: THREE.Object3D | null, x: number, y = 0, z = 0) => {
+      if (!r) return;
+      r.rotation.x += (x - r.rotation.x) * k;
+      r.rotation.y += (y - r.rotation.y) * k;
+      r.rotation.z += (z - r.rotation.z) * k;
+    };
+    if (reduceMotion) return;
+
+    // 呼吸：上身一起一伏
+    if (torso.current) torso.current.scale.y = 1 + Math.sin(t * 1.6) * 0.012;
+
+    // 转头看船：先转头，说话时整个人也慢慢转过来
+    let yaw = 0;
+    if (lookAt && root.current) {
+      root.current.getWorldPosition(tmp);
+      const parentYaw = root.current.parent ? new THREE.Euler().setFromQuaternion(root.current.parent.getWorldQuaternion(new THREE.Quaternion())).y : 0;
+      const want = Math.atan2(lookAt.x - tmp.x, lookAt.z - tmp.z) - parentYaw;
+      let d = want - (body.current?.rotation.y ?? 0);
+      while (d > Math.PI) d -= Math.PI * 2;
+      while (d < -Math.PI) d += Math.PI * 2;
+      yaw = THREE.MathUtils.clamp(d, -1.1, 1.1);
+      if (talking && body.current) body.current.rotation.y += d * Math.min(1, dt * 1.2);
+    }
+
+    if (talking) {
+      // 说话：点头，两手轮流比划
+      ease(head.current, Math.sin(t * 4.2) * 0.1, yaw * 0.6, Math.sin(t * 1.3) * 0.05);
+      ease(armR.current, -0.9 + Math.sin(t * 2.6) * 0.35, 0, -0.25);
+      ease(foreR.current, -0.8 + Math.sin(t * 3.1) * 0.3);
+      ease(armL.current, -0.4 + Math.sin(t * 2.1 + 1) * 0.25, 0, 0.2);
+      ease(foreL.current, -0.6);
+      ease(torso.current, 0.04);
+      ease(legL.current, 0);
+      ease(legR.current, 0);
+      return;
+    }
+
+    if (action === 'watch') {
+      // 手搭凉棚，望着河，头慢慢左右扫
+      ease(armL.current, -2.5, 0, 0.5);
+      ease(foreL.current, -1.6);
+      ease(armR.current, 0.08, 0, -0.1);
+      ease(foreR.current, -0.15);
+      ease(head.current, 0.12, Math.sin(t * 0.35) * 0.55 + yaw * 0.3, 0);
+      ease(torso.current, 0.06 + Math.sin(t * 0.35) * 0.02);
+      ease(legL.current, 0);
+      ease(legR.current, 0);
+      return;
+    }
+
+    if (action === 'hammer' || action === 'shovel') {
+      // 抡锤：举起 → 落下 → 震一下。一下约一秒
+      const cyc = (t * 0.95) % 1;
+      const up = cyc < 0.6 ? cyc / 0.6 : 1 - (cyc - 0.6) / 0.12;
+      const lift = Math.max(0, Math.min(1, up));
+      ease(armR.current, -0.4 - lift * 2.4, 0, -0.15);
+      ease(foreR.current, -0.3 - lift * 0.9);
+      ease(armL.current, -0.4 - lift * 1.9, 0, 0.35);
+      ease(foreL.current, -0.5 - lift * 0.7);
+      ease(torso.current, 0.35 - lift * 0.4);
+      ease(head.current, 0.3 - lift * 0.25, yaw * 0.2);
+      ease(legL.current, -0.15);
+      ease(legR.current, 0.2);
+      return;
+    }
+
+    // 闲着：重心在两脚之间换，偶尔看一眼船
+    const sway = Math.sin(t * 0.7);
+    ease(armL.current, 0.05 + sway * 0.04, 0, 0.12);
+    ease(foreL.current, -0.2);
+    ease(armR.current, 0.05 - sway * 0.04, 0, -0.12);
+    ease(foreR.current, -0.2);
+    ease(head.current, 0.02, yaw * 0.7, sway * 0.03);
+    ease(torso.current, 0);
+    ease(legL.current, sway * 0.04);
+    ease(legR.current, -sway * 0.04);
+    if (root.current) root.current.rotation.z = sway * 0.015;
   });
+
+  const prop: Prop = action === 'hammer' ? 'mallet' : look.prop;
+
+  const arm = (
+    side: 1 | -1,
+    up: React.RefObject<THREE.Group>,
+    fore: React.RefObject<THREE.Group>,
+    withProp: boolean,
+  ) => (
+    <group ref={up} position={[side * 0.27, 1.38, 0]}>
+      <mesh position={[0, -0.15, 0]} material={M.coat}>
+        <capsuleGeometry args={[0.062, 0.2, 4, 8]} />
+      </mesh>
+      <group ref={fore} position={[0, -0.31, 0]}>
+        <mesh position={[0, -0.13, 0]} material={M.coat}>
+          <capsuleGeometry args={[0.055, 0.18, 4, 8]} />
+        </mesh>
+        <mesh position={[0, -0.3, 0]} material={M.skin}>
+          <sphereGeometry args={[0.06, 10, 8]} />
+        </mesh>
+        {withProp && (
+          <group position={[0, -0.3, 0.02]}>
+            <PropMesh prop={prop} M={M} />
+          </group>
+        )}
+      </group>
+    </group>
+  );
+
+  const leg = (side: 1 | -1, ref: React.RefObject<THREE.Group>) => (
+    <group ref={ref} position={[side * 0.11, 0.86, 0]}>
+      <mesh position={[0, -0.22, 0]} material={M.pants} castShadow>
+        <capsuleGeometry args={[0.078, 0.28, 4, 8]} />
+      </mesh>
+      <mesh position={[0, -0.6, 0]} material={M.pants}>
+        <capsuleGeometry args={[0.07, 0.28, 4, 8]} />
+      </mesh>
+      <mesh position={[0, -0.82, 0.05]} material={M.dark}>
+        <boxGeometry args={[0.15, 0.08, 0.27]} />
+      </mesh>
+    </group>
+  );
 
   return (
     <group ref={root}>
-      {/* 腿 */}
-      {[-0.11, 0.11].map((x) => (
-        <mesh key={x} position={[x, 0.42, 0]} material={M.pants} castShadow>
-          <boxGeometry args={[0.16, 0.84, 0.2]} />
-        </mesh>
-      ))}
-      {[-0.11, 0.11].map((x) => (
-        <mesh key={`f${x}`} position={[x, 0.04, 0.04]} material={M.dark}>
-          <boxGeometry args={[0.17, 0.08, 0.28]} />
-        </mesh>
-      ))}
-      {/* 上身：下摆略宽，像外衣 */}
-      <mesh position={[0, 1.12, 0]} material={M.coat} castShadow>
-        <cylinderGeometry args={[0.2, 0.27, 0.62, 10]} />
-      </mesh>
-      <mesh position={[0, 0.8, 0]} material={M.trim}>
-        <cylinderGeometry args={[0.275, 0.275, 0.06, 10]} />
-      </mesh>
-      {/* 左臂垂着 */}
-      <group position={[-0.28, 1.36, 0]} rotation={[0.1, 0, 0.12]}>
-        <mesh position={[0, -0.28, 0]} material={M.coat}>
-          <cylinderGeometry args={[0.06, 0.055, 0.56, 6]} />
-        </mesh>
-        <mesh position={[0, -0.6, 0]} material={M.skin}>
-          <sphereGeometry args={[0.06, 8, 6]} />
-        </mesh>
-      </group>
-      {/* 右臂拿着工具 */}
-      <group ref={armR} position={[0.28, 1.36, 0]} rotation={[-0.15, 0, -0.12]}>
-        <mesh position={[0, -0.28, 0]} material={M.coat}>
-          <cylinderGeometry args={[0.06, 0.055, 0.56, 6]} />
-        </mesh>
-        <mesh position={[0, -0.6, 0]} material={M.skin}>
-          <sphereGeometry args={[0.06, 8, 6]} />
-        </mesh>
-        <group position={[0, -0.6, 0.02]}>
-          <PropMesh prop={look.prop} M={M} />
-        </group>
-      </group>
-      {/* 头 */}
-      <group ref={head} position={[0, 1.58, 0]}>
-        <mesh position={[0, -0.1, 0]} material={M.skin}>
-          <cylinderGeometry args={[0.06, 0.07, 0.1, 8]} />
-        </mesh>
-        <mesh position={[0, 0.06, 0]} material={M.skin} castShadow>
-          <sphereGeometry args={[0.13, 14, 12]} />
-        </mesh>
-        <HatMesh hat={look.hat} M={M} />
-        {M.glow && (
-          <mesh position={[0, 0.08, 0.125]} material={M.glow}>
-            <boxGeometry args={[0.2, 0.025, 0.02]} />
+      <group ref={body}>
+        {leg(-1, legL)}
+        {leg(1, legR)}
+        <group ref={torso} position={[0, 0.86, 0]}>
+          {/* 上身：外衣下摆略宽 */}
+          <mesh position={[0, 0.28, 0]} material={M.coat} castShadow>
+            <capsuleGeometry args={[0.2, 0.36, 6, 12]} />
           </mesh>
-        )}
+          <mesh position={[0, 0.02, 0]} material={M.coat}>
+            <cylinderGeometry args={[0.21, 0.27, 0.22, 12]} />
+          </mesh>
+          <mesh position={[0, 0.1, 0]} material={M.trim}>
+            <cylinderGeometry args={[0.215, 0.215, 0.05, 12]} />
+          </mesh>
+          <group position={[0, -0.86, 0]}>
+            {arm(-1, armL, foreL, false)}
+            {arm(1, armR, foreR, true)}
+          </group>
+          {/* 头：绘本比例，大一点 */}
+          <group ref={head} position={[0, 0.72, 0]}>
+            <mesh position={[0, -0.12, 0]} material={M.skin}>
+              <cylinderGeometry args={[0.055, 0.065, 0.1, 8]} />
+            </mesh>
+            <mesh position={[0, 0.06, 0]} material={M.skin} castShadow>
+              <sphereGeometry args={[0.155, 18, 14]} />
+            </mesh>
+            {/* 眼睛与鼻子：有了这两点，人就有了朝向 */}
+            {[-0.052, 0.052].map((x) => (
+              <mesh key={x} position={[x, 0.08, 0.142]} material={M.eye}>
+                <sphereGeometry args={[0.018, 8, 6]} />
+              </mesh>
+            ))}
+            <mesh position={[0, 0.03, 0.152]} material={M.skin}>
+              <sphereGeometry args={[0.022, 8, 6]} />
+            </mesh>
+            <HatMesh hat={look.hat} M={M} />
+            {M.glow && (
+              <mesh position={[0, 0.1, 0.15]} material={M.glow}>
+                <boxGeometry args={[0.22, 0.025, 0.02]} />
+              </mesh>
+            )}
+          </group>
+        </group>
       </group>
     </group>
   );
@@ -174,7 +295,18 @@ function HatMesh({ hat, M }: { hat: Look['hat']; M: Mats }) {
   return null;
 }
 
-function PropMesh({ prop, M }: { prop: Look['prop']; M: Mats }) {
+function PropMesh({ prop, M }: { prop: Prop; M: Mats }) {
+  if (prop === 'mallet')
+    return (
+      <group rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[0, 0.2, 0]} material={M.wood!}>
+          <cylinderGeometry args={[0.022, 0.022, 0.6, 6]} />
+        </mesh>
+        <mesh position={[0, 0.52, 0]} rotation={[0, 0, Math.PI / 2]} material={M.wood!}>
+          <cylinderGeometry args={[0.09, 0.09, 0.3, 10]} />
+        </mesh>
+      </group>
+    );
   if (prop === 'hoe')
     return (
       <group rotation={[0.2, 0, 0]}>

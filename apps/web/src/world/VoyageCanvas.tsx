@@ -8,6 +8,9 @@ import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
 import { HULL_STYLES, STYLE_BY_SCENE } from './hull';
 import { DECK_CREW } from './encounters';
+import { Bloom, EffectComposer, ToneMapping, Vignette } from '@react-three/postprocessing';
+import { ToneMappingMode } from 'postprocessing';
+import { fableLive, type FableState } from './fable';
 import type { WorldConfig } from './world.config';
 import { BLEND_SEC, DEST_TRAIL, FOLLOW_TAU, HARBOR_APPROACH, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, PORT_BEACON, PORT_BERTH, SHIP_MOTION } from './voyageConstants';
 
@@ -50,6 +53,12 @@ interface Props {
   landingT?: number;
   /** 收帆：控制权交出去，船自己往前开 */
   autopilot?: boolean;
+  /** 童话里这条航线已经发生的事 */
+  fableState?: FableState;
+  crisisDone?: boolean;
+  /** 镜头推到这座岛上：遭遇或危机进行中 */
+  stageAt?: { x: number; z: number; dist?: number; h?: number } | null;
+  taoyuanFound?: boolean;
   /** 这场戏的主角：从水里提上来的那件东西 */
   landingRelic?: string | null;
   input: ControlInput;
@@ -394,6 +403,7 @@ function Rig({
   landingT = 0,
   landingRelic = null,
   autopilot = false,
+  stageAt = null,
 }: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
@@ -752,6 +762,23 @@ function Rig({
       camera.lookAt(look);
       persp.fov = boot.fov;
       persp.updateProjectionMatrix();
+    } else if (mode === 'follow' && blend.current >= 1 && stageAt) {
+      // 遭遇：镜头离开船，推到那座小岛上。人在画面中间，船在画面一角
+      const toShip = new THREE.Vector3(g.position.x - stageAt.x, 0, g.position.z - stageAt.z);
+      const dist = toShip.length() || 1;
+      toShip.divideScalar(dist);
+      const side = new THREE.Vector3(-toShip.z, 0, toShip.x);
+      const want = new THREE.Vector3(stageAt.x, 0, stageAt.z)
+        .addScaledVector(toShip, stageAt.dist ?? 10.5)
+        .addScaledVector(side, (stageAt.dist ?? 10.5) * 0.3)
+        .setY(stageAt.h ?? 5.2);
+      const k = 1 - Math.exp(-clamped / (reduceMotion ? 0.01 : 0.55));
+      camera.position.lerp(want, k);
+      look.lerp(new THREE.Vector3(stageAt.x, 2.4, stageAt.z), k);
+      camera.up.copy(UP);
+      camera.lookAt(look);
+      persp.fov = THREE.MathUtils.lerp(persp.fov, 38, k);
+      persp.updateProjectionMatrix();
     } else if (mode === 'follow' && blend.current >= 1) {
       // 跟船弹簧：距离、横移、高度、注视点都按当前船型长度缩放，
       // 否则蒸汽船（L=26）船头出画、木筏（L=14）又空得只剩海。
@@ -803,6 +830,8 @@ function Rig({
       onBlend?.(blend.current);
     }
 
+    fableLive.ship.x = g.position.x;
+    fableLive.ship.z = g.position.z;
     onShip(
       {
         x: g.position.x,
@@ -920,8 +949,17 @@ export function VoyageCanvas(props: Props) {
           nearFragmentId={props.nearFragmentId}
           laneId={props.laneId}
           portalOpen={props.portalOpen ?? false}
+          fableState={props.fableState}
+          crisisDone={props.crisisDone}
+          taoyuanFound={props.taoyuanFound}
         />
         <Rig {...props} />
+        {/* 后期：灯火与光柱真正发光，暗角把视线收向画面中心。参考 pmndrs/react-postprocessing */}
+        <EffectComposer multisampling={4} enableNormalPass={false}>
+          <Bloom mipmapBlur luminanceThreshold={0.82} luminanceSmoothing={0.25} intensity={props.reduceMotion ? 0.5 : 0.85} radius={0.7} />
+          <Vignette eskil={false} offset={0.28} darkness={0.62} />
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+        </EffectComposer>
       </Canvas>
     </div>
   );
