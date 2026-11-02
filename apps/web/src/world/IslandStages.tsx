@@ -105,48 +105,86 @@ function Jars({ id, state }: P) {
   );
 }
 
-/* ---------- 汉阴丈人：一口井，一架桔槔。用了，它就一上一下地打水 ---------- */
-function Well({ state, reduceMotion }: P) {
-  const lever = useRef<THREE.Group>(null);
+/* ---------- 唐胥铁路：一段铁轨，骡子拉煤车；推出龙号，机车喷汽往前走 ---------- */
+function Mules({ state, reduceMotion }: P) {
+  const train = useRef<THREE.Group>(null);
+  const steam = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
-    if (!lever.current) return;
-    lever.current.rotation.z = state.machine === 'yes' && !reduceMotion ? Math.sin(clock.elapsedTime * 1.6) * 0.35 : 0.25;
+    if (reduceMotion) return;
+    const t = clock.elapsedTime;
+    const speed = state.machine === 'yes' ? 1.6 : state.machine === 'no' ? 0.35 : 0;
+    if (train.current) train.current.position.x = ((t * speed + 3) % 6) - 3;
+    steam.current?.children.forEach((c, i) => {
+      const k = (t * 0.8 + i * 0.25) % 1;
+      c.visible = state.machine === 'yes';
+      c.position.set(train.current ? train.current.position.x + 0.9 - k * 0.6 : 0, 2.4 + k * 1.6, -0.6);
+      c.scale.setScalar(0.25 + k * 0.5);
+      ((c as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity = 0.5 * (1 - k);
+    });
   });
   return (
-    <group position={[1.2, 0, -0.6]}>
-      <mesh position={[0, 1.55, 0]}>
-        <cylinderGeometry args={[0.8, 0.85, 0.7, 16, 1, true]} />
-        {mat('#6a6052', { side: THREE.DoubleSide })}
-      </mesh>
-      <mesh position={[0, 1.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.75, 16]} />
-        <meshStandardMaterial color="#3a5a6a" roughness={0.2} />
-      </mesh>
-      <mesh position={[1.6, 2.2, 0]}>
-        <cylinderGeometry args={[0.08, 0.1, 2, 6]} />
-        {mat('#5a4430')}
-      </mesh>
-      <group ref={lever} position={[1.6, 3.2, 0]}>
-        <mesh rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.05, 0.05, 4, 6]} />
-          {mat('#6a5034')}
-        </mesh>
-        <mesh position={[2, -0.2, 0]}>
-          <sphereGeometry args={[0.28, 8, 6]} />
-          {mat('#5a5048')}
-        </mesh>
-        <mesh position={[-2, -0.6, 0]}>
-          <cylinderGeometry args={[0.18, 0.15, 0.3, 8]} />
-          {mat('#6a5034')}
-        </mesh>
-      </group>
-      {/* 菜畦：浇过的是深色 */}
-      {[0, 1, 2].map((i) => (
-        <mesh key={i} position={[-2.4, 1.22, -1.6 + i * 1.3]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[2.2, 1]} />
-          {mat(state.machine ? '#4a6a32' : '#7a6a42')}
+    <group>
+      {/* 枕木与钢轨 */}
+      {Array.from({ length: 14 }, (_, i) => (
+        <mesh key={i} position={[-3.6 + i * 0.55, 1.24, -0.6]}>
+          <boxGeometry args={[0.18, 0.06, 1.1]} />
+          {mat('#4a3a2a')}
         </mesh>
       ))}
+      {[-0.4, 0.4].map((z) => (
+        <mesh key={z} position={[0, 1.3, -0.6 + z]}>
+          <boxGeometry args={[7.6, 0.06, 0.06]} />
+          {mat('#6a6a6a', { metalness: 0.6, roughness: 0.4 })}
+        </mesh>
+      ))}
+      <group ref={train} position={[0, 1.3, -0.6]}>
+        {/* 龙号：推出来才在轨道上；否则停在棚里 */}
+        {state.machine === 'yes' && (
+          <group position={[1.3, 0, 0]}>
+            <mesh position={[0, 0.45, 0]}>
+              <boxGeometry args={[1.3, 0.7, 0.8]} />
+              {mat('#2a2a2a', { metalness: 0.5, roughness: 0.5 })}
+            </mesh>
+            <mesh position={[0.4, 0.95, 0]}>
+              <cylinderGeometry args={[0.12, 0.14, 0.5, 8]} />
+              {mat('#1e1e1e')}
+            </mesh>
+          </group>
+        )}
+        {/* 骡子：没推出龙号时在前面拉 */}
+        {state.machine !== 'yes' &&
+          [0, 1].map((i) => (
+            <group key={i} position={[1.2 + i * 0.9, 0.35, 0]}>
+              <mesh>
+                <boxGeometry args={[0.7, 0.4, 0.3]} />
+                {mat('#5a4a3a')}
+              </mesh>
+              <mesh position={[0.4, 0.2, 0]}>
+                <boxGeometry args={[0.3, 0.26, 0.22]} />
+                {mat('#4a3a2c')}
+              </mesh>
+            </group>
+          ))}
+        {[0, 1, 2].map((i) => (
+          <mesh key={i} position={[-0.2 - i * 1.0, 0.35, 0]}>
+            <boxGeometry args={[0.9, 0.5, 0.7]} />
+            {mat('#2e2a26')}
+          </mesh>
+        ))}
+      </group>
+      <group ref={steam}>
+        {Array.from({ length: 5 }, (_, i) => (
+          <mesh key={i}>
+            <sphereGeometry args={[0.5, 8, 6]} />
+            <meshStandardMaterial color="#e8e8e8" transparent opacity={0.3} depthWrite={false} />
+          </mesh>
+        ))}
+      </group>
+      {/* 藏龙号的棚子 */}
+      <mesh position={[-2.6, 1.9, 1.8]}>
+        <boxGeometry args={[2.4, 1.4, 1.6]} />
+        {mat('#5a4a3a')}
+      </mesh>
     </group>
   );
 }
@@ -236,288 +274,326 @@ function Books({ id, state, kind }: P & { kind: 'books' | 'press' }) {
   );
 }
 
-/* ---------- 洞穴：洞壁上晃着影子，身后有火，洞口外有光 ---------- */
-function Cave({ reduceMotion }: P) {
-  const shadows = useRef<THREE.Group>(null);
-  const fire = useRef<THREE.PointLight>(null);
+/* ---------- 电缆登陆：江心一条船，缆从船上拉向岸；成了，缆绷直，灯亮 ---------- */
+function Landing({ id, state, reduceMotion }: P) {
+  const cable = useRef<THREE.Mesh>(null);
+  const boat = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
-    const t = clock.elapsedTime;
-    if (!reduceMotion) shadows.current?.children.forEach((c, i) => (c.position.x = -1.6 + i * 1.1 + Math.sin(t * 0.8 + i) * 0.4));
-    if (fire.current) fire.current.intensity = 7 + Math.sin(t * 9) * 2;
-  });
-  return (
-    <group position={[0, 0, -0.6]}>
-      <mesh position={[0, 1.2, -1.2]} scale={[1.3, 1, 1]}>
-        <sphereGeometry args={[3, 24, 14, Math.PI, Math.PI, 0, Math.PI / 2]} />
-        {mat('#3a342e', { side: THREE.BackSide })}
-      </mesh>
-      <mesh position={[0, 2.4, -3.6]}>
-        <planeGeometry args={[5, 2.2]} />
-        {mat('#8a7a62')}
-      </mesh>
-      <group ref={shadows} position={[0, 2.4, -3.55]}>
-        {[0, 1, 2, 3].map((i) => (
-          <mesh key={i}>
-            <circleGeometry args={[0.35 + (i % 2) * 0.15, 8]} />
-            <meshBasicMaterial color="#1a1612" transparent opacity={0.7} />
-          </mesh>
-        ))}
-      </group>
-      <mesh position={[0, 1.5, 1.2]}>
-        <coneGeometry args={[0.3, 0.8, 7]} />
-        <meshBasicMaterial color="#ff9a40" toneMapped={false} />
-      </mesh>
-      <pointLight ref={fire} position={[0, 1.8, 1.2]} color="#ff9a40" intensity={7} distance={10} decay={2} />
-    </group>
-  );
-}
-
-/* ---------- 盲人摸象：一头象，几个看不见的人围着它 ---------- */
-function Elephant({ state, reduceMotion }: P) {
-  const blind: Look = { coat: '#6a5a48', trim: '#4a3e30', skin: '#b08a6a', pants: '#3a3026', hat: 'wrap', prop: 'none', eyes: 0 };
-  const spots: [number, number, number][] = [[-2.4, 0.4, 1.3], [2.6, -0.4, -1.4], [0.2, 2.2, 3.1], [-0.4, -2, 0]];
-  return (
-    <group position={[0.4, 1.2, -0.4]}>
-      <mesh position={[0, 1.6, 0]} castShadow>
-        <boxGeometry args={[3.2, 1.8, 1.8]} />
-        {mat('#7a7670')}
-      </mesh>
-      <mesh position={[2, 1.9, 0]}>
-        <boxGeometry args={[1.1, 1.1, 1.1]} />
-        {mat('#7a7670')}
-      </mesh>
-      <mesh position={[2.7, 1.1, 0]} rotation={[0, 0, 0.3]}>
-        <cylinderGeometry args={[0.14, 0.2, 1.6, 8]} />
-        {mat('#6a6660')}
-      </mesh>
-      {[-1, 1].map((z) => (
-        <mesh key={z} position={[1.9, 1.9, z * 0.75]} rotation={[0, z * 0.5, 0]}>
-          <planeGeometry args={[0.9, 1.1]} />
-          {mat('#6a6660', { side: THREE.DoubleSide })}
-        </mesh>
-      ))}
-      {[[-1.1, -0.6], [-1.1, 0.6], [1.1, -0.6], [1.1, 0.6]].map(([x, z], i) => (
-        <mesh key={i} position={[x, 0.4, z]}>
-          <cylinderGeometry args={[0.28, 0.3, 0.9, 8]} />
-          {mat('#6e6a64')}
-        </mesh>
-      ))}
-      {/* 摸全身时，他们围成一圈牵着手；只听答案时，各站一处 */}
-      {spots.map(([x, z, r], i) => (
-        <group key={i} position={state.elephant === 'whole' ? [Math.cos(i * 1.57) * 2.4, -1.2, Math.sin(i * 1.57) * 2.0] : [x, -1.2, z]} rotation={[0, r, 0]} scale={1.1}>
-          <Person look={blind} action="idle" reduceMotion={reduceMotion} phase={i} />
-        </group>
-      ))}
-    </group>
-  );
-}
-
-/* ---------- 烽火：山头一排烽火台。点了，一座接一座烧起来 ---------- */
-function Beacons({ state, reduceMotion }: P) {
-  const flames = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => {
-    flames.current?.children.forEach((c, i) => {
-      c.visible = state.beacon === 'lit';
-      if (!reduceMotion) c.scale.y = 0.8 + Math.sin(clock.elapsedTime * 8 + i) * 0.25;
-    });
-  });
-  return (
-    <group>
-      {[-2.6, 0, 2.6].map((x, i) => (
-        <group key={x} position={[x, 1.2, -1.6 + i * 0.4]}>
-          <mesh position={[0, 1.2, 0]}>
-            <cylinderGeometry args={[0.6, 0.8, 2.4, 8]} />
-            {mat('#6a6052', { flatShading: true })}
-          </mesh>
-        </group>
-      ))}
-      <group ref={flames}>
-        {[-2.6, 0, 2.6].map((x, i) => (
-          <mesh key={x} position={[x, 4.2, -1.6 + i * 0.4]}>
-            <coneGeometry args={[0.45, 1.4, 7]} />
-            <meshBasicMaterial color="#ff8a30" toneMapped={false} />
-          </mesh>
-        ))}
-      </group>
-      {state.beacon === 'lit' && <pointLight position={[0, 5, 0]} color="#ff8a30" intensity={14} distance={24} decay={2} />}
-    </group>
-  );
-}
-
-/* ---------- 苏武：冰冷的北海，几只羊，天上的雁 ---------- */
-function Goose({ reduceMotion }: P) {
-  const geese = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => {
-    if (!geese.current || reduceMotion) return;
-    const t = clock.elapsedTime * 0.3;
-    geese.current.rotation.y = t;
-    geese.current.children.forEach((c, i) => (c.rotation.z = Math.sin(clock.elapsedTime * 6 + i) * 0.4));
-  });
-  return (
-    <group>
-      <mesh position={[-1.4, 1.23, 1.4]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[2.2, 24]} />
-        <meshStandardMaterial color="#c8dce4" roughness={0.15} metalness={0.2} />
-      </mesh>
-      {[[2, 1], [2.8, -0.6], [1.4, -1.6]].map(([x, z], i) => (
-        <mesh key={i} position={[x, 1.5, z]}>
-          <sphereGeometry args={[0.38, 10, 8]} />
-          {mat('#ece6da')}
-        </mesh>
-      ))}
-      <group ref={geese} position={[0, 7, 0]}>
-        {Array.from({ length: 7 }, (_, i) => {
-          const side = i === 0 ? 0 : i % 2 ? 1 : -1;
-          const k = Math.ceil(i / 2);
-          return (
-            <mesh key={i} position={[4 - k * 0.6, 0, side * k * 0.6]}>
-              <boxGeometry args={[0.5, 0.04, 0.9]} />
-              {mat('#3a3a38')}
-            </mesh>
-          );
-        })}
-      </group>
-    </group>
-  );
-}
-
-/* ---------- 魔法师的学徒：扫帚提着水桶来回跑，屋里的水越涨越高 ---------- */
-function Brooms({ id, state, reduceMotion }: P) {
-  const g = useRef<THREE.Group>(null);
-  const water = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    const stopped = state.broom === 'stopped';
-    const pace = live(id) ? 1 - Math.min(1, Math.abs(fableLive.value - 0.57) * 0) : stopped ? 0 : 1;
-    if (g.current && !reduceMotion)
-      g.current.children.forEach((c, i) => {
-        const a = clock.elapsedTime * 0.9 * pace + i * 1.26;
-        c.position.set(Math.cos(a) * 2.6, 1.6 + Math.abs(Math.sin(a * 3)) * 0.2 * pace, Math.sin(a) * 2);
-        c.rotation.z = stopped ? 0.4 : Math.sin(a * 3) * 0.2;
-      });
-    if (water.current) {
-      const want = state.broom === 'flooded' ? 2.1 : stopped ? 1.35 : 1.3 + ((clock.elapsedTime * 0.04) % 0.6);
-      water.current.position.y += (want - water.current.position.y) * 0.03;
+    const tight = live(id) ? fableLive.value : state.cable === 'landed' ? 0.55 : state.cable === 'snapped' ? 0 : 0.3;
+    if (cable.current) {
+      cable.current.visible = !(state.cable === 'snapped' && !live(id));
+      cable.current.scale.y = 0.5 + tight * 0.5;
+      cable.current.position.y = 1.0 - (1 - tight) * 0.35;
     }
+    if (boat.current && !reduceMotion) boat.current.position.y = Math.sin(clock.elapsedTime * 1.2) * 0.08;
   });
   return (
     <group>
-      <mesh position={[0, 2, -2.2]}>
-        <boxGeometry args={[3.4, 2.2, 1.8]} />
-        {mat('#5a4a3e')}
-      </mesh>
-      <group ref={g}>
-        {Array.from({ length: 5 }, (_, i) => (
-          <group key={i}>
-            <mesh position={[0, 0.5, 0]}>
-              <cylinderGeometry args={[0.03, 0.03, 1.4, 5]} />
-              {mat('#8a6a42')}
-            </mesh>
-            <mesh position={[0, -0.3, 0]}>
-              <coneGeometry args={[0.22, 0.5, 8]} />
-              {mat('#c8a868')}
-            </mesh>
-            <mesh position={[0.25, 0.1, 0]}>
-              <cylinderGeometry args={[0.14, 0.11, 0.26, 8]} />
-              {mat('#6a6a6a', { metalness: 0.5 })}
-            </mesh>
-          </group>
-        ))}
+      <group ref={boat} position={[-4.6, 0, 1.2]}>
+        <mesh position={[0, 0.3, 0]}>
+          <boxGeometry args={[1.6, 0.4, 3]} />
+          {mat('#3a2e24')}
+        </mesh>
+        <mesh position={[0, 0.7, -0.6]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.5, 0.5, 0.9, 14]} />
+          {mat('#1a1c1e')}
+        </mesh>
       </group>
-      <mesh ref={water} position={[0, 1.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[4.8, 32]} />
-        <meshStandardMaterial color="#5a8aa0" transparent opacity={0.55} roughness={0.15} />
+      <mesh ref={cable} position={[-1.6, 1.0, 1.0]} rotation={[0, 0, Math.PI / 2 - 0.12]}>
+        <cylinderGeometry args={[0.05, 0.05, 5.6, 6]} />
+        {mat('#111')}
+      </mesh>
+      {/* 岸上的接线房：缆拴稳了，灯就亮 */}
+      <mesh position={[1.8, 1.9, 0.4]}>
+        <boxGeometry args={[2, 1.4, 1.6]} />
+        {mat('#3a4248')}
+      </mesh>
+      <mesh position={[1.8, 1.9, 1.21]}>
+        <planeGeometry args={[0.6, 0.6]} />
+        <meshStandardMaterial color="#ffe0b0" emissive="#ffc070" emissiveIntensity={state.cable === 'landed' ? 2.2 : 0.1} toneMapped={state.cable !== 'landed'} />
       </mesh>
     </group>
   );
 }
 
-/* ---------- 浑沌：开满花的岛。凿了七窍，花就谢了 ---------- */
-function Hundun({ state }: P) {
-  const carved = state.hundun === 'carved';
+/* ---------- 报务室：耳机、电键、窗外的浮冰。一直发，天线上就一直有火花 ---------- */
+function Wireless({ state, reduceMotion }: P) {
+  const spark = useRef<THREE.MeshStandardMaterial>(null);
+  useFrame(({ clock }) => {
+    if (!spark.current) return;
+    const on = state.warning === 'kept' || !state.warning;
+    spark.current.emissiveIntensity = on && !reduceMotion && Math.sin(clock.elapsedTime * 11) > 0.6 ? 4 : 0.2;
+  });
   return (
     <group>
-      {Array.from({ length: 22 }, (_, i) => (
-        <mesh key={i} position={[Math.cos(i * 2.4) * (1.6 + (i % 4) * 0.7), 1.35, Math.sin(i * 2.4) * (1.4 + (i % 3) * 0.7)]}>
-          <sphereGeometry args={[0.14, 8, 6]} />
-          {mat(carved ? '#6a5a48' : ['#f0d0a0', '#e8b8c8', '#f8f0d8'][i % 3])}
+      <mesh position={[0, 2, -1.4]}>
+        <boxGeometry args={[3, 1.6, 2]} />
+        {mat('#3a3e46')}
+      </mesh>
+      <mesh position={[0, 2.1, -0.39]}>
+        <planeGeometry args={[1, 0.7]} />
+        <meshStandardMaterial color="#ffe0b0" emissive="#ffc070" emissiveIntensity={state.warning === 'off' ? 0.1 : 1.6} toneMapped={state.warning === 'off'} />
+      </mesh>
+      <mesh position={[0, 4.2, -1.4]}>
+        <cylinderGeometry args={[0.03, 0.04, 2.6, 5]} />
+        {mat('#6a7076', { metalness: 0.6 })}
+      </mesh>
+      <mesh position={[0, 5.55, -1.4]}>
+        <sphereGeometry args={[0.12, 8, 8]} />
+        <meshStandardMaterial ref={spark} color="#dff0ff" emissive="#9fd0ff" emissiveIntensity={0.2} toneMapped={false} />
+      </mesh>
+      {/* 浮冰 */}
+      {[[3.2, 1.8, 0.9], [-3.4, 2.4, 0.7], [2.4, -2.6, 1.2]].map(([x, z, r], i) => (
+        <mesh key={i} position={[x, 0.3, z]}>
+          <dodecahedronGeometry args={[r, 0]} />
+          {mat('#dfe8ee', { roughness: 0.4 })}
         </mesh>
       ))}
-      {/* 七把凿子：凿了，就插在地上 */}
-      {carved &&
-        Array.from({ length: 7 }, (_, i) => (
-          <mesh key={i} position={[-2.6 + i * 0.8, 1.6, 2.6]} rotation={[0.3, 0, 0]}>
-            <cylinderGeometry args={[0.03, 0.06, 0.8, 5]} />
-            {mat('#4a4d50', { metalness: 0.6 })}
-          </mesh>
-        ))}
     </group>
   );
 }
 
-/* ---------- 庄周梦蝶：花田与蝴蝶。梦里的蝴蝶是半透明的 ---------- */
-function Butterflies({ state, reduceMotion }: P) {
+/* ---------- 信鸽：鸽棚，鸽子飞回来落进棚里 ---------- */
+function Pigeons({ id, state, reduceMotion }: P) {
   const g = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
-    if (!g.current || reduceMotion) return;
+    if (!g.current) return;
+    const home = live(id) ? fableLive.value : state.pigeons === 'home' ? 1 : state.pigeons === 'lost' ? 0.3 : 0;
     const t = clock.elapsedTime;
     g.current.children.forEach((c, i) => {
-      c.position.set(Math.sin(t * 0.4 + i * 1.3) * 3, 2.2 + Math.sin(t * 1.1 + i) * 0.8, Math.cos(t * 0.35 + i * 1.7) * 2.6);
-      (c.children[0] as THREE.Object3D).rotation.y = Math.sin(t * 12 + i) * 0.9;
-      (c.children[1] as THREE.Object3D).rotation.y = -Math.sin(t * 12 + i) * 0.9;
+      const back = i / g.current!.children.length < home;
+      if (back) c.position.set(-1.6 + (i % 4) * 0.5, 2.1 + Math.floor(i / 4) * 0.4, 0.6);
+      else if (!reduceMotion) c.position.set(Math.cos(t * 0.5 + i) * 4, 4 + Math.sin(t * 0.9 + i) * 0.8, Math.sin(t * 0.5 + i) * 3);
+      if (!reduceMotion && !back) c.rotation.z = Math.sin(t * 9 + i) * 0.5;
     });
   });
   return (
     <group>
-      {Array.from({ length: 26 }, (_, i) => (
-        <mesh key={i} position={[Math.cos(i * 2.4) * (1 + (i % 5) * 0.8), 1.32, Math.sin(i * 2.4) * (1 + (i % 4) * 0.8)]}>
-          <sphereGeometry args={[0.12, 6, 5]} />
-          {mat(['#f0c040', '#f8f0e0', '#e890a0'][i % 3])}
-        </mesh>
-      ))}
+      <mesh position={[-1, 2.1, 0]}>
+        <boxGeometry args={[2.6, 1.6, 1.2]} />
+        {mat('#6a5a48')}
+      </mesh>
+      <mesh position={[-1, 3.1, 0]}>
+        <coneGeometry args={[1.8, 0.7, 4]} />
+        {mat('#4a3e30')}
+      </mesh>
       <group ref={g}>
-        {Array.from({ length: 9 }, (_, i) => {
-          const dream = i % 3 === 0;
-          const op = dream ? (state.dream === 'blurred' ? 0.7 : 0.3) : 0.95;
-          return (
-            <group key={i}>
-              {[-1, 1].map((s) => (
-                <mesh key={s} position={[s * 0.14, 0, 0]}>
-                  <planeGeometry args={[0.28, 0.22]} />
-                  <meshStandardMaterial color={dream ? '#c8d8ff' : '#f0a040'} transparent opacity={op} side={THREE.DoubleSide} emissive={dream ? '#9fb4ff' : '#000'} emissiveIntensity={dream ? 0.8 : 0} />
-                </mesh>
-              ))}
-            </group>
-          );
-        })}
+        {Array.from({ length: 8 }, (_, i) => (
+          <mesh key={i}>
+            <boxGeometry args={[0.32, 0.05, 0.14]} />
+            {mat(i % 3 ? '#cfd4d8' : '#8a8f94')}
+          </mesh>
+        ))}
+      </group>
+      {/* 城墙与气球 */}
+      <mesh position={[2.6, 1.8, -1.6]}>
+        <boxGeometry args={[0.6, 1.2, 4]} />
+        {mat('#5a5650')}
+      </mesh>
+      <mesh position={[3.2, 6, -1]}>
+        <sphereGeometry args={[0.9, 12, 10]} />
+        {mat('#c8a060')}
+      </mesh>
+    </group>
+  );
+}
+
+/* ---------- 驿马快信：一根新电线杆，一匹马。跑完了，马就不在岛上了 ---------- */
+function Pony({ state, reduceMotion }: P) {
+  const horse = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!horse.current || reduceMotion) return;
+    if (state.ride) horse.current.position.x = Math.min(9, horse.current.position.x + 0.03);
+    else horse.current.position.y = 1.2 + Math.abs(Math.sin(clock.elapsedTime * 2)) * 0.03;
+  });
+  return (
+    <group>
+      {[-2.4, 1.2, 4.8].map((x) => (
+        <group key={x} position={[x, 0, -1.6]}>
+          <mesh position={[0, 3.2, 0]}>
+            <cylinderGeometry args={[0.08, 0.11, 4, 6]} />
+            {mat('#5a4a3a')}
+          </mesh>
+          <mesh position={[0, 5, 0]}>
+            <boxGeometry args={[1, 0.1, 0.1]} />
+            {mat('#5a4a3a')}
+          </mesh>
+        </group>
+      ))}
+      <mesh position={[1.2, 5.05, -1.6]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.015, 0.015, 8, 4]} />
+        <meshBasicMaterial color="#111" />
+      </mesh>
+      <group ref={horse} position={[-0.6, 1.2, 0.8]}>
+        <mesh position={[0, 0.6, 0]}>
+          <boxGeometry args={[1.3, 0.55, 0.4]} />
+          {mat('#5a3a26')}
+        </mesh>
+        <mesh position={[0.7, 0.95, 0]} rotation={[0, 0, -0.5]}>
+          <boxGeometry args={[0.5, 0.3, 0.25]} />
+          {mat('#4a2e1e')}
+        </mesh>
+        {[-0.4, 0.4].map((x) => (
+          <mesh key={x} position={[x, 0.15, 0]}>
+            <boxGeometry args={[0.12, 0.5, 0.32]} />
+            {mat('#4a2e1e')}
+          </mesh>
+        ))}
+        <mesh position={[-0.1, 0.95, 0]}>
+          <boxGeometry args={[0.5, 0.25, 0.42]} />
+          {mat('#8a6a42')}
+        </mesh>
       </group>
     </group>
   );
 }
 
-/* ---------- 偃师造人：一个在跳舞的「人」。拆开了，零件摆在地上 ---------- */
-function Automaton({ state, reduceMotion }: P) {
-  const g = useRef<THREE.Group>(null);
-  const look: Look = { coat: '#c8a070', trim: '#8a3a2a', skin: '#e0c0a0', pants: '#6a4a3a', hat: 'wrap', prop: 'none' };
+/* ---------- 掩体：没有窗的房子，屏幕在红。撑住了，屏幕回到绿 ---------- */
+function Bunker({ id, state, reduceMotion }: P) {
+  const screen = useRef<THREE.MeshStandardMaterial>(null);
   useFrame(({ clock }) => {
-    if (!g.current || reduceMotion) return;
-    const t = clock.elapsedTime;
-    g.current.rotation.y = Math.sin(t * 1.4) * 1.2;
-    g.current.position.y = 1.2 + Math.abs(Math.sin(t * 2.8)) * 0.15;
+    if (!screen.current) return;
+    const red = live(id) ? true : state.alarm === 'reported' ? true : state.alarm === 'held' ? false : true;
+    const c = red ? '#ff3a2a' : '#5ae08a';
+    screen.current.emissive.set(c);
+    screen.current.color.set(c);
+    screen.current.emissiveIntensity = red && !reduceMotion ? 1.6 + Math.sin(clock.elapsedTime * 6) * 1 : 1.4;
   });
-  if (state.automaton === 'opened')
-    return (
-      <group position={[1.6, 1.3, -0.8]}>
-        {['#c8a070', '#8a6a42', '#e0c0a0', '#3a2a1e', '#c83a2a', '#e8e0d0'].map((c, i) => (
-          <mesh key={i} position={[(i % 3) * 0.6 - 0.6, 0.06, Math.floor(i / 3) * 0.6]}>
-            <boxGeometry args={[0.4, 0.1, 0.3]} />
-            {mat(c)}
-          </mesh>
-        ))}
-      </group>
-    );
   return (
-    <group ref={g} position={[1.6, 1.2, -0.8]} scale={1.25}>
-      <Person look={look} talking reduceMotion={reduceMotion} phase={3} />
+    <group>
+      <mesh position={[0, 2.4, -0.8]}>
+        <boxGeometry args={[4.4, 2.4, 3]} />
+        {mat('#2e3230', { roughness: 0.95 })}
+      </mesh>
+      <mesh position={[0, 2.5, 0.71]}>
+        <planeGeometry args={[1.8, 1]} />
+        <meshStandardMaterial ref={screen} color="#ff3a2a" emissive="#ff3a2a" emissiveIntensity={1.6} toneMapped={false} />
+      </mesh>
+      <mesh position={[1.6, 1.6, 1.2]}>
+        <boxGeometry args={[0.5, 0.2, 0.3]} />
+        {mat('#1a1a1a')}
+      </mesh>
+    </group>
+  );
+}
+
+/* ---------- 深蓝：一张棋桌，一台黑色机柜。记录给看了，桌上摊着一摞纸 ---------- */
+function Chess({ state, reduceMotion }: P) {
+  const lamp = useRef<THREE.MeshStandardMaterial>(null);
+  useFrame(({ clock }) => {
+    if (lamp.current && !reduceMotion) lamp.current.emissiveIntensity = 1 + Math.sin(clock.elapsedTime * 3) * 0.6;
+  });
+  return (
+    <group>
+      <mesh position={[0, 1.7, 0]}>
+        <boxGeometry args={[2, 0.1, 2]} />
+        {mat('#5a4a3a')}
+      </mesh>
+      {Array.from({ length: 64 }, (_, i) => (
+        <mesh key={i} position={[-0.7 + (i % 8) * 0.2, 1.76, -0.7 + Math.floor(i / 8) * 0.2]}>
+          <boxGeometry args={[0.2, 0.02, 0.2]} />
+          {mat((i + Math.floor(i / 8)) % 2 ? '#2a2420' : '#e8dcc4')}
+        </mesh>
+      ))}
+      {Array.from({ length: 10 }, (_, i) => (
+        <mesh key={i} position={[-0.6 + (i % 5) * 0.3, 1.9, i < 5 ? -0.5 : 0.5]}>
+          <cylinderGeometry args={[0.06, 0.08, 0.22, 8]} />
+          {mat(i < 5 ? '#f0e8d8' : '#1a1612')}
+        </mesh>
+      ))}
+      <mesh position={[2.6, 2.2, -0.6]}>
+        <boxGeometry args={[1.2, 2.2, 1.2]} />
+        {mat('#101418', { metalness: 0.5, roughness: 0.5 })}
+      </mesh>
+      <mesh position={[2.6, 2.6, 0.01]}>
+        <planeGeometry args={[0.5, 0.08]} />
+        <meshStandardMaterial ref={lamp} color="#7f98ff" emissive="#7f98ff" emissiveIntensity={1} toneMapped={false} />
+      </mesh>
+      {state.log === 'shown' && (
+        <mesh position={[-1.8, 1.5, 0.6]} rotation={[0, 0.3, 0]}>
+          <boxGeometry args={[0.9, 0.5, 1.2]} />
+          {mat('#e8e0cc')}
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+/* ---------- ELIZA：一台终端，纸带哒哒往外吐。门开着还是关着 ---------- */
+function Terminal({ state, reduceMotion }: P) {
+  const paper = useRef<THREE.Mesh>(null);
+  useFrame(({ clock }) => {
+    if (!paper.current) return;
+    const typing = state.eliza !== 'stayed';
+    paper.current.scale.y = typing && !reduceMotion ? 0.6 + ((clock.elapsedTime * 0.1) % 0.6) : 0.6;
+  });
+  return (
+    <group>
+      <mesh position={[0, 1.7, 0]}>
+        <boxGeometry args={[2.2, 0.1, 1.2]} />
+        {mat('#5a4a3a')}
+      </mesh>
+      <mesh position={[0, 2.05, 0]}>
+        <boxGeometry args={[1.2, 0.5, 0.8]} />
+        {mat('#c8c4b8')}
+      </mesh>
+      <mesh ref={paper} position={[0, 2.3, -0.3]} rotation={[0.3, 0, 0]}>
+        <planeGeometry args={[0.7, 1.2]} />
+        <meshStandardMaterial color="#f6f0e0" side={THREE.DoubleSide} />
+      </mesh>
+      {/* 门：带上了就关着 */}
+      <group position={[2.6, 0, 0.8]}>
+        <mesh position={[0, 2.1, 0]}>
+          <boxGeometry args={[0.2, 1.8, 2.4]} />
+          {mat('#3a3028')}
+        </mesh>
+        <mesh position={[0, 2.1, state.eliza === 'left' ? 0.6 : 0.2]} rotation={[0, state.eliza === 'left' ? 0 : 1.2, 0]}>
+          <boxGeometry args={[0.08, 1.7, 1.0]} />
+          {mat('#6a5034')}
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* ---------- 第 37 手：一张棋盘，右边五路一颗白子亮着 ---------- */
+function GoBoard({ id, state, reduceMotion }: P) {
+  const star = useRef<THREE.MeshStandardMaterial>(null);
+  useFrame(({ clock }) => {
+    if (!star.current) return;
+    const seen = live(id) ? fableLive.value > 0.5 : state.move === 'seen';
+    star.current.emissiveIntensity = seen ? 2.6 + (reduceMotion ? 0 : Math.sin(clock.elapsedTime * 2) * 0.6) : 0.3;
+  });
+  const stones = [[3, 3, 0], [15, 3, 1], [3, 15, 1], [15, 15, 0], [9, 9, 0], [4, 10, 1], [10, 4, 0], [6, 6, 1], [12, 12, 0], [8, 13, 1]];
+  return (
+    <group>
+      <mesh position={[0, 1.7, 0]}>
+        <boxGeometry args={[2.4, 0.16, 2.4]} />
+        {mat('#c8a060')}
+      </mesh>
+      {Array.from({ length: 19 }, (_, i) => (
+        <group key={i}>
+          <mesh position={[-1.08 + i * 0.12, 1.79, 0]}>
+            <boxGeometry args={[0.01, 0.005, 2.16]} />
+            <meshBasicMaterial color="#3a2a1a" />
+          </mesh>
+          <mesh position={[0, 1.79, -1.08 + i * 0.12]}>
+            <boxGeometry args={[2.16, 0.005, 0.01]} />
+            <meshBasicMaterial color="#3a2a1a" />
+          </mesh>
+        </group>
+      ))}
+      {stones.map(([x, y, b], i) => (
+        <mesh key={i} position={[-1.08 + x * 0.12, 1.82, -1.08 + y * 0.12]}>
+          <sphereGeometry args={[0.055, 10, 8]} />
+          {mat(b ? '#1a1612' : '#f0ece4', { roughness: 0.3 })}
+        </mesh>
+      ))}
+      {/* 第 37 手：右边五路，肩冲 */}
+      <mesh position={[-1.08 + 14 * 0.12, 1.82, -1.08 + 9 * 0.12]}>
+        <sphereGeometry args={[0.06, 10, 8]} />
+        <meshStandardMaterial ref={star} color="#f0ece4" emissive="#9fb4ff" emissiveIntensity={0.3} toneMapped={false} />
+      </mesh>
     </group>
   );
 }
@@ -529,30 +605,30 @@ export function IslandStage({ stage, id, state, reduceMotion }: { stage: Stage }
       return <Tally {...p} />;
     case 'jars':
       return <Jars {...p} />;
-    case 'well':
-      return <Well {...p} />;
+    case 'mules':
+      return <Mules {...p} />;
     case 'loom':
       return <Loom {...p} />;
     case 'books':
       return <Books {...p} kind="books" />;
     case 'press':
       return <Books {...p} kind="press" />;
-    case 'cave':
-      return <Cave {...p} />;
-    case 'elephant':
-      return <Elephant {...p} />;
-    case 'beacon':
-      return <Beacons {...p} />;
-    case 'goose':
-      return <Goose {...p} />;
-    case 'brooms':
-      return <Brooms {...p} />;
-    case 'hundun':
-      return <Hundun {...p} />;
-    case 'butterflies':
-      return <Butterflies {...p} />;
-    case 'automaton':
-      return <Automaton {...p} />;
+    case 'landing':
+      return <Landing {...p} />;
+    case 'wireless':
+      return <Wireless {...p} />;
+    case 'pigeons':
+      return <Pigeons {...p} />;
+    case 'pony':
+      return <Pony {...p} />;
+    case 'bunker':
+      return <Bunker {...p} />;
+    case 'chess':
+      return <Chess {...p} />;
+    case 'terminal':
+      return <Terminal {...p} />;
+    case 'goboard':
+      return <GoBoard {...p} />;
     default:
       return null;
   }
@@ -697,7 +773,7 @@ export function CrisisScene({
               <sphereGeometry args={[0.24, 10, 8]} />
               <meshStandardMaterial color="#fff1d0" emissive="#ffb060" emissiveIntensity={resolved && state.repair === 'small' ? 4 : 1.2} toneMapped={false} />
             </mesh>
-            {resolved && state.repair === 'small' && <pointLight position={[0, 2.4, 0]} color="#ffb060" intensity={10} distance={16} decay={2} />}
+            <pointLight position={[0, 2.4, 0]} color="#ffb060" intensity={resolved && state.repair === 'small' ? 10 : 0} distance={16} decay={2} />
           </group>
         </group>
       )}

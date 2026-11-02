@@ -64,6 +64,8 @@ interface Props {
   player?: string | null;
   /** 开局大殿里亮着的那扇窗 */
   highlightEra?: EraKey | null;
+  /** 显卡上下文丢失/恢复：由界面明确提示，不静默 */
+  onGl?: (state: 'lost' | 'restored') => void;
   /** 这场戏的主角：从水里提上来的那件东西 */
   landingRelic?: string | null;
   input: ControlInput;
@@ -917,9 +919,14 @@ export function VoyageCanvas(props: Props) {
     <div className="world-canvas">
       <Canvas
         shadows
-        dpr={[1, 1.75]}
+        dpr={[1, 1.5]}
         camera={{ fov: 34, near: 0.3, far: 420, position: [28, 5.2, 8] }}
         onCreated={({ gl }) => {
+          gl.domElement.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault();
+            props.onGl?.('lost');
+          });
+          gl.domElement.addEventListener('webglcontextrestored', () => props.onGl?.('restored'));
           gl.setClearColor(sky, 1);
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
@@ -939,8 +946,8 @@ export function VoyageCanvas(props: Props) {
           intensity={1.55}
           color={lamp}
           castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
           shadow-camera-near={2}
           shadow-camera-far={90}
           shadow-camera-left={-30}
@@ -970,7 +977,7 @@ export function VoyageCanvas(props: Props) {
         )}
         <Rig {...props} />
         {/* 后期：灯火与光柱真正发光，暗角把视线收向画面中心。参考 pmndrs/react-postprocessing */}
-        <EffectComposer multisampling={4} enableNormalPass={false}>
+        <EffectComposer multisampling={0} enableNormalPass={false}>
           <Bloom mipmapBlur luminanceThreshold={0.82} luminanceSmoothing={0.25} intensity={props.reduceMotion ? 0.5 : 0.85} radius={0.7} />
           <Vignette eskil={false} offset={0.28} darkness={0.62} />
           <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />

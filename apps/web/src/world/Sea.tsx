@@ -739,7 +739,7 @@ function Portal({
               toneMapped={!open}
             />
           </mesh>
-          {open && <pointLight position={[0, H + 0.5, 0]} color={color} intensity={9} distance={30} decay={2} />}
+          <pointLight position={[0, H + 0.5, 0]} color={color} intensity={open ? 9 : 0} distance={30} decay={2} />
         </group>
       ))}
 

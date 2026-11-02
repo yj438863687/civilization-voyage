@@ -342,6 +342,8 @@ export function App() {
   const [ship, setShip] = useState<ShipSnapshot | null>(null);
   const [input, setInput] = useState<ControlInput>({ forward: 0, turn: 0 });
   const [busy, setBusy] = useState(false);
+  /** 显卡上下文丢了：画面会黑，等浏览器把它还回来 */
+  const [glLost, setGlLost] = useState(false);
   /** 玩家：名字与口令只在本机。没登录过就先登船 */
   const [player, setPlayer] = useState<Player | null>(() => sessionPlayer());
   const [camBlend, setCamBlend] = useState(1);
@@ -1225,6 +1227,7 @@ export function App() {
           canSail={view === 'world' && !sealBeat && !enc && !crisis && !secret}
           taoyuanFound={!!stats.secrets.taoyuan}
           player={player?.name ?? null}
+          onGl={(st) => setGlLost(st === 'lost')}
           highlightEra={view === 'embark' ? (scenePick?.id === 'neutral-test' ? 'test' : ((scenePick?.id as 'A' | 'B' | 'C' | 'D' | undefined) ?? null)) : null}
           fableState={progress.state}
           crisisDone={!!story && progress.crisis.includes(story.crisis.id)}
@@ -1429,6 +1432,11 @@ export function App() {
 
       {/* 出发页只剩画面字，不挂提示条 */}
       {/* 海上不再挂教练条：铜针、旁白和门的光柱已经在指路 */}
+      {glLost && (
+        <div className="gl-lost" role="alert">
+          显卡上下文丢失，画面暂时变黑。正在等浏览器恢复；若十秒内没有恢复，请刷新页面。
+        </div>
+      )}
       {!player && <PlayerGate onDone={setPlayer} />}
       <div className={player ? '' : 'is-gated'} aria-hidden={player ? undefined : true}>
       {!['embark', 'reflection', 'cockpit', 'world'].includes(view) && (
