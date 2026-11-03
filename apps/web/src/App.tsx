@@ -787,30 +787,21 @@ export function App() {
     setIntro(voyage.scene_id);
   }, [view, voyage, records]);
 
-  // 片头一散，先让手忙起来：一阵横风把船往礁石上推，三秒内打舵，才谈故事
-  useEffect(() => {
-    // 片头、出海的推镜都要过去，船停稳了，才起风
-    if (view !== 'world' || intro || cine || camBlend < 0.98 || !voyage || !ship) return;
-    // 片头还没放过（首帧 intro 还是 null）就不算；放过了、散了，才起风
-    if (introShown.current !== voyage.id) return;
-    if (squallDone.current === voyage.id || records.some((r) => r.kind === 'choice')) return;
-    squallDone.current = voyage.id;
-    const dir: 1 | -1 = Math.random() > 0.5 ? 1 : -1;
-    // 片头的字刚散，让玩家看清船，再起风
-    const t0 = window.setTimeout(() => setSquall({ until: performance.now() + 3200, dir }), 900);
-    const t = window.setTimeout(() => setSquall(null), 4300);
-    return () => {
-      window.clearTimeout(t0);
-      window.clearTimeout(t);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, intro, cine, camBlend, voyage?.id]);
-
   // 片头的计时只认片头本身：拾取、存档这些变化不能把它重置成"永远不消失"
   useEffect(() => {
     if (!intro) return;
-    const t = window.setTimeout(() => setIntro(null), reduceMotion ? 1600 : 6200);
-    const skip = () => setIntro(null);
+    // 片头一散（到时或按键跳过），先让手忙起来：一阵横风把船往礁石上推，三秒内打舵，才谈故事
+    const dismiss = () => {
+      setIntro(null);
+      if (voyage && squallDone.current !== voyage.id && !records.some((r) => r.kind === 'choice')) {
+        squallDone.current = voyage.id;
+        const dir: 1 | -1 = Math.random() > 0.5 ? 1 : -1;
+        window.setTimeout(() => setSquall({ until: performance.now() + 3200, dir }), 900);
+        window.setTimeout(() => setSquall(null), 4300);
+      }
+    };
+    const t = window.setTimeout(dismiss, reduceMotion ? 1600 : 6200);
+    const skip = dismiss;
     window.addEventListener('keydown', skip, { once: true });
     return () => {
       window.clearTimeout(t);
