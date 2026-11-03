@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from './api/client';
 import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Usage, type Voyage, type VoyageRecord } from './api/types';
-import { Coach, Ledgers, SealButton, StageBar, Stamp, StatusBanner, contentStamp } from './components/ui';
+import { Coach, Ledgers, SealButton, StageBar, StatusBanner } from './components/ui';
 import { kernelBeat } from './crew';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
 import { laneStops, worldFor, type WorldConfig } from './world/world.config';
@@ -13,6 +13,9 @@ import { PlayerGate } from './components/PlayerGate';
 import { sessionPlayer, signOut, type Player } from './player';
 import { ShoreOverlay, SpiritMap, StoryCaption, StoryPage } from './components/Story';
 import { ISLAND_OFFSET, VILLAGE_OFFSET, fableLive } from './world/fable';
+import { buildWaterSpec, resetWaterLive, waterLive, type WaterResult, type WaterSpec } from './world/waterGame';
+import { seaStateFor } from './world/seaState';
+import type { Game } from './world/encounters';
 import { TAOYUAN, TAOYUAN_ECHO, TAOYUAN_ENC, TAOYUAN_FINALE, TAOYUAN_HINT } from './world/taoyuan';
 import { loadProgress, saveProgress, storyFor, type Beat, type StoryProgress } from './world/stories';
 
@@ -46,11 +49,11 @@ function worldState(
 }
 
 const TITLE_PRESETS: Record<string, string> = {
-  A: '靠岸一问',
-  B: '逆风一问',
-  C: '断线一问',
-  D: '目的地一问',
-  'neutral-test': '玄览一问',
+  A: '从漂流到靠岸',
+  B: '从风帆到蒸汽',
+  C: '从海上到电波',
+  D: '从驾驶到设定目的地',
+  'neutral-test': '启航港',
 };
 
 function latestScenes(list: Scene[]): Scene[] {
@@ -136,11 +139,6 @@ function ChartMap({ struck, activeEpoch }: { struck: string[]; activeEpoch: stri
   );
 }
 
-function voyageSceneLabel(v: Voyage) {
-  const raw = String(v.scene_snapshot.label ?? v.scene_id);
-  if (raw.includes('中性测试') || raw.includes('测试海域')) return '启航港 · 玄览内海（创作）';
-  return raw.replace(/^AI 推荐，待组员确认：/, '');
-}
 
 /** 场景 id → 短名。HUD 里只放得下这一行。 */
 function sceneShortFromId(id: string | undefined) {
@@ -379,9 +377,32 @@ export function App() {
   const [storyPage, setStoryPage] = useState(false);
   /** 暗线进行中：桃花源 */
   const [secret, setSecret] = useState<string | null>(null);
+  /** 水上的玩法：对话说完，东西就摆到船头前面；船开到哪，答案就是哪 */
+  const [water, setWater] = useState<WaterSpec | null>(null);
+  const [waterResult, setWaterResult] = useState<WaterResult | null>(null);
+  const [encPhase, setEncPhase] = useState<'intro' | 'talk' | 'play' | 'result'>('intro');
+  const phaseHandler = (game: Game, timeLimit?: number) => (phase: 'intro' | 'talk' | 'play' | 'result') => {
+    setEncPhase(phase);
+    if (phase === 'play') {
+      const s = shipRef.current;
+      if (!s) return;
+      resetWaterLive();
+      setWaterResult(null);
+      // 空水面：避开岛、礁石、码头、村子，东西才不会摆到岸上去
+      const obstacles = [
+        ...sea.fragments.map((f) => ({ x: f.x + ISLAND_OFFSET.x, z: f.z + ISLAND_OFFSET.z, r: 7 })),
+        ...seaStateFor(voyage?.scene_id).reefs.map((r) => ({ x: r.x, z: r.z, r: r.r + 1 })),
+        ...sea.ports.map((p) => ({ x: p.x, z: p.z, r: p.radius + 6 })),
+        ...(story ? [{ x: story.crisis.at.x + VILLAGE_OFFSET.x, z: story.crisis.at.z + VILLAGE_OFFSET.z, r: 13 }] : []),
+      ];
+      setWater(buildWaterSpec(game, s, { timeLimit, obstacles }));
+    } else if (phase === 'result' || phase === 'intro') {
+      setWater(null);
+    }
+  };
   const encRef = useRef<string | null>(null);
-  // 遭遇、危机、暗线都占住双手：船停下，键盘交给小游戏
-  encRef.current = enc ?? crisis ?? secret;
+  // 听人说话、看结果时船停下；轮到你做事时，键盘归船
+  encRef.current = encPhase === 'play' ? null : (enc ?? crisis ?? secret);
   const shipRef = useRef<ShipSnapshot | null>(null);
 
   const connected = models.length > 0;
@@ -610,10 +631,11 @@ export function App() {
       }
       // 补给见底：定量配给，船慢下来
       const ration = statsRef.current.supply <= 0;
+      const crippled = statsRef.current.hull <= 0;
       setInput((prev) =>
-        prev.forward === forward && prev.turn === turn && (prev.boost ?? 0) === boost && !!prev.ration === ration
+        prev.forward === forward && prev.turn === turn && (prev.boost ?? 0) === boost && !!prev.ration === ration && !!prev.crippled === crippled
           ? prev
-          : { forward, turn, boost, ration },
+          : { forward, turn, boost, ration, crippled },
       );
     }, 48);
     return () => {
@@ -901,8 +923,9 @@ export function App() {
       });
       const p = await api.ports(voyage.id);
       setPorts(p);
-      // 先把这一程的实物看完，再让人做选择
-      setLanding(0.0001);
+      // 先把这一程的实物看完，再让人做选择。时间轴先归零再起，上一次没走完的不会把这一次卡住
+      setLanding(0);
+      requestAnimationFrame(() => setLanding(0.0001));
     } catch (e) {
       setError(errText(e));
       setBusy(false);
@@ -1218,6 +1241,7 @@ export function App() {
 
   /** 镜头推到哪：正在打照面的那座岛，或者正在涨水的那个村子 */
   const stageAt = useMemo(() => {
+    if (encPhase === 'play') return null;
     if (enc && encounterFor(enc)?.stage) {
       const f = sea.fragments.find((x) => x.id === enc);
       if (f) return { x: f.x + ISLAND_OFFSET.x, z: f.z + ISLAND_OFFSET.z };
@@ -1226,7 +1250,7 @@ export function App() {
     if (crisis && story?.crisis.cause) return { x: story.crisis.at.x + VILLAGE_OFFSET.x, z: story.crisis.at.z + VILLAGE_OFFSET.z, dist: 21, h: 11 };
     if (secret === 'taoyuan') return { x: TAOYUAN.at.x - 4, z: TAOYUAN.at.z, dist: 24, h: 8.5 };
     return null;
-  }, [enc, crisis, secret, story, sea]);
+  }, [enc, crisis, secret, story, sea, encPhase]);
 
   const guideTarget = useMemo(() => {
     if (sealedHere && sea.portal) return { x: sea.portal.x, z: sea.portal.z };
@@ -1237,7 +1261,8 @@ export function App() {
     return portPlace ?? null;
   }, [sealedHere, sea, laneId, collectedIds, portPlace, story, progress]);
 
-  const relNow = ship && guideTarget ? portRelDeg(ship, guideTarget) : null;
+  const aimAt = water && waterLive.target ? waterLive.target : guideTarget;
+  const relNow = ship && aimAt ? portRelDeg(ship, aimAt) : null;
   const gateRel = ship && sea.portal ? portRelDeg(ship, sea.portal) : null;
   const portDistNow = ship && portPlace ? Math.hypot(portPlace.x - ship.x, portPlace.z - ship.z) : null;
   const tip = guide(view, {
@@ -1272,7 +1297,12 @@ export function App() {
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !sealBeat && !enc && !crisis && !secret}
+          canSail={view === 'world' && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
+          water={water}
+          onWaterDone={(r) => {
+            setWaterResult(r);
+            setWater(null);
+          }}
           taoyuanFound={!!stats.secrets.taoyuan}
           player={player?.name ?? null}
           onGl={(st) => setGlLost(st === 'lost')}
@@ -1326,9 +1356,6 @@ export function App() {
               <div className={`landing-body${stage3 ? ' is-in' : ''}`}>
                 {stage3 && frag ? frag.why ?? frag.text : ''}
               </div>
-              <div className={`landing-stamp${stage3 ? ' is-in' : ''}`}>
-                {stage3 && frag ? contentStamp(frag.classification, frag.sources).label : ''}
-              </div>
             </div>
           </div>
         );
@@ -1360,32 +1387,17 @@ export function App() {
             )}
           </div>
           <div className={`hud hud-tr${view === 'world' ? ' hud-tr-world' : ' scrim'}`}>
+            {view !== 'world' && (
             <Ledgers
               connected={connected}
               usage={usage}
-              balance={view === 'world' ? stats.supply : voyage?.balance ?? null}
+              balance={voyage?.balance ?? null}
               inventory={voyage?.inventory ?? null}
               capacity={voyage?.capacity ?? null}
               materials={unusedFragments}
-              compact={view === 'world'}
+              compact={false}
             />
-          </div>
-          <div className={`hud hud-tc${view === 'world' ? ' hud-tc-world' : ''}`}>
-            <Stamp
-              kind={
-                voyage?.scene_id === 'neutral-test' || scenePick?.id === 'neutral-test'
-                  ? 'creative'
-                  : voyage?.scene_track === 'candidate' || scenePick?.status === 'pending'
-                    ? 'pending'
-                    : voyage?.scene_track === 'test' || scenePick?.status === 'test'
-                      ? 'test'
-                      : 'confirmed'
-              }
-            >
-              {voyage?.scene_snapshot && typeof voyage.scene_snapshot.label === 'string'
-                ? voyage.scene_snapshot.label
-                : scenePick?.label ?? '启航港'}
-            </Stamp>
+            )}
           </div>
           <div className="hud hud-bl">
             {view === 'world' && (
@@ -1466,8 +1478,10 @@ export function App() {
                 <div className={`faint${input.boost ? ' is-boost' : ''}`}>
                   {input.boost
                     ? `${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'} · 正在烧补给`
-                    : stats.supply <= 0
-                      ? '补给已空 · 船在减速'
+                    : stats.hull <= 0
+                      ? '船身破了 · 速度减半，回港才能修'
+                      : stats.supply <= 0
+                        ? '补给已空 · 船在减速'
                       : `WASD 航行 · Shift ${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}`}
                 </div>
               </div>
@@ -1606,6 +1620,8 @@ export function App() {
           crisis
           cause={story.crisis.cause?.(progress.state)}
           timeLimit={reduceMotion ? undefined : 18}
+          onPhase={phaseHandler(story.crisis.enc.game, reduceMotion ? undefined : 18)}
+          waterResult={waterResult}
         />
       )}
 
@@ -1618,6 +1634,8 @@ export function App() {
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishSecret(o, summary)}
           secret
+          onPhase={phaseHandler(TAOYUAN_ENC.game)}
+          waterResult={waterResult}
         />
       )}
 
@@ -1659,6 +1677,8 @@ export function App() {
           title={sea.fragments.find((f) => f.id === enc)?.title ?? ''}
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishEncounter(enc, o, summary)}
+          onPhase={phaseHandler(encounterFor(enc)!.game)}
+          waterResult={waterResult}
         />
       )}
 
@@ -1744,30 +1764,26 @@ export function App() {
               </button>
             </div>
 
-            {!connected && (
-              <p className="cine-embark-note">
-                模型服务尚未接入。船员不会假装回话，整程仍可走完。
-                <button className="cine-link" type="button" onClick={() => setComms(true)}>通讯台</button>
-              </p>
-            )}
             {bootError && <p className="cine-embark-error">后端未接通：{bootError}。先运行 scripts/dev.sh。</p>}
             {error && <p className="cine-embark-error">{error}</p>}
-            <p className="cine-embark-foot" title="概念设计，不是考古复原，不冒充任何一艘历史上的具体船只。">
-              概念宝船，非考古复原。
-            </p>
           </div>
 
-          {voyages.length > 0 && (
-            <div className="cine-embark-continue">
-              <span className="cine-prompt">继续航程</span>
-              {voyages.slice(0, 4).map((v) => (
-                <button key={v.id} type="button" className="cine-continue" onClick={() => void loadVoyage(v.id)}>
-                  {v.title}
-                  <span className="cine-continue-sub">{voyageSceneLabel(v)}</span>
+          {(() => {
+            // 只认最近一程没走完的：名字就是「哪一段 · 哪条线」
+            const last = voyages.find((v) => v.stage !== 'reflection');
+            if (!last) return null;
+            const lane = (last.world as { lane?: string } | undefined)?.lane ?? 'near';
+            const st = storyFor(last.scene_id, lane);
+            return (
+              <div className="cine-embark-continue">
+                <span className="cine-prompt">上一程还没走完</span>
+                <button type="button" className="cine-continue" onClick={() => void loadVoyage(last.id)}>
+                  {EPOCH_INTRO[last.scene_id]?.era ?? '启航港'}
+                  <span className="cine-continue-sub">{st ? `「${st.title}」· 接着走` : '接着走'}</span>
                 </button>
-              ))}
-            </div>
-          )}
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -1864,9 +1880,6 @@ export function App() {
                 ? `靠过去 · ${encounterFor(nearFrag.id)!.who}守着「${nearFrag.title}」`
                 : `收入货舱 · ${nearFrag.title}`}
             </strong>
-            <Stamp kind={contentStamp(nearFrag.classification, nearFrag.sources).kind}>
-              {contentStamp(nearFrag.classification, nearFrag.sources).label}
-            </Stamp>
             <span className="faint">{nearFrag.text}</span>
           </span>
         </button>
@@ -1876,11 +1889,8 @@ export function App() {
         <button className="interact-prompt interact-prompt-port" type="button" disabled={busy} onClick={() => void dock()}>
           <span className="interact-key">F</span>
           <span className="interact-copy">
-            <strong>靠港 · {sea.ports.find((p) => p.id === nearPort)?.name}</strong>
-            <Stamp kind={portPlace?.mark === 'creative' ? 'creative' : portPlace?.mark === 'test' ? 'test' : 'pending'}>
-              {portPlace?.mark === 'creative' ? '创作' : portPlace?.mark === 'test' ? '测试' : 'AI 推荐，待组员确认'}
-            </Stamp>
-            <span className="faint">{sea.coach.near}</span>
+            <strong>靠岸 · {sea.ports.find((p) => p.id === nearPort)?.name}</strong>
+            <span className="faint">{story?.arrival ?? '岸上有人在等你。'}</span>
           </span>
         </button>
       )}
@@ -1891,9 +1901,6 @@ export function App() {
           <div className="cine-inner">
             <div className="cine-kicker">
               {portPlace?.name ?? ports[0]?.name}
-              <span className="cine-tag">
-                {portPlace?.mark === 'creative' ? '创作' : portPlace?.mark === 'test' ? '测试数据' : 'AI 推荐，待组员确认'}
-              </span>
             </div>
 
             {stance ? (

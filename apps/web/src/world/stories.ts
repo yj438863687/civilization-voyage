@@ -90,7 +90,8 @@ export interface Story {
 export const SPAWN = { x: 0, z: 34 };
 export const FORK = { x: 0, z: 18 };
 export const NEAR_MID = { x: 14, z: 10 };
-export const NEAR_STOP = { x: 27, z: 4 };
+// 第二座岛离码头远一点（>24）：否则在码头的减速区里做事，船像在爬
+export const NEAR_STOP = { x: 31, z: 11 };
 // 危机点必须在靠港范围（半径 18）以外，否则还没到就能靠港
 export const NEAR_CRISIS = { x: 41, z: -3 };
 export const FAR_MID = { x: -14, z: 8 };
@@ -114,8 +115,8 @@ const FP = { p1: { x: -12, z: 28 }, p2: { x: -22, z: 18 }, p3: { x: -32, z: -2 }
 /* ---------------- 岸上人物的穿着 ---------------- */
 
 const FIG = {
-  libing: { coat: '#4a3a2a', trim: '#b08a4a', skin: '#b58a64', pants: '#2e241a', hat: 'wrap', prop: 'pole', model: 'mage' },
-  jia: { coat: '#6a5236', trim: '#c9a15a', skin: '#b98d66', pants: '#3a2c1e', hat: 'wrap', prop: 'ledger', model: 'mage' },
+  libing: { coat: '#4a3a2a', trim: '#b08a4a', skin: '#b58a64', pants: '#2e241a', hat: 'wrap', prop: 'pole', model: 'rogue' },
+  jia: { coat: '#6a5236', trim: '#c9a15a', skin: '#b98d66', pants: '#3a2c1e', hat: 'wrap', prop: 'ledger', model: 'rogue' },
   watt: { coat: '#2a2d33', trim: '#c9a15a', skin: '#d2a789', pants: '#1e2025', hat: 'none', prop: 'ledger', model: 'rogue' },
   zhan: { coat: '#2c3038', trim: '#a8b2c0', skin: '#c49a76', pants: '#1c1f24', hat: 'bowler', prop: 'pole', model: 'rogue' },
   shannon: { coat: '#3a4048', trim: '#d7c59a', skin: '#d4ab8c', pants: '#24282e', hat: 'none', prop: 'ledger', model: 'rogue' },

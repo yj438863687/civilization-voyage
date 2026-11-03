@@ -7,12 +7,14 @@ import { Relic, relicKindOf } from './relics';
 import { Atmosphere } from './Sea';
 import { SHIP_L, TreasureShip } from './TreasureShip';
 import { HULL_STYLES, STYLE_BY_SCENE } from './hull';
-import { DECK_CREW, PLAYER_LOOK } from './encounters';
+import { DECK_CREW, PLAYER_LOOK, encounterFor } from './encounters';
 import { Bloom, EffectComposer, ToneMapping, Vignette } from '@react-three/postprocessing';
 import { Hall, type EraKey } from './Hall';
 import { ToneMappingMode } from 'postprocessing';
-import { fableLive, type FableState } from './fable';
+import { ISLAND_OFFSET, fableLive, type FableState } from './fable';
 import { REEF_DAMAGE, seaStateFor } from './seaState';
+import { waterLive, type WaterResult, type WaterSpec } from './waterGame';
+import { WaterGameScene } from './WaterGameScene';
 import type { WorldConfig } from './world.config';
 import { BLEND_SEC, DEST_TRAIL, FOLLOW_TAU, HARBOR_APPROACH, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, PORT_BEACON, PORT_BERTH, SHIP_MOTION } from './voyageConstants';
 
@@ -41,6 +43,8 @@ export interface ControlInput {
   boost?: number;
   /** 补给见底：船速打七折 */
   ration?: boolean;
+  /** 船身到零：船速减半，回港才修 */
+  crippled?: boolean;
 }
 
 interface Props {
@@ -71,6 +75,9 @@ interface Props {
   player?: string | null;
   /** 开局的横风：把船往一边推 */
   squall?: { until: number; dir: 1 | -1 } | null;
+  /** 水上的玩法：浮标门、光环、漂着的东西 */
+  water?: WaterSpec | null;
+  onWaterDone?: (r: WaterResult) => void;
   /** 开局大殿里亮着的那扇窗 */
   highlightEra?: EraKey | null;
   /** 显卡上下文丢失/恢复：由界面明确提示，不静默 */
@@ -422,7 +429,10 @@ function Rig({
   stageAt = null,
   player: playerName = null,
   squall = null,
+  water = null,
+  onWaterDone,
 }: Props) {
+  const waterDoneFor = useRef<number>(0);
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
   const exterior = useRef<THREE.Group>(null);
@@ -654,7 +664,7 @@ function Rig({
       const sailFactor = STYLE_BY_SCENE[sceneIdForStyle] === 'junk' || STYLE_BY_SCENE[sceneIdForStyle] === 'raft' ? 1 : 0.4;
       const windMul = 1 + seaNow.wind.k * sailFactor * (along > 0 ? 0.3 * along : 0.4 * along);
       windAlong.current = along;
-      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * windMul * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0)) * (input.ration && !autopilot ? 0.7 : 1);
+      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * windMul * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0)) * (input.ration && !autopilot ? 0.7 : 1) * (input.crippled && !autopilot ? 0.5 : 1);
       // 收帆：不再听玩家的，匀速往前，一点点偏向外海
       if (autopilot) autoT.current += clamped;
       else autoT.current = 0;
@@ -666,6 +676,78 @@ function Rig({
       g.rotation.y += (autopilot ? autoTurn : input.turn) * world.ship.turn * clamped;
       tmpFwd.set(0, 0, -1).applyQuaternion(g.quaternion);
       g.position.addScaledVector(tmpFwd, speed.current * clamped);
+      // 水上的玩法：船在哪，就是答案在哪
+      const g_pos_x = () => g.position.x;
+      const g_pos_z = () => g.position.z;
+      if (water && waterDoneFor.current !== water.startedAt) {
+        waterLive.active = true;
+        const now = performance.now();
+        if (water.deadline) waterLive.left = Math.max(0, (water.deadline - now) / 1000);
+        let result: WaterResult | null = null;
+        if (water.kind === 'gates' && water.gates) {
+          // 铜针指两门中间，直到你偏向其中一道
+          const mid = water.gates.reduce((a, g) => ({ x: a.x + g.x / water.gates!.length, z: a.z + g.z / water.gates!.length }), { x: 0, z: 0 });
+          let nearest = -1;
+          let nd = Infinity;
+          water.gates.forEach((g, i) => {
+            const d = Math.hypot(g.x - g_pos_x(), g.z - g_pos_z());
+            if (d < nd) {
+              nd = d;
+              nearest = i;
+            }
+          });
+          waterLive.target = nd < 9 && nearest >= 0 ? water.gates[nearest] : mid;
+          if (nd < 2.8) result = { kind: 'gates', idx: nearest };
+          else if (water.deadline && now > water.deadline) result = { kind: 'gates', idx: water.fallbackIdx ?? water.gates.length - 1 };
+        } else if (water.kind === 'ring' && water.ring) {
+          const r = water.ring;
+          const d = Math.hypot(r.x - g_pos_x(), r.z - g_pos_z());
+          waterLive.inside = d < r.r;
+          waterLive.target = { x: r.x, z: r.z };
+          if (waterLive.inside) {
+            waterLive.insideSec += clamped;
+            // 风浪往外推：越靠边推得越狠，要一直打舵顶着
+            const ox = (g_pos_x() - r.x) / (d || 1);
+            const oz = (g_pos_z() - r.z) / (d || 1);
+            const k = (0.6 + (d / r.r) * 1.4) * r.drift * 2.2 * clamped;
+            g.position.x += ox * k + Math.sin(now * 0.0021) * 0.6 * clamped;
+            g.position.z += oz * k + Math.cos(now * 0.0017) * 0.6 * clamped;
+          }
+          if (waterLive.insideSec >= r.secs) result = { kind: 'ring', won: true };
+          else if (water.deadline && now > water.deadline) result = { kind: 'ring', won: false };
+        } else if (water.kind === 'catch' && water.drops) {
+          let nearestGood: { x: number; z: number } | null = null;
+          let nd = Infinity;
+          for (const d of water.drops) {
+            if (waterLive.taken.has(d.id)) continue;
+            const dist = Math.hypot(d.x - g_pos_x(), d.z - g_pos_z());
+            if (dist < 2.6) {
+              waterLive.taken.add(d.id);
+              if (d.good) waterLive.got += 1;
+              else {
+                waterLive.bad += 1;
+                waterLive.got = Math.max(0, waterLive.got - 1);
+                speed.current *= 0.5;
+              }
+              continue;
+            }
+            if (d.good && dist < nd) {
+              nd = dist;
+              nearestGood = d;
+            }
+          }
+          waterLive.target = nearestGood;
+          const need = water.need ?? 1;
+          if (waterLive.got >= need) result = { kind: 'catch', won: true, got: waterLive.got };
+          else if (!nearestGood || (water.deadline && now > water.deadline)) result = { kind: 'catch', won: waterLive.got >= need, got: waterLive.got };
+        }
+        if (result) {
+          waterDoneFor.current = water.startedAt;
+          waterLive.done = true;
+          waterLive.active = false;
+          onWaterDone?.(result);
+        }
+      }
       // 开局的横风：往右舷推，玩家要打舵顶回去
       if (!autopilot && squall && performance.now() < squall.until) {
         tmpRight.set(1, 0, 0).applyQuaternion(g.quaternion);
@@ -679,6 +761,24 @@ function Rig({
             const f = (1 - d / c.r) * c.k * clamped;
             g.position.x += c.dx * f;
             g.position.z += c.dz * f;
+          }
+        }
+      }
+      // 岛：船开不上去，贴着边滑过去，不扣耐久
+      if (!autopilot) {
+        for (const f of world.fragments) {
+          if (!encounterFor(f.id)?.stage) continue;
+          const ix = f.x + ISLAND_OFFSET.x;
+          const iz = f.z + ISLAND_OFFSET.z;
+          const dx = g.position.x - ix;
+          const dz = g.position.z - iz;
+          const d = Math.hypot(dx, dz);
+          const keep = 6.2 + world.ship.radius * 0.3;
+          if (d < keep) {
+            const push = keep - d + 0.05;
+            g.position.x += (dx / (d || 1)) * push;
+            g.position.z += (dz / (d || 1)) * push;
+            speed.current *= 0.6;
           }
         }
       }
@@ -699,8 +799,8 @@ function Rig({
             if (performance.now() - lastReef.current > 700) {
               lastReef.current = performance.now();
               reefHit.current = REEF_DAMAGE * (0.6 + Math.min(1, Math.abs(speed.current) / world.ship.maxSpeed) * 0.8);
+              speed.current *= 0.35;
             }
-            speed.current *= 0.35;
           }
         }
       }
@@ -1031,6 +1131,7 @@ export function VoyageCanvas(props: Props) {
           hall={props.mode === 'embark'}
           hallAt={props.mode === 'embark' ? { x: props.restored?.x ?? props.world.spawn.x, z: props.restored?.z ?? props.world.spawn.z } : null}
         />
+        {props.water && <WaterGameScene spec={props.water} reduceMotion={props.reduceMotion} />}
         {props.mode === 'embark' && (
           <Hall
             center={{ x: props.restored?.x ?? props.world.spawn.x, z: props.restored?.z ?? props.world.spawn.z }}

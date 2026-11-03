@@ -2491,3 +2491,22 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 /* 开局面板：内容多时可滚，标题不被顶出屏幕 */
 .cine-embark { overflow-y: auto; align-content: start; padding-top: 28px; }
 .cine-embark-title { font-size: clamp(2rem, 4.6vw, 3.4rem); }
+
+/* 水上的玩法：只有一行指令，东西都在画面里 */
+.enc-water { display: grid; gap: 8px; justify-items: center; }
+.enc-water-line {
+  margin: 0;
+  font-family: var(--cv-font-display);
+  font-size: clamp(1.15rem, 2.4vw, 1.7rem);
+  color: #ffe1a6;
+  text-shadow: 0 2px 20px rgb(0 0 0 / 0.95);
+}
+.enc-water.is-inside .enc-water-line { color: #fff1d0; text-shadow: 0 0 24px rgb(255 225 166 / 0.8); }
+.enc-water .enc-how { display: flex; gap: 18px; }
+.enc-water-prog { font-family: var(--cv-font-mono, monospace); font-size: 14px; color: #f6efe0; }
+.enc-water-left { font-family: var(--cv-font-mono, monospace); color: rgb(232 226 210 / 0.6); }
+.enc-water-left.is-late { color: #e07a62; animation: reef-blink 300ms steps(2) infinite; }
+/* 做事的时候，遮罩退开，看得见水面 */
+.enc:has(.enc-water) .enc-scrim { opacity: 0.55; }
+.enc:has(.enc-water) .enc-talk { display: none; }
+.enc:has(.enc-water) .enc-line { display: none; }

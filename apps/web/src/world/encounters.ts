@@ -98,8 +98,8 @@ export interface Encounter {
 const LOOK = {
   // 农业：麻、土、草帽，手上是木头
   farmer: { coat: '#8a6a43', trim: '#5b4128', skin: '#b98a62', pants: '#4f3b26', hat: 'straw', prop: 'hoe', model: 'barbarian' },
-  elder: { coat: '#6f5a3e', trim: '#3d2f1f', skin: '#a77c58', pants: '#3f3122', hat: 'wrap', prop: 'pole', model: 'mage' },
-  counter: { coat: '#9a7b52', trim: '#6a4a2a', skin: '#c09068', pants: '#55402a', hat: 'wrap', prop: 'none', model: 'mage' },
+  elder: { coat: '#6f5a3e', trim: '#3d2f1f', skin: '#a77c58', pants: '#3f3122', hat: 'wrap', prop: 'pole', model: 'rogue' },
+  counter: { coat: '#9a7b52', trim: '#6a4a2a', skin: '#c09068', pants: '#55402a', hat: 'wrap', prop: 'none', model: 'rogue' },
   // 工业：煤灰、粗布、鸭舌帽、铁锹
   stoker: { coat: '#3e3e3c', trim: '#1e1e1d', skin: '#a98770', pants: '#2b2b2a', hat: 'cap', prop: 'shovel', model: 'rogue' },
   clerk: { coat: '#2d3440', trim: '#c9a15a', skin: '#c49a7c', pants: '#22262e', hat: 'bowler', prop: 'ledger', model: 'rogue' },
@@ -114,7 +114,7 @@ const LOOK = {
   keeper: { coat: '#4a4f5c', trim: '#8a90a0', skin: '#b08a6e', pants: '#2c303a', hat: 'none', prop: 'pole', model: 'rogue' },
   // 启航港：普通水手
   sailor: { coat: '#3b4a52', trim: '#c9a15a', skin: '#c19474', pants: '#2a2f33', hat: 'wrap', prop: 'none', model: 'rogue' },
-  pilotOld: { coat: '#5a3a2a', trim: '#c9a15a', skin: '#b58a6a', pants: '#2e231b', hat: 'cap', prop: 'ledger', model: 'mage' },
+  pilotOld: { coat: '#5a3a2a', trim: '#c9a15a', skin: '#b58a6a', pants: '#2e231b', hat: 'cap', prop: 'ledger', model: 'rogue' },
 } satisfies Record<string, Look>;
 
 /** 玩家自己的穿着：跟着时代换，但一直是同一个人（那块靛蓝）。 */
@@ -154,12 +154,12 @@ export const BOOST_NAME: Record<string, string> = {
 const CL = {
   gun: { coat: '#5a4a36', trim: '#3a2c1e', skin: '#a77c58', pants: '#3a2c1e', hat: 'wrap', prop: 'shovel', model: 'barbarian' },
   yu: { coat: '#6a5a40', trim: '#8a7448', skin: '#a07450', pants: '#4a3a26', hat: 'straw', prop: 'hoe', model: 'barbarian' },
-  cangjie: { coat: '#7a6a4e', trim: '#c9a15a', skin: '#b98d66', pants: '#4a3a28', hat: 'wrap', prop: 'none', model: 'mage', eyes: 4 },
+  cangjie: { coat: '#7a6a4e', trim: '#c9a15a', skin: '#b98d66', pants: '#4a3a28', hat: 'wrap', prop: 'none', model: 'rogue', eyes: 4 },
   houji: { coat: '#7a6a3e', trim: '#5a4a28', skin: '#b38660', pants: '#4a3a24', hat: 'straw', prop: 'hoe', model: 'barbarian' },
-  elder: { coat: '#8a7a5e', trim: '#5a4a34', skin: '#b08a6a', pants: '#4a3e2c', hat: 'wrap', prop: 'urn', model: 'mage' },
+  elder: { coat: '#8a7a5e', trim: '#5a4a34', skin: '#b08a6a', pants: '#4a3e2c', hat: 'wrap', prop: 'urn', model: 'rogue' },
   weaver: { coat: '#4a4038', trim: '#8a7448', skin: '#b08870', pants: '#2e2a26', hat: 'cap', prop: 'mallet', model: 'rogue' },
-  lin: { coat: '#2a3a4a', trim: '#c9a15a', skin: '#c49a76', pants: '#1e2630', hat: 'guan', prop: 'ledger', model: 'mage' },
-  wei: { coat: '#3a3a3e', trim: '#a89a7a', skin: '#c29a78', pants: '#24242a', hat: 'wrap', prop: 'ledger', model: 'mage' },
+  lin: { coat: '#2a3a4a', trim: '#c9a15a', skin: '#c49a76', pants: '#1e2630', hat: 'guan', prop: 'ledger', model: 'rogue' },
+  wei: { coat: '#3a3a3e', trim: '#a89a7a', skin: '#c29a78', pants: '#24242a', hat: 'wrap', prop: 'ledger', model: 'rogue' },
   prisoner: { coat: '#4a4440', trim: '#2a2622', skin: '#a8866a', pants: '#2e2a26', hat: 'none', prop: 'none' },
   blind: { coat: '#6a5a48', trim: '#4a3e30', skin: '#b08a6a', pants: '#3a3026', hat: 'wrap', prop: 'pole', eyes: 0 },
   king: { coat: '#6a2a22', trim: '#d8b060', skin: '#c49a76', pants: '#3a1a14', hat: 'guan', prop: 'none' },
