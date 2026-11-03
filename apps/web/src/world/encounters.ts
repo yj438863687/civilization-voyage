@@ -558,6 +558,12 @@ export interface VoyageStats {
   path: { era: string; lane: string; word: string; figure: string }[];
   /** 暗线：比如桃花源（marked / kept） */
   secrets: Record<string, string>;
+  /** 船身耐久 0..100：撞礁会掉 */
+  hull: number;
+  /** 连击：小游戏连着做成几场 */
+  combo: number;
+  /** 这一局的分 */
+  score: number;
 }
 
 const KEY = 'cv.stats.v1';
@@ -567,7 +573,7 @@ export function loadStats(): VoyageStats {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const v = JSON.parse(raw) as VoyageStats;
-      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [], secrets: v.secrets ?? {} };
+      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [], secrets: v.secrets ?? {}, hull: v.hull ?? 100, combo: v.combo ?? 0, score: v.score ?? 0 };
     }
   } catch {
     /* 私密窗口等情况：从默认值开始 */
@@ -577,7 +583,7 @@ export function loadStats(): VoyageStats {
 
 /** 新开一局：从启航港出发时，补给与人心回到起点 */
 export function freshStats(): VoyageStats {
-  return { supply: 80, trust: 50, log: [], met: [], path: [], secrets: {} };
+  return { supply: 80, trust: 50, log: [], met: [], path: [], secrets: {}, hull: 100, combo: 0, score: 0 };
 }
 
 export function saveStats(s: VoyageStats) {
@@ -598,6 +604,9 @@ export function applyOutcome(s: VoyageStats, o: Outcome, tag: string, era: strin
     met: [...s.met, { era, who, trust: o.trust }].slice(-40),
     path: s.path,
     secrets: s.secrets,
+    hull: s.hull,
+    combo: s.combo,
+    score: s.score,
   };
 }
 
@@ -628,4 +637,53 @@ export function metLine(s: VoyageStats, era: string): string | null {
   if (cold.length && !warm.length) return `这一程你遇见了${names}。他们没有被你放在心上。`;
   if (cold.length) return `这一程你遇见了${names}。${warm.join('、')}会记得你；${cold.join('、')}不会。`;
   return `这一程你遇见了${names}。`;
+}
+
+/* ---------------- 连击与分数 ---------------- */
+
+/** 小游戏做成了：连击加一，分按连击翻倍；做砸了：连击清零 */
+export function scoreOutcome(s: VoyageStats, won: boolean, base = 100): VoyageStats {
+  if (!won) return { ...s, combo: 0 };
+  const combo = s.combo + 1;
+  const mult = Math.min(4, 1 + (combo - 1) * 0.5);
+  return { ...s, combo, score: s.score + Math.round(base * mult) };
+}
+
+export function hullHit(s: VoyageStats, dmg: number): VoyageStats {
+  return { ...s, hull: clamp(s.hull - dmg), score: Math.max(0, s.score - Math.round(dmg * 2)), combo: 0 };
+}
+
+export function repairHull(s: VoyageStats, n: number): VoyageStats {
+  return { ...s, hull: clamp(s.hull + n) };
+}
+
+/* ---------------- 本机排行榜 ---------------- */
+
+export interface BoardEntry {
+  name: string;
+  lane: string;
+  score: number;
+  combo: number;
+  hull: number;
+  at: number;
+}
+
+const BOARD = 'cv.board.v1';
+
+export function loadBoard(): BoardEntry[] {
+  try {
+    return JSON.parse(localStorage.getItem(BOARD) || '[]') as BoardEntry[];
+  } catch {
+    return [];
+  }
+}
+
+export function pushBoard(e: BoardEntry): BoardEntry[] {
+  const all = [...loadBoard(), e].sort((a, b) => b.score - a.score).slice(0, 20);
+  try {
+    localStorage.setItem(BOARD, JSON.stringify(all));
+  } catch {
+    /* 存不下也能玩 */
+  }
+  return all;
 }

@@ -12,6 +12,7 @@ import { Bloom, EffectComposer, ToneMapping, Vignette } from '@react-three/postp
 import { Hall, type EraKey } from './Hall';
 import { ToneMappingMode } from 'postprocessing';
 import { fableLive, type FableState } from './fable';
+import { REEF_DAMAGE, seaStateFor } from './seaState';
 import type { WorldConfig } from './world.config';
 import { BLEND_SEC, DEST_TRAIL, FOLLOW_TAU, HARBOR_APPROACH, HEEL_MAX, HEEL_RETURN_TAU, HEEL_TAU, PORT_BEACON, PORT_BERTH, SHIP_MOTION } from './voyageConstants';
 
@@ -25,6 +26,12 @@ export interface ShipSnapshot {
   yaw: number;
   speed: number;
   headingDeg: number;
+  /** 顺风 1 · 逆风 -1 */
+  windAlong: number;
+  /** 刚撞上礁石：这一帧扣了多少 */
+  reefHit: number;
+  /** 离最近的礁石还有多远（用来预警） */
+  reefNear: number;
 }
 
 export interface ControlInput {
@@ -536,6 +543,10 @@ function Rig({
 
   /** 收帆开始后经过的秒数：先掉头离港，再匀速往外海去 */
   const autoT = useRef(0);
+  const windAlong = useRef(0);
+  const reefHit = useRef(0);
+  const reefNear = useRef(Infinity);
+  const lastReef = useRef(0);
   const { camera, gl } = useThree();
   const tmpFwd = useMemo(() => new THREE.Vector3(), []);
   const tmpRight = useMemo(() => new THREE.Vector3(), []);
@@ -633,7 +644,14 @@ function Rig({
           capMul *= 1 - (1 - HARBOR_APPROACH.misalignCap) * t;
         }
       }
-      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0)) * (input.ration && !autopilot ? 0.7 : 1);
+      // 风：顺风最多快三成，逆风最多慢四成。智能段几乎无风，蒸汽船吃风也少
+      tmpFwd.set(0, 0, -1).applyQuaternion(g.quaternion);
+      const seaNow = seaStateFor(sceneIdForStyle);
+      const along = tmpFwd.x * seaNow.wind.dx + tmpFwd.z * seaNow.wind.dz;
+      const sailFactor = STYLE_BY_SCENE[sceneIdForStyle] === 'junk' || STYLE_BY_SCENE[sceneIdForStyle] === 'raft' ? 1 : 0.4;
+      const windMul = 1 + seaNow.wind.k * sailFactor * (along > 0 ? 0.3 * along : 0.4 * along);
+      windAlong.current = along;
+      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * windMul * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0)) * (input.ration && !autopilot ? 0.7 : 1);
       // 收帆：不再听玩家的，匀速往前，一点点偏向外海
       if (autopilot) autoT.current += clamped;
       else autoT.current = 0;
@@ -645,6 +663,39 @@ function Rig({
       g.rotation.y += (autopilot ? autoTurn : input.turn) * world.ship.turn * clamped;
       tmpFwd.set(0, 0, -1).applyQuaternion(g.quaternion);
       g.position.addScaledVector(tmpFwd, speed.current * clamped);
+      // 暗流：在它范围里，被往一边推
+      if (!autopilot) {
+        for (const c of seaNow.currents) {
+          const d = Math.hypot(g.position.x - c.x, g.position.z - c.z);
+          if (d < c.r) {
+            const f = (1 - d / c.r) * c.k * clamped;
+            g.position.x += c.dx * f;
+            g.position.z += c.dz * f;
+          }
+        }
+      }
+      // 礁石：撞上就弹开、掉速、扣耐久
+      reefHit.current = 0;
+      reefNear.current = Infinity;
+      if (!autopilot) {
+        for (const rf of seaNow.reefs) {
+          const dx = g.position.x - rf.x;
+          const dz = g.position.z - rf.z;
+          const d = Math.hypot(dx, dz);
+          const hitR = rf.r + world.ship.radius * 0.45;
+          reefNear.current = Math.min(reefNear.current, d - hitR);
+          if (d < hitR) {
+            const push = (hitR - d) + 0.3;
+            g.position.x += (dx / (d || 1)) * push;
+            g.position.z += (dz / (d || 1)) * push;
+            if (performance.now() - lastReef.current > 700) {
+              lastReef.current = performance.now();
+              reefHit.current = REEF_DAMAGE * (0.6 + Math.min(1, Math.abs(speed.current) / world.ship.maxSpeed) * 0.8);
+            }
+            speed.current *= 0.35;
+          }
+        }
+      }
       if (!autopilot) {
         g.position.x = THREE.MathUtils.clamp(g.position.x, world.bounds.minX, world.bounds.maxX);
         g.position.z = THREE.MathUtils.clamp(g.position.z, world.bounds.minZ, world.bounds.maxZ);
@@ -846,6 +897,9 @@ function Rig({
         z: g.position.z,
         yaw: g.rotation.y,
         speed: speed.current,
+        windAlong: windAlong.current,
+        reefHit: reefHit.current,
+        reefNear: reefNear.current,
         // 0° = local −z (N). +90° = +x (E). yaw 0 → fwd (0,0,−1) → 0.
         headingDeg: (Math.atan2(tmpFwd.x, -tmpFwd.z) * 180) / Math.PI,
       },

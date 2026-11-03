@@ -11,6 +11,7 @@ import { ShoreFigure } from './ShoreFigure';
 import { CrisisScene } from './IslandStages';
 import { FableIsland, FloodVillage } from './FableStage';
 import { TaoyuanScene } from './TaoyuanScene';
+import { Reefs } from './Reefs';
 import { ISLAND_OFFSET, VILLAGE_OFFSET, fableLive, type FableState } from './fable';
 import { LaneKeeper } from './Figure';
 import { FAR_LAMPS, PORT_LAMP_SHAPES } from './voyageConstants';
@@ -1046,6 +1047,8 @@ export function Atmosphere({
       ))}
       {/* 这条航线的戏：沿途岸上的景，和码头上等着你的那个人 */}
       <TaoyuanScene era={sceneId} found={taoyuanFound} reduceMotion={reduceMotion} />
+      {/* 礁石、白浪、暗流：看得见的危险 */}
+      <Reefs sceneId={sceneId} reduceMotion={reduceMotion} />
       {/* 收过东西的岛还在：岛上留着你做过的事 */}
       {world.fragments
         .filter((f) => collectedIds.includes(f.id) && f.lane === laneId && encounterFor(f.id)?.stage)

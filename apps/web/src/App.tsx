@@ -7,7 +7,7 @@ import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from
 import { laneStops, worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
 import { chartSummary } from './world/chart';
-import { BOOST_NAME, addPath, addSupply, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
+import { BOOST_NAME, addPath, addSupply, hullHit, pushBoard, repairHull, scoreOutcome, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
 import { EncounterOverlay } from './components/Encounter';
 import { PlayerGate } from './components/PlayerGate';
 import { sessionPlayer, signOut, type Player } from './player';
@@ -530,9 +530,18 @@ export function App() {
   );
 
   const nearRef = useRef({ t: 0, port: '', frag: '', portal: '' });
+  const [hitFlash, setHitFlash] = useState(0);
   const onShip = useCallback(
     (s: ShipSnapshot, port: string | null, frag: string | null, portal: string | null) => {
       shipRef.current = s;
+      if (s.reefHit > 0) {
+        setStats((prev) => {
+          const next = hullHit(prev, s.reefHit);
+          saveStats(next);
+          return next;
+        });
+        setHitFlash(performance.now());
+      }
       const now = performance.now();
       const portKey = port ?? '';
       const fragKey = frag ?? '';
@@ -953,7 +962,7 @@ export function App() {
   function finishEncounter(id: string, o: Outcome, summary: string) {
     const e = encounterFor(id);
     const tag = `${e?.who ?? '海上'}（${summary}）`;
-    updateStats((s) => applyOutcome(s, o, tag, voyage?.scene_id ?? 'test', e?.who ?? '海上的人'));
+    updateStats((s) => scoreOutcome(applyOutcome(s, o, tag, voyage?.scene_id ?? 'test', e?.who ?? '海上的人'), o.trust >= 0, 120));
     // 你做过的事留在岛上：后面的危机、岸上的人、最后一页都会读它
     if (o.set) markProgress((p) => ({ ...p, state: { ...p.state, ...o.set } }));
     fableLive.island = '';
@@ -1088,9 +1097,33 @@ export function App() {
       return;
     }
     if (!story) return;
+    // 旁白按「沿航线走了多远」触发，不只看离得多近：抄近路、被遭遇打断都不会漏
+    const lane = (sea.lanes ?? []).find((l) => l.id === laneId);
+    const path: { x: number; z: number }[] = lane ? [sea.spawn, ...lane.waypoints] : [];
+    /** 这个点投影到航线上，沿航线走了多远 */
+    const along = (pt: { x: number; z: number }) => {
+      if (path.length < 2) return Infinity;
+      let best = Infinity;
+      let bestAlong = 0;
+      let acc = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const a = path[i];
+        const b = path[i + 1];
+        const len = Math.hypot(b.x - a.x, b.z - a.z) || 1;
+        const t = Math.max(0, Math.min(1, ((pt.x - a.x) * (b.x - a.x) + (pt.z - a.z) * (b.z - a.z)) / (len * len)));
+        const d = Math.hypot(pt.x - (a.x + (b.x - a.x) * t), pt.z - (a.z + (b.z - a.z) * t));
+        if (d < best) {
+          best = d;
+          bestAlong = acc + t * len;
+        }
+        acc += len;
+      }
+      return bestAlong;
+    };
+    const shipAt = along({ x: ship.x, z: ship.z });
     for (const b of story.beats) {
       if (progress.beats.includes(b.id)) continue;
-      if (Math.hypot(ship.x - b.at.x, ship.z - b.at.z) < 9.5) {
+      if (shipAt >= along(b.at) - 1.5 || Math.hypot(ship.x - b.at.x, ship.z - b.at.z) < 9.5) {
         setCaption(b);
         markProgress((p) => ({ ...p, beats: [...p.beats, b.id] }));
         return;
@@ -1153,7 +1186,7 @@ export function App() {
     if (!story || !voyage) return;
     const c = story.crisis;
     const tag = `${c.kicker} · ${c.enc.who}（${summary}）`;
-    updateStats((st) => applyOutcome(st, o, tag, voyage.scene_id, c.enc.who));
+    updateStats((st) => scoreOutcome(applyOutcome(st, o, tag, voyage.scene_id, c.enc.who), o.trust >= 0, 200));
     markProgress((p) => ({ ...p, crisis: [...p.crisis, c.id], state: { ...p.state, ...(o.set ?? {}) } }));
     setCrisis(null);
     void api
@@ -1392,7 +1425,21 @@ export function App() {
                   <span>船长</span>
                   <b>{player?.name ?? '—'}</b>
                 </div>
+                <div className="hud-sail" aria-label="船况">
+                  <span className={`hud-wind${(ship?.windAlong ?? 0) > 0.3 ? ' is-fair' : (ship?.windAlong ?? 0) < -0.3 ? ' is-foul' : ''}`}>
+                    {(ship?.windAlong ?? 0) > 0.3 ? '顺风' : (ship?.windAlong ?? 0) < -0.3 ? '逆风' : '侧风'}
+                  </span>
+                  {ship && ship.reefNear < 6 && <span className="hud-reef">礁石</span>}
+                  <span className="hud-score">
+                    {stats.combo > 1 && <b>×{stats.combo}</b>}
+                    {stats.score}
+                  </span>
+                </div>
                 <div className="hud-stats" aria-label="补给与人心">
+                  <span className={`hud-stat is-hull${stats.hull < 30 ? ' is-low' : ''}`}>
+                    船身 <b>{stats.hull}</b>
+                    <i style={{ width: `${stats.hull}%` }} />
+                  </span>
                   <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`}>
                     补给 <b>{stats.supply}</b>
                     <i style={{ width: `${stats.supply}%` }} />
@@ -1544,6 +1591,7 @@ export function App() {
           onDone={(o, summary) => finishCrisis(o, summary)}
           crisis
           cause={story.crisis.cause?.(progress.state)}
+          timeLimit={reduceMotion ? undefined : 18}
         />
       )}
 
@@ -1576,6 +1624,9 @@ export function App() {
       {storyPage && story?.page && (
         <StoryPage story={story} state={progress.state} storyId={`${voyage?.scene_id}-${laneId}`} onDone={closeStoryPage} />
       )}
+
+      {/* 撞礁：屏幕红一下 */}
+      {hitFlash > 0 && performance.now() - hitFlash < 600 && <div className="hit-flash" key={hitFlash} aria-hidden />}
 
       {/* 遭遇：海上的人和他手上的事 */}
       {view === 'world' && enc && encounterFor(enc) && (
@@ -1865,9 +1916,12 @@ export function App() {
                             epilogue: stance.epilogue,
                             met: metLine(statsRef.current, voyage?.scene_id ?? 'test'),
                           });
-                          // 港口给这一程补一次给养；这条航线在精神图谱上亮起
+                          // 港口给这一程补一次给养、修一次船；这条航线在精神图谱上亮起；这一程的分上榜
+                          if (player && story) {
+                            pushBoard({ name: player.name, lane: `${sceneShortFromId(voyage?.scene_id)} · ${story.title}`, score: statsRef.current.score, combo: statsRef.current.combo, hull: statsRef.current.hull, at: Date.now() });
+                          }
                           updateStats((st) => {
-                            const withSupply = addSupply(st, 15);
+                            const withSupply = repairHull(addSupply(st, 15), 40);
                             return story
                               ? addPath(withSupply, { era: voyage?.scene_id ?? '', lane: laneId, word: story.spirit.word, figure: story.figure.name })
                               : withSupply;

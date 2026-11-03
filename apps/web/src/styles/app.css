@@ -2425,3 +2425,34 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
   background: #e8b89a;
   border-radius: 3px;
 }
+
+/* ================= 玩法层：船况 · 风 · 礁石 · 连击 · 限时 ================= */
+.hud-sail { display: flex; gap: 10px; align-items: baseline; margin: 6px 0 2px; font-size: 11px; letter-spacing: 0.2em; }
+.hud-wind { color: rgb(232 226 210 / 0.55); }
+.hud-wind.is-fair { color: #a8e0a0; }
+.hud-wind.is-foul { color: #e07a62; }
+.hud-reef { color: #ffb060; animation: reef-blink 500ms steps(2) infinite; }
+@keyframes reef-blink { to { opacity: 0.3; } }
+.hud-score { margin-left: auto; font-family: var(--cv-font-mono, monospace); font-size: 13px; color: #f6efe0; }
+.hud-score b { margin-right: 6px; color: #ffe1a6; font-weight: 600; }
+.hud-stat.is-hull i { background: #c9a15a; }
+.hit-flash {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cv-z-panel) + 2);
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgb(200 40 20 / 0) 40%, rgb(200 40 20 / 0.55) 100%);
+  animation: hit-flash 600ms ease-out forwards;
+}
+@keyframes hit-flash { from { opacity: 1; } to { opacity: 0; } }
+.choice-timer {
+  position: relative;
+  width: min(360px, 80vw);
+  height: 4px;
+  margin: 2px auto 6px;
+  background: rgb(232 226 210 / 0.18);
+}
+.choice-timer i { position: absolute; left: 0; top: 0; bottom: 0; background: #e07a62; transition: width 100ms linear; }
+.choice-timer span { position: absolute; right: 0; top: 8px; font-family: var(--cv-font-mono, monospace); font-size: 11px; color: #e07a62; }
+.choice-timer.is-late i { background: #ff4030; }
+.choice-timer.is-late span { animation: reef-blink 300ms steps(2) infinite; }

@@ -16,6 +16,7 @@ export function EncounterOverlay({
   crisis = false,
   cause,
   secret = false,
+  timeLimit,
 }: {
   enc: Encounter;
   /** 这件东西叫什么；危机时是那一幕的名字 */
@@ -28,6 +29,8 @@ export function EncounterOverlay({
   cause?: string;
   /** 暗线：桃花源。字是暖的，像从山口透出来的光 */
   secret?: boolean;
+  /** 限时（秒）：到点没选，就按 fallback 那一项算 */
+  timeLimit?: number;
 }) {
   const [phase, setPhase] = useState<Phase>('intro');
   /** 对话进行到第几句 */
@@ -143,7 +146,7 @@ export function EncounterOverlay({
         <CatchGame g={g} onEnd={(n) => finish(n >= g.need ? enc.win! : enc.lose!, `接住 ${n}`)} />
       )}
       {phase === 'play' && g.kind === 'choice' && (
-        <ChoiceGame g={g} onPick={(i) => finish(g.options[i].out, g.options[i].label)} />
+        <ChoiceGame g={g} onPick={(i) => finish(g.options[i].out, g.options[i].label)} timeLimit={timeLimit} />
       )}
 
       {phase === 'result' && out && (
@@ -469,10 +472,31 @@ function CatchGame({
 function ChoiceGame({
   g,
   onPick,
+  timeLimit,
 }: {
   g: Extract<Encounter['game'], { kind: 'choice' }>;
   onPick: (i: number) => void;
+  timeLimit?: number;
 }) {
+  const [left, setLeft] = useState(timeLimit ?? 0);
+  // 倒计时：水在涨，炉在响。到点没选，就是最后一项——那是「什么也不做」的后果
+  useEffect(() => {
+    if (!timeLimit) return;
+    const t0 = performance.now();
+    let raf = 0;
+    const tick = () => {
+      const l = Math.max(0, timeLimit - (performance.now() - t0) / 1000);
+      setLeft(l);
+      if (l <= 0) {
+        onPick(g.options.length - 1);
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     const kd = (e: KeyboardEvent) => {
       const n = Number(e.key);
@@ -485,6 +509,12 @@ function ChoiceGame({
   return (
     <div className="enc-game enc-choice">
       <p className="choice-ask">{g.ask}</p>
+      {timeLimit ? (
+        <div className={`choice-timer${left < 4 ? ' is-late' : ''}`}>
+          <i style={{ width: `${(left / timeLimit) * 100}%` }} />
+          <span>{left.toFixed(1)}</span>
+        </div>
+      ) : null}
       <div className="choice-row">
         {g.options.map((o, i) => (
           <button key={o.label} type="button" className="choice-opt" onClick={() => onPick(i)}>
