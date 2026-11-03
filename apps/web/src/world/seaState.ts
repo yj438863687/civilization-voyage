@@ -45,6 +45,8 @@ const n = (dx: number, dz: number) => {
 /** 礁石群：沿一条线的两侧，按固定种子摆，每局一样（玩家可以记路） */
 function reefLine(a: { x: number; z: number }, b: { x: number; z: number }, side: 1 | -1, seed: number, count = 4, offset = 7): Reef[] {
   const out: Reef[] = [];
+  // 出生点附近是大殿，礁石离它远一点
+  const SP = { x: 0, z: 34 };
   const nx = -(b.z - a.z);
   const nz = b.x - a.x;
   const nl = Math.hypot(nx, nz) || 1;
@@ -52,12 +54,10 @@ function reefLine(a: { x: number; z: number }, b: { x: number; z: number }, side
     const t = (i + 0.5) / count;
     const jitter = ((seed * 31 + i * 17) % 10) / 10 - 0.5;
     const off = offset + jitter * 3;
-    out.push({
-      x: a.x + (b.x - a.x) * t + (nx / nl) * off * side + jitter * 2,
-      z: a.z + (b.z - a.z) * t + (nz / nl) * off * side - jitter * 1.5,
-      r: 1.6 + ((seed + i) % 3) * 0.5,
-      h: (seed + i) % 2 === 0 ? 0.9 : 0,
-    });
+    const rx = a.x + (b.x - a.x) * t + (nx / nl) * off * side + jitter * 2;
+    const rz = a.z + (b.z - a.z) * t + (nz / nl) * off * side - jitter * 1.5;
+    if (Math.hypot(rx - SP.x, rz - SP.z) < 24) continue;
+    out.push({ x: rx, z: rz, r: 1.6 + ((seed + i) % 3) * 0.5, h: (seed + i) % 2 === 0 ? 0.9 : 0 });
   }
   return out;
 }
@@ -71,6 +71,7 @@ const BASE_REEFS: Reef[] = [
   ...reefLine(FAR_MID, FAR_STOP, -1, 7, 3, 11),
   ...reefLine(FAR_STOP, FAR_CRISIS, 1, 8, 2, 10),
   // 两条航道之间的那片三角水域：走直线从分叉点直冲港口的人，会撞上这几块
+  // （出生点周围 22 以内不放：那里是开局的大殿）
   { x: 8, z: -6, r: 2.2, h: 1.1 },
   { x: -4, z: -2, r: 1.8, h: 0 },
   { x: 14, z: -12, r: 2.0, h: 0.8 },
@@ -117,6 +118,7 @@ export const SEA_STATES: Record<string, SeaState> = {
 export function seaStateFor(sceneId: string | null | undefined): SeaState {
   return SEA_STATES[sceneId ?? 'test'] ?? SEA_STATES.test;
 }
+
 
 /** 船的状态：耐久会被礁石磕掉，连击在小游戏里累加 */
 export interface Hull {

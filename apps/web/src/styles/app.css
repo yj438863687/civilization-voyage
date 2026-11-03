@@ -2456,3 +2456,38 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 .choice-timer span { position: absolute; right: 0; top: 8px; font-family: var(--cv-font-mono, monospace); font-size: 11px; color: #e07a62; }
 .choice-timer.is-late i { background: #ff4030; }
 .choice-timer.is-late span { animation: reef-blink 300ms steps(2) infinite; }
+
+/* 排行榜：标题页下方一小列 */
+.cine-board { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-width: 520px; font-size: 12px; letter-spacing: 0.08em; color: rgb(232 226 210 / 0.7); }
+.cine-board li { display: grid; grid-template-columns: 1.4em 7em 1fr auto; gap: 10px; align-items: baseline; }
+.cine-board-rank { font-family: var(--cv-font-mono, monospace); color: var(--cv-brass-300); }
+.cine-board-name { color: #f6efe0; }
+.cine-board-lane { color: rgb(232 226 210 / 0.45); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cine-board-score { font-family: var(--cv-font-mono, monospace); color: #ffe1a6; }
+
+/* 开局的横风 */
+.squall {
+  position: fixed;
+  left: 50%;
+  top: 26%;
+  transform: translateX(-50%);
+  z-index: calc(var(--cv-z-panel) + 2);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 2px 20px rgb(0 0 0 / 0.95);
+  animation: squall-in 300ms ease both;
+}
+@keyframes squall-in { from { opacity: 0; transform: translate(-50%, 12px) scale(0.96); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+.squall-kicker { font-size: 12px; letter-spacing: 0.6em; color: #e07a62; }
+.squall-text { font-family: var(--cv-font-display); font-size: clamp(1.3rem, 2.8vw, 2rem); color: #f6efe0; }
+.squall kbd { padding: 4px 14px; border: 2px solid #ffe1a6; border-radius: 4px; font-family: var(--cv-font-mono, monospace); font-size: 1.4rem; color: #ffe1a6; animation: reef-blink 400ms steps(2) infinite; }
+.cine-board { margin-top: 6px; padding-top: 8px; border-top: 1px solid rgb(201 161 90 / 0.25); }
+.cine-board-head { grid-template-columns: 1fr !important; font-size: 11px; letter-spacing: 0.5em; color: var(--cv-brass-300); }
+/* 开局：标题压在大殿之上 */
+.cine-embark { z-index: calc(var(--cv-z-panel) + 1); }
+/* 开局面板：内容多时可滚，标题不被顶出屏幕 */
+.cine-embark { overflow-y: auto; align-content: start; padding-top: 28px; }
+.cine-embark-title { font-size: clamp(2rem, 4.6vw, 3.4rem); }

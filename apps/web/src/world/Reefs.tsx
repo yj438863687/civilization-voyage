@@ -8,8 +8,12 @@ import { seaStateFor } from './seaState';
  * 露出水面的礁石是几块黑石；暗礁只有一圈白浪在翻；暗流是水面上一道道顺着推力方向流的纹。
  * 它们都是「看得见的危险」：先看见，再决定绕不绕。
  */
-export function Reefs({ sceneId, reduceMotion }: { sceneId: string; reduceMotion: boolean }) {
-  const sea = useMemo(() => seaStateFor(sceneId), [sceneId]);
+export function Reefs({ sceneId, reduceMotion, clear }: { sceneId: string; reduceMotion: boolean; /** 大殿立在这儿：这一圈不画礁 */ clear?: { x: number; z: number } | null }) {
+  const sea = useMemo(() => {
+    const st = seaStateFor(sceneId);
+    if (!clear) return st;
+    return { ...st, reefs: st.reefs.filter((r) => Math.hypot(r.x - clear.x, r.z - clear.z) > 26) };
+  }, [sceneId, clear]);
   const foam = useRef<THREE.Group>(null);
   const flow = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {

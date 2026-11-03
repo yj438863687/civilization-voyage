@@ -939,6 +939,8 @@ export function Atmosphere({
   fableState = {},
   crisisDone = false,
   taoyuanFound = false,
+  hall = false,
+  hallAt = null,
 }: {
   reduceMotion: boolean;
   sceneId: string;
@@ -952,6 +954,9 @@ export function Atmosphere({
   crisisDone?: boolean;
   /** 暗线：进过桃花源的人，后来的时代才看得见它的回声 */
   taoyuanFound?: boolean;
+  /** 开局的大殿：海上的人都不该在 */
+  hall?: boolean;
+  hallAt?: { x: number; z: number } | null;
 }) {
   // 夜空：竖向渐变 + 地平线暖带。不做体积云，行高处的雾由 fog 负责。
   const sky = useMemo(() => {
@@ -1048,9 +1053,9 @@ export function Atmosphere({
       {/* 这条航线的戏：沿途岸上的景，和码头上等着你的那个人 */}
       <TaoyuanScene era={sceneId} found={taoyuanFound} reduceMotion={reduceMotion} />
       {/* 礁石、白浪、暗流：看得见的危险 */}
-      <Reefs sceneId={sceneId} reduceMotion={reduceMotion} />
+      <Reefs sceneId={sceneId} reduceMotion={reduceMotion} clear={hall ? hallAt : null} />
       {/* 收过东西的岛还在：岛上留着你做过的事 */}
-      {world.fragments
+      {!hall && world.fragments
         .filter((f) => collectedIds.includes(f.id) && f.lane === laneId && encounterFor(f.id)?.stage)
         .map((f) => (
           <group key={`isle-${f.id}`} position={[f.x + ISLAND_OFFSET.x, 0, f.z + ISLAND_OFFSET.z]}>
@@ -1060,7 +1065,7 @@ export function Atmosphere({
       {(() => {
         const story = storyFor(sceneId, laneId);
         const port = world.ports[0];
-        if (!story || !port) return null;
+        if (!story || !port || hall) return null;
         const fig = { x: port.x - 3.5, z: port.z + 4.5 };
         return (
           <>
@@ -1082,7 +1087,7 @@ export function Atmosphere({
           </>
         );
       })()}
-      {world.fragments
+      {!hall && world.fragments
         .filter((f) => !collectedIds.includes(f.id) && (f.lane === 'both' || f.lane === laneId))
         .map((f) => (
           <group key={f.id} position={[f.x, 0, f.z]}>

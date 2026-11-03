@@ -69,6 +69,8 @@ interface Props {
   taoyuanFound?: boolean;
   /** 玩家名字：浮在甲板上他头顶 */
   player?: string | null;
+  /** 开局的横风：把船往一边推 */
+  squall?: { until: number; dir: 1 | -1 } | null;
   /** 开局大殿里亮着的那扇窗 */
   highlightEra?: EraKey | null;
   /** 显卡上下文丢失/恢复：由界面明确提示，不静默 */
@@ -419,6 +421,7 @@ function Rig({
   autopilot = false,
   stageAt = null,
   player: playerName = null,
+  squall = null,
 }: Props) {
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
@@ -663,6 +666,11 @@ function Rig({
       g.rotation.y += (autopilot ? autoTurn : input.turn) * world.ship.turn * clamped;
       tmpFwd.set(0, 0, -1).applyQuaternion(g.quaternion);
       g.position.addScaledVector(tmpFwd, speed.current * clamped);
+      // 开局的横风：往右舷推，玩家要打舵顶回去
+      if (!autopilot && squall && performance.now() < squall.until) {
+        tmpRight.set(1, 0, 0).applyQuaternion(g.quaternion);
+        g.position.addScaledVector(tmpRight, squall.dir * 4.2 * clamped);
+      }
       // 暗流：在它范围里，被往一边推
       if (!autopilot) {
         for (const c of seaNow.currents) {
@@ -1020,6 +1028,8 @@ export function VoyageCanvas(props: Props) {
           fableState={props.fableState}
           crisisDone={props.crisisDone}
           taoyuanFound={props.taoyuanFound}
+          hall={props.mode === 'embark'}
+          hallAt={props.mode === 'embark' ? { x: props.restored?.x ?? props.world.spawn.x, z: props.restored?.z ?? props.world.spawn.z } : null}
         />
         {props.mode === 'embark' && (
           <Hall

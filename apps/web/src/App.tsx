@@ -7,7 +7,7 @@ import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from
 import { laneStops, worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
 import { chartSummary } from './world/chart';
-import { BOOST_NAME, addPath, addSupply, hullHit, pushBoard, repairHull, scoreOutcome, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
+import { BOOST_NAME, addPath, addSupply, hullHit, loadBoard, pushBoard, repairHull, scoreOutcome, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
 import { EncounterOverlay } from './components/Encounter';
 import { PlayerGate } from './components/PlayerGate';
 import { sessionPlayer, signOut, type Player } from './player';
@@ -335,6 +335,9 @@ export function App() {
   const [sealBeat, setSealBeat] = useState<{ pick: string; epilogue: string; met?: string | null } | null>(null);
   /** 每段入海的开场字幕 */
   const [intro, setIntro] = useState<string | null>(null);
+  /** 开局的风：片头一过，船被推向礁石，三秒内打舵 */
+  const [squall, setSquall] = useState<{ until: number; dir: 1 | -1 } | null>(null);
+  const squallDone = useRef<string>('');
   /** 第四段落印后：收帆 */
   const [finale, setFinale] = useState(false);
   /** 这一程已经落过印：门才会开 */
@@ -783,6 +786,25 @@ export function App() {
     introShown.current = voyage.id;
     setIntro(voyage.scene_id);
   }, [view, voyage, records]);
+
+  // 片头一散，先让手忙起来：一阵横风把船往礁石上推，三秒内打舵，才谈故事
+  useEffect(() => {
+    // 片头、出海的推镜都要过去，船停稳了，才起风
+    if (view !== 'world' || intro || cine || camBlend < 0.98 || !voyage || !ship) return;
+    // 片头还没放过（首帧 intro 还是 null）就不算；放过了、散了，才起风
+    if (introShown.current !== voyage.id) return;
+    if (squallDone.current === voyage.id || records.some((r) => r.kind === 'choice')) return;
+    squallDone.current = voyage.id;
+    const dir: 1 | -1 = Math.random() > 0.5 ? 1 : -1;
+    // 片头的字刚散，让玩家看清船，再起风
+    const t0 = window.setTimeout(() => setSquall({ until: performance.now() + 3200, dir }), 900);
+    const t = window.setTimeout(() => setSquall(null), 4300);
+    return () => {
+      window.clearTimeout(t0);
+      window.clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, intro, cine, camBlend, voyage?.id]);
 
   // 片头的计时只认片头本身：拾取、存档这些变化不能把它重置成"永远不消失"
   useEffect(() => {
@@ -1263,6 +1285,7 @@ export function App() {
           taoyuanFound={!!stats.secrets.taoyuan}
           player={player?.name ?? null}
           onGl={(st) => setGlLost(st === 'lost')}
+          squall={squall}
           highlightEra={view === 'embark' ? (scenePick?.id === 'neutral-test' ? 'test' : ((scenePick?.id as 'A' | 'B' | 'C' | 'D' | undefined) ?? null)) : null}
           fableState={progress.state}
           crisisDone={!!story && progress.crisis.includes(story.crisis.id)}
@@ -1625,6 +1648,15 @@ export function App() {
         <StoryPage story={story} state={progress.state} storyId={`${voyage?.scene_id}-${laneId}`} onDone={closeStoryPage} />
       )}
 
+      {/* 开局的风：打舵！ */}
+      {view === 'world' && squall && (
+        <div className="squall" aria-live="assertive">
+          <span className="squall-kicker">横风</span>
+          <span className="squall-text">船在往{squall.dir > 0 ? '右' : '左'}漂——打{squall.dir > 0 ? '左' : '右'}舵！</span>
+          <kbd>{squall.dir > 0 ? 'A' : 'D'}</kbd>
+        </div>
+      )}
+
       {/* 撞礁：屏幕红一下 */}
       {hitFlash > 0 && performance.now() - hitFlash < 600 && <div className="hit-flash" key={hitFlash} aria-hidden />}
 
@@ -1694,6 +1726,19 @@ export function App() {
                 {reduceMotion ? '已减少动态' : '减少动态效果'}
               </button>
             </div>
+            {loadBoard().length > 0 && (
+              <ol className="cine-board" aria-label="本机排行">
+                <li className="cine-board-head">本机排行</li>
+                {loadBoard().slice(0, 5).map((e, i) => (
+                  <li key={e.at}>
+                    <span className="cine-board-rank">{i + 1}</span>
+                    <span className="cine-board-name">{e.name}</span>
+                    <span className="cine-board-lane">{e.lane}</span>
+                    <b className="cine-board-score">{e.score}</b>
+                  </li>
+                ))}
+              </ol>
+            )}
             <div className="cine-player">
               <span>船长 · {player?.name ?? '—'}</span>
               <button
