@@ -51,7 +51,7 @@ try{
         assert.equal(await page.locator('.challenge-feedback').getAttribute('data-audio'),'playing');
         assert.equal(await page.locator('.telegraph-light').evaluate(element=>element.getAnimations()[0].effect.getTiming().duration),270);
       }
-      await page.getByRole('button',{name:'暂时返回船上',exact:true}).click();await page.waitForTimeout(180);assert.equal(await page.locator('.history-overlay').count(),0);await page.keyboard.press('e');await page.getByRole('heading',{name:scene.title,exact:true}).waitFor();await page.keyboard.press('Escape');assert.equal(await page.locator('.history-overlay').count(),0);await context.close();
+      await page.getByRole('button',{name:'暂时返回船上',exact:true}).click();await page.waitForTimeout(180);assert.equal(await page.locator('.history-overlay,.enc-history').count(),0);await page.keyboard.press('e');await page.getByRole('heading',{name:scene.title,exact:true}).waitFor();await page.keyboard.press('Escape');assert.equal(await page.locator('.history-overlay,.enc-history').count(),0);await context.close();
     }
     assert.deepEqual(errors,[]);console.log('通过：桌面生产包实际海域打开锅炉/电报，机件与声音同步、手机返回按钮可见、退出后可重入，无页面错误。');
   }else if(process.argv.includes('--legacy-crisis')){
@@ -60,7 +60,7 @@ try{
     const legacy=await pageAt(voyage,{x:target.x-game.storyReach('A')+1.5,z:target.z},{beats:[],crisis:[story.crisis.id],shore:[],state:{}});
     const before=await legacy.page.evaluate(()=>localStorage.getItem('cv.story.v1'));
     await legacy.page.locator('.interact-prompt').filter({hasText:`重读与练习 · ${story.crisis.kicker}`}).waitFor();await legacy.page.keyboard.press('e');await legacy.page.getByRole('heading',{name:route.crisis.title,exact:true}).waitFor();await legacy.page.keyboard.press('Escape');
-    assert.equal(await legacy.page.locator('.history-overlay').count(),0);assert.equal(await legacy.page.evaluate(()=>localStorage.getItem('cv.story.v1')),before);await legacy.context.close();assert.deepEqual(errors,[]);console.log('通过：旧存档第三章重读与Escape退出不补写旁白、不修改原进度。');
+    assert.equal(await legacy.page.locator('.history-overlay,.enc-history').count(),0);assert.equal(await legacy.page.evaluate(()=>localStorage.getItem('cv.story.v1')),before);await legacy.context.close();assert.deepEqual(errors,[]);console.log('通过：旧存档第三章重读与Escape退出不补写旁白、不修改原进度。');
   }else{
   for(const [key,route]of Object.entries(game.HISTORY_ROUTES)){
     const [era,lane]=key.split('-'),world=game.worldFor(era),story=game.storyFor(era,lane);
@@ -80,7 +80,7 @@ try{
         await heading.waitFor({timeout:15000});await page.getByRole('button',{name:/进入故事/}).click();await page.locator('.voyage-challenge').waitFor();
         const beforeExit=await page.evaluate(()=>({stats:localStorage.getItem('cv.stats.v1'),progress:localStorage.getItem('cv.story.v1')}));
         if(index===0)await page.getByRole('button',{name:'暂时返回船上',exact:true}).click();else await page.keyboard.press('Escape');
-        await page.waitForTimeout(180);assert.equal(await page.locator('.history-overlay').count(),0,'Cancel must not auto-reopen the story');
+        await page.waitForTimeout(180);assert.equal(await page.locator('.history-overlay,.enc-history').count(),0,'Cancel must not auto-reopen the story');
         const afterExit=await page.evaluate(()=>({stats:localStorage.getItem('cv.stats.v1'),progress:localStorage.getItem('cv.story.v1')}));assert.equal(afterExit.progress,beforeExit.progress);
         for(const field of ['trust','score','combo','shipLevel','crewLevel'])assert.equal(JSON.parse(afterExit.stats)[field],JSON.parse(beforeExit.stats)[field]);
         await page.keyboard.press('e');await heading.waitFor();entered++;
@@ -90,7 +90,7 @@ try{
     const second=world.fragments.find(fragment=>fragment.id===route.islands[1].id),target=game.fragmentAnchor(second);
     const secondPoint={x:target.x-game.storyReach(era)+1.5,z:target.z};
     const gate=await pageAt(voyage,secondPoint,{beats:story.beats.map(beat=>beat.id),crisis:[],shore:[],state:{}});
-    await gate.page.locator('.interact-prompt').filter({hasText:`暂未开放 · ${route.islands[1].title}`}).waitFor();await gate.page.keyboard.press('e');await gate.page.getByText(`先完成「${route.islands[0].title}」，再进入「${route.islands[1].title}」。`,{exact:true}).waitFor();assert.equal(await gate.page.locator('.history-overlay').count(),0);locked++;await gate.context.close();
+    await gate.page.locator('.interact-prompt').filter({hasText:`暂未开放 · ${route.islands[1].title}`}).waitFor();await gate.page.keyboard.press('e');await gate.page.getByText(`先完成「${route.islands[0].title}」，再进入「${route.islands[1].title}」。`,{exact:true}).waitFor();assert.equal(await gate.page.locator('.history-overlay,.enc-history').count(),0);locked++;await gate.context.close();
     const first=world.fragments.find(fragment=>fragment.id===route.islands[0].id),firstPoint=game.fragmentAnchor(first);
     await request(`/voyages/${voyage.id}/records`,{kind:'fragment',text:'Original completed island record',classification:'creative',sources:[],material_ids:[first.id],version:1,access:'private'});
     const review=await pageAt(voyage,{x:firstPoint.x-game.storyReach(era)+1.5,z:firstPoint.z},{beats:story.beats.map(beat=>beat.id),crisis:[],shore:[],state:{[`history:${first.id}`]:'fast'}});
@@ -104,8 +104,8 @@ try{
       const after=await review.page.evaluate(()=>({stats:JSON.parse(localStorage.getItem('cv.stats.v1')),progress:localStorage.getItem('cv.story.v1')}));
       for(const field of ['supply','trust','score','combo','shipLevel','crewLevel'])assert.equal(after.stats[field],before.stats[field],`重读不得修改${field}`);
       assert.equal(after.progress,before.progress);assert.deepEqual(await(await fetch(`${api}/voyages/${voyage.id}/records`)).json(),recordsBefore);
-      await review.page.keyboard.press('e');await review.page.getByRole('button',{name:'结束重读，回到船上'}).waitFor();await review.page.keyboard.press('Escape');assert.equal(await review.page.locator('.history-overlay').count(),0);
-    }else{await review.page.getByRole('button',{name:'结束重读，回到船上'}).click();assert.equal(await review.page.locator('.history-overlay').count(),0);}
+      await review.page.keyboard.press('e');await review.page.getByRole('button',{name:'结束重读，回到船上'}).waitFor();await review.page.keyboard.press('Escape');assert.equal(await review.page.locator('.history-overlay,.enc-history').count(),0);
+    }else{await review.page.getByRole('button',{name:'结束重读，回到船上'}).click();assert.equal(await review.page.locator('.history-overlay,.enc-history').count(),0);}
     await review.context.close();
     const allState=Object.fromEntries([...route.islands,route.crisis].map(scene=>[`history:${scene.id}`,'fast']));
     const port=await pageAt(voyage,{x:world.ports[0].x,z:world.ports[0].z},{beats:story.beats.map(beat=>beat.id),crisis:[route.crisis.id],shore:[],state:allState});

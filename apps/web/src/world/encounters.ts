@@ -550,6 +550,16 @@ const historyLooks: Record<string, Look> = {
   'A-water': CL.gun, 'A-stake': CL.yu,
   'A-bone': CL.elder, 'A-granary': {...CL.elder,prop:'ledger'},
   'B-coal': CL.lin, 'B-gauge': CL.wei,
+  'B-ticket': CL.muleteer, 'B-shift': CL.weaver,
+  'C-relay': CL.operator, 'C-tz': CL.lineman,
+  'D-log': CL.operator2, 'D-skip': CL.recorder,
+  'D-weight': CL.secretary, 'D-star': CL.recorder,
+};
+const historyStages: Record<string, Stage> = {
+  'A-bone':'jars','A-granary':'tally',
+  'B-coal':'books','B-gauge':'press','B-ticket':'mules','B-shift':'loom',
+  'C-relay':'wireless','C-tz':'landing',
+  'D-log':'terminal','D-skip':'terminal','D-weight':'terminal','D-star':'goboard',
 };
 for (const route of Object.values(HISTORY_ROUTES)) {
   for (const island of route.islands) {
@@ -557,6 +567,7 @@ for (const route of Object.values(HISTORY_ROUTES)) {
     encounter.history = island;
     encounter.who = island.who;
     if(historyLooks[island.id])encounter.look=historyLooks[island.id];
+    if(historyStages[island.id])encounter.stage=historyStages[island.id];
     encounter.role = island.date;
     encounter.line = island.paragraphs[1];
     encounter.dialog = historyDialogue(island);

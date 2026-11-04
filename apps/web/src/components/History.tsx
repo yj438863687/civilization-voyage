@@ -29,13 +29,27 @@ export function RouteTimeline({ route, state = {} }: { route: HistoryRoute; stat
   </ol>;
 }
 
+export function IslandPictureStory({scene,onClose}:{scene:HistoryScene;onClose:()=>void}) {
+  const panel=useRef<HTMLDivElement>(null);
+  useModalFocus(panel);
+  return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={`图片故事：${scene.title}`} onKeyDown={event=>{event.stopPropagation();if(event.key==='Escape'){event.preventDefault();onClose();}}}>
+    <div className="history-island" ref={panel} tabIndex={-1}>
+      <div className="history-session-bar"><span>岛边的图片故事 · 自由阅读，不结算</span><button className="btn" type="button" onClick={onClose}>收起图片，回到航程</button></div>
+      <div className="history-visual"><HistoryImage name={scene.image}/><p>{scene.nature} · 图片许可见来源</p></div>
+      <div className="history-reading"><h2>{scene.title}</h2><p className="history-date">{scene.date} · {scene.who}</p>{scene.paragraphs.map(text=><p key={text}>{text}</p>)}<p className="history-source">历史背景与互动情境分别说明；人物台词与选择为创作。</p><a href={scene.source.url} target="_blank" rel="noreferrer">背景出处：{scene.source.title}</a><p>看完可回到岛上与人物交谈、动手；这里不收取补给，也不计为完成故事。</p><button className="btn" type="button" onClick={onClose}>收起图片，回到航程</button></div>
+    </div>
+  </div>;
+}
+
 export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, onDone, replay = false, onCancel }: { enc: Encounter; state?: FableState; supply?: number; replay?: boolean; onCancel?: ()=>void; cause?: string; onDone: (out: Outcome, summary: string) => void }) {
   const scene = enc.history!;
   const dialogue=historyDialogue(scene);
-  const [spoken,setSpoken]=useState(2);
+  const [spoken,setSpoken]=useState(1);
   const arc = arcForScene(scene.id);
   const mechanism = CHALLENGES[scene.id];
   const [phase, setPhase] = useState<'read' | 'play' | 'result'>('read');
+  const [background,setBackground]=useState(false);
+  const cinematic=(phase==='read'&&!background)||phase==='result';
   const [selected, setSelected] = useState<number[]>([]);
   const [work, setWork] = useState<ChallengeReport | null>(null);
   const [decision, setDecision] = useState(0);
@@ -44,8 +58,16 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
   useEffect(()=>{const media=window.matchMedia('(min-width:701px)');const change=()=>setFieldOpen(media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
   const done = useRef(false);
   const panel = useRef<HTMLDivElement>(null);
-  useModalFocus(panel);
-  useEffect(() => { panel.current?.focus(); panel.current?.scrollTo(0, 0); }, [phase]);
+  const subtitles=useRef<HTMLDivElement>(null);
+  useModalFocus(panel,!cinematic);
+  useModalFocus(subtitles,cinematic);
+  useEffect(() => { const element=(cinematic?subtitles:panel).current;element?.focus();element?.scrollTo(0,0); }, [phase,cinematic]);
+  useEffect(()=>{
+    if(!cinematic||phase!=='read'||spoken>=dialogue.length)return;
+    const line=dialogue[spoken-1];
+    const timer=window.setTimeout(()=>setSpoken(count=>Math.min(dialogue.length,count+1)),900+(line.you??line.them??'').length*90);
+    return()=>window.clearTimeout(timer);
+  },[cinematic,phase,spoken,dialogue.length]);
   const toggle = (index: number) => setSelected(previous => previous.includes(index) ? previous.filter(i => i !== index) : scene.activity === 'dispatch' && previous.length >= 2 ? previous : [...previous, index]);
   const option = scene.activity === 'dispatch' ? Number(selected.some(index => index >= 2)) : decision;
   const ready = !!work && (scene.activity !== 'dispatch' || selected.length === 2);
@@ -53,9 +75,24 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
   const affordable = replay || supply + outcome.supply >= 0;
   const mixed = scene.activity === 'dispatch' && selected.length === 2 && selected.filter(index => index >= 2).length === 1;
   const chosenLabel = mixed ? '一封商单，一封急用消息' : scene.options[option].label;
+  if(phase==='result')return <div className="enc enc-history" ref={subtitles} tabIndex={-1} role="dialog" aria-modal="true" aria-label={scene.title} onKeyDown={event=>{event.stopPropagation();if(event.key==='Escape'&&onCancel){event.preventDefault();onCancel();}}}>
+    <div className="enc-scrim" aria-hidden/><div className="enc-who"><span className="enc-name">{scene.who}</span><span className="enc-role">{scene.title} · 这次安排之后</span></div>
+    <p className="enc-line">{outcome.text}</p><p className="enc-hint">{replay?'练习不结算 · ':''}补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p>
+    <button type="button" className="btn btn-primary" onClick={()=>{if(!done.current){done.current=true;onDone(outcome,chosenLabel);}}}>{replay?'结束练习，回到船上':'记下这一站，回到船上'}</button>
+  </div>;
+  if(cinematic)return <div className="enc enc-history" ref={subtitles} tabIndex={-1} role="dialog" aria-modal="true" aria-label={scene.title} onKeyDown={event=>{event.stopPropagation();if(event.key==='Escape'&&onCancel){event.preventDefault();onCancel();}if((event.key===' '||event.key==='Enter')&&!(event.target instanceof HTMLElement&&event.target.closest('button,a,summary,input,select,textarea'))){event.preventDefault();if(spoken<dialogue.length)setSpoken(count=>count+1);else setPhase('play');}}}>
+    <div className="enc-scrim" aria-hidden/>
+    {onCancel&&<button className="btn enc-return" type="button" onClick={onCancel}>{replay?'结束重读，回到船上':'暂时返回船上'}</button>}
+    <div className="enc-who"><span className="enc-name">{scene.who}</span><span className="enc-role">{scene.date}</span><h2 className="enc-history-title">{scene.title}</h2></div>
+    {spoken===1&&(previousDecision(scene,state)||cause)&&<p className="enc-cause history-cause">{previousDecision(scene,state)??cause}</p>}
+    {spoken===1&&<p className="enc-line">{scene.paragraphs[1]}</p>}
+    <div className="enc-talk" aria-live="polite" aria-relevant="additions">{dialogue.slice(Math.max(0,spoken-2),spoken).map((line,index)=><p key={spoken+index} className={`talk-line ${line.you?'is-you':'is-them'} is-new`}><span className="talk-who">{line.you?'你':scene.who}</span>{line.you??line.them}</p>)}</div>
+    <div className="enc-history-actions">{spoken<dialogue.length&&<button className="btn" type="button" onClick={()=>setSpoken(count=>count+1)}>接着问</button>}<button className="btn btn-primary" type="button" onClick={()=>setPhase('play')}>进入故事 · {mechanism.title}</button><button className="btn" type="button" onClick={()=>setBackground(true)}>历史图片与背景</button><MusicControls below/></div>
+    <p className="enc-hint">字幕会依次显示 · 空格可继续 · {scene.nature}，人物话语为创作{replay?' · 重读不结算':''}</p>
+  </div>;
   return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={scene.title} onKeyDown={event => {event.stopPropagation();if(event.key==='Escape'&&onCancel){event.preventDefault();onCancel();}}}>
     <div className="history-island" ref={panel} tabIndex={-1}>
-      <div className="history-session-bar"><span>{phase==='read'?'读故事 → 动手试验 → 作出安排 → 记入航程':phase==='play'?work?'试验已完成 · 现在决定怎样使用技术':'正在试验 · 先操作，再记录结果':'确认这一站 · 点下方按钮后才结算'}</span><MusicControls below/>{onCancel&&<button className="btn" type="button" onClick={onCancel}>{replay?'结束重读，回到船上':'暂时返回船上'}</button>}</div>
+      <div className="history-session-bar"><span>{phase==='read'?'历史图片与背景':phase==='play'?work?'试验已完成 · 现在决定怎样使用技术':'正在试验 · 先操作，再记录结果':'确认这一站 · 点下方按钮后才结算'}</span>{phase==='read'&&<button className="btn" type="button" onClick={()=>setBackground(false)}>回到人物对话</button>}<MusicControls below/>{onCancel&&<button className="btn" type="button" onClick={onCancel}>{replay?'结束重读，回到船上':'暂时返回船上'}</button>}</div>
       <div className={`history-visual${phase!=='read'?' is-live':''}`}><details className="history-photo" open={phase==='read'}><summary>历史配图与来源</summary><HistoryImage name={scene.image} /></details><details className="story-field-wrap" open={fieldOpen} onToggle={event=>setFieldOpen(event.currentTarget.open)}><summary>故事现场 · 三处可查看{action?.progress?` · ${action.progress.label} ${action.progress.value}/${action.progress.total}`:''}</summary><StoryTheatre scene={scene} action={action} work={work} phase={phase} choice={chosenLabel} supply={outcome.supply} trust={outcome.trust}/></details><p>{scene.nature} · 互动人物、对话与选择为创作</p></div>
       <div className="history-reading">
         <h2>{scene.title}</h2>{replay&&<p className="replay-note" role="status">重读与练习：不改变补给、人心、升级或本次航程的原记录。</p>}<p className="history-date">{scene.date} · {scene.who}</p>
@@ -81,7 +118,7 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
           <div className="history-consequence" aria-live="polite"><strong>{chosenLabel}</strong><p>{mixed ? '保留一笔商单收入，同时让一封普通人的急用消息先发。另一封继续等待。' : scene.options[option].note}</p><p>{replay?'练习的理论变化（不结算）':'操作与安排合计'}：补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p>{!replay&&Number.isFinite(supply)&&<p>船上现有 {supply} 份补给{affordable?`，做完后剩 ${Math.min(100,supply+outcome.supply)} 份`:'，不足以承担这个安排，可以改选节省物资的办法'}</p>}{cooperationBonus(scene,state)>0&&<p>上一章留下的合作省回 3 份补给，已计入。</p>}</div>
           <div className="history-actions"><button className="btn" type="button" onClick={()=>setPhase('read')}>再读一遍</button><button className="btn btn-primary" type="button" disabled={!ready||!affordable} onClick={()=>setPhase('result')}>{!affordable?'补给不足，请调整安排':ready?'照这个安排做':'请先选好两封消息'}</button></div>
         </>}
-        {phase === 'result' && <><p>{outcome.text}</p><p className="history-consequence">{replay?'练习结果（不结算）：':''}补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p><p>{replay?'这次练习不会覆盖原来的选择或操作记录。':'操作记录和你的安排将一起带到下一章。后来的工料、布局或交班会用到它们。'}</p><button type="button" className="btn btn-primary" onClick={() => { if (!done.current) { done.current = true; onDone(outcome, chosenLabel); } }}>{replay?'结束练习，回到船上':'记下这一站，回到船上'}</button></>}
+
       </div>
     </div>
   </div>;

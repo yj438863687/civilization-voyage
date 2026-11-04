@@ -53,6 +53,7 @@ interface Props {
   shipLevel?: number;
   crewLevel?: number;
   onStorySelect?: (id:string)=>void;
+  onStoryImage?: (id:string)=>void;
   mode: CamMode;
   reduceMotion: boolean;
   canSail: boolean;
@@ -1140,6 +1141,7 @@ export function VoyageCanvas(props: Props) {
           collectedIds={props.collectedIds}
           nearFragmentId={props.nearFragmentId}
           onStorySelect={props.onStorySelect}
+          onStoryImage={props.onStoryImage}
           laneId={props.laneId}
           portalOpen={props.portalOpen ?? false}
           fableState={props.fableState}

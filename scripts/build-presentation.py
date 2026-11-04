@@ -49,6 +49,7 @@ def image_path(slide):
     if name=='02-route' and (CAPTURES/'02-route-cards.png').exists():name='02-route-cards'
     if name=='07-reflection' and (CAPTURES/'07-retrieval-answer.png').exists():name='07-retrieval-answer'
     path=CAPTURES/(name+'.png')
+    if not path.exists():path=ROOT/'.impeccable/review'/(name+'.png')
     if not path.exists():raise RuntimeError('Required real-game screenshot missing: '+str(path))
     return path
 def picture(slide,path,x,y,w,h):

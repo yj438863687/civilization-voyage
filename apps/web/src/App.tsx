@@ -1,8 +1,8 @@
 import { crisisAnchor, fragmentAnchor, inStoryReach } from './world/storyAccess';
 import { STORY_ARCS } from './world/storyArcs';
 import { CHALLENGES } from './world/challenges';
-import { historyFor } from './world/history';
-import { HistoryArrival, RouteTimeline } from './components/History';
+import { historyFor, type HistoryScene } from './world/history';
+import { IslandPictureStory, RouteTimeline } from './components/History';
 import { PresentationDemo } from './components/PresentationDemo';
 import { CULTURE_CORPUS, DEMO_ROUTES, type DemoRoute, type publicDemoSnapshot } from './world/presentationDemo';
 import { ShipyardDialog } from './components/Shipyard';
@@ -323,6 +323,7 @@ export function App() {
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem(MOTION_KEY) === '1' || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [comms, setComms] = useState(false);
   const [workspaceOpen,setWorkspaceOpen]=useState(false);
+  const [imageStory,setImageStory]=useState<HistoryScene|null>(null);
   const preparingWorkspace=useRef(false);
   const [webgl, setWebgl] = useState(true);
   const [title, setTitle] = useState('玄览一问');
@@ -417,7 +418,7 @@ export function App() {
   const encRef = useRef<string | null>(null);
   // 听人说话、看结果时船停下；轮到你做事时，键盘归船
   const nestedEncounter = !!(enc && encounterFor(enc)?.history) || !!(crisis && historyFor(voyage?.scene_id, laneId));
-  encRef.current = workspaceOpen ? 'workspace' : yardOpen ? 'shipyard' : nestedEncounter ? (enc ?? crisis) : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
+  encRef.current = imageStory ? 'picture-story' : workspaceOpen ? 'workspace' : yardOpen ? 'shipyard' : nestedEncounter ? (enc ?? crisis) : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
   const shipRef = useRef<ShipSnapshot | null>(null);
 
   useEffect(() => {
@@ -1034,8 +1035,18 @@ export function App() {
 
 
   /** 靠近一件东西：有人守着就先打照面、做一件事；没人守着就直接收 */
+  function openPictureStory(id:string) {
+    if(view!=='world'||enc||crisis||secret||yardOpen||workspaceOpen||busy||landing>0)return;
+    const route=historyFor(voyage?.scene_id,laneId),scene=route&&[...route.islands,route.crisis].find(item=>item.id===id);
+    if(!scene)return;
+    const fragment=sea.fragments.find(item=>item.id===id);
+    const anchor=fragment?fragmentAnchor(fragment):story?crisisAnchor(story):null;
+    if(!anchor||!shipRef.current||!inStoryReach(shipRef.current,anchor,voyage?.scene_id??'test')){setError('再靠近这座岛，就能查看图片故事。');return;}
+    setInput({forward:0,turn:0});setImageStory(scene);setError(null);
+  }
+
   function startEncounter(id: string | null = nearFragment) {
-    if (!id || view!=='world' || enc || crisis || secret || busy || yardOpen || workspaceOpen || landing>0) return;
+    if (!id || view!=='world' || enc || crisis || secret || busy || yardOpen || imageStory || workspaceOpen || landing>0) return;
     if(id==='shore'){if(!nearPort){setError('再靠近港口，按F靠岸后回顾这一程。');return;}void dock();return;}
     if(story?.crisis.id===id){startCrisis();return;}
     const fragment=sea.fragments.find(fragment=>fragment.id===id);
@@ -1050,7 +1061,7 @@ export function App() {
   }
 
   function startCrisis() {
-    if(!story||!voyage||view!=='world'||enc||crisis||secret||busy||yardOpen||workspaceOpen||landing>0)return;
+    if(!story||!voyage||view!=='world'||enc||crisis||secret||busy||yardOpen||imageStory||workspaceOpen||landing>0)return;
     if(!shipRef.current||!inStoryReach(shipRef.current,crisisAnchor(story),voyage.scene_id)){setError(`再靠近「${story.crisis.kicker}」的图片标识，按E进入。`);return;}
     const unfinished=historyFor(voyage.scene_id,laneId)?.islands.find(island=>!progress.state[`history:${island.id}`]&&!collectedIds.has(island.id));
     if(unfinished&&!progress.crisis.includes(story.crisis.id)){setError(`先完成「${unfinished.title}」，再进入第三章。`);return;}
@@ -1219,7 +1230,7 @@ export function App() {
 
   // 船经过旁白点、危机点：戏自己发生
   useEffect(() => {
-    if (view !== 'world' || !ship || enc || crisis || secret || workspaceOpen || landing > 0 || intro) return;
+    if (view !== 'world' || !ship || enc || crisis || secret || imageStory || workspaceOpen || landing > 0 || intro) return;
     // 暗线 · 桃花源：铜针不指它，只有顺着桃花瓣才找得到
     const era = voyage?.scene_id ?? '';
     const tao = stats.secrets.taoyuan;
@@ -1284,7 +1295,7 @@ export function App() {
         return;
       }
     }
-  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id, workspaceOpen]);
+  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id, workspaceOpen, imageStory]);
 
   function finishSecret(o: Outcome, summary: string) {
     if (!voyage) return;
@@ -1324,11 +1335,11 @@ export function App() {
   // 旁白只在真的露出来的时候计时：遭遇、危机把它遮住的那几秒不算，结束后接着读
   // 桃花那一句是暗示，短一些，别把这一程的开场「起」顶到岛后面去
   useEffect(() => {
-    if (!caption || enc || crisis) return;
+    if (!caption || enc || crisis || imageStory) return;
     const secs = caption.id === 'tao-hint' ? 3500 : reduceMotion ? 4000 : 7000;
     const t = window.setTimeout(() => setCaption(null), secs);
     return () => window.clearTimeout(t);
-  }, [caption, reduceMotion, enc, crisis]);
+  }, [caption, reduceMotion, enc, crisis, imageStory]);
 
   // 靠岸后，先见岸上的人，再落印
   useEffect(() => {
@@ -1414,13 +1425,13 @@ export function App() {
 
   return (
     <>
-      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||shoreOpen||yardOpen||workspaceOpen}/>
+      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||shoreOpen||yardOpen||!!imageStory||workspaceOpen}/>
       {webgl ? (
         <VoyageCanvas
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !workspaceOpen && !yardOpen && !nestedEncounter && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
+          canSail={view === 'world' && !imageStory && !workspaceOpen && !yardOpen && !nestedEncounter && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
           water={water}
           onWaterDone={(r) => {
             setWaterResult(r);
@@ -1440,6 +1451,7 @@ export function App() {
           world={sea}
           collectedIds={[...new Set([...collectedIds,...sea.fragments.filter(fragment=>!!progress.state[`history:${fragment.id}`]).map(fragment=>fragment.id)])]}
           onStorySelect={id=>startEncounter(id)}
+          onStoryImage={openPictureStory}
           nearFragmentId={nearFragment}
           laneId={laneId}
           portalOpen={sealedHere}
@@ -1772,11 +1784,11 @@ export function App() {
         />
       )}
 
+      {imageStory&&<IslandPictureStory scene={imageStory} onClose={()=>setImageStory(null)}/>}
       {voyage&&<PresentationDemo key={`workspace-${voyage.id}`} open={workspaceOpen} voyageId={voyage.id} mission={question||voyage.question} sceneLabel={EPOCH_INTRO[voyage.scene_id]?.era??voyage.title} laneId={laneId} lanes={sea.lanes??[]} fragments={workspaceFragments} supply={stats.supply} trust={stats.trust} onLaneChange={setLaneId} onPrepare={prepareWorkspace} onApprove={approveWorkspace} onReflection={reflectWorkspace} onClose={()=>setWorkspaceOpen(false)}/>}
       {yardOpen && <ShipyardDialog stats={stats} sceneId={(view==='embark'?scenePick?.id:voyage?.scene_id) ?? 'A'} allowPurchase={view!=='embark'} onUpdate={updateStats} onClose={() => setYardOpen(false)} />}
       {/* 合：岸上的人 */}
-      {view === 'port' && shoreOpen && story && historyFor(voyage?.scene_id, laneId) && <HistoryArrival route={historyFor(voyage?.scene_id, laneId)!} state={progress.state} onDone={() => { setShoreOpen(false); if (voyage) markProgress(previous => ({ ...previous, shore: [...previous.shore, voyage.id] })); }} />}
-      {view === 'port' && shoreOpen && story && !historyFor(voyage?.scene_id, laneId) && (
+      {view === 'port' && shoreOpen && story && (
         <ShoreOverlay
           story={story}
           state={progress.state}

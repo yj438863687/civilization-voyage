@@ -45,7 +45,7 @@ try{
   console.log('船型通过：四时代×四阶段实物预览、每次改造明显改变画面，对照不扣费。',differences.map(value=>`${value.era}${value.level}:${(value.fraction*100).toFixed(1)}%`).join(' '));
 
   for(const route of ['A-near','A-far','B-near','B-far','C-near','C-far','D-near','D-far'])for(let step=0;step<3;step++){
-    await page.goto(`${base}?route=${route}&step=${step}`);const stage=page.getByRole('region',{name:'可互动的故事现场'});await stage.waitFor();for(let index=0;index<3;index++)await stage.locator('.story-stage-spots button').nth(index).click();assert((await stage.locator('.story-stage-heading').innerText()).includes('3/3'));assert((await stage.locator('.story-stage-voice').innerText()).length>25);
+    await page.goto(`${base}?route=${route}&step=${step}`);await page.getByRole('button',{name:'历史图片与背景',exact:true}).click();const stage=page.getByRole('region',{name:'可互动的故事现场'});await stage.waitFor();for(let index=0;index<3;index++)await stage.locator('.story-stage-spots button').nth(index).click();assert((await stage.locator('.story-stage-heading').innerText()).includes('3/3'));assert((await stage.locator('.story-stage-voice').innerText()).length>25);
   }
   }
   await start('A-near',2);

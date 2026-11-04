@@ -15,6 +15,7 @@ import type { Encounter, Look } from './encounters';
 import type { FableState } from './fable';
 import { HISTORY_ROUTES, historyChoices, routeRecap } from './history';
 import { historyDialogue } from './historyDialogue';
+import { STORY_ARCS } from './storyArcs';
 
 export type PropKind =
   | 'huts'
@@ -586,7 +587,7 @@ for (const [key, route] of Object.entries(HISTORY_ROUTES)) {
   story.logline = route.question;
   story.beats = story.beats.map((beat, index) => ({ ...beat,
     kicker: index === 0 ? route.period : route.islands[index - 1].date,
-    text: index === 0 ? route.opening : route.islands[index - 1].paragraphs[0],
+    text: index === 0 ? route.opening : STORY_ARCS[key].chapters[index-1].continuation,
   }));
   story.crisis.id = route.crisis.id;
   story.crisis.kicker = route.crisis.title;

@@ -1863,6 +1863,19 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 }
 .enc > * { position: relative; }
 .enc-who { display: grid; gap: 4px; }
+.enc-history { gap: 10px; padding-bottom: max(5vh, 32px); outline: none; overflow-y: auto; }
+.enc-history-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; max-width: 800px; }
+.enc-history .btn { color: #f6efe0; border-color: #a98b5a; }
+.enc-history .btn-primary { color: var(--cv-action-primary-text); }
+.enc-history .enc-role { letter-spacing: .1em; }
+.enc-history-title { margin: 0; font: 12px/1.5 var(--cv-font-body); color: var(--cv-brass-300); }
+.enc-history .enc-line { max-width: 36em; font-size: 14px; }
+.enc-history > .enc-scrim { position: absolute; z-index: 0; }
+.enc-history > :not(.enc-scrim) { z-index: 1; min-width: 0; max-width: 100%; }
+.enc-history .enc-talk { width: min(620px, 100%); }
+.enc-history .btn { background: rgb(18 29 32 / .9); color: #f6efe0; }
+.enc-history .btn-primary { background: #a8462d; color: #fff4dc; }
+.island-picture-entry { min-height: 44px; padding: 6px 12px; border: 1px solid #c5aa75; background: #182a2e; color: #f2e4c7; font: 13px/1.5 var(--cv-font-body); white-space: nowrap; cursor: pointer; }
 .enc-name {
   font-family: var(--cv-font-display);
   font-size: clamp(1.5rem, 3.2vw, 2.3rem);

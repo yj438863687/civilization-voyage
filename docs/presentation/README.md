@@ -1,6 +1,6 @@
-> 当前版本：v08 旧版人物互动与历史航程合并初版，以 [本版脚本](v08-demo-script.md) 为准。大副二副方案已撤销；v07保留作历史版本。Demo运行和录制继续暂停，下方早期工作台描述不证明v08已通过实机验收。
+> 当前版本v09：[本版脚本](v09-demo-script.md)。恢复原版人物、场景和画面字幕，显示检查通过；未录制或重跑完整航程。旧版本描述不代表当前版本全量验收。
 >
-> 生成：`python3 scripts/build-presentation.py --draft --without-video --output ~/Desktop/文明航程演讲包/v08-旧版人物与历史航程合并初版`
+> 生成：`python3 scripts/build-presentation.py --draft --without-video --output ~/Desktop/文明航程演讲包/v09-恢复人物场景字幕初版`。配图来自 `scripts/check-story-presentation.mjs` 的实际显示检查。
 
 # 文明航程：五人演讲与原游戏集成
 

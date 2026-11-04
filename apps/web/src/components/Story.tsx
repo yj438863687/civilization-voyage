@@ -43,6 +43,8 @@ export function ShoreOverlay({
   // 0 名字 · 1..n 独白 · n+1 原文 · n+2 意义
   const last = f.monologue.length + 2;
   const [step, setStep] = useState(0);
+  const panel=useRef<HTMLDivElement>(null);
+  useModalFocus(panel);
 
   useEffect(() => {
     if (step >= last) return;
@@ -62,11 +64,11 @@ export function ShoreOverlay({
   }, [step, last, onDone]);
 
   return (
-    <div className="shore" role="dialog" aria-label={`岸上的人：${f.name}`}>
+    <div className="shore" ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`岸上的人：${f.name}`} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();onDone();}}}>
       <div className="shore-scrim" aria-hidden />
       <p className="shore-arrival">{story.arrival}</p>
       <div className="shore-who">
-        <span className="shore-name">{f.name}</span>
+        <h2 className="shore-name" style={{margin:0}}>{f.name}</h2>
         <span className="shore-years">{f.years}</span>
         <span className="shore-deed">{f.deed}</span>
       </div>

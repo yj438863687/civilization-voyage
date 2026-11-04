@@ -1,7 +1,7 @@
 {
   "title": "文明航程：技术与文明的关系",
-  "subtitle": "旧版人物互动与历史航程合并 · 五人演讲初版",
-  "version": 8,
+  "subtitle": "恢复人物、场景与画面字幕 · 五人演讲初版",
+  "version": 9,
   "date": "2026-11-04",
   "duration_seconds": 900,
   "names": {
@@ -29,9 +29,9 @@
         "载体：同一艘船、四个时代、八条历史航程",
         "产物：有出处的碎片、人的选择、可见的文明成果"
       ],
-      "notes": "【v08初版：未运行新的演示】大家好，我们展示的是文明航程。它从一个问题开始：技术越来越强之后，文明怎样跟上？我们把农业、工业、信息与人工智能四个时代放进同一个航海游戏。玩家不只是读知识，而是带着问题出发，亲手完成故事中的操作，决定技术怎样用于共同生活。接下来五个人分别从文化理解、路径比较、文明实践、产品演示和商业落地来说明。",
+      "notes": "【v09初版：显示检查通过，未录制航程】大家好，我们展示的是文明航程。它从一个问题开始：技术越来越强之后，文明怎样跟上？我们把农业、工业、信息与人工智能四个时代放进同一个航海游戏。玩家不只是读知识，而是带着问题出发，亲手完成故事中的操作，决定技术怎样用于共同生活。接下来五个人分别从文化理解、路径比较、文明实践、产品演示和商业落地来说明。",
       "kind": "hero",
-      "image": null,
+      "image": "v09-character-subtitles",
       "extra": {},
       "en": {
         "title": "As technology grows stronger, how does civilization keep pace?",
@@ -41,32 +41,32 @@
           "One ship, four eras, eight historical routes",
           "Evidence, human choices and a visible civilization artifact"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Good afternoon. Our project is Civilization Voyage. We begin with a question: as technology becomes more powerful, how does civilization keep pace? The game follows agriculture, industry, information and artificial intelligence. Players do more than read facts. They discuss a cultural question, visit historical islands, operate small systems and decide how technical capabilities should serve shared life. Five speakers will explain cultural understanding, route comparison, civilization building, the actual product and its business case. Our central idea is that technology creates possibilities, while people remain responsible for the choices that shape a civilization."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Good afternoon. Our project is Civilization Voyage. We begin with a question: as technology becomes more powerful, how does civilization keep pace? The game follows agriculture, industry, information and artificial intelligence. Players do more than read facts. They discuss a cultural question, visit historical islands, operate small systems and decide how technical capabilities should serve shared life. Five speakers will explain cultural understanding, route comparison, civilization building, the actual product and its business case. Our central idea is that technology creates possibilities, while people remain responsible for the choices that shape a civilization."
       }
     },
     {
       "speaker": "A",
       "seconds": 60,
-      "title": "从一次真正的相遇开始",
-      "subtitle": "玩家直接与岛上的人物交谈",
+      "title": "人物在岛上，故事在眼前",
+      "subtitle": "恢复原版3D人物、造景与画面字幕",
       "bullets": [
-        "基线：历史改造前c1a8fe8的人物开口、玩家追问、动手帮忙",
-        "恢复鲧、禹、林则徐、魏源等适配航程的人物",
-        "没有大副二副代问；人物台词明确标为剧情创作"
+        "人物和岛屿造景重新显示，图片只作补充",
+        "玩家与人物的交谈逐句显示在画面下方",
+        "岛边“图片故事”为额外入口，关闭后回到航行或人物对话"
       ],
-      "notes": "【v08初版：未运行新的演示】基线：历史改造前c1a8fe8的人物开口、玩家追问、动手帮忙。恢复鲧、禹、林则徐、魏源等适配航程的人物。没有大副二副代问；人物台词明确标为剧情创作。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】人物和岛屿造景重新显示，图片只作补充。玩家与人物的交谈逐句显示在画面下方。历史图片主动展开，关闭后返回原场景。本次只完成了界面显示检查，不把它说成完整航程验收。 岛边入口不扣补给、不增加人心、不推进章节，已经做过针对性显示与状态检查。",
       "kind": "image",
-      "image": null,
+      "image": "v09-character-subtitles",
       "extra": {},
       "en": {
-        "title": "Begin with an encounter",
-        "subtitle": "The player speaks directly with people on each island",
+        "title": "Characters inhabit the islands; stories unfold on screen",
+        "subtitle": "Restore the original 3D characters, scenery and subtitles",
         "bullets": [
-          "Baseline: characters speak, players ask, then help through action",
-          "Restore route-appropriate figures such as Gun, Yu, Lin Zexu and Wei Yuan",
-          "No mate intermediaries; character dialogue is labeled as creative writing"
+          "Restore characters and island scenery; images are supplementary",
+          "Player and character exchanges appear as on-screen subtitles",
+          "An optional island picture-story entry closes back to sailing or dialogue"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Baseline: characters speak, players ask, then help through action. Restore route-appropriate figures such as Gun, Yu, Lin Zexu and Wei Yuan. No mate intermediaries; character dialogue is labeled as creative writing. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Restore characters and island scenery; images are supplementary. Player and character exchanges appear as on-screen subtitles. Historical images open on request and close back to the scene. This revision has a display check, not a full voyage acceptance test. The island picture-story entry leaves supplies, trust and chapter progress unchanged; this was checked directly."
       }
     },
     {
@@ -79,7 +79,7 @@
         "历史配图保留作者、来源与许可",
         "文明重建是采用文化经验的创作成果"
       ],
-      "notes": "【v08初版：未运行新的演示】我们把三种内容分开：材料的历史背景，玩家和船员对材料的解释，以及游戏为了互动而创作的情境。比如治水传说不能当作有可靠纪年的史实，未来港口也不能说成已经发生过的事件。图片保留出处和授权，最后建成的港城明确属于创作。这样既能发挥想象，也不会让模型输出取代来源。",
+      "notes": "【v09初版：显示检查通过，未录制航程】我们把三种内容分开：材料的历史背景，玩家和船员对材料的解释，以及游戏为了互动而创作的情境。比如治水传说不能当作有可靠纪年的史实，未来港口也不能说成已经发生过的事件。图片保留出处和授权，最后建成的港城明确属于创作。这样既能发挥想象，也不会让模型输出取代来源。",
       "kind": "evidence",
       "image": null,
       "extra": {},
@@ -91,7 +91,7 @@
           "Keep image attribution and original references",
           "Treat the rebuilt port as a creative artifact"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] We distinguish three layers: historical material, interpretations of that material, and situations created for interaction. A flood-control legend is not presented as a securely dated event. A future port is not described as something that has already happened. Images retain attribution and links to their original sources. The port built at the end is clearly a creative artifact informed by cultural experience. This separation allows imaginative learning without letting either a model response or a game mechanic replace evidence. Players can revisit the original references and question the conclusions they draw."
+        "notes": "[v09 draft: display check passed; no voyage recording.] We distinguish three layers: historical material, interpretations of that material, and situations created for interaction. A flood-control legend is not presented as a securely dated event. A future port is not described as something that has already happened. Images retain attribution and links to their original sources. The port built at the end is clearly a creative artifact informed by cultural experience. This separation allows imaginative learning without letting either a model response or a game mechanic replace evidence. Players can revisit the original references and question the conclusions they draw."
       }
     },
     {
@@ -104,7 +104,7 @@
         "旧版不符合地域和时间顺序的人物不直接搬回",
         "故事最终由能理解整段经历的人物回顾"
       ],
-      "notes": "【v08初版：未运行新的演示】每条航程沿年代连接两座故事岛与一次转折。旧版不符合地域和时间顺序的人物不直接搬回。故事最终由能理解整段经历的人物回顾。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】每条航程沿年代连接两座故事岛与一次转折。旧版不符合地域和时间顺序的人物不直接搬回。故事最终由能理解整段经历的人物回顾。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
       "kind": "image",
       "image": null,
       "extra": {},
@@ -116,7 +116,7 @@
           "Do not copy older characters into incompatible places or dates",
           "An appropriate final voice connects the entire voyage"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Each route links two islands and a turning point in chronological order. Do not copy older characters into incompatible places or dates. An appropriate final voice connects the entire voyage. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Each route links two islands and a turning point in chronological order. Do not copy older characters into incompatible places or dates. An appropriate final voice connects the entire voyage. This revision merges the earlier direct character interaction with the historical route improvements."
       }
     },
     {
@@ -129,7 +129,7 @@
         "守约和协作会影响下一章，不只改变一个数字",
         "补给改船；人心达到要求解锁船员行装"
       ],
-      "notes": "【v08初版：未运行新的演示】多装一份补给，岸上可能少一份粮或学习的时间。守约和协作会影响下一章，不只改变一个数字。补给改船；人心达到要求解锁船员行装。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】多装一份补给，岸上可能少一份粮或学习的时间。守约和协作会影响下一章，不只改变一个数字。补给改船；人心达到要求解锁船员行装。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
       "kind": "quote",
       "image": null,
       "extra": {},
@@ -141,7 +141,7 @@
           "Promises and cooperation affect the next chapter, beyond a number",
           "Spend supplies on ship refits; reach trust thresholds for crew outfits"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] An extra supply aboard may cost someone ashore food or learning time. Promises and cooperation affect the next chapter, beyond a number. Spend supplies on ship refits; reach trust thresholds for crew outfits. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] An extra supply aboard may cost someone ashore food or learning time. Promises and cooperation affect the next chapter, beyond a number. Spend supplies on ship refits; reach trust thresholds for crew outfits. This revision merges the earlier direct character interaction with the historical route improvements."
       }
     },
     {
@@ -154,7 +154,7 @@
         "遇到反例，可以修改原先的安排",
         "用行动结果回看路径，而不是用价格宣布胜负"
       ],
-      "notes": "【v08初版：未运行新的演示】我们希望玩家比较的是，多看了什么材料，多检查了哪一个前提，以及最后的安排有没有照顾到被忽略的人。不同意见会留下来。等到航程结束，再用行动结果评估路径，这就是和而不同在产品里的具体体现。",
+      "notes": "【v09初版：显示检查通过，未录制航程】我们希望玩家比较的是，多看了什么材料，多检查了哪一个前提，以及最后的安排有没有照顾到被忽略的人。不同意见会留下来。等到航程结束，再用行动结果评估路径，这就是和而不同在产品里的具体体现。",
       "kind": "quote",
       "image": null,
       "extra": {},
@@ -166,7 +166,7 @@
           "Revise a premise when a counterexample matters",
           "Judge the path through actions and outcomes"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] The useful comparison is what additional work was performed: which materials were read, which premise was checked, and whether the final arrangement considered people who might otherwise be overlooked. Different suggestions remain visible. At the end, players revisit the route using their actions and outcomes. This is how we turn harmony without uniformity into a concrete product behavior."
+        "notes": "[v09 draft: display check passed; no voyage recording.] The useful comparison is what additional work was performed: which materials were read, which premise was checked, and whether the final arrangement considered people who might otherwise be overlooked. Different suggestions remain visible. At the end, players revisit the route using their actions and outcomes. This is how we turn harmony without uniformity into a concrete product behavior."
       }
     },
     {
@@ -179,7 +179,7 @@
         "对话说清困境，小游戏让技术本领变得可操作",
         "完成技术操作，再决定成果如何分配和使用"
       ],
-      "notes": "【v08初版：未运行新的演示】点“接着问”继续玩家与当地人物的对话。对话说清困境，小游戏让技术本领变得可操作。完成技术操作，再决定成果如何分配和使用。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】点“接着问”继续玩家与当地人物的对话。对话说清困境，小游戏让技术本领变得可操作。完成技术操作，再决定成果如何分配和使用。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
       "kind": "image",
       "image": null,
       "extra": {},
@@ -191,7 +191,7 @@
           "Dialogue establishes the predicament; the minigame tests the technique",
           "After the technical task, decide how its result is used and shared"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Continue the exchange between the player and the local character. Dialogue establishes the predicament; the minigame tests the technique. After the technical task, decide how its result is used and shared. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Continue the exchange between the player and the local character. Dialogue establishes the predicament; the minigame tests the technique. After the technical task, decide how its result is used and shared. This revision merges the earlier direct character interaction with the historical route improvements."
       }
     },
     {
@@ -204,7 +204,7 @@
         "合作带来后续支持；眼前收益也有未解决的代价",
         "到港回看具体选择，回到技术与文明的关系"
       ],
-      "notes": "【v08初版：未运行新的演示】渠图、仓单、译稿和工班表串联不同章节。合作带来后续支持；眼前收益也有未解决的代价。到港回看具体选择，回到技术与文明的关系。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】渠图、仓单、译稿和工班表串联不同章节。合作带来后续支持；眼前收益也有未解决的代价。到港回看具体选择，回到技术与文明的关系。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
       "kind": "image",
       "image": null,
       "extra": {},
@@ -216,7 +216,7 @@
           "Cooperation brings later support; immediate gains may leave unresolved costs",
           "At the port, revisit concrete choices and the relation of technology to civilization"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Canal plans, granary records, translations and shift tables connect chapters. Cooperation brings later support; immediate gains may leave unresolved costs. At the port, revisit concrete choices and the relation of technology to civilization. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Canal plans, granary records, translations and shift tables connect chapters. Cooperation brings later support; immediate gains may leave unresolved costs. At the port, revisit concrete choices and the relation of technology to civilization. This revision merges the earlier direct character interaction with the historical route improvements."
       }
     },
     {
@@ -229,7 +229,7 @@
         "本地检索返回片段和原始链接",
         "接入模型后，可生成带引用的检索增强回答"
       ],
-      "notes": "【v08初版：未运行新的演示】最后回到材料。当前已经实现本地关键词检索和带来源的提取式摘要；接入模型后，可以把取回的材料交给模型作引用回答。检索不是自动事实认证，玩家仍需区分材料与判断。我们希望反思能变成下一轮更具体的问题。",
+      "notes": "【v09初版：显示检查通过，未录制航程】最后回到材料。当前已经实现本地关键词检索和带来源的提取式摘要；接入模型后，可以把取回的材料交给模型作引用回答。检索不是自动事实认证，玩家仍需区分材料与判断。我们希望反思能变成下一轮更具体的问题。",
       "kind": "image",
       "image": null,
       "extra": {},
@@ -241,57 +241,57 @@
           "Retrieve local fragments with original reference links",
           "Use a connected model for an optional cited answer"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Reflection returns the player to the material. The current build includes local keyword retrieval and an extractive summary with sources. When a model is connected, the retrieved fragments can be passed into a cited generated answer. Retrieval is not automatic fact certification. The goal is to turn a broad conclusion into a more specific question for the next voyage."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Reflection returns the player to the material. The current build includes local keyword retrieval and an extractive summary with sources. When a model is connected, the retrieved fragments can be passed into a cited generated answer. Retrieval is not automatic fact certification. The goal is to turn a broad conclusion into a more specific question for the next voyage."
       }
     },
     {
       "speaker": "D",
       "seconds": 120,
-      "title": "v08操作脚本初版：恢复直接人物故事",
-      "subtitle": "按要求暂停自动演示与录制",
+      "title": "v09：人物、场景与字幕显示检查",
+      "subtitle": "不是完整航程演示，也没有录制视频",
       "bullets": [
-        "出海：选择时代与中国或世界航程",
-        "登岛：人物开口，玩家接着问，再做小游戏与安排",
-        "到港：适配的回顾者串起三章，查看后果与外观升级"
+        "岛上能看见原风格人物、造景和底部对话字幕",
+        "图片面板可打开并返回；终点恢复岸上人物独白",
+        "完成显示检查后打开桌面App，由玩家继续体验"
       ],
-      "notes": "【v08初版：未运行新的演示】出海：选择时代与中国或世界航程。登岛：人物开口，玩家接着问，再做小游戏与安排。到港：适配的回顾者串起三章，查看后果与外观升级。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】岛上能看见原风格人物、造景和底部对话字幕。图片面板可打开并返回；终点恢复岸上人物独白。完成显示检查后打开桌面App，由玩家继续体验。本次只完成了界面显示检查，不把它说成完整航程验收。",
       "kind": "demo",
-      "image": null,
+      "image": "v09-character-subtitles",
       "extra": {},
       "en": {
-        "title": "v08 walkthrough draft: restore direct character encounters",
-        "subtitle": "Automated demonstration and recording remain paused",
+        "title": "v09: checking characters, scenery and subtitles",
+        "subtitle": "A display check, not a complete voyage demonstration",
         "bullets": [
-          "Departure: choose an era and a China or world route",
-          "Island: hear the character, ask another question, play and decide",
-          "Arrival: connect three chapters through an appropriate final reflection"
+          "Island scenes show the original character style, props and dialogue subtitles",
+          "Images open separately; the final reflection returns to the shore character",
+          "After the display check, open the desktop app for the player"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Departure: choose an era and a China or world route. Island: hear the character, ask another question, play and decide. Arrival: connect three chapters through an appropriate final reflection. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Island scenes show the original character style, props and dialogue subtitles. Images open separately; the final reflection returns to the shore character. After the display check, open the desktop app for the player. This revision has a display check, not a full voyage acceptance test."
       }
     },
     {
       "speaker": "D",
       "seconds": 60,
-      "title": "本版检查：合并旧互动，保留新改进",
-      "subtitle": "构建与数据检查不等于实机体验验收",
+      "title": "验收范围：画面恢复与历史规则",
+      "subtitle": "显示检查通过，完整通关未重跑",
       "bullets": [
-        "检查24章交谈完整，玩家与当地人物轮流发言",
-        "保留年代、中国世界分线、跨章后果和外观升级规则",
-        "本版未运行新的浏览器演示，体验验收仍待进行"
+        "实看岛上人物、场景、字幕以及图片面板返回",
+        "手机宽度、Escape返回及页面错误检查通过",
+        "保留八航程、24章、12操作与跨章结算规则"
       ],
-      "notes": "【v08初版：未运行新的演示】检查24章交谈完整，玩家与当地人物轮流发言。保留年代、中国世界分线、跨章后果和外观升级规则。本版未运行新的浏览器演示，体验验收仍待进行。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】实看岛上人物、场景、字幕以及图片面板返回。手机宽度、Escape返回及页面错误检查通过。保留八航程、24章、12操作与跨章结算规则。本次只完成了界面显示检查，不把它说成完整航程验收。",
       "kind": "quote",
       "image": null,
       "extra": {},
       "en": {
-        "title": "Review the merge and preserve the improvements",
-        "subtitle": "Build and data checks do not replace gameplay review",
+        "title": "Review scope: restored presentation and history rules",
+        "subtitle": "Display checks passed; a full playthrough was not repeated",
         "bullets": [
-          "Check complete conversations in all 24 chapters, alternating player and local character",
-          "Preserve chronology, geographic routes, cross-chapter effects and upgrades",
-          "No new browser demonstration was run; gameplay review remains pending"
+          "Inspect island characters, scenery, subtitles and return from the image panel",
+          "Check mobile width, Escape behavior and page errors",
+          "Retain eight routes, 24 chapters, 12 mechanics and cross-chapter rules"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Check complete conversations in all 24 chapters, alternating player and local character. Preserve chronology, geographic routes, cross-chapter effects and upgrades. No new browser demonstration was run; gameplay review remains pending. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Inspect island characters, scenery, subtitles and return from the image panel. Check mobile width, Escape behavior and page errors. Retain eight routes, 24 chapters, 12 mechanics and cross-chapter rules. This revision has a display check, not a full voyage acceptance test."
       }
     },
     {
@@ -304,7 +304,7 @@
         "可选接口独立记录密钥授权与真实用量",
         "资料工具整理已完成的故事；玩家保留决定权"
       ],
-      "notes": "【v08初版：未运行新的演示】故事人物不是Claude或GPT角色，不强迫玩家接模型。可选接口独立记录密钥授权与真实用量。资料工具整理已完成的故事；玩家保留决定权。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】故事人物不是Claude或GPT角色，不强迫玩家接模型。可选接口独立记录密钥授权与真实用量。资料工具整理已完成的故事；玩家保留决定权。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
       "kind": "quote",
       "image": null,
       "extra": {},
@@ -316,7 +316,7 @@
           "Optional APIs handle authorization and usage records separately",
           "Material tools review completed stories; players retain decision authority"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Story characters are not Claude or GPT personas; model access is optional. Optional APIs handle authorization and usage records separately. Material tools review completed stories; players retain decision authority. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Story characters are not Claude or GPT personas; model access is optional. Optional APIs handle authorization and usage records separately. Material tools review completed stories; players retain decision authority. This revision merges the earlier direct character interaction with the historical route improvements."
       }
     },
     {
@@ -329,7 +329,7 @@
         "每次请求由用户点击，显示真实Token用量",
         "重复请求保护；超时不自动再次付费调用"
       ],
-      "notes": "【v08初版：未运行新的演示】落地还要回答三件事：凭据放哪里，费用怎样看，出错怎么办。我们把密钥留在当前页面内存，不写进游戏存档、PPT或导出记录；请求经本机接口到官方服务。每次调用由用户点击，实际Token另记。重复请求有保护，超时后不会自动再调用一次。线路的准备补给和真实模型账单分开，这能让后续课堂预算与商业成本都保持可追溯。",
+      "notes": "【v09初版：显示检查通过，未录制航程】落地还要回答三件事：凭据放哪里，费用怎样看，出错怎么办。我们把密钥留在当前页面内存，不写进游戏存档、PPT或导出记录；请求经本机接口到官方服务。每次调用由用户点击，实际Token另记。重复请求有保护，超时后不会自动再调用一次。线路的准备补给和真实模型账单分开，这能让后续课堂预算与商业成本都保持可追溯。",
       "kind": "architecture-small",
       "image": null,
       "extra": {},
@@ -341,7 +341,7 @@
           "Initiate each real request explicitly and record token usage",
           "Protect duplicate requests; never automatically repeat an uncertain paid call"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Implementation also requires operational boundaries. Keys remain in page memory and are not written into game saves, presentation files or exported records. The loopback gateway forwards a request to the selected official provider. Each call is initiated explicitly, and actual token usage is recorded separately from game supplies. Duplicate requests are protected. If an upstream timeout makes the outcome uncertain, the product does not automatically send another paid request. These controls help teachers or future customers understand and manage spending. They also preserve an honest distinction between a reproducible local workflow and a live model-assisted session."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Implementation also requires operational boundaries. Keys remain in page memory and are not written into game saves, presentation files or exported records. The loopback gateway forwards a request to the selected official provider. Each call is initiated explicitly, and actual token usage is recorded separately from game supplies. Duplicate requests are protected. If an upstream timeout makes the outcome uncertain, the product does not automatically send another paid request. These controls help teachers or future customers understand and manage spending. They also preserve an honest distinction between a reproducible local workflow and a live model-assisted session."
       }
     },
     {
@@ -354,7 +354,7 @@
         "交付：课堂航程、教师引导、来源与反思记录",
         "付费单元：班级/学期授权＋文化内容包"
       ],
-      "notes": "【v08初版：未运行新的演示】我们的首批验证客群是大学通识、人文与AI工具课程。这是基于产品结构提出的客群假设，并不代表已经有学校合作。老师获得的是一条可组织的课堂航程、讨论引导和可复核的学习过程；学生得到的不是一份生成答案，而是一次带证据作出安排的经历。商业上先验证按班级或学期授权，再考虑文化内容包和文博轻定制。早期先解决老师是否愿意重复使用，而不是急着宣称规模化。",
+      "notes": "【v09初版：显示检查通过，未录制航程】我们的首批验证客群是大学通识、人文与AI工具课程。这是基于产品结构提出的客群假设，并不代表已经有学校合作。老师获得的是一条可组织的课堂航程、讨论引导和可复核的学习过程；学生得到的不是一份生成答案，而是一次带证据作出安排的经历。商业上先验证按班级或学期授权，再考虑文化内容包和文博轻定制。早期先解决老师是否愿意重复使用，而不是急着宣称规模化。",
       "kind": "business",
       "image": null,
       "extra": {},
@@ -366,7 +366,7 @@
           "Deliver a classroom voyage, teaching prompts and evidence records",
           "Test class/term licensing, then cultural content packages"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Our first customer hypothesis is university general education, humanities and AI-literacy courses. This follows from the product structure; it is not a claim that a university has already become a customer. Teachers would receive an organized classroom voyage, discussion prompts and an inspectable learning process. Students would receive an evidence-based experience of making a decision, rather than just a generated answer. We would first validate class or term licensing, then consider cultural content packages and limited customization for cultural institutions. Early on, repeat use by teachers matters more than an unsupported story about immediate scale."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Our first customer hypothesis is university general education, humanities and AI-literacy courses. This follows from the product structure; it is not a claim that a university has already become a customer. Teachers would receive an organized classroom voyage, discussion prompts and an inspectable learning process. Students would receive an evidence-based experience of making a decision, rather than just a generated answer. We would first validate class or term licensing, then consider cultural content packages and limited customization for cultural institutions. Early on, repeat use by teachers matters more than an unsupported story about immediate scale."
       }
     },
     {
@@ -379,7 +379,7 @@
         "1920轮 × 0.03元/轮假设＝57.6元模型成本",
         "再计审核、支持与运维；单独看成本敏感性"
       ],
-      "notes": "【v08初版：未运行新的演示】为了让BP可以讨论，我们提供一组可替换的情景参数，不把它当成已验证定价。假设四十人上四周，每人每周十二轮，共一千九百二十轮。若每轮平均模型成本假设为三分钱，模型部分是五十七点六元，再加内容审核一百六十元、支持八十元和运维二十元，总可变成本三百一十七点六元。假设试验报价为九百九十九元，贡献余额为六百八十一点四元，尚未扣研发、获客和税费。真实试点要用导出的Token与工时替换这些假设，并看高成本情形是否仍可承受。",
+      "notes": "【v09初版：显示检查通过，未录制航程】为了让BP可以讨论，我们提供一组可替换的情景参数，不把它当成已验证定价。假设四十人上四周，每人每周十二轮，共一千九百二十轮。若每轮平均模型成本假设为三分钱，模型部分是五十七点六元，再加内容审核一百六十元、支持八十元和运维二十元，总可变成本三百一十七点六元。假设试验报价为九百九十九元，贡献余额为六百八十一点四元，尚未扣研发、获客和税费。真实试点要用导出的Token与工时替换这些假设，并看高成本情形是否仍可承受。",
       "kind": "economics",
       "image": null,
       "extra": {},
@@ -391,7 +391,7 @@
           "1,920 interactions × CNY 0.03 assumed average cost = CNY 57.60",
           "Add review, support and hosting; test cost sensitivity"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] To make the business plan discussable, we provide replaceable assumptions. Assume forty students, four weeks and twelve interactions per student per week: that is one thousand nine hundred and twenty interactions. At an assumed average model cost of three fen each, the model component is fifty-seven yuan and sixty fen. Add one hundred and sixty yuan for content review, eighty for support and twenty for hosting. Total variable cost is three hundred and seventeen yuan and sixty fen. Against an experimental class price of nine hundred and ninety-nine yuan, contribution is six hundred and eighty-one yuan and forty fen, before development, acquisition and tax. These are not validated prices. A pilot must replace the assumptions with actual token usage and labor, and test the higher-cost scenario."
+        "notes": "[v09 draft: display check passed; no voyage recording.] To make the business plan discussable, we provide replaceable assumptions. Assume forty students, four weeks and twelve interactions per student per week: that is one thousand nine hundred and twenty interactions. At an assumed average model cost of three fen each, the model component is fifty-seven yuan and sixty fen. Add one hundred and sixty yuan for content review, eighty for support and twenty for hosting. Total variable cost is three hundred and seventeen yuan and sixty fen. Against an experimental class price of nine hundred and ninety-nine yuan, contribution is six hundred and eighty-one yuan and forty fen, before development, acquisition and tax. These are not validated prices. A pilot must replace the assumptions with actual token usage and labor, and test the higher-cost scenario."
       }
     },
     {
@@ -404,7 +404,7 @@
         "访谈教师：是否愿意再用、愿为哪项价值付费",
         "用真实用量、审核工时与反馈更新BP"
       ],
-      "notes": "【v08初版：未运行新的演示】下一步我们希望招募一门课做小范围试点。先看学生能否走完、来源能否回溯、反思能否把证据和判断分开，再问老师愿不愿意重复使用，愿意为什么价值付费。用真实调用和审核工时更新成本，符合预设门槛再扩展。我们的核心观点是：技术提供能力，文明需要共同的判断；文明航程把这件事变成可以亲手做、也可以回头检查的过程。",
+      "notes": "【v09初版：显示检查通过，未录制航程】下一步我们希望招募一门课做小范围试点。先看学生能否走完、来源能否回溯、反思能否把证据和判断分开，再问老师愿不愿意重复使用，愿意为什么价值付费。用真实调用和审核工时更新成本，符合预设门槛再扩展。我们的核心观点是：技术提供能力，文明需要共同的判断；文明航程把这件事变成可以亲手做、也可以回头检查的过程。",
       "kind": "closing",
       "image": null,
       "extra": {},
@@ -416,7 +416,7 @@
           "Ask teachers whether and why they would use it again",
           "Update the business case with actual usage, labor and feedback"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] The next step is a small course pilot. First ask whether students can complete a voyage, whether references remain traceable, and whether reflection separates evidence from judgment. Then ask teachers whether they would use it again, and which value they would pay for. Real usage and review time should replace our cost assumptions before expansion. Our conclusion is simple: technology creates capabilities, while civilization requires shared judgment. Civilization Voyage turns that relationship into something people can act on, inspect and reconsider."
+        "notes": "[v09 draft: display check passed; no voyage recording.] The next step is a small course pilot. First ask whether students can complete a voyage, whether references remain traceable, and whether reflection separates evidence from judgment. Then ask teachers whether they would use it again, and which value they would pay for. Real usage and review time should replace our cost assumptions before expansion. Our conclusion is simple: technology creates capabilities, while civilization requires shared judgment. Civilization Voyage turns that relationship into something people can act on, inspect and reconsider."
       }
     },
     {
@@ -429,7 +429,7 @@
         "C 文明实践：07—09页；D 产品演示：10—11页",
         "E AI工具与商业BP：12—16页"
       ],
-      "notes": "【v08初版：未运行新的演示】姓名未提供，暂按仓库A—E岗位制作。A交接：问题已经明确，接下来比较怎样走。B交接：路径选好，看看能做成什么。C交接：理念进入操作，交给D演示。D交接：产品闭环已展示，交给E解释工具与落地。E负责总结与商业相关问答。",
+      "notes": "【v09初版：显示检查通过，未录制航程】姓名未提供，暂按仓库A—E岗位制作。A交接：问题已经明确，接下来比较怎样走。B交接：路径选好，看看能做成什么。C交接：理念进入操作，交给D演示。D交接：产品闭环已展示，交给E解释工具与落地。E负责总结与商业相关问答。",
       "kind": "team",
       "image": null,
       "extra": {},
@@ -441,7 +441,7 @@
           "C: Civilization practice, 07–09 | D: Product demo, 10–11",
           "E: AI tools and business plan, slides 12–16"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Names have not been supplied, so the deck uses the repository's A–E role assignments. Handoffs: A passes from a clear question to route comparison. B passes from the route to action. C passes from the design principle to the actual product. D passes from product evidence to E's implementation and business case. E leads the closing and business-related questions."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Names have not been supplied, so the deck uses the repository's A–E role assignments. Handoffs: A passes from a clear question to route comparison. B passes from the route to action. C passes from the design principle to the actual product. D passes from product evidence to E's implementation and business case. E leads the closing and business-related questions."
       }
     },
     {
@@ -454,7 +454,7 @@
         "后续改进：年代、地域、配图、连续后果与船只船员外观",
         "新版体验待验收；无密钥不声称完成付费模型实调"
       ],
-      "notes": "【v08初版：未运行新的演示】旧版基线c1a8fe8：保留玩家与人物直接交谈的形式。后续改进：年代、地域、配图、连续后果与船只船员外观。新版体验待验收；无密钥不声称完成付费模型实调。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
+      "notes": "【v09初版：显示检查通过，未录制航程】旧版基线c1a8fe8：保留玩家与人物直接交谈的形式。后续改进：年代、地域、配图、连续后果与船只船员外观。新版体验待验收；无密钥不声称完成付费模型实调。这版合并的是旧版玩家与岛上人物直接互动的形式，不是大副二副的角色方案。",
       "kind": "questions",
       "image": null,
       "extra": {},
@@ -466,7 +466,7 @@
           "Later improvements add chronology, geography, images, consequences and appearance upgrades",
           "Gameplay review is pending; paid model calls are unverified without credentials"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Baseline c1a8fe8 preserves direct player-to-character conversations. Later improvements add chronology, geography, images, consequences and appearance upgrades. Gameplay review is pending; paid model calls are unverified without credentials. This revision merges the earlier direct character interaction with the historical route improvements."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Baseline c1a8fe8 preserves direct player-to-character conversations. Later improvements add chronology, geography, images, consequences and appearance upgrades. Gameplay review is pending; paid model calls are unverified without credentials. This revision merges the earlier direct character interaction with the historical route improvements."
       }
     },
     {
@@ -479,7 +479,7 @@
         "技术：OpenAI Responses API、Claude Messages API",
         "课程：iSpace入口需登录，评分标准尚未取得"
       ],
-      "notes": "【v08初版：未运行新的演示】技术文档核对日期为2026年11月4日。模型型号是可修改的示例，不承诺任何账户均有权限。课程入口目前跳转登录页，未获取课程作业与评分标准，因此没有宣称已逐项满足课程评分要求。历史背景的来源与图片许可仍在游戏各站的来源栏目中。",
+      "notes": "【v09初版：显示检查通过，未录制航程】技术文档核对日期为2026年11月4日。模型型号是可修改的示例，不承诺任何账户均有权限。课程入口目前跳转登录页，未获取课程作业与评分标准，因此没有宣称已逐项满足课程评分要求。历史背景的来源与图片许可仍在游戏各站的来源栏目中。",
       "kind": "sources",
       "image": null,
       "extra": {
@@ -519,7 +519,7 @@
           "Official OpenAI Responses and Claude Messages documentation",
           "iSpace requires login; the course marking rubric was not accessible"
         ],
-        "notes": "[v08 draft: no new gameplay run for this revision.] Technical documentation was checked on November 4, 2026. Model identifiers are editable examples, not a promise of account access. The provided iSpace address redirects to a login page. We have not accessed the assignment or marking rubric and therefore do not claim rubric-by-rubric compliance. Original-language historical references and image licenses remain available in the game."
+        "notes": "[v09 draft: display check passed; no voyage recording.] Technical documentation was checked on November 4, 2026. Model identifiers are editable examples, not a promise of account access. The provided iSpace address redirects to a login page. We have not accessed the assignment or marking rubric and therefore do not claim rubric-by-rubric compliance. Original-language historical references and image licenses remain available in the game."
       }
     }
   ],
