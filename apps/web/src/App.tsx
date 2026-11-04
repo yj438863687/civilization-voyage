@@ -1176,6 +1176,14 @@ export function App() {
       }
       return bestAlong;
     };
+    const c = story.crisis;
+    if (!progress.crisis.includes(c.id) && Math.hypot(ship.x - c.at.x, ship.z - c.at.z) < 7) {
+      setCaption(null);
+      setCrisis(c.id);
+      return;
+    }
+    // 上一段旁白还在屏幕上：下一段等它读完再出。船快了，两段挨得近，不然前一段两秒就被盖掉
+    if (caption) return;
     const shipAt = along({ x: ship.x, z: ship.z });
     for (const b of story.beats) {
       if (progress.beats.includes(b.id)) continue;
@@ -1185,12 +1193,7 @@ export function App() {
         return;
       }
     }
-    const c = story.crisis;
-    if (!progress.crisis.includes(c.id) && Math.hypot(ship.x - c.at.x, ship.z - c.at.z) < 7) {
-      setCaption(null);
-      setCrisis(c.id);
-    }
-  }, [view, story, ship, enc, crisis, secret, landing, intro, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id]);
+  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id]);
 
   function finishSecret(o: Outcome, summary: string) {
     if (!voyage) return;
