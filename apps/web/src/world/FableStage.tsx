@@ -1,7 +1,8 @@
+import { HistoryMarker } from './HistoryMarker';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import type { Encounter } from './encounters';
+import type { Encounter, Stage } from './encounters';
 import { fableLive, type FableState } from './fable';
 import { Figure } from './Figure';
 import { IslandStage } from './IslandStages';
@@ -212,9 +213,16 @@ function StakesIsland({ state, reduceMotion }: { state: FableState; reduceMotion
   );
 }
 
+const STAGE_RESULTS: Partial<Record<Stage,[string,string,string]>> = {
+  stakes:['stakes','gap','closed'],gate:['gate','even','tilt'],
+  jars:['jars','full','low'],tally:['tally','full','missed'],
+  books:['eyes','open','half'],press:['book','printed','shelved'],
+};
+
 /** 一座有人住的小岛。stage 决定岛上的景，action 决定他在做什么 */
 export function FableIsland({
   id,
+  onEnter,
   enc,
   state,
   active,
@@ -222,6 +230,7 @@ export function FableIsland({
   reduceMotion,
 }: {
   id: string;
+  onEnter?: ()=>void;
   enc: Encounter;
   state: FableState;
   active: boolean;
@@ -229,12 +238,15 @@ export function FableIsland({
   shipAt: { x: number; z: number } | null;
   reduceMotion: boolean;
 }) {
+  const decision=state[`history:${id}`],result=enc.stage&&STAGE_RESULTS[enc.stage];
+  const sceneState=enc.history&&decision&&result?{...state,[result[0]]:result[decision==='care'?1:2]}:state;
   return (
     <group>
       <Mound />
-      {enc.stage === 'gate' && <GateIsland id={id} state={state} reduceMotion={reduceMotion} />}
-      {enc.stage === 'stakes' && <StakesIsland state={state} reduceMotion={reduceMotion} />}
-      {enc.stage && enc.stage !== 'gate' && enc.stage !== 'stakes' && <IslandStage stage={enc.stage} id={id} state={state} reduceMotion={reduceMotion} />}
+      {enc.history&&<group position={[3.6,1.2,-2.8]} rotation={[0,Math.PI*.75,0]} scale={.4}><HistoryMarker title={enc.history.title} onEnter={onEnter} image={enc.history.image} completed={!!state[`history:${id}`]}/></group>}
+      {enc.stage === 'gate' && <GateIsland id={id} state={sceneState} reduceMotion={reduceMotion} />}
+      {enc.stage === 'stakes' && <StakesIsland state={sceneState} reduceMotion={reduceMotion} />}
+      {enc.stage && enc.stage !== 'gate' && enc.stage !== 'stakes' && <IslandStage stage={enc.stage} id={id} state={sceneState} reduceMotion={reduceMotion} />}
       <group position={enc.stage === 'gate' ? [1.4, 1.2, -1.0] : [-1.2, 1.2, 0.6]} rotation={[0, Math.PI * 0.75, 0]} scale={1.3}>
         <Figure look={enc.look} action={enc.action ?? 'idle'} talking={active} reduceMotion={reduceMotion} lookAt={shipAt} />
       </group>

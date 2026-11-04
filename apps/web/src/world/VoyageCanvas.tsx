@@ -1,3 +1,5 @@
+import { nearestFragment } from './storyAccess';
+import { crewAppearance } from './progression';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -48,6 +50,10 @@ export interface ControlInput {
 }
 
 interface Props {
+  shipLevel?: number;
+  crewLevel?: number;
+  onStorySelect?: (id:string)=>void;
+  onStoryImage?: (id:string)=>void;
   mode: CamMode;
   reduceMotion: boolean;
   canSail: boolean;
@@ -411,6 +417,8 @@ function PortBeacon({
 }
 
 function Rig({
+  shipLevel = 0,
+  crewLevel = 0,
   sceneId: sceneIdForStyle,
   mode,
   reduceMotion,
@@ -621,19 +629,7 @@ function Rig({
       else if (harborDist > r * HARBOR_APPROACH.exit) approachHold.current = false;
     }
     approach = approachHold.current;
-    let nearFragment: string | null = null;
-    for (const f of world.fragments) {
-      if (collectedIds.includes(f.id)) continue;
-      // 不在这一条航道上的东西，既看不见也拾不到
-      if (f.lane !== 'both' && f.lane !== laneId) continue;
-      const staged = !!encounterFor(f.id)?.stage;
-      const cx = staged ? f.x + ISLAND_OFFSET.x : f.x;
-      const cz = staged ? f.z + ISLAND_OFFSET.z : f.z;
-      const rr = staged ? 6.2 + world.ship.radius * 0.3 + 3.5 : f.pickupRadius;
-      const dx = g.position.x - cx;
-      const dz = g.position.z - cz;
-      if (dx * dx + dz * dz < rr * rr) nearFragment = f.id;
-    }
+    const nearFragment = nearestFragment(world,laneId,{x:g.position.x,z:g.position.z},propsScene,collectedIds);
 
     let nearPortal: string | null = null;
     if (world.portal) {
@@ -786,7 +782,7 @@ function Rig({
       // 岛：船开不上去，贴着边滑过去，不扣耐久。正在跟你说话做事时，地形不挡道
       if (!autopilot && !water) {
         for (const f of world.fragments) {
-          if (!encounterFor(f.id)?.stage) continue;
+          if (!encounterFor(f.id)?.stage || (f.lane !== 'both' && f.lane !== laneId)) continue;
           const ix = f.x + ISLAND_OFFSET.x;
           const iz = f.z + ISLAND_OFFSET.z;
           const dx = g.position.x - ix;
@@ -1058,8 +1054,10 @@ function Rig({
             <Suspense fallback={null}>
               <TreasureShip
                 reduceMotion={reduceMotion}
+                shipLevel={shipLevel}
+                crewLevel={crewLevel}
                 style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']}
-                crew={DECK_CREW[propsScene] ?? DECK_CREW.test}
+                crew={crewAppearance(DECK_CREW[propsScene] ?? DECK_CREW.test, crewLevel)}
                 player={playerName ? { name: playerName, look: PLAYER_LOOK[propsScene] ?? PLAYER_LOOK.test } : null}
               />
             </Suspense>
@@ -1142,6 +1140,8 @@ export function VoyageCanvas(props: Props) {
           world={props.world}
           collectedIds={props.collectedIds}
           nearFragmentId={props.nearFragmentId}
+          onStorySelect={props.onStorySelect}
+          onStoryImage={props.onStoryImage}
           laneId={props.laneId}
           portalOpen={props.portalOpen ?? false}
           fableState={props.fableState}

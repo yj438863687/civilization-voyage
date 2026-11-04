@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useModalFocus } from './useModalFocus';
+import { HistoryRecap } from './History';
+import { ERA_NAMES, historyFor } from '../world/history';
+import { useEffect, useRef, useState } from 'react';
 import type { FableState } from '../world/fable';
 import { STORIES, type Beat, type Story } from '../world/stories';
 
@@ -40,6 +43,8 @@ export function ShoreOverlay({
   // 0 名字 · 1..n 独白 · n+1 原文 · n+2 意义
   const last = f.monologue.length + 2;
   const [step, setStep] = useState(0);
+  const panel=useRef<HTMLDivElement>(null);
+  useModalFocus(panel);
 
   useEffect(() => {
     if (step >= last) return;
@@ -59,11 +64,11 @@ export function ShoreOverlay({
   }, [step, last, onDone]);
 
   return (
-    <div className="shore" role="dialog" aria-label={`岸上的人：${f.name}`}>
+    <div className="shore" ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`岸上的人：${f.name}`} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();onDone();}}}>
       <div className="shore-scrim" aria-hidden />
       <p className="shore-arrival">{story.arrival}</p>
       <div className="shore-who">
-        <span className="shore-name">{f.name}</span>
+        <h2 className="shore-name" style={{margin:0}}>{f.name}</h2>
         <span className="shore-years">{f.years}</span>
         <span className="shore-deed">{f.deed}</span>
       </div>
@@ -93,10 +98,10 @@ export function ShoreOverlay({
 }
 
 const ERA_ORDER = ['A', 'B', 'C', 'D'] as const;
-const ERA_NAME: Record<string, string> = { A: '农业', B: '工业', C: '信息', D: '智能' };
+const ERA_NAME = ERA_NAMES;
 
 /**
- * 人类精神图谱：四个时代、八颗星。你走过的那条线亮着，并且连在一起；
+ * 文明航程足迹：四个时代、八颗星。你走过的那条线亮着，并且连在一起；
  * 没走的那条也在图上，暗着——它是另一种可能，不是错。
  */
 export function SpiritMap({
@@ -118,9 +123,9 @@ export function SpiritMap({
   }).filter(Boolean) as { x: number; y: number }[];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="spirit-map" role="img" aria-label="人类精神图谱">
+    <svg viewBox={`0 0 ${W} ${H}`} className="spirit-map" role="img" aria-label="文明航程足迹">
       <text x={W / 2} y={20} textAnchor="middle" className="spirit-title">
-        人类精神图谱
+        文明航程足迹
       </text>
       {/* 时代的列 */}
       {ERA_ORDER.map((e, i) => (
@@ -195,6 +200,10 @@ export function StoryPage({
   onDone: () => void;
 }) {
   const lines = story.page?.(state) ?? [];
+  const [era, lane] = storyId.split('-');
+  const historical = historyFor(era, lane);
+  const panel = useRef<HTMLDivElement>(null);
+  useModalFocus(panel);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key === ' ' || e.key === 'Enter') {
@@ -206,18 +215,18 @@ export function StoryPage({
     return () => window.removeEventListener('keydown', key);
   }, [onDone]);
   return (
-    <div className="page" role="dialog" aria-label={`这一程的故事：${story.title}`}>
-      <div className="page-paper">
+    <div className={`page${historical ? ' is-history' : ''}`} role="dialog" aria-modal="true" aria-label={`这一程的故事：${story.title}`} onKeyDown={event => event.stopPropagation()}>
+      <div className="page-paper" ref={panel} tabIndex={-1}>
         <span className="page-kicker">这一程的故事</span>
         <h2 className="page-title">{story.title}</h2>
-        {storyId === 'A-near' ? <GateTale state={state} /> : story.art && story.artNames && <TaleArt story={story} state={state} />}
-        <div className="page-lines">
+        {historical ? <HistoryRecap era={era} lane={lane} state={state} /> : storyId === 'A-near' ? <GateTale state={state} /> : story.art && story.artNames && <TaleArt story={story} state={state} />}
+        {!historical && <div className="page-lines">
           {lines.map((l, i) => (
             <p key={i} style={{ animationDelay: `${0.8 + i * 1.1}s` }}>
               {l}
             </p>
           ))}
-        </div>
+        </div>}
         {story.concept && (
           <div className="page-concept" style={{ animationDelay: `${1.2 + lines.length * 1.1}s` }}>
             <span className="page-concept-name">{story.concept.name}</span>

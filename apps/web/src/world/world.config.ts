@@ -1,3 +1,4 @@
+import { HISTORY_ROUTES } from './history';
 /** World data is configuration, not render code. Scene-keyed, stamps stay honest. */
 
 import { STERN_HALL } from './hull';
@@ -578,6 +579,25 @@ for (const id of ['A', 'B', 'C', 'D'] as const) {
     f.x = at.x;
     f.z = at.z;
     f.pickupRadius = 7;
+  }
+}
+
+// 内海讲中国，外海讲世界；年代、人物和收集记录来自同一套内容。
+for (const [key, route] of Object.entries(HISTORY_ROUTES)) {
+  const [era, laneId] = key.split('-') as ['A' | 'B' | 'C' | 'D', LaneId];
+  const world = WORLDS[era];
+  const lane = world.lanes.find(lane => lane.id === laneId)!;
+  lane.name = laneId === 'near' ? '内海 · 中国' : '外海 · 世界';
+  lane.promise = `${route.title}。${route.question}`;
+  lane.waypoints.forEach((point, index) => { point.label = index === 0 ? route.period : index <= 2 ? `${route.islands[index - 1].date} · ${route.islands[index - 1].title}` : `${route.crisis.date} · ${route.crisis.title}`; });
+  for (const island of route.islands) {
+    const fragment = world.fragments.find(fragment => fragment.id === island.id)!;
+    fragment.title = island.title;
+    fragment.what = island.title;
+    fragment.why = island.paragraphs[0];
+    fragment.text = `${island.date} · ${island.nature}。${island.paragraphs.join(' ')} 互动情境与台词为创作。`;
+    fragment.classification = 'creative';
+    fragment.sources = [{ id: `history-${island.id}`, title: island.source.title, url: island.source.url, license: '链接参考，未转载原文', verification: 'unverified' }];
   }
 }
 

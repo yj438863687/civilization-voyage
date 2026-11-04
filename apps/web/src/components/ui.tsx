@@ -14,7 +14,7 @@ export type StampKind =
 
 const STAMP_TITLE: Record<StampKind, string> = {
   test: '测试数据，不代表任何文明或真实费用。',
-  pending: 'AI 的建议，组员还没确认。',
+  pending: '内容草案，仍待审核。',
   fact: '有可核对的材料，请连同出处读。',
   counter: '依据材料推想，结果取决于条件。',
   creative: '为这段体验创作，不作历史依据。',

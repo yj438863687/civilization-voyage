@@ -1,0 +1,15 @@
+.voyage-music { position: relative; font: 13px/1.5 var(--cv-font-body); color: inherit; flex-shrink: 0; }
+.voyage-music > summary { display: flex; gap: 6px; align-items: center; min-height: 44px; border: 1px solid currentColor; padding: 6px 10px; cursor: pointer; box-sizing: border-box; list-style: none; }
+.voyage-music > summary::-webkit-details-marker { display: none; }
+.voyage-music svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+.voyage-music[data-playing="true"] svg { color: #c49b52; }
+.music-panel { position: absolute; z-index: 12; bottom: calc(100% + 8px); right: 0; width: min(260px,75vw); padding: 18px; border: 1px solid #a18b67; background: #eee3ce; color: #302d25; box-shadow: 0 12px 28px #0004; box-sizing: border-box; }
+.voyage-music[data-placement="below"] .music-panel { top: calc(100% + 8px); bottom: auto; }
+.music-panel strong { font-size: 17px; }
+.music-panel p { font-size: 12px; line-height: 1.6; margin-block: 8px; }
+.music-panel label { display: grid; gap: 10px; margin-block: 16px; }
+.music-panel input { width: 100%; accent-color: #344f48; }
+.shipyard-compare { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; }
+.history-session-bar { flex-wrap: wrap; }
+.history-session-bar > span { margin-right: auto; }
+@media(max-width:600px) { .history-session-bar { gap: 6px; } .history-session-bar > span { flex: 1 1 100%; } .history-session-bar .voyage-music { margin-right: auto; } .shipyard-compare { flex-wrap: wrap; } }

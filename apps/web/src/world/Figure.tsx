@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { Action, Look } from './encounters';
-import { Mascot, Person } from './People';
+import { Person } from './People';
 import { RiggedPerson } from './RiggedPerson';
 
 /**
@@ -30,11 +30,13 @@ export function Figure(props: {
  */
 export function EraDeckCrew({
   crew,
+  crewLevel = 0,
   player,
   deckY,
   reduceMotion,
 }: {
   crew: [Look, Look];
+  crewLevel?: number;
   player?: { name: string; look: Look } | null;
   deckY: number;
   reduceMotion?: boolean;
@@ -49,10 +51,12 @@ export function EraDeckCrew({
       )}
       {/* 大副与二副：戴着这个时代的帽子，站在船的右舷。两人会互相看 */}
       <group position={[1.58, deckY, -1.55]} rotation={[0, -0.5, 0]} scale={1.45}>
-        <Mascot kind="claude" hat={crew[0].hat} reduceMotion={reduceMotion} phase={0.3} buddy={[-0.2, 0, 2.6]} />
+        <Person look={crew[0]} reduceMotion={reduceMotion} phase={0.3} action="watch" />
+        {crewLevel >= 3 && <CrewBadge />}
       </group>
       <group position={[1.48, deckY, 1.05]} rotation={[0, -0.9, 0]} scale={1.45}>
-        <Mascot kind="gpt" hat={crew[1].hat} reduceMotion={reduceMotion} phase={1.7} buddy={[0.2, 0, -2.6]} />
+        <Person look={crew[1]} reduceMotion={reduceMotion} phase={1.7} action="count" />
+        {crewLevel >= 3 && <CrewBadge />}
       </group>
     </group>
   );
@@ -147,3 +151,7 @@ export function LaneKeeper({
   );
 }
 
+
+function CrewBadge() {
+  return <mesh position={[-0.1, 1.38, 0.24]}><torusGeometry args={[0.075, 0.018, 6, 16]} /><meshStandardMaterial color="#dcbd84" metalness={0.65} roughness={0.35} /></mesh>;
+}

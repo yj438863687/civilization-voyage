@@ -1,3 +1,4 @@
+import { HistoryMarker } from './HistoryMarker';
 import { Figure as Human } from './Figure';
 import type { Figure } from './stories';
 
@@ -7,11 +8,13 @@ import type { Figure } from './stories';
 /** 码头上的那个人：比船员高一点，有一盏灯照着，面朝来船 */
 export function ShoreFigure({
   figure,
+  onEnter,
   at,
   face,
   reduceMotion,
 }: {
   figure: Figure;
+  onEnter?: ()=>void;
   at: { x: number; z: number };
   face: number;
   reduceMotion: boolean;
@@ -23,7 +26,7 @@ export function ShoreFigure({
         <meshStandardMaterial color="#4a4238" roughness={0.9} />
       </mesh>
       <group position={[0, 0.24, 0]} scale={1.9}>
-        <Human look={figure.look} reduceMotion={reduceMotion} phase={2.2} />
+        {figure.image ? <HistoryMarker onEnter={onEnter} image={figure.image} completed /> : <Human look={figure.look} reduceMotion={reduceMotion} phase={2.2} />}
       </group>
       {/* 一盏立灯：远远就看见岸上站着一个人 */}
       <mesh position={[1.3, 1.6, 0.3]}>

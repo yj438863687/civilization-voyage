@@ -1,3 +1,6 @@
+import { CultureCityBuildings, type CityStyle } from '../components/CultureCity';
+import type { DemoPriority } from './presentationDemo';
+import { HistoryMarker } from './HistoryMarker';
 import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
@@ -107,7 +110,7 @@ function LampHead({
 }
 
 /** 港口：可认路的剪影。突堤、仓库体块、灯杆、桅樯。不复原真实建筑。 */
-function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string }) {
+function PortSilhouette({ port, sceneId, city }: { port: PortPlace; sceneId: string; city?:{priority:DemoPriority;style:CityStyle} }) {
   const lamp = cssVar('--cv-ship-lamp-warm', '#f0b46a');
   const core = cssVar('--cv-ship-lamp-core', '#ffd9a0');
   const trim = cssVar('--cv-ship-trim', '#c9a15a');
@@ -146,7 +149,7 @@ function PortSilhouette({ port, sceneId }: { port: PortPlace; sceneId: string })
         <meshStandardMaterial color="#2a2521" roughness={0.9} />
       </mesh>
 
-      {kind === 'riverbank' ? (
+      {city?<group position={[0,.48,-1]} scale={1.2}><CultureCityBuildings priority={city.priority} style={city.style}/></group>:kind === 'riverbank' ? (
         <>
           {/* 农业：缓坡河岸、木桩、粮仓、低矮茅顶 */}
           <mesh position={[0, 0.34, 0]} rotation={[0, 0.12, 0]} receiveShadow>
@@ -934,6 +937,8 @@ export function Atmosphere({
   world,
   collectedIds,
   nearFragmentId,
+  onStorySelect,
+  onStoryImage,
   laneId,
   portalOpen = false,
   fableState = {},
@@ -947,6 +952,8 @@ export function Atmosphere({
   world: WorldConfig;
   collectedIds: string[];
   nearFragmentId: string | null;
+  onStorySelect?: (id:string)=>void;
+  onStoryImage?: (id:string)=>void;
   laneId: string;
   portalOpen?: boolean;
   /** 这条航线上已经发生的事 */
@@ -1048,7 +1055,7 @@ export function Atmosphere({
         />
       ))}
       {world.ports.map((p) => (
-        <PortSilhouette key={p.id} port={p} sceneId={sceneId} />
+        <PortSilhouette key={p.id} port={p} sceneId={sceneId} city={fableState['city:built']?{priority:fableState['city:built']==='production'?'production':'community',style:(['ancient','modern','future'].includes(fableState['city:style'])?fableState['city:style']:'ancient') as CityStyle}:undefined} />
       ))}
       {/* 这条航线的戏：沿途岸上的景，和码头上等着你的那个人 */}
       <TaoyuanScene era={sceneId} found={taoyuanFound} reduceMotion={reduceMotion} />
@@ -1059,7 +1066,7 @@ export function Atmosphere({
         .filter((f) => collectedIds.includes(f.id) && f.lane === laneId && encounterFor(f.id)?.stage)
         .map((f) => (
           <group key={`isle-${f.id}`} position={[f.x + ISLAND_OFFSET.x, 0, f.z + ISLAND_OFFSET.z]}>
-            <FableIsland id={f.id} enc={encounterFor(f.id)!} state={fableState} active={false} shipAt={fableLive.ship} reduceMotion={reduceMotion} />
+            <FableIsland id={f.id} onEnter={()=>onStoryImage?.(f.id)} enc={encounterFor(f.id)!} state={fableState} active={false} shipAt={fableLive.ship} reduceMotion={reduceMotion} />
           </group>
         ))}
       {(() => {
@@ -1071,6 +1078,7 @@ export function Atmosphere({
           <>
             {story.crisis.stage && (
               <group position={[story.crisis.at.x + VILLAGE_OFFSET.x, 0, story.crisis.at.z + VILLAGE_OFFSET.z]}>
+                {story.crisis.enc.history&&<group position={[5,1.2,-2]} scale={.4}><HistoryMarker image={story.crisis.enc.history.image} completed={crisisDone} title={story.crisis.enc.history.title} onEnter={()=>onStoryImage?.(story.crisis.id)}/></group>}
                 {story.crisis.stage === 'flood' ? (
                   <FloodVillage state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
                 ) : (
@@ -1080,6 +1088,7 @@ export function Atmosphere({
             )}
             <ShoreFigure
               figure={story.figure}
+              onEnter={()=>onStorySelect?.('shore')}
               at={fig}
               face={Math.atan2(story.crisis.at.x - fig.x, story.crisis.at.z - fig.z)}
               reduceMotion={reduceMotion}
@@ -1098,6 +1107,7 @@ export function Atmosphere({
               <group position={[ISLAND_OFFSET.x, 0, ISLAND_OFFSET.z]}>
                 <FableIsland
                   id={f.id}
+                  onEnter={()=>onStoryImage?.(f.id)}
                   enc={encounterFor(f.id)!}
                   state={fableState}
                   active={nearFragmentId === f.id}
