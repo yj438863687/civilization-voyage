@@ -1,3 +1,5 @@
+import { IslandBackground } from './components/IslandBackground';
+import { ISLAND_BACKGROUNDS } from './world/islandBackgrounds';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from './api/client';
 import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Usage, type Voyage, type VoyageRecord } from './api/types';
@@ -313,6 +315,7 @@ export function App() {
   const [bootError, setBootError] = useState<string | null>(null);
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem(MOTION_KEY) === '1' || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [comms, setComms] = useState(false);
+  const [backgroundId,setBackgroundId]=useState<string|null>(null);
   const [webgl, setWebgl] = useState(true);
   const [title, setTitle] = useState('玄览一问');
   const [scenePick, setScenePick] = useState<Scene | null>(null);
@@ -403,7 +406,7 @@ export function App() {
   };
   const encRef = useRef<string | null>(null);
   // 听人说话、看结果时船停下；轮到你做事时，键盘归船
-  encRef.current = encPhase === 'play' ? null : (enc ?? crisis ?? secret);
+  encRef.current = backgroundId ? 'background-reading' : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
   const shipRef = useRef<ShipSnapshot | null>(null);
 
   const connected = models.length > 0;
@@ -1129,7 +1132,7 @@ export function App() {
 
   // 船经过旁白点、危机点：戏自己发生
   useEffect(() => {
-    if (view !== 'world' || !ship || enc || crisis || secret || landing > 0 || intro) return;
+    if (view !== 'world' || !ship || backgroundId || enc || crisis || secret || landing > 0 || intro) return;
     // 暗线 · 桃花源：铜针不指它，只有顺着桃花瓣才找得到
     const era = voyage?.scene_id ?? '';
     const tao = stats.secrets.taoyuan;
@@ -1193,7 +1196,7 @@ export function App() {
         return;
       }
     }
-  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id]);
+  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id, backgroundId]);
 
   function finishSecret(o: Outcome, summary: string) {
     if (!voyage) return;
@@ -1233,11 +1236,11 @@ export function App() {
   // 旁白只在真的露出来的时候计时：遭遇、危机把它遮住的那几秒不算，结束后接着读
   // 桃花那一句是暗示，短一些，别把这一程的开场「起」顶到岛后面去
   useEffect(() => {
-    if (!caption || enc || crisis) return;
+    if (!caption || enc || crisis || backgroundId) return;
     const secs = caption.id === 'tao-hint' ? 3500 : reduceMotion ? 4000 : 7000;
     const t = window.setTimeout(() => setCaption(null), secs);
     return () => window.clearTimeout(t);
-  }, [caption, reduceMotion, enc, crisis]);
+  }, [caption, reduceMotion, enc, crisis, backgroundId]);
 
   // 靠岸后，先见岸上的人，再落印
   useEffect(() => {
@@ -1326,7 +1329,7 @@ export function App() {
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
+          canSail={view === 'world' && !backgroundId && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
           water={water}
           onWaterDone={(r) => {
             setWaterResult(r);
@@ -1900,6 +1903,9 @@ export function App() {
           </div>
         </div>
       )}
+
+      {backgroundId&&<IslandBackground id={backgroundId} onClose={()=>setBackgroundId(null)}/>}
+      {view==='world'&&nearFrag&&ISLAND_BACKGROUNDS[nearFrag.id]&&!enc&&!crisis&&!secret&&<button className="island-background-entry" type="button" onClick={()=>{setInput({forward:0,turn:0});setBackgroundId(nearFrag.id);}}>图片背景 · {encounterFor(nearFrag.id)?.who}</button>}
 
       {view === 'world' && nearFragment && nearFrag && !nearFragCollected && !enc && (
         <button className={`interact-prompt${nearPort ? ' interact-prompt-with-port' : ''}`} type="button" disabled={busy} onClick={() => startEncounter()}>

@@ -1,0 +1,35 @@
+{
+  "id": "D",
+  "version": 1,
+  "status": "pending",
+  "label": "AI 推荐，待组员确认：智能 · 从驾驶到设定目的地",
+  "background": "第四段航程：船开始自己看星、自己画航线、自己生成下一个港口；人只负责说去哪里。航程从「人划桨」变成「人定方向，机器航行」。",
+  "cultural_core": "把方向交出去之前，先弄清你还想不想改。",
+  "questions": [
+    "船能自己生成下一个港口。你要它去的地方，是谁的地方？"
+  ],
+  "fragments": [
+    "模型自绘星图（创作）",
+    "目的地的定义（创作）",
+    "被略过的港（创作）"
+  ],
+  "interactions": [
+    "给船写一个目的地，再让它自己找一条你没想过的路",
+    "审一遍它略过的港，决定要不要加回去"
+  ],
+  "economy": "以虚构的算力与航次讨论自动化的成本，不把「更自动」当成「更对」",
+  "educational_value": "练习在自动化系统前保留判断：目标由谁设定、路径由谁审",
+  "sources": [
+    {
+      "id": "D-source",
+      "title": "本项目创作（无外部史料）",
+      "url": "https://github.com/yj438863687/civilization-voyage",
+      "license": "MIT",
+      "verification": "unverified"
+    }
+  ],
+  "needs_verification": [
+    "本段全部为创作与推演，不得标为史实",
+    "「AI 生成航线」的具体能力边界需与实现一致"
+  ]
+}

@@ -1,0 +1,13 @@
+.island-background-entry { position: fixed; right: 20px; top: 26%; z-index: 25; padding: 10px 14px; min-height: 44px; border: 1px solid #b69a65; background: #14242b; color: #f0e4ca; font: 14px/1.5 var(--cv-font-body); cursor: pointer; }
+.island-background { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px; background: rgb(5 10 13 / .75); }
+.island-background-paper { width: min(720px,100%); max-height: 90dvh; overflow: auto; overscroll-behavior: contain; padding: 24px; background: #eee2c9; color: #302b23; border: 1px solid #b69a65; line-height: 1.8; text-align: left; }
+.island-background-paper header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.island-background-paper h2 { margin: 0; font: 500 24px/1.5 var(--cv-font-display); }
+.island-background-paper figure { margin: 20px 0; }
+.island-background-paper img { display: block; max-width: 100%; max-height: 44dvh; margin-inline: auto; object-fit: contain; }
+.island-background-paper figcaption, .island-background-note { font-size: 12px; line-height: 1.7; }
+.island-background-paper .btn { min-height: 44px; color: #302b23; border-color: #8e7751; }
+.island-background-paper a { color: #68421f; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.island-background-paper summary { cursor: pointer; min-height: 44px; }
+.island-background-paper :is(button,a,summary):focus-visible { outline: 2px solid #86472d; outline-offset: 3px; }
+@media(max-width:600px) { .island-background-entry { right: 12px; top: 29%; } .island-background-paper { padding: 18px; } }

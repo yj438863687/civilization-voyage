@@ -5,10 +5,14 @@
 *.pem
 *.key
 .DS_Store
-node_modules/
+node_modules
 dist/
 coverage/
 .venv/
 __pycache__/
 .pytest_cache/
 *.sqlite3*
+
+.impeccable/
+deliverables/
+apps/web/public/presentation/

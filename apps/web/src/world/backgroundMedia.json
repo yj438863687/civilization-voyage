@@ -1,0 +1,128 @@
+{
+  "water": {
+    "src": "/background/water.jpg",
+    "title": "The \"Fish Mouth\" Dujiangyan - panoramio.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:The_%22Fish_Mouth%22_Dujiangyan_-_panoramio.jpg",
+    "author": "Colin W",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "caption": "都江堰鱼嘴分水堤的现代照片，供理解分水结构；不是传说时代的影像。"
+  },
+  "yu": {
+    "src": "/background/yu.jpg",
+    "title": "King Yu of Xia.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:King_Yu_of_Xia.jpg",
+    "author": "Ma Lin",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "南宋马麟所绘禹像，是后世对传说人物的想象。"
+  },
+  "lin": {
+    "src": "/background/lin.jpg",
+    "title": "Portrait of Lin Zexu.jpeg",
+    "url": "https://commons.wikimedia.org/wiki/File:Portrait_of_Lin_Zexu.jpeg",
+    "author": "Lam Qua",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "林则徐的后世画像。"
+  },
+  "wei": {
+    "src": "/background/wei.jpg",
+    "title": "Wei Yuan.png",
+    "url": "https://commons.wikimedia.org/wiki/File:Wei_Yuan.png",
+    "author": "叶衍兰",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "魏源画像。"
+  },
+  "loom": {
+    "src": "/background/loom.jpg",
+    "title": "Luddite.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Luddite.jpg",
+    "author": "Unknown. 195 years since publication, copyright extinguished",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "卢德运动的历史版画；表现工业化中的劳作冲突，并非所述工厂的实拍。"
+  },
+  "telegraph": {
+    "src": "/background/telegraph.jpg",
+    "title": "Telegraph key found in Viet Cong tunnel.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Telegraph_key_found_in_Viet_Cong_tunnel.jpg",
+    "author": "ArnoldReinhold",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "caption": "20 世纪电键的实物照片，只示意电报操作，不是 1871 年上海的设备。"
+  },
+  "computer": {
+    "src": "/background/computer.jpg",
+    "title": "Tianhe-2.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Tianhe-2.jpg",
+    "author": "O01326",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "caption": "天河二号超级计算机的照片，作为计算设施背景；不是未来港口或人物照片。"
+  },
+  "eliza": {
+    "src": "/background/eliza.jpg",
+    "title": "ELIZA conversation.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:ELIZA_conversation.jpg",
+    "author": "Unknown authorUnknown author",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "ELIZA 对话界面的示例图。"
+  },
+  "go": {
+    "src": "/background/go.jpg",
+    "title": "Go board.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Go_board.jpg",
+    "author": "Donarreiskoffer",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "caption": "十九路围棋棋盘，用来理解棋局规则，并非 AlphaGo 比赛现场照片。"
+  },
+  "cangjie": {
+    "src": "/background/cangjie.jpg",
+    "title": "Cangjie2.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Cangjie2.jpg",
+    "author": "Unknown authorUnknown author",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "后世绘制的仓颉形象，不是传说人物的真实肖像。"
+  },
+  "pigeon": {
+    "src": "/background/pigeon.jpg",
+    "title": "Carrier Pigeon (PSF).jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Carrier_Pigeon_(PSF).jpg",
+    "author": "Pearson Scott Foresman",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "信鸽线描图，不是原故事中某一只鸽子的画像。"
+  },
+  "pony": {
+    "src": "/background/pony.jpg",
+    "title": "Remington Coming and Going of the Pony Express.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Remington_Coming_and_Going_of_the_Pony_Express.jpg",
+    "author": "Frederic Remington",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "雷明顿描绘驿马快信的画作，并非现场照片。"
+  },
+  "houji": {
+    "src": "/background/houji.png",
+    "title": "后稷.png",
+    "url": "https://commons.wikimedia.org/wiki/File:%E5%90%8E%E7%A8%B7.png",
+    "author": "Shibo77",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "后世绘制的后稷形象，补充农耕传说背景。"
+  },
+  "rocket": {
+    "src": "/background/rocket.jpg",
+    "title": "Loco Rocket of China.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Loco_Rocket_of_China.jpg",
+    "author": "(unknown)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "中国“龙号”蒸汽机车的历史图像；游戏中的人物对话与选择为创作。"
+  }
+}
