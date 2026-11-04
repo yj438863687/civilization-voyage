@@ -955,24 +955,24 @@ function Rig({
       toShip.divideScalar(dist);
       const side = new THREE.Vector3(-toShip.z, 0, toShip.x);
       const want = new THREE.Vector3(stageAt.x, 0, stageAt.z)
-        .addScaledVector(toShip, stageAt.dist ?? 12.5)
-        .addScaledVector(side, (stageAt.dist ?? 12.5) * 0.32)
+        .addScaledVector(toShip, stageAt.dist ?? 16.5)
+        .addScaledVector(side, (stageAt.dist ?? 16.5) * 0.32)
         .setY(stageAt.h ?? 6.0);
       const k = 1 - Math.exp(-clamped / (reduceMotion ? 0.01 : 0.55));
       camera.position.lerp(want, k);
       look.lerp(new THREE.Vector3(stageAt.x, 2.4, stageAt.z), k);
       camera.up.copy(UP);
       camera.lookAt(look);
-      persp.fov = THREE.MathUtils.lerp(persp.fov, 38, k);
+      persp.fov = THREE.MathUtils.lerp(persp.fov, 42, k);
       persp.updateProjectionMatrix();
     } else if (mode === 'follow' && blend.current >= 1) {
       // 跟船弹簧：距离、横移、高度、注视点都按当前船型长度缩放，
       // 否则蒸汽船（L=26）船头出画、木筏（L=14）又空得只剩海。
       const L = SHIP_L * camScale;
       const vw = view.current;
-      const dist = (approach ? L * 0.95 : L * 1.45) * vw.zoom;
+      const dist = (approach ? L * 1.1 : L * 1.85) * vw.zoom;
       const az = THREE.MathUtils.clamp(((approach ? 60 : 35) * Math.PI) / 180 + vw.yaw, -1.4, 1.4);
-      const el = ((approach ? 12 : 18) * Math.PI) / 180 + vw.pitch;
+      const el = ((approach ? 13 : 20) * Math.PI) / 180 + vw.pitch;
       const dBack = dist * Math.cos(az) * Math.cos(el);
       const dRight = dist * Math.sin(az) * Math.cos(el);
       const dHeight = dist * Math.sin(el) + 2 + (camScale - 1) * 3;
@@ -1000,7 +1000,7 @@ function Rig({
       }
       camera.up.copy(UP);
       camera.lookAt(look);
-      persp.fov = THREE.MathUtils.lerp(persp.fov, approach ? 46 : 54, 1 - Math.exp(-clamped / 0.35));
+      persp.fov = THREE.MathUtils.lerp(persp.fov, approach ? 48 : 58, 1 - Math.exp(-clamped / 0.35));
       persp.updateProjectionMatrix();
     } else {
       camera.position.lerpVectors(blendFrom.current, pose.pos, k);

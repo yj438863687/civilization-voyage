@@ -20,6 +20,6 @@ export const fableLive = {
 };
 
 /** 童话小岛摆在材料旁边多远：船靠近材料时，岛正好在镜头里 */
-export const ISLAND_OFFSET = { x: 7.5, z: -3 };
+export const ISLAND_OFFSET = { x: 9.5, z: -3.5 };
 /** 危机里的村子相对危机点的位置 */
-export const VILLAGE_OFFSET = { x: 9, z: -9 };
+export const VILLAGE_OFFSET = { x: 11.5, z: -11 };
