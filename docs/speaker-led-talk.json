@@ -1,0 +1,134 @@
+[
+  {
+    "role": "A",
+    "kind": "cover",
+    "en": "Civilization Voyage",
+    "note_en": "A | Open with the purpose of the talk rather than a list of features. Civilization Voyage is a working history game organized around a recurring question: when a new capability becomes available, how do people arrange its benefits and costs? We use a ship because it needs both provisions and people willing to continue. Today we will follow one decision through the game, then put our own project through the same discipline: what value do we create, who carries the work, and who might pay to use it?"
+  },
+  {
+    "role": "A",
+    "kind": "case",
+    "en": "The village is dry.\nThe next field is flooded.",
+    "note_en": "A | Begin inside the first agricultural China scene. The village raises its dike and protects its own fields. Water collects beyond the boundary. Ask the audience to hold two observations at once: the work has achieved a local objective, and somebody else bears a cost. This encounter is a fictional reconstruction of a flood-control legend; it is not a documented conversation. We chose it because the consequences can be understood before anyone needs an economic term. Let the scene establish the problem that the rest of the presentation will explain."
+  },
+  {
+    "role": "A",
+    "kind": "mechanism",
+    "en": "Follow the gain.\nThen follow the cost.",
+    "note_en": "A | The currently opened Dr.Dan讲书 article, 目标与代价的循环，从李录框架看中国资产切换, moves from an observed change to resource allocation, the party bearing a cost, and a conditional practical interpretation. I take that sequence as a useful way to ask questions about our game. We are not importing its macroeconomic figures, asset predictions or proposed historical cycle into the product. Here the player can inspect a much smaller causal chain: a decision changes resources and cooperation, which changes the next scene. This is our interpretation of the article's reasoning method, written in our own words. Progress can benefit several parties; the task is to make consequential costs visible rather than assume every gain requires a victim."
+  },
+  {
+    "role": "B",
+    "kind": "eras",
+    "en": "Four eras. Four arrangements to examine.",
+    "note_en": "B | The eras organize questions rather than rank civilizations. Agriculture raises questions about allocation and upkeep. Industry changes production and the organization of labour. Information changes whose experience is recorded and transmitted. AI changes the scope of delegation and responsibility. Each historical route has its own chronology; the eras can overlap in calendar time. The same technology can operate under different arrangements. The player should therefore be able to explain a local choice, not simply memorize a verdict about an entire age."
+  },
+  {
+    "role": "B",
+    "kind": "route",
+    "en": "A decision should outlive its island.",
+    "note_en": "B | This explains the structure of a route. Two island encounters lead into a shared crisis and then a return to shore. The first choice establishes an arrangement; a later scene tests what that arrangement has left behind. The closing character belongs to the historical setting and recalls the choices the player actually made. In the China agriculture route, Gun and Yu are introduced as legends, then the route reaches a historical Dujiangyan setting. Li Bing's closing conversation is written for the game and identified as reconstruction."
+  },
+  {
+    "role": "B",
+    "kind": "ledger",
+    "en": "What does one decision change?",
+    "note_en": "B | Read the actual choice values rather than hiding behind the word tradeoff. At the first China agriculture encounter, protecting the village gives seven supplies and removes five trust; agreeing to a shared outlet costs six supplies and adds eight trust. A task result settles separately. Earlier cooperation can return three supplies at a later scene, but trust at twenty or below suspends that support. These are designed game values, not measurements of human welfare. Their function is to make a relationship between a decision now and a constraint later playable. Cooperation can still fail when material reserves are exhausted."
+  },
+  {
+    "role": "B",
+    "kind": "seas",
+    "en": "Two settings make the question harder.",
+    "note_en": "B | The inner sea follows China; the outer sea follows world settings. Together they give four eras, eight routes and twenty-four scenes. Compare arrangements in context rather than treating a civilization as a universal model. The China agriculture route moves from flood-control legends to Warring States Dujiangyan; the world agriculture route concerns grain and records in Mesopotamia. Later routes cover industrial power, communication and AI. Legends and imagined future scenes are labelled, and source notes remain available. Differences between settings are material to the inquiry."
+  },
+  {
+    "role": "C",
+    "kind": "failure",
+    "en": "An exhausted resource stops the voyage.",
+    "note_en": "C | Failure gives the decisions a consequence. Supplies at fifteen or below reduce sailing speed by thirty percent; at zero the ship stops. Trust at twenty or below suspends cooperation support; at zero crew members withdraw. The player can record a bad ending or pay for recovery. Recovery removes two hundred score, resets the combo and lowers the relevant upgrade tier. Supply recovery restores thirty-five supplies but also costs twenty hull condition. Trust recovery restores thirty trust. Values and tiers have zero floors. Choices remain saved. We have checked the installed build, reload persistence and evaluation before harbour replenishment."
+  },
+  {
+    "role": "C",
+    "kind": "upgrades",
+    "en": "The ship and crew carry the history.",
+    "note_en": "C | The ship makes capacity visible: supplies pay for hull refits and navigation equipment that appear on the sailing model. Crew outfits show the development of shared identity. Trust is an unlock threshold, so buying an outfit does not consume trust. The original characters remain recognizable. Losing a tier during recovery gives an interruption a visible history; the player does not emerge untouched from a failed arrangement. These upgrades support the story about maintaining capability and cooperation rather than being a separate reward screen."
+  },
+  {
+    "role": "C",
+    "kind": "evidence",
+    "en": "Players should see where a story begins.",
+    "note_en": "C | A source supports a historical setting; it does not authenticate dialogue we have written. The optional image entrance distinguishes a modern explanatory photograph, a later portrait, a legendary account and an imagined future. It preserves the original island characters, scene and subtitles in the main game. Reading the notes does not award resources or complete a scene. This makes interpretation inspectable. Historical and image credits are maintained in the game; the Dujiangyan setting includes UNESCO material and the legends refer to Shiji, Xia Ben Ji."
+  },
+  {
+    "role": "D",
+    "kind": "video",
+    "en": "Follow a choice into its consequences.",
+    "note_en": "D | Introduce the film in one sentence, then let it play. This is actual gameplay recorded from prepared demonstration saves and edited with game sound, synthetic narration and captions. It shows sailing, island interaction, visible upgrades, resource failure, recovery, a saved bad ending and a return to shore. The MP4 lasts approximately two minutes and forty-three seconds and is embedded here. The independent MP4 is the backup. This demonstration establishes observable implemented behaviour; it is not a continuous playthrough or evidence of classroom impact."
+  },
+  {
+    "role": "D",
+    "kind": "skills",
+    "en": "Capability leaves a further decision.",
+    "note_en": "D | The four task forms ask the player to steer through gates, hold position, collect useful objects or verify a sequence. Successfully completing an action creates a possibility; the player then decides how its result is used. That separation supports discussion. After the demonstration, invite the audience to name who benefited from one choice, who carried a cost, and what the next scene inherited. The game gives a facilitator concrete choices to discuss. E will now ask whether packaging that experience can become a deliverable that a teacher and a purchaser value."
+  },
+  {
+    "role": "E",
+    "kind": "workflow",
+    "en": "AI changed the cost of building.\nSelection and delivery still take work.",
+    "note_en": "E | Connect the tools to the business argument. Git history records the independent framework, then design, FastAPI contracts and React/Three.js handoffs. Local integration added SQLite saves, browser checks and a desktop wrapper; history, sound, upgrades and bilingual display were later revisions. The documents assign design to Claude, API work to Codex and web/3D work to Grok; they are a record of handoffs, not an audit of every model call. Lovable is a useful parallel for describe, build, synchronize with GitHub and continue locally. The repository does not establish a Lovable origin. Faster construction leaves us responsible for choosing coherent stories and delivering a session people can use. Sources: scripts/dev.sh, docs/handoffs/, Git commits c150efd through a75e93b; https://docs.lovable.dev/introduction/welcome and /integrations/github ."
+  },
+  {
+    "role": "E",
+    "kind": "buyer",
+    "en": "Who plays, who uses it, who pays?",
+    "note_en": "E | Choose a concrete initial customer hypothesis: a history teacher preparing a technology-and-society lesson in a secondary-school setting. The learner wants agency and a comprehensible story. The teacher needs a coherent, source-linked session with manageable preparation. A department or school budget holder needs a clear purchase, an acceptable delivery burden and a reason to approve another session. Those roles may overlap, but they should not be conflated. The first proposal is one facilitated class. We have not verified curriculum fit, access to a budget or willingness to pay. Those are the interviews and pilot decisions we need next."
+  },
+  {
+    "role": "E",
+    "kind": "alternatives",
+    "en": "We compete with the lesson already planned.",
+    "note_en": "E | The relevant comparison begins with a teacher's existing choice. Teacher-made slides offer control and familiarity; our preparation burden has to be low enough to justify a change. A factual quiz offers a quick way to check recall; we need to show the value of discussing consequences. A longer history game may offer immersion; our route needs to fit an actual class. These are comparison hypotheses, not tested claims that other products lack value. We would observe current lesson preparation, ask what the teacher would otherwise use and compare explanation quality, setup effort and willingness to run the session again. A working 3D world alone does not establish an advantage."
+  },
+  {
+    "role": "E",
+    "kind": "offer",
+    "en": "Make the first purchase easy to understand.",
+    "note_en": "E | Propose one unit of sale: one facilitated class with a route, source notes, a run guide and a debrief sheet. The current game and source notes are implemented. The classroom run guide, evaluation sheet and repeatable delivery process must be completed and tested before selling that package as ready. Route packs and licences can be considered after repeat use supports them. Open source code is available under MIT; the commercial proposition must therefore come from the reviewed content, preparation saved, facilitation and reliable support. No signed orders, active customers or paid learning results are claimed."
+  },
+  {
+    "role": "E",
+    "kind": "economics",
+    "en": "The first purchase must cover its real work.",
+    "note_en": "E | This is an illustrative first-purchase model, not observed pricing or cost. Assume three thousand yuan for one class, twelve hundred in direct delivery cost and six hundred to acquire that customer. Contribution after those variable costs is twelve hundred, before fixed costs, tax and further development. If direct delivery cost rises to eighteen hundred, contribution falls to six hundred; at six hundred delivery cost it rises to eighteen hundred. The pilot budget on the later page distinguishes eighteen thousand in fixed launch work from twelve thousand held for delivery operations. Covering that eighteen-thousand fixed amount would require fifteen baseline first purchases, thirty at the higher delivery cost or ten at the lower cost. This assumes every purchase bears the full acquisition cost. Repeat purchases would change the calculation; retention is unmeasured. The delivery reserve is cash held for operations and is not added again as fixed expense."
+  },
+  {
+    "role": "E",
+    "kind": "demand",
+    "en": "Follow the buyer through the second decision.",
+    "note_en": "E | A free or subsidized pilot can show whether the session can be used, but we must distinguish that evidence from a paid purchasing decision. Track a facilitator agreeing to try a route, running it, asking to repeat it, obtaining budget approval and paying for another session. Record the denominator and the time required at each step. The proposed first recruitment is three classes of twenty learners; those sixty places are a target, not achieved attendance or paying accounts. The learner is not our unit of sale in this first model. A request for another session is useful evidence; the buyer's approved payment tests whether the value supports a transaction."
+  },
+  {
+    "role": "E",
+    "kind": "reuse",
+    "en": "What improves with the next class?",
+    "note_en": "E | The potential compounding asset is a route that becomes easier to prepare, explain and support across repeated classes. Historical review improves the source notes; observed confusion improves the choices and guide; delivery records show where support time is spent. Those improvements can make the next session less costly. This is a proposed advantage to earn, not a proven moat or network effect. An MIT codebase can be reused by others. Our position would have to rest on a coherent reviewed library, a trusted facilitator relationship and a delivery process that actually saves work. The pilot needs to test all three."
+  },
+  {
+    "role": "E",
+    "kind": "budget",
+    "en": "Separate launch work from delivery cash.",
+    "note_en": "E | Keep the accounting consistent with the session model. The illustrative thirty-thousand-yuan pilot cash envelope allocates twelve thousand to source/content review and six thousand to product hardening: eighteen thousand of fixed launch work. Nine thousand for facilitation/evaluation and three thousand for hosting/support form a twelve-thousand operating reserve. Reserve cash becomes expense as work is delivered; it should not be counted again on top of the per-session direct cost. These are planning allocations, not money raised, supplier quotations or approved budgets. The purpose of the pilot is to replace these assumptions with actual effort and purchasing evidence."
+  },
+  {
+    "role": "E",
+    "kind": "gates",
+    "en": "Invest again when the constraint is understood.",
+    "note_en": "E | Set the next decision around evidence. Can a teacher run a route with the guide and manageable support? Can learners explain an earlier choice and its later consequence while distinguishing the source from reconstruction? Will the responsible budget holder approve a paid repeat? If setup remains difficult, spend on the guide and reliability before commissioning more scenes. If the explanation remains unclear, revise the route. If teachers want it but budgets do not follow, revisit the package and purchaser. These are proposed decision gates. A small pilot can reveal the next constraint; it cannot establish market size, lifetime value or causal educational impact."
+  },
+  {
+    "role": "E",
+    "kind": "closing",
+    "en": "Let the next class decide what deserves to grow.",
+    "note_en": "E | Return to the scene that opened the talk. In the game, a technical gain changes other people's work and the conditions of the next decision. Our project faces a related discipline. A capability to build quickly becomes useful when learners understand the choices, teachers can deliver the session and a purchaser values the result enough to return. We are looking for three pilot classrooms, historical reviewers and a budget owner willing to examine the offer. The next commitment is to learn what deserves another investment. Reference method: the already-opened Dr.Dan讲书 article 目标与代价的循环，从李录框架看中国资产切换; its financial predictions and macroeconomic numbers are not adopted here. Broader business design references: https://www.strategyzer.com/library/what-is-a-business-model ; https://www.isc.hbs.edu/strategy/Pages/strategy-explained.aspx ; https://articles.sequoiacap.com/writing-a-business-plan . All wording and application to Civilization Voyage are original. The HarbourMind public palette and the user-provided BP remain visual and structural references; its private business data is not reused."
+  }
+]
