@@ -1230,11 +1230,14 @@ export function App() {
     return () => cancelAnimationFrame(raf);
   }, [crisis]);
 
+  // 旁白只在真的露出来的时候计时：遭遇、危机把它遮住的那几秒不算，结束后接着读
+  // 桃花那一句是暗示，短一些，别把这一程的开场「起」顶到岛后面去
   useEffect(() => {
-    if (!caption) return;
-    const t = window.setTimeout(() => setCaption(null), reduceMotion ? 4000 : 7000);
+    if (!caption || enc || crisis) return;
+    const secs = caption.id === 'tao-hint' ? 3500 : reduceMotion ? 4000 : 7000;
+    const t = window.setTimeout(() => setCaption(null), secs);
     return () => window.clearTimeout(t);
-  }, [caption, reduceMotion]);
+  }, [caption, reduceMotion, enc, crisis]);
 
   // 靠岸后，先见岸上的人，再落印
   useEffect(() => {
