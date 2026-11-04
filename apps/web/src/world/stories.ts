@@ -88,29 +88,29 @@ export interface Story {
 /* ---------------- 航线几何：所有时代共用 ---------------- */
 
 export const SPAWN = { x: 0, z: 34 };
-export const FORK = { x: 0, z: 18 };
-export const NEAR_MID = { x: 19, z: 8 };
+export const FORK = { x: 0, z: 8 };
+export const NEAR_MID = { x: 34, z: -2 };
 // 第二座岛离码头远一点（>24）：否则在码头的减速区里做事，船像在爬
-export const NEAR_STOP = { x: 44, z: 9 };
+export const NEAR_STOP = { x: 74, z: -14 };
 // 危机点必须在靠港范围（半径 18）以外，否则还没到就能靠港
-export const NEAR_CRISIS = { x: 56, z: -9 };
-export const FAR_MID = { x: -20, z: 6 };
-export const FAR_STOP = { x: -31, z: -14 };
-export const FAR_CRISIS = { x: -12, z: -33 };
+export const NEAR_CRISIS = { x: 84, z: -50 };
+export const FAR_MID = { x: -34, z: -4 };
+export const FAR_STOP = { x: -64, z: -30 };
+export const FAR_CRISIS = { x: -44, z: -66 };
 
 const NB = {
   b1: { x: 0, z: 27 },
-  b2: { x: 10, z: 16 },
-  b3: { x: 31, z: 5 },
+  b2: { x: 17, z: 3 },
+  b3: { x: 54, z: -8 },
 };
 const FB = {
   b1: { x: 0, z: 27 },
-  b2: { x: -10, z: 15 },
-  b3: { x: -25, z: -3 },
+  b2: { x: -17, z: 2 },
+  b3: { x: -49, z: -17 },
 };
 // 景放在航线外侧：近岸线的景在东边，外海线的景在西边
-const NP = { p1: { x: 17, z: 30 }, p2: { x: 29, z: 21 }, p3: { x: 62, z: 18 } };
-const FP = { p1: { x: -17, z: 30 }, p2: { x: -33, z: 19 }, p3: { x: -47, z: -6 } };
+const NP = { p1: { x: 18, z: 30 }, p2: { x: 46, z: 12 }, p3: { x: 96, z: -26 } };
+const FP = { p1: { x: -18, z: 30 }, p2: { x: -52, z: 8 }, p3: { x: -84, z: -44 } };
 
 /* ---------------- 岸上人物的穿着 ---------------- */
 

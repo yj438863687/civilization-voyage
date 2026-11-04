@@ -64,17 +64,18 @@ function reefLine(a: { x: number; z: number }, b: { x: number; z: number }, side
 
 // 出港那一段留干净的水；分叉之后，礁石在航道外侧 11 左右，直走不会碰到，抄近路会
 const BASE_REEFS: Reef[] = [
-  ...reefLine(FORK, NEAR_MID, 1, 3, 3, 11),
-  ...reefLine(NEAR_MID, NEAR_STOP, 1, 4, 3, 11),
-  ...reefLine(NEAR_STOP, NEAR_CRISIS, -1, 5, 2, 10),
-  ...reefLine(FORK, FAR_MID, -1, 6, 3, 11),
-  ...reefLine(FAR_MID, FAR_STOP, -1, 7, 3, 11),
-  ...reefLine(FAR_STOP, FAR_CRISIS, 1, 8, 2, 10),
+  ...reefLine(FORK, NEAR_MID, 1, 3, 3, 14),
+  ...reefLine(NEAR_MID, NEAR_STOP, 1, 4, 3, 14),
+  ...reefLine(NEAR_STOP, NEAR_CRISIS, -1, 5, 2, 13),
+  ...reefLine(FORK, FAR_MID, -1, 6, 3, 14),
+  ...reefLine(FAR_MID, FAR_STOP, -1, 7, 3, 14),
+  ...reefLine(FAR_STOP, FAR_CRISIS, 1, 8, 2, 13),
   // 两条航道之间的那片三角水域：走直线从分叉点直冲港口的人，会撞上这几块
   // （出生点周围 22 以内不放：那里是开局的大殿）
-  { x: 8, z: -6, r: 2.2, h: 1.1 },
-  { x: -4, z: -2, r: 1.8, h: 0 },
-  { x: 14, z: -12, r: 2.0, h: 0.8 },
+  { x: 12, z: -30, r: 2.2, h: 1.1 },
+  { x: -10, z: -22, r: 1.8, h: 0 },
+  { x: 26, z: -62, r: 2.0, h: 0.8 },
+  { x: -22, z: -58, r: 2.0, h: 0 },
 ];
 
 export const SEA_STATES: Record<string, SeaState> = {

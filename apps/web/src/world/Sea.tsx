@@ -861,9 +861,9 @@ function SeaFurniture({ sceneId, reduceMotion }: { sceneId: string; reduceMotion
 
       {sceneId === 'B' &&
         [
-          [-40, -46, 9],
-          [-52, -30, 7],
-          [-34, -58, 11],
+          [-40, -112, 9],
+          [-52, -100, 7],
+          [-34, -124, 11],
         ].map(([x, z, h], i) => (
           <group key={i} position={[x, 0, z]}>
             <mesh position={[0, h / 2, 0]}>
@@ -881,7 +881,7 @@ function SeaFurniture({ sceneId, reduceMotion }: { sceneId: string; reduceMotion
         Array.from({ length: 9 }, (_, i) => {
           const x = -44 + i * 11;
           return (
-            <group key={i} position={[x, 0, -52]}>
+            <group key={i} position={[x, 0, -118]}>
               <mesh position={[0, 2.4, 0]}>
                 <cylinderGeometry args={[0.05, 0.06, 4.8, 6]} />
                 <meshStandardMaterial color={stone} roughness={0.7} metalness={0.4} />
@@ -897,7 +897,7 @@ function SeaFurniture({ sceneId, reduceMotion }: { sceneId: string; reduceMotion
       {sceneId === 'D' &&
         Array.from({ length: 7 }, (_, i) => {
           const x = -40 + i * 13;
-          const z = -46 - (i % 3) * 7;
+          const z = -112 - (i % 3) * 7;
           return (
             <group key={i} position={[x, 0, z]}>
               <mesh position={[0, 0.4, 0]} rotation={[0, i * 0.4, 0]}>

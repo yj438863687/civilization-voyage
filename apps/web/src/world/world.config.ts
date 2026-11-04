@@ -70,7 +70,7 @@ export type WorldConfig = {
 };
 
 const SHARED = {
-  bounds: { minX: -70, maxX: 70, minZ: -70, maxZ: 70 },
+  bounds: { minX: -150, maxX: 150, minZ: -160, maxZ: 70 },
   ship: { maxSpeed: 17, reverseSpeed: 7, accel: 6, turn: 1.1, radius: 6 },
   spawn: { x: SPAWN.x, z: SPAWN.z, yaw: 0 },
   camera: {
@@ -148,8 +148,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       {
         id: 'test-port',
         name: '玄览启航港',
-        x: 26,
-        z: -16,
+        x: 22,
+        z: -96,
         radius: 12,
         pierLength: 10,
         mark: 'creative',
@@ -157,7 +157,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       },
     ],
     lanes: LANES('海图残页', '未开口的人', '沿岸', '外海', '短，能早一点靠港', '远，多遇见一件没人问起的事'),
-    portal: { x: 6, z: -40, radius: 8, to: 'A', label: '农业 · 从漂流到靠岸' },
+    portal: { x: 6, z: -130, radius: 8, to: 'A', label: '农业 · 从漂流到靠岸' },
     fragments: [
       {
         id: 'chart-scrap',
@@ -218,8 +218,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       {
         id: 'riverbank-port',
         name: '河岸港（候选）',
-        x: 26,
-        z: -16,
+        x: 22,
+        z: -96,
         radius: 12,
         pierLength: 10,
         mark: 'pending',
@@ -227,7 +227,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       },
     ],
     lanes: LANES('第一粒种子', '粮仓记号', '沿岸', '外海', '贴着河岸走，先看到界桩与泥板', '绕出去，先看到囤粮的那一头'),
-    portal: { x: 6, z: -40, radius: 8, to: 'B', label: '工业 · 从风帆到蒸汽' },
+    portal: { x: 6, z: -130, radius: 8, to: 'B', label: '工业 · 从风帆到蒸汽' },
     fragments: [
       {
         id: 'A-water',
@@ -301,8 +301,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       {
         id: 'steam-port',
         name: '蒸汽港（候选）',
-        x: 26,
-        z: -16,
+        x: 22,
+        z: -96,
         radius: 12,
         pierLength: 12,
         mark: 'pending',
@@ -310,7 +310,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       },
     ],
     lanes: LANES('汽压表', '锅炉工班次', '近岸', '外海', '沿航线走，一路看表、看班次', '绕开礁线，多看到一班人的夜'),
-    portal: { x: 6, z: -40, radius: 8, to: 'C', label: '信息 · 从海上到电波' },
+    portal: { x: 6, z: -130, radius: 8, to: 'C', label: '信息 · 从海上到电波' },
     fragments: [
       {
         id: 'B-coal',
@@ -384,8 +384,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       {
         id: 'signal-port',
         name: '信号港（候选）',
-        x: 26,
-        z: -16,
+        x: 22,
+        z: -96,
         radius: 12,
         pierLength: 11,
         mark: 'pending',
@@ -393,7 +393,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       },
     ],
     lanes: LANES('海底电缆接头', '时区分界', '贴岸', '绕岛', '信号最强，但图上只剩亮点', '信号弱，多看到一处时差'),
-    portal: { x: 6, z: -40, radius: 8, to: 'D', label: '智能 · 从驾驶到设定目的地' },
+    portal: { x: 6, z: -130, radius: 8, to: 'D', label: '智能 · 从驾驶到设定目的地' },
     fragments: [
       {
         id: 'C-relay',
@@ -467,8 +467,8 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
       {
         id: 'auto-port',
         name: '自绘港（候选）',
-        x: 26,
-        z: -16,
+        x: 22,
+        z: -96,
         radius: 12,
         pierLength: 11,
         mark: 'pending',
