@@ -6,9 +6,9 @@ export const SHIP_UPGRADES = [
   { name: '挂起船队旗', cost: 34, detail: '形成远行船型：双体支撑、甲板起重架或太阳能设备，升起船队旗' },
 ];
 export const CREW_UPGRADES = [
-  { name: '整齐的常服', trust: 55, detail: '船员换上靛蓝常服，保留各自的工具' },
-  { name: '齐备的行装', trust: 65, detail: '船员换上护帽与铜色衣饰' },
-  { name: '共同的船徽', trust: 75, detail: '船员佩戴船队徽饰，服装加入暖金色细节' },
+  { name: '整齐的常服', trust: 55, detail: '深靛蓝与灰青常服，配窄领和小纽扣，保留各自工具' },
+  { name: '齐备的行装', trust: 65, detail: '合身的平顶软帽、浅色袖口与皮质腰带' },
+  { name: '共同的船徽', trust: 75, detail: '领口收边与小型黄铜船徽，不叠加大面积金饰' },
 ];
 export function shipUpgradeReason(stats: VoyageStats): string | null {
   const upgrade = SHIP_UPGRADES[stats.shipLevel];
@@ -28,5 +28,5 @@ export function upgradeCrew(stats: VoyageStats): VoyageStats {
 }
 export function crewAppearance(crew: [Look, Look], level: number): [Look, Look] {
   if (!level) return crew;
-  return crew.map((look, index) => ({ ...look, coat: index ? '#345966' : '#2c3e50', trim: level >= 3 ? '#dcbd84' : level >= 2 ? '#ad8443' : look.trim, hat: level >= 2 ? index ? 'cap' : 'wrap' : look.hat, prop: level >= 3 && index ? 'ledger' : look.prop })) as [Look, Look];
+  return crew.map((look, index) => ({ ...look, coat: index ? '#435a5b' : '#263944', trim: level >= 3 ? '#a78f62' : '#9b927f', hat: 'cap', prop: level >= 3 && index ? 'ledger' : look.prop })) as [Look, Look];
 }

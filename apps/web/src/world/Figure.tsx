@@ -1,3 +1,4 @@
+import { localize } from '../i18n';
 import { Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
@@ -46,7 +47,7 @@ export function EraDeckCrew({
       {player && (
         <group position={[-1.62, deckY, -0.9]} rotation={[0, 0.5, 0]} scale={1.3}>
           <Figure look={player.look} action="idle" reduceMotion={reduceMotion} phase={0.9} />
-          <NameTag text={player.name} y={2.28} />
+          <NameTag text={localize(player.name)} y={2.28} />
         </group>
       )}
       {/* 大副与二副：戴着这个时代的帽子，站在船的右舷。两人会互相看 */}

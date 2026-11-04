@@ -1,0 +1,92 @@
+/* Readable text over the existing ink-sea world; language never changes the scene. */
+:root{--cv-text-xs:14px;--cv-text-sm:15px;--cv-text-md:17px;--cv-text-faint:#c6bdac;--cv-text-muted:#d5cbb9;--cv-hud-scrim:rgb(8 18 24 / .94);--cv-reading-size:17px;--cv-label-size:14px}
+html[data-large-text='true']{--cv-text-xs:16px;--cv-text-sm:18px;--cv-text-md:20px;--cv-reading-size:20px;--cv-label-size:16px;font-size:20px}
+.language-controls{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:90;display:flex;gap:4px;padding:4px;background:#102027;border:1px solid #9b8359;border-radius:5px;color:#f4ead8}
+.language-controls button{font:500 14px/1.4 var(--cv-font-body);min-height:40px;padding:7px 11px;border:1px solid transparent;background:transparent;color:inherit;white-space:nowrap}
+.language-controls button[aria-pressed='true']{background:#e8dcc6;color:#20312f;border-color:#e8dcc6}
+.language-controls button:focus-visible{outline:2px solid #f4d493;outline-offset:2px}
+.hud-world-card{background:#0b1821f2;border-color:#786c53;max-width:390px}
+.hud-world-card .hud-quest{font-size:clamp(18px,1.8vw,24px);line-height:1.5;color:#f6efe0}
+.hud-history-step,.hud-relic-name,.hud-player,.hud-sail,.hud-bl .faint{font-size:var(--cv-label-size);line-height:1.6;color:#f0e2c8;letter-spacing:.025em}
+.hud-stats{min-width:150px;background:#0b1821ed;padding:10px 12px;gap:8px;border:1px solid #786c53;border-radius:4px}
+.hud-stat{font-size:var(--cv-label-size);line-height:1.5;color:#f4ead8;letter-spacing:.02em;align-items:baseline}
+.hud-stat b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.hud-bl .faint,.hud-player,.hud-sail{background:#0b1821ed;padding:4px 8px;border-radius:3px;max-width:260px}
+.hud-br{align-items:center;max-width:min(70vw,820px)}
+.hud-br .hud-action,.hud-br .voyage-music>summary{font-size:var(--cv-label-size);min-height:44px;color:#f4ead8;background:#102027f5;border-color:#9b8359;letter-spacing:0;padding:9px 12px}
+.hud-relic-key,.compass-key,.interact-prompt kbd{font-size:16px;color:#fff0cc}
+.interact-prompt,.portal-hint{background:#0b1821ed;border:1px solid #9b8359;padding:12px 18px;max-width:min(720px,calc(100vw - 24px));white-space:normal;line-height:1.6}
+.interact-prompt{font-size:var(--cv-reading-size)}
+.enc{padding-top:115px;max-height:100dvh;overflow-y:auto;gap:10px}
+.enc-who,.enc-line,.enc-talk,.enc-how,.enc-result{max-width:min(70ch,94vw)}
+.enc-role,.enc-hint,.enc-how,.talk-who,.shore-years,.shore-deed,.shore-tag,.story-cap-title,.story-cap-kicker,.enc-result-delta,.enc-crisis,.enc-secret{font-size:var(--cv-label-size);line-height:1.7;letter-spacing:.035em;color:#edddc1}
+.enc-talk{max-height:34dvh;overflow-y:auto;padding:12px 18px;background:#0b1821eb;border-radius:5px;scrollbar-color:#ae946b #102027}
+.talk-line.is-you,.talk-line.is-them,.enc-line,.enc-cause,.enc-result-text,.shore-line,.page-lines p{font-size:var(--cv-reading-size);line-height:1.85;letter-spacing:.01em}
+.enc-result{background:#0b1821eb;padding:16px 20px;border-radius:5px}
+.enc-how{display:flex;flex-wrap:wrap;justify-content:center;background:#0b1821ed;padding:8px 12px;border-radius:4px}
+.enc-water-prog,.enc-water-left{font-size:16px;color:#f4ead8}
+.enc-decision p,.enc-decision button,.enc-decision small{font-size:var(--cv-reading-size);line-height:1.7}
+.enc-decision{max-height:58dvh;width:min(800px,94vw)}
+.shore{padding-top:95px}.shore-arrival{font-size:var(--cv-label-size);color:#e4d6be;letter-spacing:.025em;max-width:70ch;line-height:1.7}
+.shore-mono,.shore-deed,.shore-meaning,.page-lines{max-width:70ch}
+.shore-meaning p,.page-concept p{font-size:var(--cv-reading-size);line-height:1.85}
+.island-background-paper,.shipyard-panel{font-size:var(--cv-reading-size);line-height:1.85;padding-top:22px}
+.island-background-paper figcaption,.island-background-note,.shipyard-catalog span,.shipyard-catalog small{font-size:var(--cv-label-size);line-height:1.75;color:#514535}
+.shipyard-catalog button{white-space:normal;overflow-wrap:break-word}
+.island-background-entry{font-size:var(--cv-label-size);max-width:min(340px,calc(100vw - 24px));line-height:1.6}
+.cine-embark{padding-top:78px}.cine-embark-actions{flex-wrap:wrap}.cine-embark-main{min-width:0}
+.cine-embark-note,.cine-embark-foot,.cine-scene-note,.cine-reading-blind,.cine-material-src,.cine-end-body,.cine-sealed-line{font-size:var(--cv-label-size);color:#d8ccb6;line-height:1.75}
+html[lang='en'] :is(.label,.enc-name,.enc-role,.enc-hint,.story-cap-title,.story-cap-kicker,.shore-name,.shore-years,.page-title,.page-concept-name,.cine-embark-title,.cine-scene-title,.cine-embark-era,.portal-hint-name,.portal-hint-kicker,.hud-player b){letter-spacing:0;word-spacing:normal}
+html[lang='en'] :is(h1,h2,h3,button,p,figcaption,summary){overflow-wrap:break-word}
+html[lang='en'] .enc-name{font-size:clamp(21px,2.6vw,34px);max-width:85vw}
+html[lang='en'] .cine-embark-title{font-size:clamp(2rem,4vw,3.4rem)}
+@media(max-width:700px){
+ .language-controls{top:8px;right:10px}.language-controls button{padding:7px 9px}
+ .hud-tl{top:68px;left:12px;max-width:calc(100vw - 24px)}.hud-world-card{max-width:calc(100vw - 24px);padding:10px 12px;gap:5px}.hud-world-card .hud-quest{font-size:18px}
+ .hud-bl{bottom:86px;left:12px}.hud-stats{min-width:140px;max-width:175px}.hud-stat b{font-size:21px}
+ .hud-br{left:12px;right:12px;bottom:12px;max-width:none;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;background:#102027f5;padding:5px;border:1px solid #786c53;scrollbar-color:#ae946b #102027}
+ .hud-br>*{flex:0 0 auto}.hud-br .hud-action{white-space:nowrap}.hud-br .music-panel{position:fixed;bottom:82px;right:12px;z-index:80}
+ .enc{padding:115px 12px 95px}.enc>.encounter-return{top:66px}.enc-talk{max-height:29dvh;padding:10px 12px}.enc-role{max-width:90vw}.enc-cause{max-height:15dvh;overflow:auto}
+ .enc:has(.enc-water){padding-bottom:112px}.enc-how{gap:8px}.enc-decision{max-height:52dvh}.enc-decision>div{grid-template-columns:minmax(0,1fr)}
+ .interact-prompt{bottom:88px}.island-background-entry{top:28%;right:12px;max-width:220px}
+ .shipyard-overlay,.island-background{padding-top:68px;padding-bottom:12px}.shipyard-panel,.island-background-paper{max-height:calc(100dvh - 84px)}
+ .shore{padding:95px 18px 100px;align-content:start}.shore-name{font-size:30px}.shore-mono{min-height:0}.shore-line{font-size:var(--cv-reading-size)}
+ .page{padding-top:75px}.page-paper{max-height:calc(100dvh - 90px);overflow-y:auto}.page-concept-name{letter-spacing:.1em}
+}
+
+.enc-gate-legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(660px,90vw);text-align:left}.enc-gate-legend>div{min-width:0;padding:10px 12px;background:#0b1821f2;border:1px solid #9b8359;border-radius:4px}.enc-gate-legend strong{display:block;font-size:16px;line-height:1.5;color:#fff0cf}.enc-gate-legend span{display:block;font-size:14px;line-height:1.6;color:#e0d2bc;margin-top:4px}
+
+.enc{align-content:safe end}.enc .enc-hint{pointer-events:auto;min-height:44px;padding:8px 16px;background:#102027;border:1px solid #a58c5e;border-radius:4px;color:#f3e6cb}
+
+/* Keep English controls at their natural width and preserve readable selection states. */
+.hud-br .hud-action{width:auto;flex:0 0 auto;white-space:nowrap;line-height:1.4}
+.enc>.encounter-return{background:#102027;color:#f4ead8;border:1px solid #b69a65;min-height:44px;font-size:var(--cv-label-size)}
+.enc-line.is-up,.enc-cause.is-up{display:none}
+.shipyard-catalog button[aria-pressed='true'] :is(span,small){color:#f2e5cc}
+.shipyard-panel button:disabled{opacity:1;color:#67573e;background:#e4d9c3;border-style:dashed}
+.interact-prompt{width:min(680px,calc(100vw - 24px))}
+@media(max-width:700px){
+ .hud-bl{width:calc(100vw - 24px);right:12px;bottom:86px}
+ .hud-bl .sailing-instruments{display:grid;grid-template-columns:86px minmax(0,1fr);gap:5px;width:100%;padding:8px;background:#0b1821f5}
+ .sailing-heading{grid-column:1/-1;font-size:12px;line-height:1.5;white-space:normal;letter-spacing:0}
+ .sailing-instruments .compass{grid-column:1;grid-row:2 / span 2;width:68px;height:68px;margin:8px}
+ .sailing-instruments .joystick{grid-column:1;grid-row:4;width:76px;height:76px}
+ .sailing-instruments .hud-player{grid-column:2;grid-row:2;flex-direction:row;gap:8px;padding:3px 5px;max-width:none;align-items:baseline}
+ .sailing-instruments .hud-player b{font-size:16px;letter-spacing:0}
+ .sailing-instruments .hud-sail{grid-column:2;grid-row:3;max-width:none;padding:3px 5px}
+ .sailing-instruments .hud-stats{grid-column:2;grid-row:4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;min-width:0;max-width:none;padding:5px;gap:5px;margin:0}
+ .sailing-instruments .hud-stat{flex-direction:column;align-items:center;gap:2px;font-size:14px;line-height:1.5}
+ .sailing-instruments .hud-stat b{font-size:21px}
+ .sailing-instruments>.faint{grid-column:1/-1;grid-row:5;max-width:none;font-size:12px;line-height:1.5;margin:0}
+ .chart-hud{position:absolute;left:0;bottom:calc(100% + 8px);width:80px;padding:4px}.chart-hud .chart-map{width:70px}.chart-hud-note{display:none}
+ .interact-prompt{bottom:calc(86px + 235px);left:auto;right:12px;transform:none;width:calc(100vw - 110px);max-width:none;padding:10px;gap:8px;box-shadow:none}
+ .interact-prompt:active{transform:scale(.98)}.interact-copy strong{font-size:16px;line-height:1.6}.interact-copy .faint{font-size:14px;line-height:1.6}
+ .interact-prompt-port{bottom:calc(86px + 235px)}.interact-prompt-with-port{bottom:calc(86px + 355px)}
+ .island-background-entry{top:245px;bottom:auto;max-width:200px;width:auto}
+ .squall{top:auto;bottom:calc(86px + 390px);width:calc(100vw - 24px);gap:5px;padding:8px 10px;background:#0b1821ed;border-radius:4px}
+ .squall-kicker{font-size:12px;letter-spacing:.03em}.squall-text{font-size:17px;line-height:1.4}.squall kbd{font-size:18px;padding:2px 12px}
+}
+
+@media(max-width:700px){.squall{top:310px;bottom:auto}.sailing-instruments .hud-stat{font-size:var(--cv-label-size)}}
+.enc-decision .btn{background:#173039;color:#f6ead3;border:1px solid #a68c5e}
+.enc-decision .btn:hover{background:#24444a}

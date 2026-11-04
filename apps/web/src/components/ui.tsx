@@ -1,3 +1,4 @@
+import { localize } from '../i18n';
 import { useRef, useState, type ReactNode } from 'react';
 import type { Classification, Source, Usage } from '../api/types';
 
@@ -34,8 +35,8 @@ export function Stamp({
   title?: string;
 }) {
   return (
-    <span className={`stamp stamp-${kind}`} title={title ?? STAMP_TITLE[kind]}>
-      {children}
+    <span className={`stamp stamp-${kind}`} title={localize(title ?? STAMP_TITLE[kind])}>
+      {localize(children)}
     </span>
   );
 }
@@ -107,9 +108,9 @@ export function SealButton({
         onBlur={stop}
       >
         <span className="seal-fill" style={{ transform: `scaleX(${held})` }} aria-hidden />
-        {label}
+        {localize(label)}
       </button>
-      {disabled && hint ? <p className="faint">{hint}</p> : null}
+      {disabled && hint ? <p className="faint">{localize(hint)}</p> : null}
     </div>
   );
 }
@@ -143,12 +144,12 @@ export function Ledgers({
     return (
       <div className="ledger-compact">
         <span className={connected ? 'ledger-real' : 'unconnected-inline'}>
-          {connected ? `真实 ${tokens ? `${tokens} tok` : '0'}` : '真实 未接入'}
+          {localize(connected ? `真实 ${tokens ? `${tokens} tok` : '0'}` : '真实 未接入')}
         </span>
         <span className="ledger-sep" aria-hidden />
-        <span className="ledger-story">材料 {materials}</span>
+        <span className="ledger-story">{localize("材料 ")}{localize(materials)}</span>
         <span className="ledger-test">
-          <Stamp kind="test">测试</Stamp>补给 {balance ?? '—'}
+          <Stamp kind="test">{localize("测试")}</Stamp>{localize("补给 ")}{localize(balance ?? '—')}
         </span>
       </div>
     );
@@ -157,34 +158,33 @@ export function Ledgers({
   return (
     <div className="ledger">
       <div className="ledger-block">
-        <div className="label ledger-real">真实用量</div>
+        <div className="label ledger-real">{localize("真实用量")}</div>
         {connected ? (
           usage.length ? (
             <div className="mono ledger-real">
-              {tokens || '—'} tokens · 金额未知 · {usage[0]?.settlement === 'not_connected' ? 'HMT 尚未接入' : ''}
+              {localize(tokens || '—')}{localize(" tokens · 金额未知 · ")}{localize(usage[0]?.settlement === 'not_connected' ? 'HMT 尚未接入' : '')}
             </div>
           ) : (
-            <div className="mono ledger-real">本航程尚无用量</div>
+            <div className="mono ledger-real">{localize("本航程尚无用量")}</div>
           )
         ) : (
-          <div className="unconnected">尚未接入</div>
+          <div className="unconnected">{localize("尚未接入")}</div>
         )}
       </div>
       <div className="ledger-block">
-        <div className="label ledger-story">剧情资源</div>
-        <div className="mono ledger-story">材料 {materials}</div>
+        <div className="label ledger-story">{localize("剧情资源")}</div>
+        <div className="mono ledger-story">{localize("材料 ")}{localize(materials)}</div>
         {balance == null ? (
-          <div className="muted">无航程</div>
+          <div className="muted">{localize("无航程")}</div>
         ) : (
           <div className="card-test" style={{ padding: 8, borderRadius: 2 }}>
-            <Stamp kind="test">测试</Stamp>
-            <div className="mono ledger-story">
-              补给 {balance} · 测试货舱 {held}/{capacity}
+            <Stamp kind="test">{localize("测试")}</Stamp>
+            <div className="mono ledger-story">{localize("补给")}{localize(balance)}{localize(" · 测试货舱 ")}{localize(held)}/{localize(capacity)}
             </div>
             {inventory &&
               Object.entries(inventory).map(([k, v]) => (
                 <div key={k} className="mono faint">
-                  {k} × {v}
+                  {localize(k)} × {localize(v)}
                 </div>
               ))}
           </div>
@@ -218,8 +218,8 @@ export function StatusBanner({
     <div className={`status${compact ? ' status-compact' : ''}`}>
       <span className="status-dot" style={{ background: color[kind] }} />
       <div>
-        <div>{text}</div>
-        {action}
+        <div>{localize(text)}</div>
+        {localize(action)}
       </div>
     </div>
   );
@@ -238,10 +238,10 @@ export function Coach({
 }) {
   return (
     <div className="coach">
-      <div className="label">{step}</div>
-      <div className="coach-title">{title}</div>
-      <p className="coach-body">{body}</p>
-      <p className="coach-next">下一步：{next}</p>
+      <div className="label">{localize(step)}</div>
+      <div className="coach-title">{localize(title)}</div>
+      <p className="coach-body">{localize(body)}</p>
+      <p className="coach-next">{localize("下一步：")}{localize(next)}</p>
     </div>
   );
 }
@@ -274,12 +274,12 @@ export function StageBar({
       <div className="stage-bar">
         {items.map(([id, label], i) => (
           <span key={id} data-on={String(reached.includes(id))} data-now={String(current === id)}>
-            {label}
-            {i < items.length - 1 ? ' ·' : ''}
+            {localize(label)}
+            {localize(i < items.length - 1 ? ' ·' : '')}
           </span>
         ))}
       </div>
-      <div className="stage-caption">{caption[current]}</div>
+      <div className="stage-caption">{localize(caption[current])}</div>
     </div>
   );
 }

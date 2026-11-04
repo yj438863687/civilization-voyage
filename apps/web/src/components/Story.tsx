@@ -1,3 +1,4 @@
+import { localize } from '../i18n';
 import { useEffect, useState } from 'react';
 import type { FableState } from '../world/fable';
 import { STORIES, type Beat, type Story } from '../world/stories';
@@ -14,9 +15,9 @@ function glossKicker(kicker: string) {
 export function StoryCaption({ beat, title }: { beat: Beat; title: string }) {
   return (
     <div className="story-cap" key={beat.id} aria-live="polite">
-      <span className="story-cap-title">「{title}」</span>
-      <span className="story-cap-kicker">{glossKicker(beat.kicker)}</span>
-      <p className="story-cap-text">{beat.text}</p>
+      <span className="story-cap-title">「{localize(title)}」</span>
+      <span className="story-cap-kicker">{localize(glossKicker(beat.kicker))}</span>
+      <p className="story-cap-text">{localize(beat.text)}</p>
     </div>
   );
 }
@@ -59,34 +60,34 @@ export function ShoreOverlay({
   }, [step, last, onDone]);
 
   return (
-    <div className="shore" role="dialog" aria-label={`岸上的人：${f.name}`}>
+    <div className="shore" role="dialog" aria-label={localize(`岸上的人：${f.name}`)}>
       <div className="shore-scrim" aria-hidden />
-      <p className="shore-arrival">{story.arrival}</p>
+      <p className="shore-arrival">{localize(story.arrival)}</p>
       <div className="shore-who">
-        <span className="shore-name">{f.name}</span>
-        <span className="shore-years">{f.years}</span>
-        <span className="shore-deed">{f.deed}</span>
+        <span className="shore-name">{localize(f.name)}</span>
+        <span className="shore-years">{localize(f.years)}</span>
+        <span className="shore-deed">{localize(f.deed)}</span>
       </div>
       <div className="shore-mono">
         {f.monologue.map((line, i) => step===i+1 || (step>=last&&i===f.monologue.length-1) ? (
           <p key={i} className={`shore-line${step > i ? ' is-in' : ''}`}>
-            {line}
+            {localize(line)}
           </p>
         ) : null)}
-        <span className={`shore-tag${step > 0 ? ' is-in' : ''}`}>独白为创作</span>
+        <span className={`shore-tag${step > 0 ? ' is-in' : ''}`}>{localize("独白为创作")}</span>
       </div>
       {f.quote && (
         <blockquote className={`shore-quote${step > f.monologue.length ? ' is-in' : ''}`}>
-          <p>{f.quote.text}</p>
-          <cite>{f.quote.source}</cite>
+          <p>{localize(f.quote.text)}</p>
+          <cite>{localize(f.quote.source)}</cite>
         </blockquote>
       )}
       <div className={`shore-meaning${step >= last ? ' is-in' : ''}`}>
-        <span className="shore-spirit">{story.spirit.word}</span>
-        <p>{f.meaning}</p>
+        <span className="shore-spirit">{localize(story.spirit.word)}</span>
+        <p>{localize(f.meaning)}</p>
       </div>
       <button className="cine-link shore-go" type="button" onClick={() => (step < last ? setStep(s=>s+1) : onDone())}>
-        {step < last ? '下一段 · 空格' : '去落印'}
+        {localize(step < last ? '下一段 · 空格' : '去落印')}
       </button>
     </div>
   );
@@ -118,16 +119,14 @@ export function SpiritMap({
   }).filter(Boolean) as { x: number; y: number }[];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="spirit-map" role="img" aria-label="人类精神图谱">
-      <text x={W / 2} y={20} textAnchor="middle" className="spirit-title">
-        人类精神图谱
-      </text>
+    <svg viewBox={`0 0 ${W} ${H}`} className="spirit-map" role="img" aria-label={localize("人类精神图谱")}>
+      <text x={W / 2} y={20} textAnchor="middle" className="spirit-title">{localize("人类精神图谱")}</text>
       {/* 时代的列 */}
       {ERA_ORDER.map((e, i) => (
         <g key={e}>
           <line x1={col(i)} y1={40} x2={col(i)} y2={200} stroke="rgba(232,226,210,0.08)" />
           <text x={col(i)} y={218} textAnchor="middle" className="spirit-era">
-            {ERA_NAME[e]}
+            {localize(ERA_NAME[e])}
           </text>
         </g>
       ))}
@@ -157,10 +156,10 @@ export function SpiritMap({
                 fill={on ? '#fff1d0' : '#8a8478'}
               />
               <text x={x} y={y - 15} textAnchor="middle" className={`spirit-word${on ? ' is-on' : ''}`}>
-                {st.spirit.word}
+                {localize(st.spirit.word)}
               </text>
               <text x={x} y={y + 22} textAnchor="middle" className="spirit-fig">
-                {st.figure.name}
+                {localize(st.figure.name)}
               </text>
             </g>
           );
@@ -170,9 +169,7 @@ export function SpiritMap({
         <g className="spirit-tao">
           <circle cx={W - 26} cy={34} r={9} fill="rgba(244,184,196,0.12)" />
           <circle cx={W - 26} cy={34} r={2.6} fill="#f4b8c4" />
-          <text x={W - 26} y={56} textAnchor="middle" className="spirit-fig">
-            桃花源
-          </text>
+          <text x={W - 26} y={56} textAnchor="middle" className="spirit-fig">{localize("桃花源")}</text>
         </g>
       )}
     </svg>
@@ -206,27 +203,25 @@ export function StoryPage({
     return () => window.removeEventListener('keydown', key);
   }, [onDone]);
   return (
-    <div className="page" role="dialog" aria-label={`这一程的故事：${story.title}`}>
+    <div className="page" role="dialog" aria-label={localize(`这一程的故事：${story.title}`)}>
       <div className="page-paper">
-        <span className="page-kicker">这一程的故事</span>
-        <h2 className="page-title">{story.title}</h2>
+        <span className="page-kicker">{localize("这一程的故事")}</span>
+        <h2 className="page-title">{localize(story.title)}</h2>
         {storyId === 'A-near' ? <GateTale state={state} /> : story.art && story.artNames && <TaleArt story={story} state={state} />}
         <div className="page-lines">
           {lines.map((l, i) => (
             <p key={i} style={{ animationDelay: `${0.8 + i * 1.1}s` }}>
-              {l}
+              {localize(l)}
             </p>
           ))}
         </div>
         {story.concept && (
           <div className="page-concept" style={{ animationDelay: `${1.2 + lines.length * 1.1}s` }}>
-            <span className="page-concept-name">{story.concept.name}</span>
-            <p>{story.concept.explain}</p>
+            <span className="page-concept-name">{localize(story.concept.name)}</span>
+            <p>{localize(story.concept.explain)}</p>
           </div>
         )}
-        <button className="cine-link page-go" type="button" onClick={onDone}>
-          合上这一页
-        </button>
+        <button className="cine-link page-go" type="button" onClick={onDone}>{localize("合上这一页")}</button>
       </div>
     </div>
   );
@@ -256,7 +251,7 @@ function GateTale({ state }: { state: FableState }) {
         <rect x="130" y="108" width="30" height="22" fill={fieldR} stroke="#5a4428" />
         {!even && <path d="M136 112 l6 8 l-4 6 M150 110 l-3 10" stroke="#5a4428" fill="none" />}
         <rect x="116" y="100" width="8" height="34" fill="#6a5034" />
-        <text x="120" y="160" textAnchor="middle" className="pg-label">禹 · 分水</text>
+        <text x="120" y="160" textAnchor="middle" className="pg-label">{localize("禹 · 分水")}</text>
       </g>
       {/* 第二座岛：一圈桩 */}
       <g className="pg-fade" transform="translate(-170 0)" style={{ animationDelay: '0.4s' }}>
@@ -272,7 +267,7 @@ function GateTale({ state }: { state: FableState }) {
         ) : (
           <circle cx="238" cy="128" r="9" fill="none" stroke="#5a8aa0" strokeWidth="3" />
         )}
-        <text x="290" y="168" textAnchor="middle" className="pg-label">鲧 · 筑堤</text>
+        <text x="290" y="168" textAnchor="middle" className="pg-label">{localize("鲧 · 筑堤")}</text>
       </g>
       {/* 下游的村子：淹没淹 */}
       <g className="pg-fade" style={{ animationDelay: '2s' }}>
@@ -287,7 +282,7 @@ function GateTale({ state }: { state: FableState }) {
           <path className="pg-draw" d={flooded ? 'M386 150 Q 440 132 494 150' : 'M392 166 Q 440 178 488 166'} stroke="#5a8aa0" strokeWidth="6" fill="none" opacity="0.7" style={{ animationDelay: '2.6s' }} />
         )}
         <text x="440" y="190" textAnchor="middle" className="pg-label">
-          {flooded ? '屋子淹了，人都在' : state.flood === 'open' ? '下游的苗没了' : '两岸都在'}
+          {localize(flooded ? '屋子淹了，人都在' : state.flood === 'open' ? '下游的苗没了' : '两岸都在')}
         </text>
       </g>
       {/* 小船 */}
@@ -315,17 +310,17 @@ function TaleArt({ story, state }: { story: Story; state: FableState }) {
         <g key={i} className="pg-fade" style={{ animationDelay: `${0.4 + i * 0.7}s` }}>
           <ellipse cx={p.x} cy={p.y} rx="46" ry="20" fill={i === 2 ? '#d8c09a' : '#c8b48a'} stroke="#6a5034" strokeWidth="1.5" />
           <text x={p.x} y={p.y + 5} textAnchor="middle" className="pg-name">
-            {names[i]}
+            {localize(names[i])}
           </text>
           <text x={p.x} y={p.y + 40} textAnchor="middle" className="pg-label">
-            {tags[i]}
+            {localize(tags[i])}
           </text>
         </g>
       ))}
       <g className="pg-fade" style={{ animationDelay: '2.6s' }}>
         <circle cx="500" cy="96" r="6" fill="#8a3a22" />
         <text x="500" y="122" textAnchor="end" className="pg-label">
-          {story.figure.name}
+          {localize(story.figure.name)}
         </text>
       </g>
       <g className="pg-fade" style={{ animationDelay: '0.2s' }}>

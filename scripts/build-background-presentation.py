@@ -9,13 +9,13 @@ from pptx.dml.color import RGBColor
 from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[1]
-OUTPUT=Path.home()/'Desktop/文明航程演讲包/历史配乐船坞版-初版'
+OUTPUT=Path.home()/'Desktop/文明航程演讲包/双语清晰度与船员精修-初版'
 SLIDES=[('A',
   '文明航程：技术怎样改变共同生活',
   'Civilization Voyage: Technology and Shared Life',
-  ['农业、工业、信息、人工智能四个时代', '中国与世界八条航线，保留人物、场景与字幕', '用故事选择连接技术能力与文明责任'],
+  ['农业、工业、信息、人工智能四个时代', '中国与世界八条航线，中英文故事与操作提示', '用故事选择连接技术能力与文明责任'],
   ['Four eras: agriculture, industry, information and artificial intelligence',
-   'Eight routes across China and the world, with the original characters and scenes',
+   'Eight China/world routes, with Chinese/English stories and controls',
    'Connect technical capability with responsibility through story choices'],
   'original-character-subtitles.png'),
  ('A',
@@ -69,18 +69,18 @@ SLIDES=[('A',
  ('D',
   '看清任务，再动手',
   'Understand the Task, Then Act',
-  ['WASD开船，E进入人物故事，Escape返回', '浮标选择、稳船光环、收集物件与顺序校验', '操作完成后再决定怎样使用成果；没有正确价值观按钮'],
-  ['Use WASD to sail, E to enter a story and Escape to return',
+  ['WASD开船、E进入、Escape返回；对白由玩家逐句推进', '浮标选择、稳船光环、收集物件与顺序校验', '操作完成后再决定怎样使用成果；没有正确价值观按钮'],
+  ['Use WASD to sail, E to enter and Escape to return; advance dialogue at your own pace',
    'Choose a buoy gate, hold position, collect objects or verify a sequence',
    'After the task, decide how to use the result; choices carry visible tradeoffs'],
   'original-character-subtitles.png'),
  ('D',
   '升级要真的看得见',
   'Upgrades Must Be Visible',
-  ['补给购买三级船体整修，至少留15份口粮', '人心达到55／65／75，解锁三级行装', '免费预览、实际购买和海上外观使用同一船型'],
+  ['补给购买三级船体整修，至少留15份口粮', '人心达到55／65／75，解锁三级行装', '哑光常服、合身软帽与小型船徽，预览和实船共用船员模型'],
   ['Buy three ship upgrade tiers while keeping at least 15 supplies',
    'Unlock three outfit tiers at trust levels 55, 65 and 75',
-   'Preview and sailing use the same ship and crew models'],
+   'Matte uniforms, fitted caps and a small brass fleet insignia; the same crew models sail with you'],
   'shipyard.png'),
  ('D',
   '音乐与操作一起发生',
@@ -115,6 +115,11 @@ SLIDES=[('A',
    'Editable first draft; no new demo recording or complete presentation rehearsal'],
   None)]
 
+SLIDES.insert(6,('D','文字看清，随时换语言','Read Clearly, Switch Languages',
+ ['右上角切换中文／English，不重开当前故事','大字选项、深色字幕底与完整的浮标文字','语言与字号记在本机，资源、选择和存档不变'],
+ ['Switch Chinese/English without restarting the current story','Larger text, high-contrast subtitles and untruncated buoy labels','Language and size persist locally; resources, choices and saves stay intact'],
+ 'readable-hud-en-mobile.png'))
+
 def box(slide,value,x,y,w,h,size=22,color='EFE3C9'):
     shape=slide.shapes.add_textbox(Inches(x),Inches(y),Inches(w),Inches(h))
     shape.text_frame.word_wrap=True
@@ -131,18 +136,18 @@ def write_deck(path,lang,indices):
         title,lines=(en,bullets_en) if lang=='en' else (zh,bullets_zh)
         slide=deck.slides.add_slide(deck.slide_layouts[6]);slide.background.fill.solid();slide.background.fill.fore_color.rgb=RGBColor.from_string('142D33')
         box(slide,title,.7,.6,11.9,1.1,32)
-        photo=ROOT/'.impeccable/background'/capture if capture else None
+        photo=ROOT/'.impeccable/bilingual'/capture if capture else None
         width=5.0 if photo and photo.exists() else 11.8
         for row,line in enumerate(lines):box(slide,line,.8,2.1+row*1.15,width,1.0,22)
         if photo and photo.exists():
             with Image.open(photo) as bitmap:ratio=bitmap.width/bitmap.height
             w=min(6.3,4.3*ratio);h=w/ratio
             slide.shapes.add_picture(str(photo),Inches(6.3),Inches(2.0),width=Inches(w),height=Inches(h))
-            box(slide,'Actual UI check; original game interface is Chinese.' if lang=='en' else '实际界面检查截图；不是完整航程录像。',6.3,6.4,6.2,.3,10,'D3C2A0')
+            box(slide,'Actual game screenshot; Chinese and English can be switched in game.' if lang=='en' else '实际游戏截图；支持中英文切换，不是完整航程录像。',6.3,6.4,6.2,.3,10,'D3C2A0')
         shown_role='Appendix' if lang=='en' and role not in 'ABCDE' else role
         footer=f'{index+1:02d}/{len(SLIDES):02d} · '+('Speaker ' if lang=='en' else '主讲 ')+shown_role+(' · First draft / history, music and upgrades' if lang=='en' else ' · 历史配乐船坞初版')
         box(slide,footer,.8,7.0,11.8,.3,11,'D3C2A0')
-        note=('This version keeps native storytelling and adds historical routes, music and upgrades. ' if lang=='en' else '本版保留原人物互动，补齐历史线、配乐与升级。')+' '.join(lines)
+        note=('This version retains native storytelling, with Chinese/English display, clearer text and refined crew outfits. ' if lang=='en' else '本版保留原人物互动，加入双语显示、清晰文字与船员精修。')+' '.join(lines)
         slide.notes_slide.notes_text_frame.text=note
         notes.append(f'{index+1:02d} {title}\n{note}\n')
     deck.save(path)
@@ -153,9 +158,9 @@ def main():
     for lang,folder in [('en','English'),('zh','中文理解')]:
         target=OUTPUT/folder;target.mkdir(parents=True,exist_ok=True)
         suffix='EN' if lang=='en' else '中文理解版'
-        write_deck(target/f'Civilization-Voyage-History-Music-Refit-{suffix}.pptx',lang,list(range(len(SLIDES))))
+        write_deck(target/f'Civilization-Voyage-Bilingual-Refined-Crew-{suffix}.pptx',lang,list(range(len(SLIDES))))
         for role in 'ABCDE':write_deck(target/f'Speaker-{role}-{suffix}.pptx',lang,[i for i,s in enumerate(SLIDES) if s[0]==role])
-    (OUTPUT/'version.json').write_text(json.dumps({'baseline':'c1a8fe8','change':'history-music-refit-v1','languages':['en','zh'],'status':'first-draft','full_demo_recorded':False},ensure_ascii=False,indent=2))
+    (OUTPUT/'version.json').write_text(json.dumps({'baseline':'c1a8fe8','change':'bilingual-readable-crew-v2','languages':['en','zh'],'status':'first-draft','full_demo_recorded':False},ensure_ascii=False,indent=2))
     print('已生成历史配乐船坞版的中英文初版、五人个人PPT与备注：'+str(OUTPUT))
 
 if __name__=='__main__':main()

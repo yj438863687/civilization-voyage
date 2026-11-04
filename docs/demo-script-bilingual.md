@@ -1,7 +1,7 @@
 # 现场操作稿 / Live Demonstration Script
 
-本版演示与实际游戏共用代码，没有另做替代Demo。下列为现场操作稿，尚未录制或完成整场排练。
-This demonstration uses the actual game. This is a live-operation draft, with no new recording or complete rehearsal.
+本版演示与实际游戏共用代码，没有另做替代Demo。右上角可切换中文／English与大字，不清空航程；人物对白由空格或“下一句”按钮推进。下列为现场操作稿，尚未录制或完成整场排练。
+This demonstration uses the actual game. Use the top-right language and text controls without resetting the voyage; advance dialogue with Space or Next Line. This is a live-operation draft, with no new recording or complete rehearsal.
 
 ## 五人顺序 / Five Speakers
 
@@ -10,9 +10,9 @@ This demonstration uses the actual game. This is a live-operation draft, with no
 |A|技术与共同生活 / Technology and shared life|1–2|
 |B|中国与世界时间线 / Timelines in China and the world|3–4|
 |C|史料、传说与配图 / Sources, legends and images|5–6|
-|D|游戏操作、升级与声音 / Gameplay, upgrades and audio|7–9|
-|E|AI工具与商业验证 / AI tools and business validation|10–11|
-|全组 / All|边界与问答 / Scope and questions|12|
+|D|游戏操作、升级与声音 / Gameplay, upgrades and audio|7–10|
+|E|AI工具与商业验证 / AI tools and business validation|11–12|
+|全组 / All|边界与问答 / Scope and questions|13|
 
 ## 操作顺序 / Operation Sequence
 

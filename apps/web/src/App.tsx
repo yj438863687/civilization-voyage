@@ -1,3 +1,5 @@
+import { localize, useLanguage } from './i18n';
+import { LanguageControls } from './components/LanguageControls';
 import { MusicDirector, MusicControls, voyageCue } from './components/VoyageMusic';
 import { ShipyardDialog } from './components/Shipyard';
 import { historyFor, historyScene, supportedEncounter } from './world/voyageHistory';
@@ -91,7 +93,7 @@ function ChartMap({ struck, activeEpoch }: { struck: string[]; activeEpoch: stri
   const order = ['A', 'B', 'C', 'D'];
   const ink: Record<string, string> = { A: '#c8794f', B: '#9aa3ad', C: '#6fb3bd', D: '#8fa0dc' };
   return (
-    <svg viewBox="0 0 120 76" className="chart-map" role="img" aria-label="这一趟的海图">
+    <svg viewBox="0 0 120 76" className="chart-map" role="img" aria-label={localize("这一趟的海图")}>
       <rect x="0" y="0" width="120" height="76" fill="rgba(20,28,30,0.55)" />
       {[15, 30, 45, 60].map((y) => (
         <line key={y} x1="0" y1={y} x2="120" y2={y} stroke="rgba(220,200,160,0.12)" strokeWidth="0.5" />
@@ -125,7 +127,7 @@ function ChartMap({ struck, activeEpoch }: { struck: string[]; activeEpoch: stri
             {e === 'B' && on && <circle cx={cx} cy={cy} r="2" fill={c} />}
             <circle cx={cx} cy={cy} r="1.4" fill={c} opacity={e === 'A' || e === 'C' || e === 'D' ? 0 : 1} />
             <text x={cx} y={cy + 14} textAnchor="middle" fontSize="6" fill={on ? '#e8dcc6' : '#7d7568'}>
-              {e}
+              {localize(e)}
             </text>
           </g>
         );
@@ -305,6 +307,7 @@ function errText(e: unknown) {
 }
 
 export function App() {
+  useLanguage();
   const [health, setHealth] = useState<Health | null>(null);
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [scenes, setScenes] = useState<Scene[]>([]);
@@ -1341,8 +1344,9 @@ export function App() {
 
   return (
     <>
+      <LanguageControls/>
       <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||!!backgroundId||yardOpen||shoreOpen}/>
-      {water&&waterFeedback&&<div key={waterFeedback.at} className={`water-feedback is-${waterFeedback.cue}`} role="status">{waterFeedback.cue==='dot'?'接住了':waterFeedback.cue==='error'?'碰到杂物，重新稳住':'进圈了，稳住船'}</div>}
+      {water&&waterFeedback&&<div key={waterFeedback.at} className={`water-feedback is-${waterFeedback.cue}`} role="status">{localize(waterFeedback.cue==='dot'?'接住了':waterFeedback.cue==='error'?'碰到杂物，重新稳住':'进圈了，稳住船')}</div>}
       {yardOpen&&<ShipyardDialog stats={stats} sceneId={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} allowPurchase={view!=='embark'} onUpdate={updateStats} onClose={()=>setYardOpen(false)}/>}
       {webgl ? (
         <VoyageCanvas
@@ -1384,8 +1388,8 @@ export function App() {
       ) : (
         <div className="webgl-fallback">
           <div>
-            <h1 className="display title-page">无法使用 WebGL</h1>
-            <p>3D 海域需要 WebGL。核心操作仍可通过下方面板完成。</p>
+            <h1 className="display title-page">{localize("无法使用 WebGL")}</h1>
+            <p>{localize("3D 海域需要 WebGL。核心操作仍可通过下方面板完成。")}</p>
           </div>
         </div>
       )}
@@ -1400,16 +1404,16 @@ export function App() {
           <div className="landing-cine" aria-live="polite">
             <div className="landing-cine-inner">
               <div className={`landing-kicker${stage1 ? ' is-in' : ''}`}>
-                {stage1 ? `靠港 · ${portPlace?.name ?? '港口'}` : ''}
+                {localize(stage1 ? `靠港 · ${portPlace?.name ?? '港口'}` : '')}
               </div>
               <div className={`landing-name${stage2 ? ' is-in' : ''}`}>
-                {stage2 && frag ? frag.title : ''}
+                {localize(stage2 && frag ? frag.title : '')}
               </div>
               <div className={`landing-what${stage2 ? ' is-in' : ''}`}>
-                {stage2 && frag?.what ? frag.what : ''}
+                {localize(stage2 && frag?.what ? frag.what : '')}
               </div>
               <div className={`landing-body${stage3 ? ' is-in' : ''}`}>
-                {stage3 && frag ? frag.why ?? frag.text : ''}
+                {localize(stage3 && frag ? frag.why ?? frag.text : '')}
               </div>
             </div>
           </div>
@@ -1421,24 +1425,24 @@ export function App() {
           <div className={`hud hud-tl${view === 'world' ? ' hud-world' : ' scrim'}`}>
             {view === 'world' ? (
               <div className="hud-world-card">
-                <div className="hud-quest">{story?.logline ?? voyage?.question ?? ''}</div>
-                {currentHistory&&<div className="hud-history-step">{currentHistory.region} · {pendingHistory<0?'三站已完成，回港回顾':`第 ${pendingHistory+1}/3 站 · ${[...currentHistory.islands,currentHistory.crisis][pendingHistory].date}`}</div>}
+                <div className="hud-quest">{localize(story?.logline ?? voyage?.question ?? '')}</div>
+                {currentHistory&&<div className="hud-history-step">{localize(currentHistory.region)} · {localize(pendingHistory<0?'三站已完成，回港回顾':`第 ${pendingHistory+1}/3 站 · ${[...currentHistory.islands,currentHistory.crisis][pendingHistory].date}`)}</div>}
                 {/* 靠近一件实物时，先告诉眼睛"那是什么"，文字后补 */}
                 {nearFrag ? (
                   <div className="hud-relic" key={nearFrag.id}>
                     <span className="hud-relic-key">E</span>
-                    <span className="hud-relic-name">{nearFrag.title}</span>
+                    <span className="hud-relic-name">{localize(nearFrag.title)}</span>
                   </div>
                 ) : null}
                 {/* 「模型未接入」右上角已标出，海上只在真的出错或在执行时提示 */}
-                {(status.kind === 'failed' || status.kind === 'running') && <StatusBanner kind={status.kind} text={status.text} compact />}
+                {(status.kind === 'failed' || status.kind === 'running') && <StatusBanner kind={status.kind} text={localize(status.text)} compact />}
               </div>
             ) : (
               <>
-                <div className="label">{voyage?.title ?? '文明航程'}</div>
-                <div>{voyage?.question || ''}</div>
+                <div className="label">{localize(voyage?.title ?? '文明航程')}</div>
+                <div>{localize(voyage?.question || '')}</div>
                 <StageBar current={beat.current} reached={beat.reached} />
-                <StatusBanner kind={status.kind} text={status.text} />
+                <StatusBanner kind={status.kind} text={localize(status.text)} />
               </>
             )}
           </div>
@@ -1458,19 +1462,17 @@ export function App() {
           </div>
           <div className="hud hud-bl">
             {view === 'world' && (
-              <div className="scrim chart-hud" aria-label="这一趟的海图">
+              <div className="scrim chart-hud" aria-label={localize("这一趟的海图")}>
                 <ChartMap struck={struck} activeEpoch={voyage?.scene_id ?? ''} />
                 <div className="chart-hud-note">
-                  {sceneShortFromId(voyage?.scene_id)} · 第 {struck.length} / 4 笔
-                </div>
+                  {localize(sceneShortFromId(voyage?.scene_id))}{localize(" · 第 ")}{localize(struck.length)}{localize("/ 4 笔")}</div>
               </div>
             )}
             {view === 'world' && (
-              <div className="scrim">
-                <div className="mono">
-                  航向 {ship ? Math.round((ship.headingDeg + 360) % 360) : '—'}° · 速度 {ship ? ship.speed.toFixed(1) : '0'}
+              <div className="scrim sailing-instruments">
+                <div className="mono sailing-heading">{localize("航向 ")}{localize(ship ? Math.round((ship.headingDeg + 360) % 360) : '—')}{localize("° · 速度 ")}{localize(ship ? ship.speed.toFixed(1) : '0')}
                 </div>
-                <div className="compass" aria-label="罗盘">
+                <div className="compass" aria-label={localize("罗盘")}>
                   <div
                     className="compass-disk"
                     style={{ transform: `rotate(${-((ship?.headingDeg ?? 0) + 360) % 360}deg)` }}
@@ -1489,14 +1491,14 @@ export function App() {
                   {/* 门的方位：一直在罗盘边上，锁着是暗点，开了是亮点 */}
                   {gateRel != null && (
                     <div className={`compass-gate${sealedHere ? ' is-open' : ''}`} style={{ transform: `rotate(${gateRel}deg)` }}>
-                      <span>门</span>
+                      <span>{localize("门")}</span>
                     </div>
                   )}
                   <div className="compass-needle" />
                   <span className={`compass-key compass-key-a${relNow != null && relNow < -32 ? ' is-on' : ''}`}>A</span>
                   <span className={`compass-key compass-key-d${relNow != null && relNow > 32 ? ' is-on' : ''}`}>D</span>
                 </div>
-                <div className="joystick" ref={joystick} aria-label="航行摇杆">
+                <div className="joystick" ref={joystick} aria-label={localize("航行摇杆")}>
                   <div
                     className="joystick-knob"
                     style={{
@@ -1504,63 +1506,58 @@ export function App() {
                     }}
                   />
                 </div>
-                <div className="hud-player" title={player ? `编号 ${player.id}` : ''}>
-                  <span>船长</span>
+                <div className="hud-player" title={localize(player ? `编号 ${player.id}` : '')}>
+                  <span>{localize("船长")}</span>
                   <b>{player?.name ?? '—'}</b>
                 </div>
-                <div className="hud-sail" aria-label="船况">
+                <div className="hud-sail" aria-label={localize("船况")}>
                   <span className={`hud-wind${(ship?.windAlong ?? 0) > 0.3 ? ' is-fair' : (ship?.windAlong ?? 0) < -0.3 ? ' is-foul' : ''}`}>
-                    {(ship?.windAlong ?? 0) > 0.3 ? '顺风' : (ship?.windAlong ?? 0) < -0.3 ? '逆风' : '侧风'}
+                    {localize((ship?.windAlong ?? 0) > 0.3 ? '顺风' : (ship?.windAlong ?? 0) < -0.3 ? '逆风' : '侧风')}
                   </span>
-                  {ship && ship.reefNear < 6 && <span className="hud-reef">礁石</span>}
+                  {ship && ship.reefNear < 6 && <span className="hud-reef">{localize("礁石")}</span>}
                   <span className="hud-score">
-                    {stats.combo > 1 && <b>×{stats.combo}</b>}
-                    {stats.score}
+                    {stats.combo > 1 && <b>×{localize(stats.combo)}</b>}
+                    {localize(stats.score)}
                   </span>
                 </div>
-                <div className="hud-stats" aria-label="船身、补给与人心">
-                  <span className={`hud-stat is-hull${stats.hull < 30 ? ' is-low' : ''}`} title="船身：船体还剩多少。撞礁会掉，掉到 0 船只剩一半速度。">
-                    船身 <b>{stats.hull}</b>
+                <div className="hud-stats" aria-label={localize("船身、补给与人心")}>
+                  <span className={`hud-stat is-hull${stats.hull < 30 ? ' is-low' : ''}`} title={localize("船身：船体还剩多少。撞礁会掉，掉到 0 船只剩一半速度。")}>{localize("船身")}<b>{localize(stats.hull)}</b>
                     <i style={{ width: `${stats.hull}%` }} />
                   </span>
-                  <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`} title="补给：船上的粮和水。按 Shift 全速会烧补给，烧光了船走不快。">
-                    补给 <b>{stats.supply}</b>
+                  <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`} title={localize("补给：船上的粮和水。按 Shift 全速会烧补给，烧光了船走不快。")}>{localize("补给")}<b>{localize(stats.supply)}</b>
                     <i style={{ width: `${stats.supply}%` }} />
                   </span>
-                  <span className="hud-stat is-trust" title="人心：船员信你几分。岸上和海上的每一次选择都会改变它。">
-                    人心 <b>{stats.trust}</b>
+                  <span className="hud-stat is-trust" title={localize("人心：船员信你几分。岸上和海上的每一次选择都会改变它。")}>{localize("人心")}<b>{localize(stats.trust)}</b>
                     <i style={{ width: `${stats.trust}%` }} />
                   </span>
                 </div>
                 <div className={`faint${input.boost ? ' is-boost' : ''}`}>
-                  {input.boost
+                  {localize(input.boost
                     ? `${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'} · 正在烧补给`
                     : stats.hull <= 0
                       ? '船身破了 · 速度减半，回港才能修'
                       : stats.supply <= 0
                         ? '补给已空 · 船在减速'
-                      : `WASD 航行 · Shift ${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}`}
+                      : `WASD 航行 · Shift ${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}`)}
                 </div>
               </div>
             )}
           </div>
           <div className="hud hud-br">
             <MusicControls/>
-            <button className="btn btn-icon hud-action" type="button" disabled={!!enc||!!crisis||!!secret||!!backgroundId||landing>0} onClick={()=>{setInput({forward:0,turn:0});setYardOpen(true);}}>船坞与换装 · B</button>
-            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('embark')}>启航</button>
+            <button className="btn btn-icon hud-action" type="button" disabled={!!enc||!!crisis||!!secret||!!backgroundId||landing>0} onClick={()=>{setInput({forward:0,turn:0});setYardOpen(true);}}>{localize("船坞与换装 · B")}</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setView('embark')}>{localize("启航")}</button>
             <button
               className="btn btn-icon hud-action"
               type="button"
               disabled={!voyage || voyage.stage === 'cockpit'}
-              title={voyage?.stage === 'cockpit' ? '先确认航程并选择航线' : undefined}
+              title={localize(voyage?.stage === 'cockpit' ? '先确认航程并选择航线' : undefined)}
               onClick={() => setView('world')}
-            >
-              出海
-            </button>
-            <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => void goReflect()}>日志</button>
-            <button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
+            >{localize("出海")}</button>
+            <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => void goReflect()}>{localize("日志")}</button>
+            <button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>{localize("通讯台")}</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setReduceMotion((v) => !v)}>
-              {reduceMotion ? '减少动态开' : '减少动态'}
+              {localize(reduceMotion ? '减少动态开' : '减少动态')}
             </button>
           </div>
         </>
@@ -1569,17 +1566,15 @@ export function App() {
       {/* 出发页只剩画面字，不挂提示条 */}
       {/* 海上不再挂教练条：铜针、旁白和门的光柱已经在指路 */}
       {glLost && (
-        <div className="gl-lost" role="alert">
-          显卡上下文丢失，画面暂时变黑。正在等浏览器恢复；若十秒内没有恢复，请刷新页面。
-        </div>
+        <div className="gl-lost" role="alert">{localize("显卡上下文丢失，画面暂时变黑。正在等浏览器恢复；若十秒内没有恢复，请刷新页面。")}</div>
       )}
       {!player && <PlayerGate onDone={setPlayer} />}
       <div className={player ? '' : 'is-gated'} aria-hidden={player ? undefined : true}>
       {!['embark', 'reflection', 'cockpit', 'world'].includes(view) && (
         <div className={`coach-bar ${view === 'world' || view === 'cockpit' ? 'coach-bar-top' : ''}`}>
           <div className="scrim">
-            <div className="label">{tip.step}</div>
-            <div>{tip.next}</div>
+            <div className="label">{localize(tip.step)}</div>
+            <div>{localize(tip.next)}</div>
           </div>
         </div>
       )}
@@ -1587,22 +1582,22 @@ export function App() {
       {/* 入海开场：时代 → 名字 → 一句话 → 这一程的问题 */}
       {intro && view === 'world' && EPOCH_INTRO[intro] && (
         <div className="epoch-intro" aria-live="polite" onClick={() => setIntro(null)}>
-          <span className="epoch-intro-era">{EPOCH_INTRO[intro].era}</span>
-          <span className="epoch-intro-title">{EPOCH_INTRO[intro].title}</span>
-          <span className="epoch-intro-line">{EPOCH_INTRO[intro].line}</span>
-          <span className="epoch-intro-q">{voyage?.question}</span>
-          {story && <span className="epoch-intro-story">这一程 · 「{story.title}」</span>}
+          <span className="epoch-intro-era">{localize(EPOCH_INTRO[intro].era)}</span>
+          <span className="epoch-intro-title">{localize(EPOCH_INTRO[intro].title)}</span>
+          <span className="epoch-intro-line">{localize(EPOCH_INTRO[intro].line)}</span>
+          <span className="epoch-intro-q">{localize(voyage?.question)}</span>
+          {story && <span className="epoch-intro-story">{localize("这一程 · 「")}{localize(story.title)}」</span>}
         </div>
       )}
 
       {/* 落印的回响：你站在哪、谁承担，然后门开了 */}
       {sealBeat && (
         <div className="seal-beat" aria-live="polite">
-          <span className="seal-beat-mark">印</span>
-          <span className="seal-beat-pick">{sealBeat.pick}</span>
-          <span className="seal-beat-epi">{sealBeat.epilogue}</span>
-          {sealBeat.met && <span className="seal-beat-met">{sealBeat.met}</span>}
-          {voyage?.scene_id !== 'D' && sea.portal && <span className="seal-beat-next">门开了 · {sea.portal.label}</span>}
+          <span className="seal-beat-mark">{localize("印")}</span>
+          <span className="seal-beat-pick">{localize(sealBeat.pick)}</span>
+          <span className="seal-beat-epi">{localize(sealBeat.epilogue)}</span>
+          {sealBeat.met && <span className="seal-beat-met">{localize(sealBeat.met)}</span>}
+          {voyage?.scene_id !== 'D' && sea.portal && <span className="seal-beat-next">{localize("门开了 · ")}{localize(sea.portal.label)}</span>}
         </div>
       )}
 
@@ -1610,45 +1605,40 @@ export function App() {
       {finale && (
         <div className="finale" aria-live="polite">
           <div className="finale-lines">
-            <p style={{ animationDelay: '1.2s' }}>你把目的地交了出去。</p>
+            <p style={{ animationDelay: '1.2s' }}>{localize("你把目的地交了出去。")}</p>
             {stats.path.length > 0 ? (
               <p style={{ animationDelay: '4.2s' }} className="finale-path">
                 {stats.path.map((p) => (
                   <span key={p.era}>
-                    <b>{p.word}</b>
-                    <i>{p.figure}</i>
+                    <b>{localize(p.word)}</b>
+                    <i>{localize(p.figure)}</i>
                   </span>
                 ))}
               </p>
             ) : (
               <>
-                <p style={{ animationDelay: '4.2s' }}>农业画下第一个圈。工业把它连成线。</p>
-                <p style={{ animationDelay: '7.2s' }}>信息在线上留下一处断点。智能点上了一颗它自己算出来的星。</p>
+                <p style={{ animationDelay: '4.2s' }}>{localize("农业画下第一个圈。工业把它连成线。")}</p>
+                <p style={{ animationDelay: '7.2s' }}>{localize("信息在线上留下一处断点。智能点上了一颗它自己算出来的星。")}</p>
               </>
             )}
             {stats.met.length > 0 && (
-              <p style={{ animationDelay: '9.6s' }} className="finale-met">
-                你在海上遇见过：{[...new Set(stats.met.map((m) => m.who))].join('、')}。
+              <p style={{ animationDelay: '9.6s' }} className="finale-met">{localize("你在海上遇见过：")}{localize([...new Set(stats.met.map((m) => m.who))].join('、'))}。
               </p>
             )}
-            <p style={{ animationDelay: '12.4s' }} className="finale-big">这张图上没有终点港。</p>
+            <p style={{ animationDelay: '12.4s' }} className="finale-big">{localize("这张图上没有终点港。")}</p>
             {stats.secrets.taoyuan && (
-              <p style={{ animationDelay: '13.8s' }} className="finale-tao">
-                图的角落里，还有一个你去过、却再也找不到的地方。
-                <span>「{TAOYUAN_FINALE.quote}」—— {TAOYUAN_FINALE.source}</span>
+              <p style={{ animationDelay: '13.8s' }} className="finale-tao">{localize("图的角落里，还有一个你去过、却再也找不到的地方。")}<span>「{localize(TAOYUAN_FINALE.quote)}」—— {localize(TAOYUAN_FINALE.source)}</span>
               </p>
             )}
-            <p style={{ animationDelay: '15.2s' }}>终点，是人能把自己的能力伸到多远 —— 以及伸出去的时候，还记不记得问一句：这是谁的地方。</p>
+            <p style={{ animationDelay: '15.2s' }}>{localize("终点，是人能把自己的能力伸到多远 —— 以及伸出去的时候，还记不记得问一句：这是谁的地方。")}</p>
             <p style={{ animationDelay: '18.4s' }} className="finale-trust">
-              {trustLine(stats.trust)}
-              <span>人心 {stats.trust} · 补给 {stats.supply}</span>
+              {localize(trustLine(stats.trust))}
+              <span>{localize("人心 ")}{localize(stats.trust)}{localize(" · 补给 ")}{localize(stats.supply)}</span>
             </p>
           </div>
           <div className="finale-chart" style={{ animationDelay: '21.5s' }}>
             <SpiritMap path={stats.path} taoyuan={stats.secrets.taoyuan} />
-            <button className="cine-link" type="button" onClick={() => { setFinale(false); void goReflect(); }}>
-              看这张图
-            </button>
+            <button className="cine-link" type="button" onClick={() => { setFinale(false); void goReflect(); }}>{localize("看这张图")}</button>
           </div>
         </div>
       )}
@@ -1657,18 +1647,18 @@ export function App() {
       {view === 'world' && sea.portal && ship && !portalCross && !enc &&
         Math.hypot(sea.portal.x - ship.x, sea.portal.z - ship.z) < 26 && (
           <div className="portal-hint" aria-live="polite">
-            <span className="portal-hint-kicker">{sealedHere ? '门已开' : '还没落印'}</span>
-            <span className="portal-hint-name">{sea.portal.label}</span>
+            <span className="portal-hint-kicker">{localize(sealedHere ? '门已开' : '还没落印')}</span>
+            <span className="portal-hint-name">{localize(sea.portal.label)}</span>
             <span className="portal-hint-sub">
-              {sealedHere ? '驶入门内，这一段就结束' : '完成三站故事、回港回顾并落印后，才能前往下一段'}
+              {localize(sealedHere ? '驶入门内，这一段就结束' : '完成三站故事、回港回顾并落印后，才能前往下一段')}
             </span>
           </div>
         )}
 
       {/* 承：沿途的旁白，从画面里浮出来 */}
-      {view === 'world' && caption && !enc && !crisis && <StoryCaption beat={caption} title={story?.title ?? ''} />}
+      {view === 'world' && caption && !enc && !crisis && <StoryCaption beat={caption} title={localize(story?.title ?? '')} />}
 
-      {view==='world'&&story&&nearbyBackground===story.crisis.id&&!crisis&&!enc&&!secret&&!backgroundId&&!yardOpen&&!progress.crisis.includes(story.crisis.id)&&historyFor(voyage?.scene_id,laneId)?.islands.every(scene=>collectedIds.has(scene.id)||!!progress.state[`history:${scene.id}`])&&<button className="interact-prompt" type="button" onClick={()=>{dismissedCrisis.current='';setCrisis(story.crisis.id);}}>继续故事 · {story.crisis.enc.who}</button>}
+      {view==='world'&&story&&nearbyBackground===story.crisis.id&&!crisis&&!enc&&!secret&&!backgroundId&&!yardOpen&&!progress.crisis.includes(story.crisis.id)&&historyFor(voyage?.scene_id,laneId)?.islands.every(scene=>collectedIds.has(scene.id)||!!progress.state[`history:${scene.id}`])&&<button className="interact-prompt" type="button" onClick={()=>{dismissedCrisis.current='';setCrisis(story.crisis.id);}}>{localize("继续故事 · ")}{localize(story.crisis.enc.who)}</button>}
 
       {/* 转：躲不开的那件事 */}
       {view === 'world' && crisis && story && (
@@ -1676,7 +1666,7 @@ export function App() {
           key={crisis}
           enc={supportedEncounter(story.crisis.enc,progress.state)}
           onCancel={()=>{dismissedCrisis.current=crisis;setCrisis(null);setWater(null);setWaterResult(null);}}
-          title={story.crisis.kicker}
+          title={localize(story.crisis.kicker)}
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishCrisis(o, summary)}
           crisis
@@ -1692,7 +1682,7 @@ export function App() {
         <EncounterOverlay
           key="taoyuan"
           enc={TAOYUAN_ENC}
-          title="桃花源"
+          title={localize("桃花源")}
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishSecret(o, summary)}
           secret
@@ -1722,9 +1712,9 @@ export function App() {
       {/* 开局的风：打舵！ */}
       {view === 'world' && squall && (
         <div className="squall" aria-live="assertive">
-          <span className="squall-kicker">横风</span>
-          <span className="squall-text">船在往{squall.dir > 0 ? '右' : '左'}漂——打{squall.dir > 0 ? '左' : '右'}舵！</span>
-          <kbd>{squall.dir > 0 ? 'A' : 'D'}</kbd>
+          <span className="squall-kicker">{localize("横风")}</span>
+          <span className="squall-text">{localize("船在往")}{localize(squall.dir > 0 ? '右' : '左')}{localize("漂——打")}{localize(squall.dir > 0 ? '左' : '右')}{localize("舵！")}</span>
+          <kbd>{localize(squall.dir > 0 ? 'A' : 'D')}</kbd>
         </div>
       )}
 
@@ -1737,7 +1727,7 @@ export function App() {
           key={enc}
           enc={supportedEncounter(encounterFor(enc)!,progress.state)}
           onCancel={()=>{setEnc(null);fableLive.island='';setWater(null);setWaterResult(null);}}
-          title={sea.fragments.find((f) => f.id === enc)?.title ?? ''}
+          title={localize(sea.fragments.find((f) => f.id === enc)?.title ?? '')}
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishEncounter(enc, o, summary)}
           onPhase={phaseHandler(encounterFor(enc)!.game)}
@@ -1748,31 +1738,28 @@ export function App() {
       {/* 穿门：整屏压黑一瞬，换段从这里过去 */}
       {portalCross && (
         <div className="portal-cross" aria-hidden>
-          <span className="portal-cross-word">{sealedHere ? '过门' : '过门 · 这一段留白'}</span>
+          <span className="portal-cross-word">{localize(sealedHere ? '过门' : '过门 · 这一段留白')}</span>
         </div>
       )}
       {(view === 'embark' || cine) && <div className="letterbox" aria-hidden />}
       </div>
       {pickupFlash && (
-        <div className="pickup-flash" aria-live="polite">
-          已收入货舱 · {pickupFlash}
+        <div className="pickup-flash" aria-live="polite">{localize("已收入货舱 ·")}{localize(pickupFlash)}
         </div>
       )}
       {camBlend < 0.98 && !reduceMotion && (
-        <div className="skip-hint">点击或按键跳过镜头</div>
+        <div className="skip-hint">{localize("点击或按键跳过镜头")}</div>
       )}
 
       {view === 'embark' && (
         <div className="cine-embark">
           <div className="cine-embark-main">
-            <h1 className="cine-embark-title">文明航程</h1>
-            <p className="cine-embark-sub">
-              四扇窗，四个时代。船停在它们中间，等你选一扇走进去。
-            </p>
+            <h1 className="cine-embark-title">{localize("文明航程")}</h1>
+            <p className="cine-embark-sub">{localize("四扇窗，四个时代。船停在它们中间，等你选一扇走进去。")}</p>
             {scenePick && EPOCH_INTRO[scenePick.id] && (
               <p className="cine-embark-era" key={scenePick.id}>
-                <span>{EPOCH_INTRO[scenePick.id].era} · {EPOCH_INTRO[scenePick.id].title}</span>
-                {EPOCH_INTRO[scenePick.id].line}
+                <span>{localize(EPOCH_INTRO[scenePick.id].era)} · {localize(EPOCH_INTRO[scenePick.id].title)}</span>
+                {localize(EPOCH_INTRO[scenePick.id].line)}
               </p>
             )}
 
@@ -1787,34 +1774,34 @@ export function App() {
                     onClick={() => setScenePick(sc)}
                     aria-pressed={on}
                   >
-                    <span className="cine-scene-name">{sceneShort(sc)}</span>
-                    <span className="cine-scene-q">{sc.questions[0]}</span>
+                    <span className="cine-scene-name">{localize(sceneShort(sc))}</span>
+                    <span className="cine-scene-q">{localize(sc.questions[0])}</span>
                   </button>
                 );
               })}
             </div>
 
             <div className="cine-embark-actions">
-              <SealButton label="启航" disabled={busy} hint="" onSeal={() => void createVoyage()} /><MusicControls/><button className="btn" type="button" onClick={()=>setYardOpen(true)}>船坞与换装 · 先看看外形</button>
+              <SealButton label={localize("启航")} disabled={busy} hint="" onSeal={() => void createVoyage()} /><MusicControls/><button className="btn" type="button" onClick={()=>setYardOpen(true)}>{localize("船坞与换装 · 先看看外形")}</button>
               <button className="cine-link" type="button" onClick={() => setReduceMotion((v) => !v)}>
-                {reduceMotion ? '已减少动态' : '减少动态效果'}
+                {localize(reduceMotion ? '已减少动态' : '减少动态效果')}
               </button>
             </div>
             {loadBoard().length > 0 && (
-              <ol className="cine-board" aria-label="本机排行">
-                <li className="cine-board-head">本机排行</li>
+              <ol className="cine-board" aria-label={localize("本机排行")}>
+                <li className="cine-board-head">{localize("本机排行")}</li>
                 {loadBoard().slice(0, 5).map((e, i) => (
                   <li key={e.at}>
-                    <span className="cine-board-rank">{i + 1}</span>
-                    <span className="cine-board-name">{e.name}</span>
-                    <span className="cine-board-lane">{e.lane}</span>
-                    <b className="cine-board-score">{e.score}</b>
+                    <span className="cine-board-rank">{localize(i + 1)}</span>
+                    <span className="cine-board-name">{localize(e.name)}</span>
+                    <span className="cine-board-lane">{localize(e.lane)}</span>
+                    <b className="cine-board-score">{localize(e.score)}</b>
                   </li>
                 ))}
               </ol>
             )}
             <div className="cine-player">
-              <span>船长 · {player?.name ?? '—'}</span>
+              <span>{localize("船长 · ")}{player?.name ?? '—'}</span>
               <button
                 className="cine-link"
                 type="button"
@@ -1822,13 +1809,11 @@ export function App() {
                   signOut();
                   setPlayer(null);
                 }}
-              >
-                换一位船长
-              </button>
+              >{localize("换一位船长")}</button>
             </div>
 
-            {bootError && <p className="cine-embark-error">后端未接通：{bootError}。先运行 scripts/dev.sh。</p>}
-            {error && <p className="cine-embark-error">{error}</p>}
+            {bootError && <p className="cine-embark-error">{localize("后端未接通：")}{localize(bootError)}{localize("。先运行 scripts/dev.sh。")}</p>}
+            {error && <p className="cine-embark-error">{localize(error)}</p>}
           </div>
 
           {(() => {
@@ -1839,10 +1824,10 @@ export function App() {
             const st = storyFor(last.scene_id, lane);
             return (
               <div className="cine-embark-continue">
-                <span className="cine-prompt">上一程还没走完</span>
+                <span className="cine-prompt">{localize("上一程还没走完")}</span>
                 <button type="button" className="cine-continue" onClick={() => void loadVoyage(last.id)}>
-                  {EPOCH_INTRO[last.scene_id]?.era ?? '启航港'}
-                  <span className="cine-continue-sub">{st ? `「${st.title}」· 接着走` : '接着走'}</span>
+                  {localize(EPOCH_INTRO[last.scene_id]?.era ?? '启航港')}
+                  <span className="cine-continue-sub">{localize(st ? `「${st.title}」· 接着走` : '接着走')}</span>
                 </button>
               </div>
             );
@@ -1855,11 +1840,11 @@ export function App() {
         <div className="cine-depart">
           <div className="cine-inner cine-depart-inner">
             <div className="cine-kicker">
-              {EPOCH_INTRO[voyage.scene_id]?.era ?? '启航港'}
-              <span className="cine-tag">这一程问的是</span>
+              {localize(EPOCH_INTRO[voyage.scene_id]?.era ?? '启航港')}
+              <span className="cine-tag">{localize("这一程问的是")}</span>
             </div>
-            <p className="cine-line cine-q cine-depart-q">{question || voyage.question || ''}</p>
-            <p className="cine-line cine-prompt">两条航道都到同一个港，路上遇见的东西不一样</p>
+            <p className="cine-line cine-q cine-depart-q">{localize(question || voyage.question || '')}</p>
+            <p className="cine-line cine-prompt">{localize("两条航道都到同一个港，路上遇见的东西不一样")}</p>
             <div className="cine-costs">
               {(sea.lanes ?? []).map((lane) => {
                 const on = laneId === lane.id;
@@ -1872,19 +1857,19 @@ export function App() {
                     aria-pressed={on}
                   >
                     <span className="cine-cost-name">
-                      {lane.name}
-                      {storyFor(voyage.scene_id, lane.id) && <em className="cine-cost-story"> · {storyFor(voyage.scene_id, lane.id)!.title}</em>}
+                      {localize(lane.name)}
+                      {storyFor(voyage.scene_id, lane.id) && <em className="cine-cost-story"> · {localize(storyFor(voyage.scene_id, lane.id)!.title)}</em>}
                     </span>
-                    <span className="cine-cost-note">{storyFor(voyage.scene_id, lane.id)?.logline ?? lane.promise}</span>
+                    <span className="cine-cost-note">{localize(storyFor(voyage.scene_id, lane.id)?.logline ?? lane.promise)}</span>
                   </button>
                 );
               })}
             </div>
             <div className="cine-actions">
-              <SealButton label="出海" disabled={busy} hint="" onSeal={() => void departNow()} />
-              <button className="cine-link" type="button" onClick={() => setView('embark')}>换一段</button>
+              <SealButton label={localize("出海")} disabled={busy} hint="" onSeal={() => void departNow()} />
+              <button className="cine-link" type="button" onClick={() => setView('embark')}>{localize("换一段")}</button>
             </div>
-            {error && <p className="error">{error}</p>}
+            {error && <p className="error">{localize(error)}</p>}
           </div>
         </div>
       )}
@@ -1892,9 +1877,9 @@ export function App() {
       {view === 'route' && voyage && (
         <div className="overlay overlay-right">
           <div className="paper">
-            <h2 className="display title-panel">选一条航道</h2>
-            <Coach step={tip.step} title={tip.title} body={tip.body} next={tip.next} />
-            <p className="muted">两条都到同一个港。路上遇见的东西不一样 —— 没走的这条，不算白走。</p>
+            <h2 className="display title-panel">{localize("选一条航道")}</h2>
+            <Coach step={tip.step} title={localize(tip.title)} body={tip.body} next={tip.next} />
+            <p className="muted">{localize("两条都到同一个港。路上遇见的东西不一样 —— 没走的这条，不算白走。")}</p>
             <div className="lanes">
               {(sea.lanes ?? []).map((lane) => {
                 const on = laneId === lane.id;
@@ -1911,42 +1896,40 @@ export function App() {
                     aria-pressed={on}
                   >
                     <div className="lane-head">
-                      <strong className="lane-name">{lane.name}</strong>
-                      <span className="lane-count">{total} 处可看{seen ? ` · 已看 ${seen}` : ''}</span>
+                      <strong className="lane-name">{localize(lane.name)}</strong>
+                      <span className="lane-count">{localize(total)}{localize(" 处可看")}{localize(seen ? ` · 已看 ${seen}` : '')}</span>
                     </div>
-                    <p className="lane-promise">{lane.promise}</p>
+                    <p className="lane-promise">{localize(lane.promise)}</p>
                     <ol className="lane-stops">
                       {lane.waypoints.map((w) => (
-                        <li key={w.label}>{w.label}</li>
+                        <li key={w.label}>{localize(w.label)}</li>
                       ))}
                     </ol>
                   </button>
                 );
               })}
             </div>
-            <p className="faint">航道画在水面上：亮的那条是你选的，暗的那条还在，只是不去了。</p>
+            <p className="faint">{localize("航道画在水面上：亮的那条是你选的，暗的那条还在，只是不去了。")}</p>
             <Ledgers connected={connected} usage={usage} balance={voyage.balance} inventory={voyage.inventory} capacity={voyage.capacity} materials={unusedFragments} />
-            <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void launchRoute()}>
-              按此航线启航
-            </button>
-            {error && <p className="error">{error}</p>}
+            <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void launchRoute()}>{localize("按此航线启航")}</button>
+            {error && <p className="error">{localize(error)}</p>}
           </div>
         </div>
       )}
 
       {backgroundId&&<IslandBackground id={backgroundId} onClose={()=>setBackgroundId(null)}/>}
-      {view==='world'&&nearbyBackground&&ISLAND_BACKGROUNDS[nearbyBackground]&&!enc&&!crisis&&!secret&&<button className="island-background-entry" type="button" onClick={()=>{setInput({forward:0,turn:0});setBackgroundId(nearbyBackground);}}>图片背景 · {historyScene(nearbyBackground)?.who}</button>}
+      {view==='world'&&nearbyBackground&&ISLAND_BACKGROUNDS[nearbyBackground]&&!enc&&!crisis&&!secret&&<button className="island-background-entry" type="button" onClick={()=>{setInput({forward:0,turn:0});setBackgroundId(nearbyBackground);}}>{localize("图片背景 · ")}{localize(historyScene(nearbyBackground)?.who)}</button>}
 
       {view === 'world' && nearFragment && nearFrag && !nearFragCollected && !enc && (
         <button className={`interact-prompt${nearPort ? ' interact-prompt-with-port' : ''}`} type="button" disabled={busy} onClick={() => startEncounter()}>
           <span className="interact-key">E</span>
           <span className="interact-copy">
             <strong>
-              {encounterFor(nearFrag.id)
+              {localize(encounterFor(nearFrag.id)
                 ? `靠过去 · ${encounterFor(nearFrag.id)!.who}守着「${nearFrag.title}」`
-                : `收入货舱 · ${nearFrag.title}`}
+                : `收入货舱 · ${nearFrag.title}`)}
             </strong>
-            <span className="faint">{nearFrag.text}</span>
+            <span className="faint">{localize(nearFrag.text)}</span>
           </span>
         </button>
       )}
@@ -1955,8 +1938,8 @@ export function App() {
         <button className="interact-prompt interact-prompt-port" type="button" disabled={busy} onClick={() => void dock()}>
           <span className="interact-key">F</span>
           <span className="interact-copy">
-            <strong>靠岸 · {sea.ports.find((p) => p.id === nearPort)?.name}</strong>
-            <span className="faint">{story?.arrival ?? '岸上有人在等你。'}</span>
+            <strong>{localize("靠岸 · ")}{localize(sea.ports.find((p) => p.id === nearPort)?.name)}</strong>
+            <span className="faint">{localize(story?.arrival ?? '岸上有人在等你。')}</span>
           </span>
         </button>
       )}
@@ -1966,17 +1949,17 @@ export function App() {
         <div className="cine-panel" aria-live="polite">
           <div className="cine-inner">
             <div className="cine-kicker">
-              {portPlace?.name ?? ports[0]?.name}
-              <span className="cine-tag">落印 · 把你这一程的站位盖在海图上</span>
+              {localize(portPlace?.name ?? ports[0]?.name)}
+              <span className="cine-tag">{localize("落印 · 把你这一程的站位盖在海图上")}</span>
             </div>
 
             {stance ? (
               <>
-                <p className="cine-line cine-q">{stance.axis.question}</p>
+                <p className="cine-line cine-q">{localize(stance.axis.question)}</p>
 
                 <div className="cine-axis">
                   {/* 端点名只在和首尾刻度不同名时才显示，否则屏幕上会出现两遍同样的字 */}
-                  <span>{stance.axis.left !== stance.axis.choices[0]?.label ? stance.axis.left : ''}</span>
+                  <span>{localize(stance.axis.left !== stance.axis.choices[0]?.label ? stance.axis.left : '')}</span>
                   <div className="cine-stops">
                     {stance.axis.choices.map((c, i) => (
                       <button
@@ -1987,23 +1970,23 @@ export function App() {
                         onClick={() => setStanceIdx(i)}
                       >
                         <span className="cine-dot" aria-hidden />
-                        <span className="cine-stop-label">{c.label}</span>
+                        <span className="cine-stop-label">{localize(c.label)}</span>
                       </button>
                     ))}
                   </div>
                   <span>
-                    {stance.axis.right !== stance.axis.choices[stance.axis.choices.length - 1]?.label
+                    {localize(stance.axis.right !== stance.axis.choices[stance.axis.choices.length - 1]?.label
                       ? stance.axis.right
-                      : ''}
+                      : '')}
                   </span>
                 </div>
-                {stanceIdx != null && <p className="cine-line cine-note">{stance.axis.choices[stanceIdx].note}</p>}
+                {stanceIdx != null && <p className="cine-line cine-note">{localize(stance.axis.choices[stanceIdx].note)}</p>}
 
                 <div className="cine-actions">
                   <SealButton
-                    label="按住落印"
+                    label={localize("按住落印")}
                     disabled={busy || stanceIdx == null}
-                    hint="先在上面三个位置里选一个，再按住。"
+                    hint={localize("先在上面三个位置里选一个，再按住。")}
                     onSeal={() => {
                       if (!voyage || stanceIdx == null) return;
                       const pick = stance.axis.choices[stanceIdx];
@@ -2040,15 +2023,13 @@ export function App() {
                         .catch((e) => setError(errText(e)));
                     }}
                   />
-                  <button className="cine-link" type="button" onClick={() => void goReflect()}>
-                    看这一程的图
-                  </button>
+                  <button className="cine-link" type="button" onClick={() => void goReflect()}>{localize("看这一程的图")}</button>
                 </div>
               </>
             ) : (
-              <p className="cine-line">这一段还没有站位刻度。</p>
+              <p className="cine-line">{localize("这一段还没有站位刻度。")}</p>
             )}
-            {error && <p className="error">{error}</p>}
+            {error && <p className="error">{localize(error)}</p>}
           </div>
         </div>
       )}
@@ -2058,20 +2039,20 @@ export function App() {
         <div className="cine-scroll">
           <div className="cine-inner cine-journal">
             <div className="cine-kicker">
-              {voyage.title}
-              <span className="cine-tag">省 · 回头看这一程</span>
+              {localize(voyage.title)}
+              <span className="cine-tag">{localize("省 · 回头看这一程")}</span>
             </div>
 
             {struck.length > 0 && (
               <div className="cine-chart">
                 <div className="cine-chart-head">
-                  <span className="cine-prompt">这一趟的海图</span>
-                  <span className="cine-chart-count">第 {struck.length} / 4 笔</span>
+                  <span className="cine-prompt">{localize("这一趟的海图")}</span>
+                  <span className="cine-chart-count">{localize("第 ")}{localize(struck.length)}{localize(" / 4 笔")}</span>
                 </div>
                 <ChartMap struck={struck} activeEpoch={voyage.scene_id} />
                 <pre className="cine-chart-text">{chartSummary(struck)}</pre>
                 {struck.length < 4 && (
-                  <p className="cine-chart-foot">图上还空着 {4 - struck.length} 处。没走到的地方，仍然是空白。</p>
+                  <p className="cine-chart-foot">{localize("图上还空着 ")}{localize(4 - struck.length)}{localize(" 处。没走到的地方，仍然是空白。")}</p>
                 )}
               </div>
             )}
@@ -2083,7 +2064,7 @@ export function App() {
                   .map((r) => (
                     <div key={r.id} className="cine-sealed">
                       {r.text.split('\n').map((line, i) => (
-                        <div key={i} className={i === 0 ? 'cine-sealed-main' : 'cine-sealed-line'}>{line}</div>
+                        <div key={i} className={i === 0 ? 'cine-sealed-main' : 'cine-sealed-line'}>{localize(line)}</div>
                       ))}
                     </div>
                   ))}
@@ -2092,15 +2073,15 @@ export function App() {
 
             {records.filter((r) => r.kind === 'fragment').length > 0 && (
               <details className="cine-fold">
-                <summary>材料与出处 · {records.filter((r) => r.kind === 'fragment').length} 件</summary>
+                <summary>{localize("材料与出处 · ")}{localize(records.filter((r) => r.kind === 'fragment').length)}{localize(" 件")}</summary>
                 {records
                   .filter((r) => r.kind === 'fragment')
                   .map((r) => (
                     <div key={r.id} className="cine-material">
-                      <div className="cine-material-name">{r.text.split('\n')[0]}</div>
+                      <div className="cine-material-name">{localize(r.text.split('\n')[0])}</div>
                       {r.sources.map((src) => (
                         <div key={src.id} className="cine-material-src">
-                          {src.title} · {src.verification}
+                          {localize(src.title)} · {localize(src.verification)}
                         </div>
                       ))}
                     </div>
@@ -2110,18 +2091,16 @@ export function App() {
 
             {struck.length >= 4 && (
               <div className="cine-end">
-                <p className="cine-end-line">四笔都画完了。这张图上没有终点港。</p>
-                <p className="cine-end-body">
-                  农业画下第一个圈，工业把它连成线，信息在线上留下一处断点，智能把最后一颗星交给了一个不必经过人的地方。
-                </p>
-                <p className="cine-end-body">航程到这里结束。可这张图还在你手里 —— 下一次，你仍然可以决定从哪一笔开始改。</p>
+                <p className="cine-end-line">{localize("四笔都画完了。这张图上没有终点港。")}</p>
+                <p className="cine-end-body">{localize("农业画下第一个圈，工业把它连成线，信息在线上留下一处断点，智能把最后一颗星交给了一个不必经过人的地方。")}</p>
+                <p className="cine-end-body">{localize("航程到这里结束。可这张图还在你手里 —— 下一次，你仍然可以决定从哪一笔开始改。")}</p>
               </div>
             )}
 
             <div className="cine-actions">
               {nextScene ? (
                 <SealButton
-                  label={`进入${sceneShort(nextScene)}`}
+                  label={localize(`进入${sceneShort(nextScene)}`)}
                   disabled={busy}
                   hint=""
                   onSeal={() => {
@@ -2130,9 +2109,7 @@ export function App() {
                   }}
                 />
               ) : null}
-              <button className="cine-link" type="button" onClick={() => setView('world')}>
-                回到海上
-              </button>
+              <button className="cine-link" type="button" onClick={() => setView('world')}>{localize("回到海上")}</button>
             </div>
           </div>
         </div>
@@ -2140,22 +2117,21 @@ export function App() {
 
       {comms && (
         <div className="drawer">
-          <h2 className="display title-panel">通讯台</h2>
-          <p className="muted">这里只查看模型是否已接入。本基础版不在网页里填密钥，避免写进浏览器。要接模型，请到 apps/api 按 .env.example 配置后重启后端。没接也能把测试航程走完。</p>
+          <h2 className="display title-panel">{localize("通讯台")}</h2>
+          <p className="muted">{localize("这里只查看模型是否已接入。本基础版不在网页里填密钥，避免写进浏览器。要接模型，请到 apps/api 按 .env.example 配置后重启后端。没接也能把测试航程走完。")}</p>
           <div className={connected ? '' : 'unconnected'}>
             {connected
               ? models.map((m) => (
                   <div key={m.id} className="mono">
-                    {m.id} · {m.model} · {m.credential_source}
+                    {localize(m.id)} · {localize(m.model)} · {localize(m.credential_source)}
                   </div>
                 ))
               : '模型服务尚未接入'}
           </div>
           <p className="muted">
-            HMT：{health?.hmt ?? 'unknown'}。真实费用与剧情资源分账。
-          </p>
-          <p className="faint">在 apps/api 导出 VOYAGE_MODEL_URL / NAME / KEY 后重启后端。</p>
-          <button className="btn btn-ghost" type="button" onClick={() => setComms(false)}>关闭</button>
+            HMT：{localize(health?.hmt ?? 'unknown')}{localize("。真实费用与剧情资源分账。")}</p>
+          <p className="faint">{localize("在 apps/api 导出 VOYAGE_MODEL_URL / NAME / KEY 后重启后端。")}</p>
+          <button className="btn btn-ghost" type="button" onClick={() => setComms(false)}>{localize("关闭")}</button>
         </div>
       )}
     </>

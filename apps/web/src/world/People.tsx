@@ -456,7 +456,8 @@ export function Mascot({
     const m = (c: string, r = 0.7, metal = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: metal });
     return {
       body: m(C.body, 0.6),
-      uniform:m(outfitColor),uniformTrim:m(outfitTrim,.45,.3),
+      uniform:m(outfitColor,.92),uniformTrim:m(outfitTrim,.72,.22),
+      lining:m('#c8bda5',.96),leather:m('#3e3931',.9),
       belly: m(C.belly, 0.7),
       trim: m(C.trim, 0.5, 0.2),
       eyeW: m('#fff8ee', 0.3),
@@ -491,7 +492,7 @@ export function Mascot({
       head.current.rotation.z += (Math.sin(t * 0.7) * 0.04 - head.current.rotation.z) * k;
     }
     // 手：大副拿着海图上下看；二副掰着指头数。偶尔挥一下手
-    const wave = ((t * 0.5) % 9) < 1.2 ? Math.sin(t * 14) * 0.5 : 0;
+    const wave = ((t * 0.5) % 9) < 1.2 ? Math.sin(t * (outfitLevel>0?5:14)) * (outfitLevel>0?.1:.5) : 0;
     if (armR.current) {
       const base = kind === 'claude' ? -1.1 + Math.sin(t * 1.3) * 0.12 : -0.5 + Math.abs(Math.sin(t * 2.2)) * 0.5;
       armR.current.rotation.x += (base - armR.current.rotation.x) * k;
@@ -522,14 +523,22 @@ export function Mascot({
         <mesh position={[0, bodyH / 2 + 0.12, 0]} material={outfitLevel>0?M.uniform:M.body} castShadow>
           <capsuleGeometry args={[bodyR, bodyH - bodyR * 2 + 0.1, 6, 16]} />
         </mesh>
-        {/* 肚皮 */}
-        <mesh position={[0, bodyH / 2 + 0.06, bodyR * 0.72]} scale={[0.8, 1, 0.5]} material={outfitLevel>0?M.uniformTrim:M.belly}>
-          <sphereGeometry args={[bodyR * 0.75, 14, 10]} />
-        </mesh>
-        {outfitLevel>=2&&<mesh position={[0,bodyH*.37,0]}><cylinderGeometry args={[bodyR*1.02,bodyR*1.02,.08,16]}/><primitive object={M.uniformTrim} attach="material"/></mesh>}
-        {outfitLevel>=3&&<mesh position={[-bodyR*.5,bodyH*.72,bodyR*.98]}><torusGeometry args={[.075,.018,6,16]}/><primitive object={M.uniformTrim} attach="material"/></mesh>}
+        {outfitLevel===0&&<mesh position={[0,bodyH/2+.06,bodyR*.72]} scale={[.8,1,.5]} material={M.belly}><sphereGeometry args={[bodyR*.75,14,10]}/></mesh>}
+        {outfitLevel>0&&<group name="crew-tailored-uniform">
+          {[-1,1].map(side=><mesh key={side} position={[side*.065,bodyH*.83,bodyR*.79]} rotation={[0,0,side*.35]} material={M.lining}><boxGeometry args={[.065,.18,.018]}/></mesh>)}
+          {[.49,.67].map(height=><mesh key={height} position={[.035,bodyH*height+.07,bodyR*.98]} material={M.uniformTrim}><sphereGeometry args={[.018,10,8]}/></mesh>)}
+          {outfitLevel>=2&&<group name="crew-leather-belt">
+            <mesh position={[0,bodyH*.37,0]} material={M.leather}><cylinderGeometry args={[bodyR*1.005,bodyR*1.005,.045,24]}/></mesh>
+            <mesh position={[0,bodyH*.37,bodyR+.01]} material={M.uniformTrim}><boxGeometry args={[.055,.04,.016]}/></mesh>
+          </group>}
+          {outfitLevel>=3&&<group name="crew-fleet-insignia" position={[-bodyR*.48,bodyH*.72+.07,bodyR*.94]}>
+            <mesh rotation={[Math.PI/2,0,0]} material={M.uniformTrim}><cylinderGeometry args={[.045,.045,.014,16]}/></mesh>
+            <mesh position={[0,.005,.012]} material={M.leather}><boxGeometry args={[.009,.05,.008]}/></mesh>
+            <mesh position={[0,.013,.012]} material={M.leather}><boxGeometry args={[.036,.009,.008]}/></mesh>
+          </group>}
+        </group>}
         {/* 胸口的记号 */}
-        <group ref={emblem} position={[0, bodyH / 2 + 0.16, bodyR + 0.03]}>
+        {outfitLevel===0&&<group ref={emblem} position={[0, bodyH / 2 + 0.16, bodyR + 0.03]}>
           {kind === 'claude'
             ? Array.from({ length: 8 }, (_, i) => (
                 <mesh key={i} rotation={[0, 0, (i / 8) * Math.PI]} material={M.glow}>
@@ -546,13 +555,14 @@ export function Mascot({
                 </mesh>
               </>
             )}
-        </group>
+        </group>}
         {/* 手臂 */}
         {([[-1, armL], [1, armR]] as const).map(([s, ref]) => (
           <group key={s} ref={ref} position={[s * (bodyR + 0.02), bodyH * 0.72, 0]}>
-            <mesh position={[0, -0.16, 0]} material={M.body}>
+            <mesh position={[0, -0.16, 0]} material={outfitLevel>0?M.uniform:M.body}>
               <capsuleGeometry args={[0.055, 0.22, 4, 8]} />
             </mesh>
+            {outfitLevel>=2&&<mesh position={[0,-.25,0]} material={M.lining}><cylinderGeometry args={[.058,.058,.035,12]}/></mesh>}
             <mesh position={[0, -0.32, 0]} material={M.trim}>
               <sphereGeometry args={[0.065, 10, 8]} />
             </mesh>
@@ -589,9 +599,11 @@ export function Mascot({
           <mesh position={[0, 0.02, (tall ? 0.24 : 0.28) - 0.02]} rotation={[0.2, 0, 0]} material={M.dark}>
             <torusGeometry args={[0.04, 0.008, 6, 10, Math.PI]} />
           </mesh>
-          <group position={[0, (tall ? 0.24 : 0.28) - 0.1, 0]} scale={tall ? 1.6 : 1.85}>
-            <HatMesh hat={hat} M={M as never} />
-          </group>
+          {outfitLevel===0?<group position={[0,(tall?.24:.28)-.1,0]} scale={tall?1.6:1.85}><HatMesh hat={hat} M={M as never}/></group>:<group name="crew-fitted-cap" position={[0,tall?.32:.36,0]}>
+            <mesh material={M.uniform}><cylinderGeometry args={[tall?.205:.235,tall?.22:.25,.085,24]}/></mesh>
+            <mesh position={[0,-.035,.115]} scale={[1,.06,.62]} material={M.uniform}><sphereGeometry args={[tall?.23:.26,20,10]}/></mesh>
+            {outfitLevel>=2&&<mesh position={[0,-.005,tall?.22:.25]} material={M.uniformTrim}><boxGeometry args={[.065,.018,.012]}/></mesh>}
+          </group>}
         </group>
       </group>
     </group>

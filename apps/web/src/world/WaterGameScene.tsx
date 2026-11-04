@@ -1,5 +1,6 @@
+import { localize } from '../i18n';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { waterLive, type WaterSpec } from './waterGame';
 
@@ -10,24 +11,30 @@ import { waterLive, type WaterSpec } from './waterGame';
 
 function makeLabel(text: string, sub = '', warm = true) {
   const c = document.createElement('canvas');
-  c.width = 512;
-  c.height = sub ? 160 : 112;
+  c.width = 1024;
+  c.height = sub ? 400 : 224;
   const g = c.getContext('2d')!;
-  g.fillStyle = 'rgba(18,16,12,0.78)';
-  g.fillRect(8, 8, 496, c.height - 16);
-  g.strokeStyle = warm ? 'rgba(201,161,90,0.9)' : 'rgba(224,122,98,0.9)';
+  g.fillStyle = '#0b1821';
+  g.fillRect(4, 4, c.width-8, c.height-8);
+  g.strokeStyle = warm ? '#cfb379' : '#e89c83';
   g.lineWidth = 4;
-  g.strokeRect(10, 10, 492, c.height - 20);
-  g.fillStyle = '#f6efe0';
-  g.font = '600 46px "Noto Serif SC", serif';
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.fillText(text.slice(0, 10), 256, sub ? 56 : 56);
-  if (sub) {
-    g.fillStyle = 'rgba(232,226,210,0.75)';
-    g.font = '26px "Noto Sans SC", sans-serif';
-    g.fillText(sub.slice(0, 18), 256, 114);
-  }
+  g.strokeRect(8, 8, c.width-16, c.height-16);
+  g.textAlign = 'center';g.textBaseline = 'top';
+  const lines=(value:string,size:number)=>{
+    g.font=`600 ${size}px "Noto Sans SC", sans-serif`;
+    const words=value.match(/\p{Script=Han}|[^\s\p{Script=Han}]+/gu)??[];
+    const result:string[]=[];let line='';
+    for(const word of words){const spacer=/[A-Za-z0-9]$/.test(line)&&/^[A-Za-z0-9]/.test(word)?' ':'';const next=line+spacer+word;if(line&&g.measureText(next).width>944){result.push(line);line=word;}else line=next;}
+    if(line)result.push(line);return result;
+  };
+  const draw=(value:string,y:number,initial:number,maxLines:number,color:string)=>{
+    let size=initial,rows=lines(value,size);
+    while(rows.length>maxLines&&size>20){size-=2;rows=lines(value,size);}
+    g.fillStyle=color;
+    rows.forEach((row,index)=>g.fillText(row,512,y+index*size*1.25));
+  };
+  draw(text,30,sub?66:70,2,'#fff1d7');
+  if(sub)draw(sub,210,40,3,'#e8dcc6');
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return { map: t, aspect: c.width / c.height };
@@ -35,6 +42,7 @@ function makeLabel(text: string, sub = '', warm = true) {
 
 function Label({ text, sub, y = 3.2, w = 5, warm = true }: { text: string; sub?: string; y?: number; w?: number; warm?: boolean }) {
   const { map, aspect } = useMemo(() => makeLabel(text, sub, warm), [text, sub, warm]);
+  useEffect(()=>()=>map.dispose(),[map]);
   return (
     <sprite position={[0, y, 0]} scale={[w, w / aspect, 1]}>
       <spriteMaterial map={map} transparent depthWrite={false} toneMapped={false} />
@@ -108,7 +116,7 @@ export function WaterGameScene({ spec, reduceMotion }: { spec: WaterSpec; reduce
                   <planeGeometry args={[4.6, 1.2]} />
                   <meshBasicMaterial color="#f0d59a" transparent opacity={0.35} depthWrite={false} />
                 </mesh>
-                <Label text={gt.label} sub={gt.note} y={4.2} w={6.5} />
+                <Label text={localize(gt.label)} sub={localize(gt.note)} y={4.2} w={6.5} />
               </group>
             );
           })}
@@ -124,7 +132,7 @@ export function WaterGameScene({ spec, reduceMotion }: { spec: WaterSpec; reduce
             <circleGeometry args={[spec.ring.r - 0.3, 40]} />
             <meshBasicMaterial color="#f0d59a" transparent opacity={0.2} depthWrite={false} />
           </mesh>
-          <Label text={spec.ring.label} sub="把船停在圈里" y={3.6} w={6} />
+          <Label text={localize(spec.ring.label)} sub={localize("把船停在圈里")} y={3.6} w={6} />
         </group>
       )}
       {spec.kind === 'catch' && (
@@ -145,7 +153,7 @@ export function WaterGameScene({ spec, reduceMotion }: { spec: WaterSpec; reduce
                 <ringGeometry args={[0.9, 1.2, 24]} />
                 <meshBasicMaterial color={d.good ? '#f0d59a' : '#e07a62'} transparent opacity={0.3} depthWrite={false} />
               </mesh>
-              <Label text={d.label} y={2.2} w={2.6} warm={d.good} />
+              <Label text={localize(d.label)} y={2.2} w={2.6} warm={d.good} />
             </group>
           ))}
         </group>

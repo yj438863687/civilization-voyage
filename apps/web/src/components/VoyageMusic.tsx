@@ -1,3 +1,4 @@
+import { localize } from '../i18n';
 import { ChallengeSound, type ChallengeCue } from '../world/challengeSound';
 import { useEffect, useSyncExternalStore } from 'react';
 import { MUSIC_SCORES, VoyageMusic, type MusicEra } from '../world/voyageMusic';
@@ -41,10 +42,10 @@ export function MusicDirector({ era, story }: { era: string; story: boolean }) {
 export function MusicControls({ below = false }: { below?: boolean }) {
   const state = useSyncExternalStore(subscribe, () => snapshot);
   return <details className="voyage-music" data-placement={below ? 'below' : 'above'} data-playing={state.playing} data-era={state.era}>
-    <summary><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 14V4l9-2v10M7 6l9-2"/><ellipse cx="4.5" cy="15" rx="2.5" ry="2"/><ellipse cx="13.5" cy="13" rx="2.5" ry="2"/></svg>配乐{state.enabled ? '开' : '关'}</summary>
-    <div className="music-panel"><strong>{MUSIC_SCORES[state.era].title}</strong><p>{state.error || (state.playing ? '正在播放 · 游戏原创配乐' : state.enabled ? '开始操作后起奏' : '已暂停配乐')}</p>
-      <button type="button" className="btn" onClick={() => { if (state.error) { publish({ enabled: true, unlocked: true }); void play(); } else { const enabled = !snapshot.enabled; publish({ enabled }); save(); if (enabled) void play(); else music.stop(); } }}>{state.enabled && !state.error ? '关闭背景音乐' : '开启背景音乐'}</button>
-      <label>配乐音量<input type="range" aria-label="配乐音量" min="0" max="100" value={Math.round(state.volume * 100)} onChange={event => { publish({ volume: Number(event.target.value) / 100 }); save(); music.setVolume(snapshot.volume, storyMode); }}/></label><button type="button" className="btn" aria-pressed={state.effects} onClick={()=>{publish({effects:!state.effects});save();if(!snapshot.effects)effects.silence();else voyageCue('message');}}>互动音效{state.effects?'开':'关'}</button><p>配乐和音效分别控制，切到后台自动暂停。</p>
+    <summary><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 14V4l9-2v10M7 6l9-2"/><ellipse cx="4.5" cy="15" rx="2.5" ry="2"/><ellipse cx="13.5" cy="13" rx="2.5" ry="2"/></svg>{localize(state.enabled?'配乐开':'配乐关')}</summary>
+    <div className="music-panel"><strong>{localize(MUSIC_SCORES[state.era].title)}</strong><p>{localize(state.error || (state.playing ? '正在播放 · 游戏原创配乐' : state.enabled ? '开始操作后起奏' : '已暂停配乐'))}</p>
+      <button type="button" className="btn" onClick={() => { if (state.error) { publish({ enabled: true, unlocked: true }); void play(); } else { const enabled = !snapshot.enabled; publish({ enabled }); save(); if (enabled) void play(); else music.stop(); } }}>{localize(state.enabled && !state.error ? '关闭背景音乐' : '开启背景音乐')}</button>
+      <label>{localize("配乐音量")}<input type="range" aria-label={localize("配乐音量")} min="0" max="100" value={Math.round(state.volume * 100)} onChange={event => { publish({ volume: Number(event.target.value) / 100 }); save(); music.setVolume(snapshot.volume, storyMode); }}/></label><button type="button" className="btn" aria-pressed={state.effects} onClick={()=>{publish({effects:!state.effects});save();if(!snapshot.effects)effects.silence();else voyageCue('message');}}>{localize(state.effects?'互动音效开':'互动音效关')}</button><p>{localize("配乐和音效分别控制，切到后台自动暂停。")}</p>
     </div>
   </details>;
 }

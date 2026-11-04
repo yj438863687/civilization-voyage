@@ -1,0 +1,954 @@
+{
+  "A-near": {
+    "title": "Who receives the water?",
+    "region": "China",
+    "period": "Legends of flood control → Warring States period",
+    "question": "Once people can change a river, who decides where its water goes?",
+    "opening": "From flood legends to the Min River, the voyage follows irrigation from a skill into a shared way of life.",
+    "islands": [
+      {
+        "id": "A-water",
+        "title": "People beyond the dike",
+        "date": "The legend of Gun",
+        "who": "Gun",
+        "image": "water",
+        "paragraphs": [
+          "Ancient accounts tell of Gun building dikes and Yu continuing his unfinished work. These legends have no reliable calendar dates; we begin with the earlier generation.",
+          "This village is imagined from the legend. A higher dike protects its fields but sends rising water toward its neighbours. Earth is plentiful; workers are scarce. The next village asks you to leave a spillway."
+        ],
+        "source": {
+          "title": "《史记·夏本纪》：治水传说的文献记录",
+          "url": "https://ctext.org/shiji/xia-ben-ji/zh"
+        },
+        "options": [
+          {
+            "label": "Protect our village first",
+            "note": "Save materials; the neighbours bear the flood",
+            "text": "Our dike is higher. The neighbouring fields flood. When workers are needed again, that village is slow to respond.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Dig a shared spillway",
+            "note": "Contribute food and labour to give water a way out",
+            "text": "Water flows through the channel. The neighbours return with tools, and both banks agree to take turns watching the river.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Ancient legend",
+        "year": null
+      },
+      {
+        "id": "A-stake",
+        "title": "A turn for each field",
+        "date": "The legend of Yu, after Gun",
+        "who": "Yu",
+        "image": "yu",
+        "paragraphs": [
+          "In the legend, Yu takes up the task Gun left unfinished. Accounts of guiding water through channels raise a new question: how should people arrange the land around its flow?",
+          "The previous village’s method has reached this one. The main channel is open. Upstream farmers offer grain for more water, while downstream seedlings are drying. You must arrange when the gate opens."
+        ],
+        "source": {
+          "title": "《史记·夏本纪》：治水传说的文献记录",
+          "url": "https://ctext.org/shiji/xia-ben-ji/zh"
+        },
+        "options": [
+          {
+            "label": "Accept grain from upstream",
+            "note": "Take grain in exchange for more water",
+            "text": "The upstream village sends grain. Downstream fields miss this round of irrigation. The water keepers argue: should those with more grain always open the gate first?",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Agree on turns for both banks",
+            "note": "Spend provisions to share irrigation",
+            "text": "Both banks mark their irrigation times beside the channel. The water keepers have a common agreement to follow.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Ancient legend",
+        "year": null
+      }
+    ],
+    "crisis": {
+      "id": "A-n-flood",
+      "title": "Who maintains the river?",
+      "date": "Warring States period, third century BCE",
+      "who": "Villagers beside the Min River",
+      "image": "water",
+      "paragraphs": [
+        "Leaving legend behind, the voyage reaches Dujiangyan, an irrigation system with surviving engineering evidence. Diversion, sediment discharge and flood control work together and require continuing maintenance.",
+        "The spring flood is approaching. People along the river ask the fleet to help dredge the channel. Keeping all provisions for sailing gets the ship there sooner; staying to help makes it possible to clear the channel in time."
+      ],
+      "source": {
+        "title": "联合国教科文组织：都江堰",
+        "url": "https://whc.unesco.org/en/list/1001/"
+      },
+      "options": [
+        {
+          "label": "Leave on schedule",
+          "note": "Keep provisions for sailing",
+          "text": "The ship leaves on time. The villagers still wait beside the river; one group of helpers is missing from the maintenance work.",
+          "supply": 7,
+          "trust": -5
+        },
+        {
+          "label": "Stay to help maintain the channel",
+          "note": "Spend provisions and delay departure",
+          "text": "The ship leaves a day later. The channel entrance is clear, and both banks agree on next season’s water-keeping roster.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Historical context",
+      "year": -250
+    },
+    "ending": {
+      "name": "Li Bing",
+      "date": "Third century BCE",
+      "deed": "Governor of Shu under Qin, associated with the Dujiangyan works. This reflection is creative dialogue.",
+      "image": "water",
+      "reflection": "Dikes and channels change how water flows. Agreements change how neighbours live together. Irrigation makes settlement possible; fair access and continuing maintenance help both banks remain.",
+      "year": -250,
+      "fictional": false,
+      "deathYear": null
+    }
+  },
+  "A-far": {
+    "title": "Grain, records and a city",
+    "region": "World",
+    "period": "Around 3500–3200 BCE",
+    "question": "When a city can store and count grain, who should receive it?",
+    "opening": "In Mesopotamia, irrigation brings grain to the storehouse and writing records it. Follow what happens when the list and the people outside it do not match.",
+    "islands": [
+      {
+        "id": "A-bone",
+        "title": "Leave grain for tomorrow",
+        "date": "Around 3500 BCE",
+        "who": "A storekeeper in Mesopotamia",
+        "image": "grain",
+        "paragraphs": [
+          "Irrigated agriculture supported larger settlements in Mesopotamia. Storing and distributing grain became shared concerns. This storekeeping household and its choices are fictional.",
+          "This season has surplus barley. The ship can buy it at a high price, or leave it for families facing a season without a harvest. The canal workers also wait for their share."
+        ],
+        "source": {
+          "title": "大都会艺术博物馆：乌鲁克",
+          "url": "https://www.metmuseum.org/essays/uruk-the-first-city"
+        },
+        "options": [
+          {
+            "label": "Load the grain and leave",
+            "note": "Keep more grain aboard",
+            "text": "The hold is full. The canal workers’ families must wait for the next harvest for their provisions.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Keep a shared reserve",
+            "note": "Leave food for the canal workers",
+            "text": "Surplus grain stays in the store. The canal workers have food and agree to look after the next stretch of waterway.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": -3500
+      },
+      {
+        "id": "A-granary",
+        "title": "Who appears on the tablet?",
+        "date": "Around 3200 BCE",
+        "who": "An accounting apprentice in Uruk",
+        "image": "tablet",
+        "paragraphs": [
+          "Early tablets from Uruk record goods and quantities. The development of writing was closely connected with administration. A tablet was not an equal-access public register in the modern sense.",
+          "Those who deliver grain have a mark beside their names. Some people who carry grain and maintain the canals are missing. Check the records before the store closes."
+        ],
+        "source": {
+          "title": "大都会艺术博物馆：乌鲁克",
+          "url": "https://www.metmuseum.org/essays/uruk-the-first-city"
+        },
+        "options": [
+          {
+            "label": "Distribute by the existing list",
+            "note": "Save checking time",
+            "text": "The records match the stock, but people missing from the list still receive nothing. The numbers are right; the list is incomplete.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Check missing names before distribution",
+            "note": "Spend time checking the record",
+            "text": "The apprentice prepares another tablet and adds the workers. The store closes later, but the people who were missed receive grain.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": -3200
+      }
+    ],
+    "crisis": {
+      "id": "A-f-famine",
+      "title": "Open the reserve?",
+      "date": "Around 3200 BCE; fictional situation",
+      "who": "Families at the storehouse door",
+      "image": "grain",
+      "paragraphs": [
+        "A reserve and written accounts are already in place. Now a poor harvest arrives, and the ship also depends on this grain for the next leg.",
+        "The storehouse has enough to keep the ship moving. Families outside ask for food. You must weigh the next departure against the people who keep this settlement alive."
+      ],
+      "source": {
+        "title": "大都会艺术博物馆：乌鲁克",
+        "url": "https://www.metmuseum.org/essays/uruk-the-first-city"
+      },
+      "options": [
+        {
+          "label": "Load the ship first",
+          "note": "Keep the ship’s grain share",
+          "text": "The ship has surplus grain. People still wait outside the store. Keeping accounts has not automatically changed the order of distribution.",
+          "supply": 7,
+          "trust": -5
+        },
+        {
+          "label": "Honour the distribution agreement first",
+          "note": "Give up part of the crew’s share",
+          "text": "The crew takes a smaller share. People at the store receive grain by the list, giving the previous scene’s records practical weight.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Historical context",
+      "year": -3200
+    },
+    "ending": {
+      "name": "An old scribe of Uruk",
+      "date": "Around 3200 BCE",
+      "deed": "A fictional record keeper based on early urban administration.",
+      "image": "tablet",
+      "fictional": true,
+      "reflection": "Canals bring grain into the store; marks record it on clay. People still decide whose work appears and who receives food in a poor harvest. Technology helps a city grow; shared life requires more than counting.",
+      "year": -3200,
+      "deathYear": null
+    }
+  },
+  "B-near": {
+    "title": "From reading to building",
+    "region": "China",
+    "period": "1839–1909",
+    "question": "How can new technical knowledge open opportunities for more people?",
+    "opening": "The voyage begins with translated accounts, continues through a printed book and reaches a railway. Knowledge must travel through people before it changes daily life.",
+    "islands": [
+      {
+        "id": "B-coal",
+        "title": "First, understand the world",
+        "date": "1839–1841",
+        "who": "Lin Zexu",
+        "image": "lin",
+        "paragraphs": [
+          "Lin Zexu organized translations of foreign geography and newspapers. His compiled material, known as Sizhou Zhi, later became an important source for Wei Yuan.",
+          "In this fictional translation room, the ship has time for only part of the work. Merchants will pay for material on ships, cannon and prices. Nobody is pressing for material about harbour work and ordinary lives."
+        ],
+        "source": {
+          "title": "《海国图志》：原书",
+          "url": "https://zh.wikisource.org/wiki/海國圖志"
+        },
+        "options": [
+          {
+            "label": "Take the ship and cannon material first",
+            "note": "Keep the paying customers’ priority",
+            "text": "The translations reach merchants first. Craftspeople who want to learn repairs must wait for another opportunity.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Complete translations and share them with craftspeople",
+            "note": "Spend supplies on wider learning",
+            "text": "The ship leaves a day later. Craftspeople receive the translations too, and suggest starting a school that can teach repairs.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1839
+      },
+      {
+        "id": "B-gauge",
+        "title": "Let the book travel",
+        "date": "1842; compilation context",
+        "who": "Wei Yuan",
+        "image": "wei",
+        "paragraphs": [
+          "Wei Yuan used Sizhou Zhi and other sources to compile Haiguo Tuzhi, discussing world geography and the study of foreign technology. Later editions continued to expand.",
+          "The previous scene’s material has reached the printing blocks. Should limited paper and ink go to a few expensive copies, or to simpler editions for port apprentices? This printing arrangement is fictional."
+        ],
+        "source": {
+          "title": "《海国图志》：原书",
+          "url": "https://zh.wikisource.org/wiki/海國圖志"
+        },
+        "options": [
+          {
+            "label": "Print expensive editions first",
+            "note": "Keep more income from fewer copies",
+            "text": "The books sell. An apprentice at the port still has to wait to borrow a copy.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Keep simple editions for apprentices",
+            "note": "Use paper and ink for wider access",
+            "text": "Apprentices take turns reading and draw the parts they do not understand. Knowledge begins to travel beyond the study.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1842
+      }
+    ],
+    "crisis": {
+      "id": "B-n-boiler",
+      "title": "Who learns to build the railway?",
+      "date": "1909; opening of the Beijing–Zhangjiakou Railway",
+      "who": "A construction foreman",
+      "image": "zhan",
+      "paragraphs": [
+        "Zhan Tianyou led construction of the Beijing–Zhangjiakou Railway from 1905 to 1909. Turning technical knowledge into a working railway required engineers and the labour of workers.",
+        "The railway must open, but new workers still need training and experienced workers need rest. The fastest schedule is not necessarily the one that leaves people able to maintain the line."
+      ],
+      "source": {
+        "title": "国家铁路局：百年京张",
+        "url": "https://www.nra.gov.cn/tlfc/tpsy/202204/t20220405_293018.shtml"
+      },
+      "options": [
+        {
+          "label": "Work consecutive shifts to meet the deadline",
+          "note": "Keep the contract on schedule",
+          "text": "The contract is delivered on time. Workers are exhausted, and apprentices still only follow instructions.",
+          "supply": 7,
+          "trust": -5
+        },
+        {
+          "label": "Arrange relief and teach apprentices",
+          "note": "Spend supplies on rest and training",
+          "text": "The schedule gains some room. Workers rest, and a maintenance apprentice finally diagnoses a fault independently.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Historical context",
+      "year": 1909
+    },
+    "ending": {
+      "name": "Zhan Tianyou",
+      "date": "1909; Beijing–Zhangjiakou Railway",
+      "deed": "1861–1919. Led the railway’s surveying, design and construction. The dialogue is fictional.",
+      "image": "zhan",
+      "reflection": "Translation, printing and railway construction bring knowledge from paper onto the land. Progress needs designers, but also workers who can learn, rest and be respected. A line matters partly because of the opportunities it opens.",
+      "year": 1909,
+      "fictional": false,
+      "deathYear": 1919
+    }
+  },
+  "B-far": {
+    "title": "Beyond the engine",
+    "region": "World",
+    "period": "1769–1842",
+    "question": "When machines produce more, how should the gains be shared?",
+    "opening": "A more efficient engine leads to a factory and a dockside shift. More output makes new arrangements possible, but does not create them by itself.",
+    "islands": [
+      {
+        "id": "B-ticket",
+        "title": "What should fuel savings buy?",
+        "date": "1769",
+        "who": "An apprentice in Watt’s workshop",
+        "image": "watt",
+        "paragraphs": [
+          "In 1769 James Watt obtained a patent involving the separate condenser, improving the efficient use of fuel in steam engines.",
+          "The engine uses less coal. More orders would bring immediate income, but newcomers still need to learn maintenance. First help keep the pressure steady, then decide how to use the savings."
+        ],
+        "source": {
+          "title": "科学博物馆：瓦特与分离冷凝器",
+          "url": "https://blog.sciencemuseum.org.uk/james-watt-and-the-separate-condenser/"
+        },
+        "options": [
+          {
+            "label": "Put everything into new orders",
+            "note": "Turn fuel savings into more output",
+            "text": "The furnaces run longer and orders increase. New apprentices have still not learned to stop the machine for maintenance.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Maintain the engine and teach newcomers",
+            "note": "Use savings for skills and upkeep",
+            "text": "Apprentices learn maintenance and the machine stops for servicing. Workers remember that the fleet let them learn the work properly.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1769
+      },
+      {
+        "id": "B-shift",
+        "title": "Who covers the next shift?",
+        "date": "1833",
+        "who": "An adult textile worker",
+        "image": "loom",
+        "paragraphs": [
+          "Britain’s Factory Act of 1833 restricted child labour in textile mills and required education for some children. Rising output did not automatically produce better working rules.",
+          "The new rules need a practical shift plan. An adult must cover the work, and someone must pay. Count the materials, then decide what the ship will contribute."
+        ],
+        "source": {
+          "title": "英国议会：1833 年工厂法",
+          "url": "https://www.parliament.uk/about/living-heritage/transformingsociety/livinglearning/19thcentury/overview/factoryact/"
+        },
+        "options": [
+          {
+            "label": "Schedule only the minimum required",
+            "note": "Save the extra staffing cost",
+            "text": "The factory meets the minimum requirements. Families still struggle to balance income with children’s learning.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Pay for adult cover",
+            "note": "Use supplies to support lessons and wages",
+            "text": "Children stay in the classroom longer, and adult workers receive wages for covering the shift. The forgone cloth now has a clear purpose.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1833
+      }
+    ],
+    "crisis": {
+      "id": "B-f-strike",
+      "title": "A delivery and a working day",
+      "date": "1842; fictional situation",
+      "who": "A representative of dockworkers",
+      "image": "loom",
+      "paragraphs": [
+        "Industrialization depended on more than invention. Working hours, education and safety became continuing matters of public debate.",
+        "Cargo is waiting and a delivery is due. Workers ask for relief and a safer handover. Keeping every minute for loading saves money; a different schedule costs supplies today."
+      ],
+      "source": {
+        "title": "英国议会：1833 年工厂法",
+        "url": "https://www.parliament.uk/about/living-heritage/transformingsociety/livinglearning/19thcentury/overview/factoryact/"
+      },
+      "options": [
+        {
+          "label": "Cut the arrangements to deliver early",
+          "note": "Save time and supplies today",
+          "text": "The cargo arrives early. Workers cross out the old promise. When new machinery is discussed again, they ask about the contract first.",
+          "supply": 7,
+          "trust": -5
+        },
+        {
+          "label": "Keep the agreed shifts",
+          "note": "Spend provisions to honour the arrangement",
+          "text": "The cargo arrives later. Workers keep their rest rotation and are willing to discuss the next improvements with the fleet.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Historical context",
+      "year": 1842
+    },
+    "ending": {
+      "name": "Robert Owen",
+      "date": "1842",
+      "deed": "1771–1858. Known for factory reform and education at New Lanark. This is creative reflection, not a quotation.",
+      "image": "loom",
+      "fictional": false,
+      "reflection": "Less coal and more output are only a beginning. Who gains a meal, a rest or a chance to learn? The methods of production can change; people must also discuss how to live and work together.",
+      "year": 1842,
+      "deathYear": 1858,
+      "source": {
+        "title": "联合国教科文组织：新拉纳克",
+        "url": "https://whc.unesco.org/en/list/429/"
+      }
+    }
+  },
+  "C-near": {
+    "title": "A line needs people",
+    "region": "China",
+    "period": "1871–1896",
+    "question": "Once messages travel faster, who can use the line and keep it working?",
+    "opening": "A cable reaches Shanghai, the Tianjin–Shanghai line expands communication, and an education proposal asks who will care for the network next.",
+    "islands": [
+      {
+        "id": "C-screen",
+        "title": "Who sends the first message?",
+        "date": "1871; Shanghai",
+        "who": "A cable apprentice in Shanghai",
+        "image": "telegraph",
+        "paragraphs": [
+          "In 1871 international submarine telegraph lines reached Shanghai. Long-distance communication began changing how messages moved through the treaty port.",
+          "Trade orders pay the bill, but requests for medical help and family letters are also waiting. First secure the cable. A faster line will not decide the queue for you."
+        ],
+        "source": {
+          "title": "中国电信博物馆：从1871年海缆到1881年津沪电报",
+          "url": "https://museum.chinatelecom.com.cn/yj/txkp/202507/t20250709_88651.html"
+        },
+        "options": [
+          {
+            "label": "Send two cargo orders first",
+            "note": "Keep the fleet’s trading advantage",
+            "text": "The fleet agrees on cargo prices in time. A person asking for medical help still waits outside.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Reserve space for medical requests and family letters",
+            "note": "Give up a paid slot",
+            "text": "The medical request goes first. For the first time, the cable worker hears a recipient’s name rather than just an account number.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1871
+      },
+      {
+        "id": "C-dark",
+        "title": "Arrange the telegraph queue",
+        "date": "1881",
+        "who": "An operator on the Tianjin–Shanghai line",
+        "image": "sheng",
+        "paragraphs": [
+          "The Tianjin–Shanghai telegraph line opened in 1881, advancing Chinese-operated telecommunications. Charges, staffing and training also shaped who could use it.",
+          "High-paying orders fill the queue. A request for help needs its place name checked, and a family letter needs forwarding. Decide who receives attention first."
+        ],
+        "source": {
+          "title": "中国电信博物馆：从1871年海缆到1881年津沪电报",
+          "url": "https://museum.chinatelecom.com.cn/yj/txkp/202507/t20250709_88651.html"
+        },
+        "options": [
+          {
+            "label": "Order messages by payment",
+            "note": "Keep the line’s higher-paying traffic",
+            "text": "The commercial order receives a quick reply. The request for help still waits for a free slot.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Send urgent requests and family letters first",
+            "note": "Spend supplies on public access",
+            "text": "The operator checks the place name and sends the request for help. The fleet loses a small price advantage and leaves a new staffing rule.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1881
+      }
+    ],
+    "crisis": {
+      "id": "C-n-wire",
+      "title": "Who will keep the line working?",
+      "date": "1896; fictional situation around an education proposal",
+      "who": "A new telegraph apprentice",
+      "image": "sheng",
+      "paragraphs": [
+        "Sheng Xuanhuai helped develop modern telegraph services and proposed schools to train people. A communication network needs knowledge to reach the next generation.",
+        "The line is busy. Teaching a new apprentice takes an experienced operator away from the desk. You can keep the immediate work moving or support someone learning to maintain the network."
+      ],
+      "source": {
+        "title": "上海档案馆：1896年请设学堂",
+        "url": "https://www.shda.gov.cn/dawh/dacq/202604/t20260410_76503.html"
+      },
+      "options": [
+        {
+          "label": "Hire an experienced operator for the orders",
+          "note": "Keep immediate commercial work moving",
+          "text": "Commercial messages continue. The apprentice still only copies text; the next shortage will require another experienced hire.",
+          "supply": 7,
+          "trust": -5
+        },
+        {
+          "label": "Set aside an instruction shift",
+          "note": "Accept fewer orders to train someone",
+          "text": "The apprentice takes an independent shift for the first time. Someone is now available for ordinary people’s urgent messages too.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Historical context",
+      "year": 1896
+    },
+    "ending": {
+      "name": "Sheng Xuanhuai",
+      "date": "1896",
+      "deed": "1844–1916. Helped develop modern telegraph services and schools. The dialogue is fictional.",
+      "image": "sheng",
+      "reflection": "Cables connect places, organizations keep a line operating, and schools prepare its next keepers. Technology can carry words far away. Wider access, understanding and learning still require social arrangements.",
+      "year": 1896,
+      "fictional": false,
+      "deathYear": 1916
+    }
+  },
+  "C-far": {
+    "title": "Across the ocean, beyond the signal",
+    "region": "World",
+    "period": "1844–1948",
+    "question": "When a message can cross the world, what makes communication useful?",
+    "opening": "Follow the telegraph, the transatlantic cable and communication theory. A signal can be measured, but its place in people’s lives needs another kind of judgment.",
+    "islands": [
+      {
+        "id": "C-relay",
+        "title": "Can the other end read it?",
+        "date": "1844; United States",
+        "who": "An apprentice beside Samuel Morse",
+        "image": "morse",
+        "paragraphs": [
+          "In 1844 Samuel Morse demonstrated telegraph communication between Washington and Baltimore. Telegraphy let messages travel without waiting for a messenger’s footsteps.",
+          "A key turns words into signals, and each part must be checked. Send the sequence correctly before deciding how to share the line between urgent requests and commercial orders."
+        ],
+        "source": {
+          "title": "美国国会图书馆：1844 年第一封电报",
+          "url": "https://www.loc.gov/item/mcc.019/"
+        },
+        "options": [
+          {
+            "label": "Handle commercial orders first",
+            "note": "Keep the trading advantage",
+            "text": "Cargo prices arrive first. A family still waits beside the window for news.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Send missing-person and medical requests first",
+            "note": "Give up revenue for urgent messages",
+            "text": "Two urgent telegrams are sent. The new technology enters these families’ daily lives for the first time.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1844
+      },
+      {
+        "id": "C-tz",
+        "title": "Who is left off the network?",
+        "date": "1866",
+        "who": "A transatlantic cable-station operator",
+        "image": "cable",
+        "paragraphs": [
+          "In 1866 a lasting transatlantic telegraph connection was established. Crossing the ocean no longer always meant waiting for a ship to bring a reply.",
+          "The line is expensive and slots are scarce. The previous scene’s priorities now reach across an ocean: merchants offer more, while families of shipwreck victims can afford only an ordinary fee."
+        ],
+        "source": {
+          "title": "美国国务院历史办公室：1866 年跨洋电缆",
+          "url": "https://history.state.gov/milestones/1866-1898/telegraph"
+        },
+        "options": [
+          {
+            "label": "Sell the slots to trading firms",
+            "note": "Keep the higher payments",
+            "text": "The cable is busier. Families still wait by the shore for the list of survivors.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Reserve a slot for ordinary families",
+            "note": "Give up a higher-paying slot",
+            "text": "The survivor list reaches the other shore. Someone finally learns that a relative is still alive.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1866
+      }
+    ],
+    "crisis": {
+      "id": "C-f-wire",
+      "title": "What should reliability serve?",
+      "date": "1948; fictional situation",
+      "who": "An engineer in a communication laboratory",
+      "image": "shannon",
+      "paragraphs": [
+        "Claude Shannon published A Mathematical Theory of Communication in 1948, examining channel capacity, coding and noise.",
+        "The laboratory can improve transmission, but the line still has limited capacity. The fleet must choose between selling all of it and reserving some for requests for help."
+      ],
+      "source": {
+        "title": "贝尔实验室：1948 年《通信的数学理论》",
+        "url": "https://www.nokia.com/bell-labs/publications-and-media/publications/a-mathematical-theory-of-communication/"
+      },
+      "options": [
+        {
+          "label": "Take high-paying messages first",
+          "note": "Sell the available capacity",
+          "text": "The line’s utilization looks good. Someone receives no reply because their message has not reached the front of the queue.",
+          "supply": 7,
+          "trust": -5
+        },
+        {
+          "label": "Reserve capacity for requests for help",
+          "note": "Give up immediate revenue",
+          "text": "The request for help arrives. The engineer writes the reserved public capacity into the shift instructions.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Historical context",
+      "year": 1948
+    },
+    "ending": {
+      "name": "Claude Shannon",
+      "date": "1948",
+      "deed": "1916–2001. Developed a mathematical theory of communication. The discussion of priorities is creative dialogue.",
+      "image": "shannon",
+      "reflection": "Telegraphy reduces waiting; a cable crosses an ocean; information theory explains reliable transmission. Equations help measure capacity. People and institutions still decide which messages come first and who pays.",
+      "year": 1948,
+      "fictional": false,
+      "deathYear": 2001
+    }
+  },
+  "D-near": {
+    "title": "Capacity, boundaries and responsibility",
+    "region": "China",
+    "period": "2017 → 2021 → imagined 2035",
+    "question": "How should artificial intelligence enter shared life responsibly?",
+    "opening": "From a development plan to information boundaries and an imagined future voyage, consider what people need to learn, understand and remain responsible for.",
+    "islands": [
+      {
+        "id": "D-log",
+        "title": "What is missing from the schedule?",
+        "date": "2017",
+        "who": "A port dispatcher",
+        "image": "computer",
+        "paragraphs": [
+          "China issued its New Generation Artificial Intelligence Development Plan in 2017. Alongside development, it addressed ethical, legal and social questions.",
+          "The new schedule raises output, but does not count long shifts or time for learning. A system can calculate only with the priorities people give it."
+        ],
+        "source": {
+          "title": "国务院：2017 年新一代人工智能发展规划",
+          "url": "https://app.www.gov.cn/govdata/gov/201707/20/408540/article.html"
+        },
+        "options": [
+          {
+            "label": "Adopt the system’s schedule immediately",
+            "note": "Save training time and supplies",
+            "text": "Waiting times fall. People unfamiliar with the terminal move into temporary jobs without knowing how to return to their previous work.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Train people during a trial",
+            "note": "Use time and supplies for participation",
+            "text": "The trial is slower. An experienced worker spots an error in the tide data, and the schedule is corrected.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 2017
+      },
+      {
+        "id": "D-skip",
+        "title": "Which details are really needed?",
+        "date": "2021",
+        "who": "A passenger-information clerk",
+        "image": "computer",
+        "paragraphs": [
+          "China’s Personal Information Protection Law took effect in 2021. The game’s specific forms and decisions are fictional and are not legal instructions.",
+          "The new dispatch service can collect more information. Basic operation will continue either way. Should an optional personalized service have a separate explanation, consent and an exit?"
+        ],
+        "source": {
+          "title": "全国人大：2021 年个人信息保护法",
+          "url": "https://en.npc.gov.cn.cdurl.cn/2021-12/29/c_694559.htm"
+        },
+        "options": [
+          {
+            "label": "Leave the optional service off for now",
+            "note": "Keep the basic service and save supplies",
+            "text": "The system continues running, while personalized services are postponed. The fleet keeps its supplies but does not offer passengers a new option.",
+            "supply": 4,
+            "trust": 0
+          },
+          {
+            "label": "Explain the service and provide an exit",
+            "note": "Spend supplies on an informed choice",
+            "text": "Passengers understand the purpose. Some participate and others opt out. The dispatcher learns to separate what can be collected from what people are willing to share.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 2021
+      }
+    ],
+    "crisis": {
+      "id": "D-n-grant",
+      "title": "Who answers for the voyage?",
+      "date": "2035; an imagined future",
+      "who": "The ship’s duty captain",
+      "image": "computer",
+      "paragraphs": [
+        "This is a fictional future situation, not an event that has already happened or a prediction of technological progress.",
+        "The system proposes the lowest-energy route, omitting a small port short of supplies. The crew notices that the port’s data has not been updated for a long time. Will you verify it before deciding on a detour?"
+      ],
+      "source": {
+        "title": "国务院：2017 年新一代人工智能发展规划",
+        "url": "https://app.www.gov.cn/govdata/gov/201707/20/408540/article.html"
+      },
+      "options": [
+        {
+          "label": "Continue on the planned route",
+          "note": "Save provisions and the detour",
+          "text": "The ship passes safely. You record why it did not stop, while the small port waits for the next ship.",
+          "supply": 7,
+          "trust": -5
+        },
+        {
+          "label": "Check the information and take a detour",
+          "note": "Spend supplies on verification and support",
+          "text": "The crew verifies the letter and changes course. The system provides calculations; people aboard decide whether to stop.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Imagined future",
+      "year": 2035
+    },
+    "ending": {
+      "name": "The fleet’s duty captain",
+      "date": "2035; an imagined future",
+      "deed": "A fictional Chinese captain reflecting on training, informed choices and navigation decisions.",
+      "image": "computer",
+      "fictional": true,
+      "reflection": "A schedule can be faster and a dataset larger. The crew still needs time to learn, passengers need to understand what they share, and someone must answer for navigation. Our arrangements give capability its boundaries and responsibilities.",
+      "year": 2035,
+      "deathYear": null
+    }
+  },
+  "D-far": {
+    "title": "A convincing result needs a boundary",
+    "region": "World",
+    "period": "1950–2016",
+    "question": "What does a machine’s achievement justify us asking it to do next?",
+    "opening": "From questions about intelligence to ELIZA and AlphaGo, examine the difference between a compelling demonstration and evidence for another task.",
+    "islands": [
+      {
+        "id": "D-star",
+        "title": "A fluent reply is not understanding",
+        "date": "1950 → 1966",
+        "who": "A research assistant in the ELIZA laboratory",
+        "image": "eliza",
+        "paragraphs": [
+          "In 1950 Alan Turing discussed machine intelligence and the imitation game. In 1966 Joseph Weizenbaum’s ELIZA let people experience a text conversation with a program.",
+          "The replies sound attentive. Check what the program actually verified, rather than treating a reformulated question as evidence of understanding."
+        ],
+        "source": {
+          "title": "计算机历史博物馆：ELIZA（1966）",
+          "url": "https://www.computerhistory.org/timeline/ai-robotics/"
+        },
+        "options": [
+          {
+            "label": "Give a short demonstration only",
+            "note": "Save time explaining how it works",
+            "text": "Visitors remember the replies. Some treat the program as an adviser that understands their situation.",
+            "supply": 7,
+            "trust": -5
+          },
+          {
+            "label": "Explain how the replies work and their limits",
+            "note": "Use supplies for a clearer demonstration",
+            "text": "Visitors still find it novel, and also know that the program has not verified their lives.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 1966
+      },
+      {
+        "id": "D-weight",
+        "title": "What does one good move prove?",
+        "date": "2016",
+        "who": "A player watching AlphaGo",
+        "image": "go",
+        "paragraphs": [
+          "In 2016 AlphaGo defeated Lee Sedol by four games to one, demonstrating machine learning’s ability in the game of Go.",
+          "A strong move is real evidence within the rules of Go. Choosing a sea route is a different task. Sort supported records from unsupported claims before deciding what further testing needs."
+        ],
+        "source": {
+          "title": "DeepMind：AlphaGo 与李世石（2016）",
+          "url": "https://deepmind.google/research/alphago/"
+        },
+        "options": [
+          {
+            "label": "Keep the demonstration to the game",
+            "note": "Save the cost of another trial",
+            "text": "The demonstration ends smoothly. The fleet undertakes no new trial, and the original crew remains responsible for navigation.",
+            "supply": 4,
+            "trust": 0
+          },
+          {
+            "label": "Invest in a navigation-context trial",
+            "note": "Use supplies to test a different task",
+            "text": "The trial reveals a problem with outdated information. The player says that winning at Go is impressive, but another job needs another body of evidence.",
+            "supply": -6,
+            "trust": 8
+          }
+        ],
+        "nature": "Historical context",
+        "year": 2016
+      }
+    ],
+    "crisis": {
+      "id": "D-f-proposal",
+      "title": "Set the limits before departure",
+      "date": "2016; fictional situation",
+      "who": "The fleet’s technology assessor",
+      "image": "turing",
+      "paragraphs": [
+        "This assessment is fictional, developed from the questions in the first two scenes. It is not a real navigation application of AlphaGo.",
+        "A sponsor offers to fund a fully automated sailing demonstration. The crew thinks verification is incomplete and wants confirmation and human takeover to remain available. Earlier choices affect whether anyone helps you check."
+      ],
+      "source": {
+        "title": "DeepMind：AlphaGo 与李世石（2016）",
+        "url": "https://deepmind.google/research/alphago/"
+      },
+      "options": [
+        {
+          "label": "Decline the demonstration and keep the voyage",
+          "note": "Save supplies and avoid an unverified trial",
+          "text": "The fleet sails as usual. Nobody takes the risk, and there are no new test results yet.",
+          "supply": 3,
+          "trust": 0
+        },
+        {
+          "label": "Agree on confirmation and human takeover",
+          "note": "Spend supplies on a supervised trial",
+          "text": "The sponsor accepts the revised demonstration. The crew records what the system can do and when a person must take over.",
+          "supply": -6,
+          "trust": 8
+        }
+      ],
+      "nature": "Historical context",
+      "year": 2016
+    },
+    "ending": {
+      "name": "Lee Sedol",
+      "date": "2016",
+      "deed": "Played AlphaGo in the five-game match. This reflection is creative dialogue, not his own words.",
+      "image": "go",
+      "fictional": false,
+      "reflection": "From fluent replies to surprising moves, machines have gained real abilities. A game proves something within that game. Another task needs another body of evidence, and the decisions we hand over need clear limits.",
+      "year": 2016,
+      "deathYear": null,
+      "source": {
+        "title": "Google DeepMind：AlphaGo",
+        "url": "https://deepmind.google/research/alphago/"
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { localize } from '../i18n';
 import { useEffect, useRef, useState } from 'react';
 import type { Encounter, Outcome } from '../world/encounters';
 import { voyageCue } from './VoyageMusic';
@@ -67,16 +68,12 @@ export function EncounterOverlay({
     };
   }, [phase, reduceMotion]);
 
-  // 对话：一句一句出来。空格或点击加快
+  const advanceDialogue=()=>{if(said+1>=dialog.length){setSaid(dialog.length);setPhase('play');}else setSaid(n=>Math.min(dialog.length,n+1));};
+
+  // 每句由玩家推进，英文长句和减少动态模式都有足够阅读时间。
   useEffect(() => {
     if (phase !== 'talk') return;
-    const next = () => {
-      if(said+1>=dialog.length){setSaid(dialog.length);setPhase('play');}
-      else setSaid(n=>Math.min(dialog.length,n+1));
-    };
-    const line = dialog[Math.min(said, dialog.length - 1)];
-    const len = (line?.you ?? line?.them ?? '').length;
-    const t = window.setTimeout(next, reduceMotion ? 700 : 900 + len * 90);
+    const next=advanceDialogue;
     const key = (e: KeyboardEvent) => {
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
@@ -85,7 +82,6 @@ export function EncounterOverlay({
     };
     window.addEventListener('keydown', key);
     return () => {
-      window.clearTimeout(t);
       window.removeEventListener('keydown', key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,24 +147,24 @@ export function EncounterOverlay({
 
   const g = enc.game;
   return (
-    <div className={`enc${crisis ? ' is-crisis' : ''}${secret ? ' is-secret' : ''}`} role="dialog" aria-label={`${enc.who}：${title}`}>
+    <div className={`enc${crisis ? ' is-crisis' : ''}${secret ? ' is-secret' : ''}`} role="dialog" aria-label={localize(`${enc.who}：${title}`)}>
       <div className="enc-scrim" aria-hidden />
-      {onCancel&&<button className="btn encounter-return" type="button" onClick={onCancel}>暂时回到船上</button>}
-      {crisis && <span className="enc-crisis">{title.startsWith('转') ? `${title} · 出事了` : title}</span>}
-      {secret && <span className="enc-secret">暗线 · {title} · 引文出自陶渊明《桃花源记》</span>}
+      {onCancel&&<button className="btn encounter-return" type="button" onClick={onCancel}>{localize("暂时回到船上")}</button>}
+      {crisis && <span className="enc-crisis">{localize(title.startsWith('转') ? `${title} · 出事了` : title)}</span>}
+      {secret && <span className="enc-secret">{localize("暗线 · ")}{localize(title)}{localize(" · 引文出自陶渊明《桃花源记》")}</span>}
       <div className="enc-who">
-        <span className="enc-name">{enc.who}</span>
-        <span className="enc-role">{enc.role}</span>
+        <span className="enc-name">{localize(enc.who)}</span>
+        <span className="enc-role">{localize(enc.role)}</span>
       </div>
-      {cause && <p className={`enc-cause${phase === 'intro' ? ' is-in' : ' is-up'}`}>{cause}</p>}
-      <p className={`enc-line${phase === 'intro' ? ' is-in' : ' is-up'}`}>{dialog.length ? enc.line : `「${enc.line}」`}</p>
+      {cause && <p className={`enc-cause${phase === 'intro' ? ' is-in' : ' is-up'}`}>{localize(cause)}</p>}
+      <p className={`enc-line${phase === 'intro' ? ' is-in' : ' is-up'}`}>{localize(dialog.length ? enc.line : `「${enc.line}」`)}</p>
 
       {(phase === 'talk' || (phase === 'play' && dialog.length > 0)) && (
         <div className={`enc-talk${phase === 'play' ? ' is-done' : ''}`}>
           {dialog.slice(0, Math.max(1, said + 1)).map((d, i) => (
             <p key={i} className={`talk-line ${d.you ? 'is-you' : 'is-them'}${i === said ? ' is-new' : ''}`}>
-              {d.you ? <span className="talk-who">你</span> : <span className="talk-who">{enc.who}</span>}
-              {d.you ?? d.them}
+              {d.you ? <span className="talk-who">{localize("你")}</span> : <span className="talk-who">{localize(enc.who)}</span>}
+              {localize(d.you ?? d.them)}
             </p>
           ))}
         </div>
@@ -176,28 +172,28 @@ export function EncounterOverlay({
 
       {phase === 'play' && <WaterPlay g={g} timed={!!timeLimit} />}
 
-      {phase==='decision'&&enc.social&&work&&<div className="enc-decision" aria-label="决定怎样使用成果"><h3>{enc.social.ask}</h3><p>{work.o.text}</p><div>{enc.social.options.map(option=><button className="btn" type="button" key={option.label} onClick={()=>{voyageCue('confirm');settle({skillSucceeded:work.o.skillSucceeded,text:work.o.text+' '+option.out.text,supply:work.o.supply+option.out.supply,trust:work.o.trust+option.out.trust,set:{...work.o.set,...option.out.set}},option.label);}}><strong>{option.label}</strong><span>{option.note}</span><small>补给 {work.o.supply+option.out.supply>0?'+':''}{work.o.supply+option.out.supply} · 人心 {work.o.trust+option.out.trust>0?'+':''}{work.o.trust+option.out.trust}</small></button>)}</div><p>想好再选，没有倒计时。补给要留给航行，人心来自沿途的信任。</p></div>}
+      {phase==='decision'&&enc.social&&work&&<div className="enc-decision" aria-label={localize("决定怎样使用成果")}><h3>{localize(enc.social.ask)}</h3><p>{localize(work.o.text)}</p><div>{enc.social.options.map(option=><button className="btn" type="button" key={option.label} onClick={()=>{voyageCue('confirm');settle({skillSucceeded:work.o.skillSucceeded,text:work.o.text+' '+option.out.text,supply:work.o.supply+option.out.supply,trust:work.o.trust+option.out.trust,set:{...work.o.set,...option.out.set}},option.label);}}><strong>{localize(option.label)}</strong><span>{localize(option.note)}</span><small>{localize("补给 ")}{localize(work.o.supply+option.out.supply>0?'+':'')}{localize(work.o.supply+option.out.supply)}{localize(" · 人心 ")}{localize(work.o.trust+option.out.trust>0?'+':'')}{localize(work.o.trust+option.out.trust)}</small></button>)}</div><p>{localize("想好再选，没有倒计时。补给要留给航行，人心来自沿途的信任。")}</p></div>}
 
       {phase === 'result' && out && (
         <div className="enc-result">
-          <p className="enc-result-text">{out.o.text}</p>
+          <p className="enc-result-text">{localize(out.o.text)}</p>
           <p className="enc-result-delta">
-            <Delta label="补给" v={out.o.supply} />
-            <Delta label="人心" v={out.o.trust} />
-            {!crisis && !secret && <span className="enc-got">记进航海日志 · {title}</span>}
+            <Delta label={localize("补给")} v={out.o.supply} />
+            <Delta label={localize("人心")} v={out.o.trust} />
+            {!crisis && !secret && <span className="enc-got">{localize("记进航海日志 · ")}{localize(title)}</span>}
           </p>
         </div>
       )}
-      {(phase === 'intro' || phase === 'talk') && <p className="enc-hint">空格继续</p>}
+      {(phase==='intro'||phase==='talk')&&<button className="cine-link enc-hint" type="button" onClick={()=>phase==='intro'?setPhase(dialog.length?'talk':'play'):advanceDialogue()}>{localize(phase==='intro'?'开始对话 · 空格':'下一句 · 空格')}</button>}
     </div>
   );
 }
 
 function Delta({ label, v }: { label: string; v: number }) {
-  if (!v) return <span className="enc-delta is-zero">{label} ±0</span>;
+  if (!v) return <span className="enc-delta is-zero">{localize(label)} ±0</span>;
   return (
     <span className={`enc-delta ${v > 0 ? 'is-up' : 'is-down'}`}>
-      {label} {v > 0 ? `+${v}` : v}
+      {localize(label)} {localize(v > 0 ? `+${v}` : v)}
     </span>
   );
 }
@@ -223,11 +219,12 @@ function WaterPlay({ g, timed }: { g: Encounter['game']; timed: boolean }) {
   }
   return (
     <div className={`enc-water${w.inside ? ' is-inside' : ''}`}>
-      <p className="enc-water-line">{line}</p>
+      <p className="enc-water-line">{localize(line)}</p>
+      {g.kind==='choice'&&<div className="enc-gate-legend">{g.options.map(option=><div key={option.label}><strong>{localize(option.label)}</strong><span>{localize(option.note)}</span></div>)}</div>}
       <p className="enc-how">
-        {prog && <span className="enc-water-prog">{prog}</span>}
-        {timed || g.kind !== 'choice' ? <span className={`enc-water-left${w.left < 5 ? ' is-late' : ''}`}>还剩 {w.left.toFixed(0)} 秒</span> : null}
-        <span>WASD 开船 · 铜针指着它</span>
+        {prog && <span className="enc-water-prog">{localize(prog)}</span>}
+        {timed || g.kind !== 'choice' ? <span className={`enc-water-left${w.left < 5 ? ' is-late' : ''}`}>{localize("还剩 ")}{localize(w.left.toFixed(0))}{localize(" 秒")}</span> : null}
+        <span>{localize("WASD 开船 · 铜针指着它")}</span>
       </p>
     </div>
   );
