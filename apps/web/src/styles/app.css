@@ -2510,3 +2510,71 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 .enc:has(.enc-water) .enc-scrim { opacity: 0.55; }
 .enc:has(.enc-water) .enc-talk { display: none; }
 .enc:has(.enc-water) .enc-line { display: none; }
+
+/* 历史岛：海图上的入口，进入后翻开一册有图可考的故事。 */
+.history-overlay { position: fixed; inset: 0; z-index: var(--cv-z-modal); display: grid; place-items: center; padding: clamp(12px, 3vw, 40px); background: rgb(7 15 19 / 0.94); color: var(--cv-text-on-paper); }
+.history-island { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); width: min(1120px, 100%); max-height: 92dvh; overflow: auto; overscroll-behavior: contain; background: var(--cv-surface-paper); border: 1px solid var(--cv-brass-500); box-shadow: var(--cv-shadow-panel); text-align: left; scrollbar-color: var(--cv-brass-500) var(--cv-surface-paper-2); }
+.history-island:focus { outline: none; }
+.history-visual { padding: clamp(18px, 3vw, 38px); background: var(--cv-surface-paper-2); border-right: 1px solid var(--cv-line-on-paper); }
+.history-image { margin: 0; min-width: 0; }
+.history-image img { display: block; width: 100%; height: min(48vh, 440px); object-fit: contain; background: #d6c9b1; }
+.history-image figcaption, .history-visual > p { margin: 12px 0 0; font-size: 12px; line-height: 1.7; color: var(--cv-text-on-paper-muted); overflow-wrap: anywhere; }
+.history-image details { margin-top: 8px; }
+.history-image details span { display: block; }
+.history-island a, .history-recap a { color: #71501f; text-decoration: underline; text-underline-offset: 3px; }
+.history-island summary { cursor: pointer; padding-block: 8px; }
+.history-reading { padding: clamp(20px, 3.6vw, 48px); min-width: 0; }
+.history-reading h2 { margin: 0 0 8px; font: 600 clamp(26px, 3vw, 36px)/1.4 var(--cv-font-display); text-wrap: balance; }
+.history-reading h3 { font: 600 22px/1.5 var(--cv-font-display); margin: 28px 0 12px; }
+.history-reading p { line-height: 1.85; margin: 16px 0; overflow-wrap: anywhere; }
+.history-reading .history-date { color: var(--cv-text-on-paper-muted); margin: 0 0 24px; font-size: 14px; }
+.history-reading .history-source { font-size: 13px; margin: 24px 0; }
+.history-island .btn { color: var(--cv-text-on-paper); border-color: var(--cv-brass-600); min-height: 44px; white-space: normal; line-height: 1.5; }
+.history-island .btn-primary { color: var(--cv-action-primary-text); }
+.history-island :is(button, summary, a):focus-visible, .shipyard-panel :is(button, a):focus-visible { outline: 2px solid #9e3a26; outline-offset: 4px; }
+.history-island ::selection { background: #c9a15a; color: #2a2620; }
+.history-island button { transition: background-color 160ms ease-out, border-color 160ms ease-out; }
+.history-board > p { font-size: 13px; color: var(--cv-text-on-paper-muted); }
+.history-board > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-block: 16px 24px; }
+.history-board button, .history-decision button { min-height: 62px; border: 1px solid #a18b67; background: transparent; color: var(--cv-text-on-paper); padding: 10px 12px; text-align: left; font: inherit; cursor: pointer; }
+.history-board button span, .history-board button small { display: block; }
+.history-board button small { margin-top: 5px; font-size: 12px; }
+.history-board button[aria-pressed="true"], .history-decision button[aria-pressed="true"] { background: #344f48; border-color: #344f48; color: #fff4df; }
+.history-board button:hover, .history-decision button:hover { border-color: var(--cv-cinnabar-600); }
+.history-board button:disabled { cursor: default; opacity: 0.55; }
+.history-decision { display: flex; gap: 8px; margin-top: 20px; }
+.history-decision button { flex: 1; }
+.history-evidence details, .history-cause { border-block-end: 1px solid var(--cv-line-on-paper); padding: 6px 0; }
+.history-evidence details p { margin-top: 8px; }
+.history-consequence { padding-block: 14px; border-block: 1px solid var(--cv-line-on-paper); font-variant-numeric: tabular-nums; }
+.history-consequence p { margin: 4px 0; font-size: 14px; }
+.history-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.history-timeline { list-style: none; display: grid; gap: 0; padding: 0; margin: 24px 0; }
+.history-timeline li { display: grid; gap: 4px; padding: 10px 0; border-bottom: 1px solid currentColor; }
+.history-timeline li span { font-size: 12px; }
+.history-timeline li strong { font-size: 14px; font-weight: 500; }
+.history-timeline li.is-complete strong::after { content: ' · 已走过'; font-size: 12px; }
+.history-recap { margin-top: 24px; text-align: left; }
+.history-recap .history-image img { max-height: 240px; }
+.history-recap p { font-size: 15px; line-height: 1.9; margin-block: 18px; }
+.shipyard-panel { width: min(860px, 100%); max-height: 90dvh; overflow: auto; padding: clamp(20px, 4vw, 40px); background: var(--cv-surface-paper); }
+.shipyard { text-align: left; }
+.shipyard h3 { font: 600 28px/1.5 var(--cv-font-display); margin: 24px 0 16px; }
+.shipyard h4 { font-size: 18px; margin: 0 0 12px; }
+.shipyard p { color: var(--cv-text-on-paper-muted); font-size: 14px; line-height: 1.8; }
+.shipyard > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; padding-block: 24px; margin-block: 20px; border-block: 1px solid var(--cv-line-on-paper); }
+.shipyard-panel .btn { color: var(--cv-text-on-paper); border-color: var(--cv-brass-600); min-height: 44px; white-space: normal; }
+@media (max-width: 700px) {
+  .history-overlay { padding: 8px; }
+  .history-island { grid-template-columns: 1fr; max-height: 96dvh; }
+  .history-visual { padding: 18px; border-right: 0; border-bottom: 1px solid var(--cv-line-on-paper); }
+  .history-image img { height: 220px; }
+  .history-reading { padding: 22px 20px 30px; }
+  .history-decision { flex-direction: column; }
+  .shipyard > div { grid-template-columns: 1fr; }
+  .shipyard-panel { max-height: 95dvh; }
+}
+@media (prefers-reduced-motion: reduce) { .history-island button { transition: none; } }
+
+.page.is-history { align-items: start; }
+.page-paper:focus, .shipyard-panel:focus { outline: none; }

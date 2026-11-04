@@ -281,6 +281,8 @@ function Lantern({
 }
 
 export function TreasureShip({
+  shipLevel = 0,
+  crewLevel = 0,
   reduceMotion = false,
   style = HULL_STYLES.junk,
   crew,
@@ -288,6 +290,8 @@ export function TreasureShip({
 }: {
   reduceMotion?: boolean;
   style?: HullStyle;
+  shipLevel?: number;
+  crewLevel?: number;
   /** 甲板上的两个人：每个时代不同 */
   crew: [Look, Look];
   /** 玩家：名字浮在头顶，衣服跟着时代换 */
@@ -562,7 +566,10 @@ export function TreasureShip({
         />
       ))}
       <Rigging masts={masts} />
-      <EraDeckCrew crew={crew} player={player} deckY={DECK_Y} reduceMotion={reduceMotion} />
+      {shipLevel >= 1 && [-1, 1].map(side => <mesh key={side} position={[side * style.beam * 0.48, style.deckY + 0.15, 0]} material={M.trim}><boxGeometry args={[0.09, 0.12, span * 0.7]} /></mesh>)}
+      {shipLevel >= 2 && [-1, 1].map(side => <Lantern key={side} position={[side * style.beam * 0.39, style.deckY + 0.65, -span * 0.2]} trim={M.trim} glow={M.glow} scale={1.5} />)}
+      {shipLevel >= 3 && <group position={[0, style.deckY + 1, span * 0.38]}><mesh material={M.trim}><cylinderGeometry args={[0.07, 0.07, 3.6, 8]} /></mesh><mesh position={[0.65, 1.2, 0]}><boxGeometry args={[1.3, 0.75, 0.04]} /><meshStandardMaterial color="#2c3e50" roughness={0.8} /></mesh><mesh position={[0.65, 1.2, 0.03]} material={M.trim}><torusGeometry args={[0.19, 0.035, 6, 20]} /></mesh></group>}
+      <EraDeckCrew crew={crew} crewLevel={crewLevel} player={player} deckY={style.deckY} reduceMotion={reduceMotion} />
 
       {/* 主帆旁的旗：场景唯一可换的点缀 */}
       <mesh position={[0.9, DECK_Y + mainH * 0.99 - 0.6, 0.5]} material={M.banner}>

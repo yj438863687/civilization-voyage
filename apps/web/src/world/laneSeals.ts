@@ -1,3 +1,4 @@
+import { HISTORY_ROUTES, routeRecap } from './history';
 import type { FableState } from './fable';
 
 /**
@@ -134,6 +135,19 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
         : `你落了「${pick}」的印。你跟它去过那个地方，很美，像专门为你准备的。这一印，是你回来之后落的。`,
   },
 };
+
+// 回顾与当前路线共用主题和选择记录，不能讲起另一条航道的旧故事。
+for (const [key, route] of Object.entries(HISTORY_ROUTES)) {
+  LANE_SEALS[key] = {
+    question: route.question, left: '先把技术用起来', right: '同时安排共同生活的规则',
+    choices: [
+      { label: '先保证眼前运转', note: '保住物资与机会，尚未解决的处境要继续记着。' },
+      { label: '试用，也约定边界', note: '让技术前行，并明确谁参与、谁受益、谁负责。' },
+      { label: '先让受影响的人参与', note: '接受眼前的时间与物资成本，共同决定怎样使用。' },
+    ],
+    epilogue: (state, pick) => `你记下了「${pick}」。${routeRecap(route, state).join(' ')} ${route.ending.reflection}`,
+  };
+}
 
 export function laneSealFor(sceneId: string | null | undefined, lane: string): LaneSeal | null {
   if (!sceneId) return null;

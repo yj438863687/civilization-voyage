@@ -1,3 +1,4 @@
+import { HistoryMarker } from './HistoryMarker';
 import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
@@ -1071,7 +1072,7 @@ export function Atmosphere({
           <>
             {story.crisis.stage && (
               <group position={[story.crisis.at.x + VILLAGE_OFFSET.x, 0, story.crisis.at.z + VILLAGE_OFFSET.z]}>
-                {story.crisis.stage === 'flood' ? (
+                {story.crisis.enc.history ? <HistoryMarker image={story.crisis.enc.history.image} completed={crisisDone} /> : story.crisis.stage === 'flood' ? (
                   <FloodVillage state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
                 ) : (
                   <CrisisScene stage={story.crisis.stage} state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />

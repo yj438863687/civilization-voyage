@@ -1,3 +1,4 @@
+import { HISTORY_ROUTES, historyChoices, type HistoryScene } from './history';
 /**
  * 海上的人与事。
  *
@@ -76,6 +77,7 @@ export type Game =
     };
 
 export interface Encounter {
+  history?: HistoryScene;
   who: string;
   role: string;
   look: Look;
@@ -542,6 +544,19 @@ export const ENCOUNTERS: Record<string, Encounter> = {
   },
 };
 
+// 保留岛屿位置与造景，把人物、叙事与玩法接到同一份历史内容。
+for (const route of Object.values(HISTORY_ROUTES)) {
+  for (const island of route.islands) {
+    const encounter = ENCOUNTERS[island.id];
+    encounter.history = island;
+    encounter.who = island.who;
+    encounter.role = island.date;
+    encounter.line = island.paragraphs[1];
+    encounter.dialog = [];
+    encounter.game = historyChoices(island);
+  }
+}
+
 export function encounterFor(id: string): Encounter | null {
   return ENCOUNTERS[id] ?? null;
 }
@@ -549,6 +564,8 @@ export function encounterFor(id: string): Encounter | null {
 /* ---------------- 补给与人心：一程一程带下去 ---------------- */
 
 export interface VoyageStats {
+  shipLevel: number;
+  crewLevel: number;
   supply: number;
   trust: number;
   log: string[];
@@ -567,13 +584,14 @@ export interface VoyageStats {
 }
 
 const KEY = 'cv.stats.v1';
+const validLevel = (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 3 ? value : 0;
 
 export function loadStats(): VoyageStats {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const v = JSON.parse(raw) as VoyageStats;
-      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [], secrets: v.secrets ?? {}, hull: v.hull ?? 100, combo: v.combo ?? 0, score: v.score ?? 0 };
+      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, shipLevel: validLevel(v.shipLevel), crewLevel: validLevel(v.crewLevel), log: v.log ?? [], met: v.met ?? [], path: v.path ?? [], secrets: v.secrets ?? {}, hull: v.hull ?? 100, combo: v.combo ?? 0, score: v.score ?? 0 };
     }
   } catch {
     /* 私密窗口等情况：从默认值开始 */
@@ -583,7 +601,7 @@ export function loadStats(): VoyageStats {
 
 /** 新开一局：从启航港出发时，补给与人心回到起点 */
 export function freshStats(): VoyageStats {
-  return { supply: 80, trust: 50, log: [], met: [], path: [], secrets: {}, hull: 100, combo: 0, score: 0 };
+  return { shipLevel: 0, crewLevel: 0, supply: 80, trust: 50, log: [], met: [], path: [], secrets: {}, hull: 100, combo: 0, score: 0 };
 }
 
 export function saveStats(s: VoyageStats) {
@@ -598,6 +616,7 @@ const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
 
 export function applyOutcome(s: VoyageStats, o: Outcome, tag: string, era: string, who: string): VoyageStats {
   return {
+    ...s,
     supply: clamp(s.supply + o.supply),
     trust: clamp(s.trust + o.trust),
     log: [...s.log, `${tag}：${o.text}`].slice(-40),

@@ -1,0 +1,50 @@
+{
+  "id": "D",
+  "status": "pending",
+  "version": 3,
+  "label": "人工智能时代",
+  "background": "内海从2017年人工智能发展规划、2021年个人信息保护走向明确标注的2035年未来推演；外海从图灵提出的问题，经ELIZA走向AlphaGo。回顾由适合终点时代的记录者完成。",
+  "cultural_core": "机器的能力、人的知情与参与、决定的责任，需要一起安排。",
+  "questions": [
+    "机器能够参与判断时，我们应该信任到哪一步，由谁负责？"
+  ],
+  "fragments": [
+    "调度与工人培训",
+    "知情选择与退出",
+    "能力验证与人工接管"
+  ],
+  "interactions": [
+    "登岛读故事，在具体处境里安排物资、工班、消息或核对材料",
+    "完成两座岛与一次关键决定，听取回顾，再写下自己的看法"
+  ],
+  "economy": "补给与人心为游戏资源。补给供航行及船体整修，人心来自选择并解锁船员行装；数值不代表真实历史经济。",
+  "educational_value": "围绕技术与文明的关系，比较能力、参与、收益、代价与责任。史实背景、传说与未来推演分别标注，互动人物与选择为创作。",
+  "sources": [
+    {
+      "id": "D-history-0",
+      "title": "国务院：新一代人工智能发展规划",
+      "url": "https://app.www.gov.cn/govdata/gov/201707/20/408540/article.html",
+      "license": "链接参考与原创概述；图片另附逐项授权",
+      "verification": "unverified"
+    },
+    {
+      "id": "D-history-1",
+      "title": "计算机历史博物馆：人工智能与机器人时间线",
+      "url": "https://www.computerhistory.org/timeline/ai-robotics/",
+      "license": "链接参考与原创概述；图片另附逐项授权",
+      "verification": "unverified"
+    },
+    {
+      "id": "D-history-2",
+      "title": "DeepMind：AlphaGo",
+      "url": "https://deepmind.google/research/alphago/",
+      "license": "链接参考与原创概述；图片另附逐项授权",
+      "verification": "unverified"
+    }
+  ],
+  "needs_verification": [
+    "互动抉择不是历史原话，也不宣称改变历史结果。",
+    "图片年代与所述事件不同时，图注应明确说明。",
+    "2035年场景为未来推演，不是已经发生的历史。"
+  ]
+}

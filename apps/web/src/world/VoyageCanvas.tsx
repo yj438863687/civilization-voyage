@@ -1,3 +1,4 @@
+import { crewAppearance } from './progression';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -48,6 +49,8 @@ export interface ControlInput {
 }
 
 interface Props {
+  shipLevel?: number;
+  crewLevel?: number;
   mode: CamMode;
   reduceMotion: boolean;
   canSail: boolean;
@@ -411,6 +414,8 @@ function PortBeacon({
 }
 
 function Rig({
+  shipLevel = 0,
+  crewLevel = 0,
   sceneId: sceneIdForStyle,
   mode,
   reduceMotion,
@@ -1058,8 +1063,10 @@ function Rig({
             <Suspense fallback={null}>
               <TreasureShip
                 reduceMotion={reduceMotion}
+                shipLevel={shipLevel}
+                crewLevel={crewLevel}
                 style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']}
-                crew={DECK_CREW[propsScene] ?? DECK_CREW.test}
+                crew={crewAppearance(DECK_CREW[propsScene] ?? DECK_CREW.test, crewLevel)}
                 player={playerName ? { name: playerName, look: PLAYER_LOOK[propsScene] ?? PLAYER_LOOK.test } : null}
               />
             </Suspense>

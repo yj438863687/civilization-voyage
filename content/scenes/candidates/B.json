@@ -1,44 +1,42 @@
 {
   "id": "B",
-  "version": 2,
+  "version": 3,
   "status": "pending",
-  "label": "AI 推荐，待组员确认：集装箱作为当代「礼 / 标准」",
-  "background": "20 世纪中叶起，标准化集装箱改变了装卸、港口布局和全球分工。本场景把「盒子」当作一种当代的礼与标准：它让交换变快，也改写了谁被看见、谁承担代价。几何体堆场不含真实船公司标志。",
-  "cultural_core": "标准如何塑造文明：一个看似简单的盒子改变城市、劳动和日常商品。",
+  "label": "工业时代",
+  "background": "内海从译书、印书走向京张铁路，外海从瓦特的节煤技术走向工厂与劳动安排。两条线都按年代向前，追问生产的进步怎样进入人的生活。",
+  "cultural_core": "机器提高生产能力，收益、知识与劳动代价仍需由社会安排。",
   "questions": [
-    "标准化带来的效率由谁获益、谁承担代价？港口城市和码头工人的生活如何改变？"
+    "技术让生产更快以后，怎样让更多人分享进步？"
   ],
   "fragments": [
-    "标准箱尺寸摘录（史实候选·待核实）",
-    "装卸时间对照（测试数值）",
-    "工人口述残句（创作）"
+    "译书与知识传播",
+    "蒸汽机与工厂",
+    "工班和学徒安排"
   ],
   "interactions": [
-    "对照散货装卸与集装箱装卸的时间与人力（测试数值）",
-    "用一份材料说明：效率落在谁身上"
+    "登岛读故事，在具体处境里安排物资、工班、消息或核对材料",
+    "完成两座岛与一次关键决定，听取回顾，再写下自己的看法"
   ],
-  "economy": "泊位、吊机、工人、运价均为虚构测试资源，不引用未核年份的真实运价。",
-  "educational_value": "理解基础设施与制度标准对全球化的影响；讨论技术变革中的分配，而不是把效率写成进步颂。",
+  "economy": "补给与人心为游戏资源。补给供航行及船体整修，人心来自选择并解锁船员行装；数值不代表真实历史经济。",
+  "educational_value": "围绕技术与文明的关系，比较能力、参与、收益、代价与责任。史实背景、传说与未来推演分别标注，互动人物与选择为创作。",
   "sources": [
     {
-      "id": "B-iso-668",
-      "title": "ISO 668 系列集装箱尺寸标准（公开摘要）",
-      "url": "https://www.iso.org/standard/83558.html",
-      "license": "仅链接与原创概述；标准全文需购买，不随项目 MIT 自动授权",
+      "id": "B-history-0",
+      "title": "国家铁路局：百年京张",
+      "url": "https://www.nra.gov.cn/tlfc/tpsy/202204/t20220405_293018.shtml",
+      "license": "链接参考与原创概述；图片另附逐项授权",
       "verification": "unverified"
     },
     {
-      "id": "B-levinson-box",
-      "title": "Marc Levinson, The Box（Princeton University Press）书目线索",
-      "url": "https://press.princeton.edu/books/paperback/9780691170817/the-box",
-      "license": "仅书目与原创概述；正文引用待核实授权",
+      "id": "B-history-1",
+      "title": "英国议会：1833年工厂法",
+      "url": "https://www.parliament.uk/about/living-heritage/transformingsociety/livinglearning/19thcentury/overview/factoryact/",
+      "license": "链接参考与原创概述；图片另附逐项授权",
       "verification": "unverified"
     }
   ],
   "needs_verification": [
-    "首次集装箱航运的日期、船名与航线需与原始档案对照",
-    "不同国家港口转型时间差异大，演示港口尚未由组员选定",
-    "工人口述材料的授权与隐私；本场景口述为创作，不作口述史",
-    "运价与效率数据的年份口径"
+    "互动抉择不是历史原话，也不宣称改变历史结果。",
+    "图片年代与所述事件不同时，图注应明确说明。"
   ]
 }
