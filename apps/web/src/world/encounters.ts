@@ -1,3 +1,4 @@
+import { enrichHistoricalEncounters } from './historicalEncounters';
 /**
  * 海上的人与事。
  *
@@ -32,6 +33,7 @@ export interface Look {
 }
 
 export interface Outcome {
+  skillSucceeded?: boolean;
   text: string;
   supply: number;
   trust: number;
@@ -43,7 +45,7 @@ export interface Outcome {
 export type Action = 'idle' | 'watch' | 'hammer' | 'shovel' | 'tap' | 'count';
 export type Stage =
   | 'gate' | 'stakes' | 'tally' | 'jars' | 'mules' | 'loom' | 'books' | 'press'
-  | 'landing' | 'wireless' | 'pigeons' | 'pony' | 'bunker' | 'chess' | 'terminal' | 'goboard';
+  | 'engine' | 'telegraph' | 'landing' | 'wireless' | 'pigeons' | 'pony' | 'bunker' | 'chess' | 'terminal' | 'goboard';
 
 export type Game =
   | {
@@ -76,6 +78,8 @@ export type Game =
     };
 
 export interface Encounter {
+  historyId?: string;
+  social?: {ask:string;options:{label:string;note:string;out:Outcome}[]};
   who: string;
   role: string;
   look: Look;
@@ -542,6 +546,8 @@ export const ENCOUNTERS: Record<string, Encounter> = {
   },
 };
 
+enrichHistoricalEncounters(ENCOUNTERS,CL);
+
 export function encounterFor(id: string): Encounter | null {
   return ENCOUNTERS[id] ?? null;
 }
@@ -549,6 +555,8 @@ export function encounterFor(id: string): Encounter | null {
 /* ---------------- 补给与人心：一程一程带下去 ---------------- */
 
 export interface VoyageStats {
+  shipLevel: number;
+  crewLevel: number;
   supply: number;
   trust: number;
   log: string[];
@@ -573,7 +581,7 @@ export function loadStats(): VoyageStats {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const v = JSON.parse(raw) as VoyageStats;
-      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [], secrets: v.secrets ?? {}, hull: v.hull ?? 100, combo: v.combo ?? 0, score: v.score ?? 0 };
+      if (typeof v.supply === 'number' && typeof v.trust === 'number') return { ...v, shipLevel: Number.isInteger(v.shipLevel)?Math.max(0,Math.min(3,v.shipLevel)):0, crewLevel: Number.isInteger(v.crewLevel)?Math.max(0,Math.min(3,v.crewLevel)):0, log: v.log ?? [], met: v.met ?? [], path: v.path ?? [], secrets: v.secrets ?? {}, hull: v.hull ?? 100, combo: v.combo ?? 0, score: v.score ?? 0 };
     }
   } catch {
     /* 私密窗口等情况：从默认值开始 */
@@ -583,7 +591,7 @@ export function loadStats(): VoyageStats {
 
 /** 新开一局：从启航港出发时，补给与人心回到起点 */
 export function freshStats(): VoyageStats {
-  return { supply: 80, trust: 50, log: [], met: [], path: [], secrets: {}, hull: 100, combo: 0, score: 0 };
+  return { shipLevel:0, crewLevel:0, supply: 80, trust: 50, log: [], met: [], path: [], secrets: {}, hull: 100, combo: 0, score: 0 };
 }
 
 export function saveStats(s: VoyageStats) {
@@ -598,6 +606,7 @@ const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
 
 export function applyOutcome(s: VoyageStats, o: Outcome, tag: string, era: string, who: string): VoyageStats {
   return {
+    shipLevel:s.shipLevel, crewLevel:s.crewLevel,
     supply: clamp(s.supply + o.supply),
     trust: clamp(s.trust + o.trust),
     log: [...s.log, `${tag}：${o.text}`].slice(-40),

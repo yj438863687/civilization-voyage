@@ -1,3 +1,4 @@
+import { applyHistoricalStories } from './historicalStories';
 /**
  * 每条航线是一出完整的戏：起 · 承 · 转 · 合。
  *
@@ -551,7 +552,9 @@ export function loadProgress(voyageId: string | undefined): StoryProgress {
   if (!voyageId) return empty;
   try {
     const all = JSON.parse(localStorage.getItem(PKEY) || '{}') as Record<string, StoryProgress>;
-    return { ...empty, ...(all[voyageId] ?? {}) };
+    const result={ ...empty, ...(all[voyageId] ?? {}) };
+    for(const [oldId,newId] of [['C-n-storm','C-n-wire'],['C-f-urgent','C-f-wire'],['D-f-dest','D-f-proposal']])if(result.crisis.includes(oldId)&&!result.crisis.includes(newId))result.crisis=[...result.crisis,newId];
+    return result;
   } catch {
     return empty;
   }
@@ -838,3 +841,5 @@ for (const era of ['A', 'B', 'C', 'D'] as const) {
     st.artNames = f.names;
   }
 }
+
+applyHistoricalStories(STORIES,FIG);

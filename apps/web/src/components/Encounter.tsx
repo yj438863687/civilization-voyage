@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Encounter, Outcome } from '../world/encounters';
+import { voyageCue } from './VoyageMusic';
 import { waterLive, type WaterResult } from '../world/waterGame';
 
 /**
  * 一场遭遇：人先开口 → 你做一件小事 → 结果浮上来 → 东西收进货舱。
  * 不用卡片：字浮在画面下三分之一，游戏的刻度也画在画面上。
  */
-type Phase = 'intro' | 'talk' | 'play' | 'result';
+type Phase = 'intro' | 'talk' | 'play' | 'decision' | 'result';
 
 export function EncounterOverlay({
   enc,
   title,
   reduceMotion,
   onDone,
+  onCancel,
   crisis = false,
   cause,
   secret = false,
@@ -25,6 +27,7 @@ export function EncounterOverlay({
   title: string;
   reduceMotion: boolean;
   onDone: (o: Outcome, summary: string) => void;
+  onCancel?:()=>void;
   /** 危机：不是捡东西，是一件躲不开的事 */
   crisis?: boolean;
   /** 危机的来由：前面那几件事让它变成了什么样子 */
@@ -42,6 +45,9 @@ export function EncounterOverlay({
   const [said, setSaid] = useState(0);
   const dialog = enc.dialog ?? [];
   const [out, setOut] = useState<{ o: Outcome; summary: string } | null>(null);
+  const [work,setWork]=useState<{o:Outcome;summary:string}|null>(null);
+  const taskFinished=useRef(false);
+  useEffect(()=>{const escape=(event:KeyboardEvent)=>{if(event.key==='Escape'&&onCancel){event.preventDefault();event.stopImmediatePropagation();onCancel();}};window.addEventListener('keydown',escape,true);return()=>window.removeEventListener('keydown',escape,true);},[onCancel]);
 
   // 开场：人说完一句话，再开始
   useEffect(() => {
@@ -65,13 +71,8 @@ export function EncounterOverlay({
   useEffect(() => {
     if (phase !== 'talk') return;
     const next = () => {
-      setSaid((n) => {
-        if (n + 1 >= dialog.length) {
-          window.setTimeout(() => setPhase('play'), reduceMotion ? 300 : 1600);
-          return dialog.length;
-        }
-        return n + 1;
-      });
+      if(said+1>=dialog.length){setSaid(dialog.length);setPhase('play');}
+      else setSaid(n=>Math.min(dialog.length,n+1));
     };
     const line = dialog[Math.min(said, dialog.length - 1)];
     const len = (line?.you ?? line?.them ?? '').length;
@@ -94,7 +95,7 @@ export function EncounterOverlay({
   const playAt = useRef(0);
   useEffect(() => {
     if (phase === 'play') playAt.current = performance.now();
-    onPhase?.(phase);
+    onPhase?.(phase==='decision'?'talk':phase);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
@@ -116,16 +117,23 @@ export function EncounterOverlay({
   /** 只结算一次：结果被重复读到、组件重挂，都不能重复加连击分 */
   const settled = useRef(false);
   const finish = (o: Outcome, summary: string) => {
+    if(taskFinished.current)return;
+    taskFinished.current=true;
+    if(enc.social&&enc.game.kind!=='choice'){setWork({o,summary});setPhase('decision');return;}
+    settle(o,summary);
+  };
+  const settle=(o:Outcome,summary:string)=>{
     if (settled.current) return;
     settled.current = true;
     setOut({ o, summary });
     setPhase('result');
   };
 
+  const delivered=useRef(false);
   // 结果停一会儿，或按空格跳过
   useEffect(() => {
     if (phase !== 'result' || !out) return;
-    const done = () => onDone(out.o, out.summary);
+    const done = () => {if(!delivered.current){delivered.current=true;onDone(out.o,out.summary);}};
     const t = window.setTimeout(done, reduceMotion ? 1600 : 3400);
     const key = (e: KeyboardEvent) => {
       if (e.key === ' ' || e.key === 'Enter') {
@@ -145,6 +153,7 @@ export function EncounterOverlay({
   return (
     <div className={`enc${crisis ? ' is-crisis' : ''}${secret ? ' is-secret' : ''}`} role="dialog" aria-label={`${enc.who}：${title}`}>
       <div className="enc-scrim" aria-hidden />
+      {onCancel&&<button className="btn encounter-return" type="button" onClick={onCancel}>暂时回到船上</button>}
       {crisis && <span className="enc-crisis">{title.startsWith('转') ? `${title} · 出事了` : title}</span>}
       {secret && <span className="enc-secret">暗线 · {title} · 引文出自陶渊明《桃花源记》</span>}
       <div className="enc-who">
@@ -166,6 +175,8 @@ export function EncounterOverlay({
       )}
 
       {phase === 'play' && <WaterPlay g={g} timed={!!timeLimit} />}
+
+      {phase==='decision'&&enc.social&&work&&<div className="enc-decision" aria-label="决定怎样使用成果"><h3>{enc.social.ask}</h3><p>{work.o.text}</p><div>{enc.social.options.map(option=><button className="btn" type="button" key={option.label} onClick={()=>{voyageCue('confirm');settle({skillSucceeded:work.o.skillSucceeded,text:work.o.text+' '+option.out.text,supply:work.o.supply+option.out.supply,trust:work.o.trust+option.out.trust,set:{...work.o.set,...option.out.set}},option.label);}}><strong>{option.label}</strong><span>{option.note}</span><small>补给 {work.o.supply+option.out.supply>0?'+':''}{work.o.supply+option.out.supply} · 人心 {work.o.trust+option.out.trust>0?'+':''}{work.o.trust+option.out.trust}</small></button>)}</div><p>想好再选，没有倒计时。补给要留给航行，人心来自沿途的信任。</p></div>}
 
       {phase === 'result' && out && (
         <div className="enc-result">

@@ -1,3 +1,4 @@
+import { HISTORY_ROUTES } from './voyageHistory';
 /** World data is configuration, not render code. Scene-keyed, stamps stay honest. */
 
 import { STERN_HALL } from './hull';
@@ -217,7 +218,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     ports: [
       {
         id: 'riverbank-port',
-        name: '河岸港（候选）',
+        name: '河岸港',
         x: 22,
         z: -96,
         radius: 12,
@@ -285,7 +286,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     coach: {
       sea: '朝河口的灯航行。靠岸之前按 E 收下沿途的东西，靠港按 F。',
       near: '靠港后，用种子或泥板说明：这块地能养几年，留下的人谁说了算。',
-      portTitle: '河岸港（候选）',
+      portTitle: '河岸港',
       portBody: '岸、粮仓、桩界都是体块与剪影，不代表任何真实遗址。先看来源，再写安排。',
       compass: '铜针指向河口',
     },
@@ -300,7 +301,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     ports: [
       {
         id: 'steam-port',
-        name: '蒸汽港（候选）',
+        name: '蒸汽港',
         x: 22,
         z: -96,
         radius: 12,
@@ -368,7 +369,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     coach: {
       sea: '朝烟囱的灯航行。按 E 收下沿途的东西，靠港按 F。',
       near: '靠港后，用汽压或班次说明：这份动力烧的是谁的煤、谁的时间。',
-      portTitle: '蒸汽港（候选）',
+      portTitle: '蒸汽港',
       portBody: '吊机与锅炉是几何体，不出现任何公司标志。效率与代价要写在同一张纸上。',
       compass: '铜针指向烟囱',
     },
@@ -383,7 +384,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     ports: [
       {
         id: 'signal-port',
-        name: '信号港（候选）',
+        name: '信号港',
         x: 22,
         z: -96,
         radius: 12,
@@ -451,7 +452,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     coach: {
       sea: '朝浮台的冷灯航行。按 E 收下沿途的东西，靠港按 F。',
       near: '靠港后，用电缆或断线说明：谁能被看见，谁只剩一个断点。',
-      portTitle: '信号港（候选）',
+      portTitle: '信号港',
       portBody: '模块化浮体，不是赛博霓虹。连通不等于文明，断点也要画在图上。',
       compass: '铜针指向信号塔',
     },
@@ -466,7 +467,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     ports: [
       {
         id: 'auto-port',
-        name: '自绘港（候选）',
+        name: '自绘港',
         x: 22,
         z: -96,
         radius: 12,
@@ -533,7 +534,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
     coach: {
       sea: '朝自绘的星图航行。按 E 收下沿途的东西，靠港按 F。',
       near: '靠港后，说明你交给它的目的地，以及它替你略过了什么。',
-      portTitle: '自绘港（候选）',
+      portTitle: '自绘港',
       portBody: '浮体与光点都是体块。方向由谁设定、路径由谁审，是这一段真正的问题。',
       compass: '铜针指向自绘的港',
     },
@@ -579,6 +580,23 @@ for (const id of ['A', 'B', 'C', 'D'] as const) {
     f.z = at.z;
     f.pickupRadius = 7;
   }
+}
+
+// Only story labels and chronology change here; navigation geometry stays intact.
+for(const [key,route] of Object.entries(HISTORY_ROUTES)){
+  const [era,lane]=key.split('-') as ['A'|'B'|'C'|'D','near'|'far'];
+  const world=WORLDS[era],line=world.lanes?.find(item=>item.id===lane);
+  if(line){
+    line.name=lane==='near'?'内海 · 中国':'外海 · 世界';line.promise=route.question;
+    line.waypoints[0].label=line.name;
+    [...route.islands,route.crisis].forEach((scene,index)=>{if(line.waypoints[index+1])line.waypoints[index+1].label=scene.title;});
+  }
+  world.coach.sea='沿罗盘依次完成两座岛和最后一站，再回港听这一程的回顾。';
+  world.coach.near='靠近岛上人物按E，按屏幕指引开船完成任务；Escape可返回。';
+  world.coach.portBody='带着三站的经历，回看技术给谁带来了便利，又让谁承担了代价。';
+  for(const scene of route.islands){const fragment=world.fragments.find(item=>item.id===scene.id);if(fragment){fragment.title=scene.title;fragment.text=`${scene.date} · ${scene.who}`;fragment.what=scene.title;fragment.why=scene.paragraphs[0];fragment.classification='creative';
+    fragment.sources=[{id:scene.id+'-history',title:scene.source.title,url:scene.source.url,
+      license:'链接与原创背景概述；互动情境、对白及选择为创作',verification:'verified'}];}}
 }
 
 /** 一条航道上要按顺序经过的材料：先分叉点，再这条路自己的那件。 */

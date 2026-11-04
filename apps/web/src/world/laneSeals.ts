@@ -1,3 +1,4 @@
+import { HISTORY_ROUTES, historyRecap } from './voyageHistory';
 import type { FableState } from './fable';
 
 /**
@@ -139,3 +140,5 @@ export function laneSealFor(sceneId: string | null | undefined, lane: string): L
   if (!sceneId) return null;
   return LANE_SEALS[`${sceneId}-${lane === 'far' ? 'far' : 'near'}`] ?? null;
 }
+
+for(const [key,route] of Object.entries(HISTORY_ROUTES))LANE_SEALS[key]={question:route.question,left:'先保住眼前运转',right:'给共同生活留出安排',choices:[{label:'先保住眼前运转',note:'船要有物资，技术要能用；留下的代价仍要继续处理。'},{label:'边试用，边核对',note:'把新本领用起来，也逐步检查谁受益、谁承担。'},{label:'先约好使用的办法',note:'愿意付出一些眼前物资，让协作、学习和负责的规则先落下来。'}],epilogue:(state,pick)=>`你记下了“${pick}”。${historyRecap(route,state).join(' ')} ${route.ending.reflection}`};

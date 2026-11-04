@@ -30,11 +30,13 @@ export function Figure(props: {
  */
 export function EraDeckCrew({
   crew,
+  crewLevel = 0,
   player,
   deckY,
   reduceMotion,
 }: {
   crew: [Look, Look];
+  crewLevel?: number;
   player?: { name: string; look: Look } | null;
   deckY: number;
   reduceMotion?: boolean;
@@ -49,10 +51,10 @@ export function EraDeckCrew({
       )}
       {/* 大副与二副：戴着这个时代的帽子，站在船的右舷。两人会互相看 */}
       <group position={[1.58, deckY, -1.55]} rotation={[0, -0.5, 0]} scale={1.45}>
-        <Mascot kind="claude" hat={crew[0].hat} reduceMotion={reduceMotion} phase={0.3} buddy={[-0.2, 0, 2.6]} />
+        <Mascot kind="claude" hat={crew[0].hat} outfitLevel={crewLevel} outfitColor={crew[0].coat} outfitTrim={crew[0].trim} reduceMotion={reduceMotion} phase={0.3} buddy={[-0.2, 0, 2.6]} />
       </group>
       <group position={[1.48, deckY, 1.05]} rotation={[0, -0.9, 0]} scale={1.45}>
-        <Mascot kind="gpt" hat={crew[1].hat} reduceMotion={reduceMotion} phase={1.7} buddy={[0.2, 0, -2.6]} />
+        <Mascot kind="gpt" hat={crew[1].hat} outfitLevel={crewLevel} outfitColor={crew[1].coat} outfitTrim={crew[1].trim} reduceMotion={reduceMotion} phase={1.7} buddy={[0.2, 0, -2.6]} />
       </group>
     </group>
   );
@@ -146,4 +148,3 @@ export function LaneKeeper({
     </group>
   );
 }
-

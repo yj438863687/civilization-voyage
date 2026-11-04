@@ -424,6 +424,7 @@ export type MascotKind = 'claude' | 'gpt';
  */
 export function Mascot({
   kind,
+  outfitLevel=0, outfitColor='#2c3e50', outfitTrim='#dcbd84',
   hat = 'none',
   reduceMotion = false,
   phase = 0,
@@ -432,6 +433,7 @@ export function Mascot({
   buddy = null,
 }: {
   kind: MascotKind;
+  outfitLevel?:number;outfitColor?:string;outfitTrim?:string;
   hat?: Hat;
   reduceMotion?: boolean;
   phase?: number;
@@ -454,6 +456,7 @@ export function Mascot({
     const m = (c: string, r = 0.7, metal = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: metal });
     return {
       body: m(C.body, 0.6),
+      uniform:m(outfitColor),uniformTrim:m(outfitTrim,.45,.3),
       belly: m(C.belly, 0.7),
       trim: m(C.trim, 0.5, 0.2),
       eyeW: m('#fff8ee', 0.3),
@@ -465,7 +468,7 @@ export function Mascot({
       iron: m('#4a4d50', 0.45, 0.7),
       glow: new THREE.MeshStandardMaterial({ color: C.glow, emissive: C.glow, emissiveIntensity: 1.6, toneMapped: false }),
     };
-  }, [C.body, C.belly, C.trim, C.eye, C.glow]);
+  }, [C.body, C.belly, C.trim, C.eye, C.glow,outfitColor,outfitTrim]);
 
   useFrame(({ clock }, dt) => {
     if (reduceMotion) return;
@@ -516,13 +519,15 @@ export function Mascot({
           </mesh>
         ))}
         {/* 身子：一只圆圆的胶囊 */}
-        <mesh position={[0, bodyH / 2 + 0.12, 0]} material={M.body} castShadow>
+        <mesh position={[0, bodyH / 2 + 0.12, 0]} material={outfitLevel>0?M.uniform:M.body} castShadow>
           <capsuleGeometry args={[bodyR, bodyH - bodyR * 2 + 0.1, 6, 16]} />
         </mesh>
         {/* 肚皮 */}
-        <mesh position={[0, bodyH / 2 + 0.06, bodyR * 0.72]} scale={[0.8, 1, 0.5]} material={M.belly}>
+        <mesh position={[0, bodyH / 2 + 0.06, bodyR * 0.72]} scale={[0.8, 1, 0.5]} material={outfitLevel>0?M.uniformTrim:M.belly}>
           <sphereGeometry args={[bodyR * 0.75, 14, 10]} />
         </mesh>
+        {outfitLevel>=2&&<mesh position={[0,bodyH*.37,0]}><cylinderGeometry args={[bodyR*1.02,bodyR*1.02,.08,16]}/><primitive object={M.uniformTrim} attach="material"/></mesh>}
+        {outfitLevel>=3&&<mesh position={[-bodyR*.5,bodyH*.72,bodyR*.98]}><torusGeometry args={[.075,.018,6,16]}/><primitive object={M.uniformTrim} attach="material"/></mesh>}
         {/* 胸口的记号 */}
         <group ref={emblem} position={[0, bodyH / 2 + 0.16, bodyR + 0.03]}>
           {kind === 'claude'

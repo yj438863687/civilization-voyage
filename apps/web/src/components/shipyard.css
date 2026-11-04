@@ -1,0 +1,23 @@
+.shipyard-overlay { position:fixed; inset:0; z-index:70; display:grid; place-items:center; padding:16px; background:rgb(5 10 13 / .8); }
+.shipyard-panel { width:min(1100px,100%); max-height:92dvh; overflow:auto; overscroll-behavior:contain; background:#eee2c9; color:#302b23; padding:24px; text-align:left; line-height:1.7; border:1px solid #b69a65; }
+.shipyard-panel .btn,.shipyard-panel button { color:#302b23; min-height:44px; font:inherit; border:1px solid #8e7751; background:#e3d6bb; padding:8px 12px; cursor:pointer; }
+.shipyard-panel button:disabled { opacity:.5; cursor:not-allowed; }
+.shipyard-panel button[aria-pressed="true"] { background:#31564f; color:#fff0d6; }
+.shipyard-panel h3 { font:500 26px/1.5 var(--cv-font-display); margin:12px 0; }
+.shipyard-workbench { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(240px,1fr); gap:20px; }
+.shipyard-preview { height:340px; min-width:0; position:relative; background:#11242b; }
+.shipyard-preview p { position:absolute; bottom:0; padding:6px; color:#f1dfbd; font-size:12px; background:#11242bcc; pointer-events:none; }
+.shipyard-tabs,.shipyard-view-tools,.shipyard-compare { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-block:10px; }
+.shipyard-catalog ol { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.shipyard-catalog button { width:100%; text-align:left; }
+.shipyard-catalog :is(strong,span,small) { display:block; }
+.shipyard-catalog span { font-size:13px; line-height:1.6; margin-block:4px; }
+.shipyard-catalog small { font-size:11px; }
+.shipyard-purchase { display:grid; grid-template-columns:1fr 1fr; gap:20px; border-top:1px solid #b69a65; margin-top:20px; }
+.shipyard-panel :is(button,summary,input):focus-visible { outline:2px solid #86472d; outline-offset:3px; }
+@media(max-width:700px) { .shipyard-workbench,.shipyard-purchase { grid-template-columns:1fr; } .shipyard-panel { padding:16px; } .shipyard-preview { height:280px; } }
+
+.shipyard,.shipyard-workbench > div,.shipyard-catalog {min-width:0;max-width:100%}
+.shipyard-preview {width:100%;overflow:hidden}
+.shipyard-panel canvas {display:block;max-width:100%}
+@media(max-width:700px){.shipyard-panel{box-sizing:border-box}.shipyard-workbench{grid-template-columns:minmax(0,1fr)}.shipyard-view-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.shipyard-view-tools button{padding:8px 2px;min-width:0}.shipyard-catalog button{white-space:normal;overflow-wrap:anywhere}}

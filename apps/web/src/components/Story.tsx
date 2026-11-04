@@ -38,12 +38,12 @@ export function ShoreOverlay({
 }) {
   const f = { ...story.figure, monologue: story.figure.speak?.(state) ?? story.figure.monologue };
   // 0 名字 · 1..n 独白 · n+1 原文 · n+2 意义
-  const last = f.monologue.length + 2;
+  const last = f.monologue.length + (f.quote ? 2 : 1);
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     if (step >= last) return;
-    const t = window.setTimeout(() => setStep((s) => s + 1), reduceMotion ? 900 : step === 0 ? 2600 : 3600);
+    const t = window.setTimeout(() => setStep((s) => s + 1), step === 0 ? 2600 : Math.max(5000,(f.monologue[step-1]?.length??45)*120));
     return () => window.clearTimeout(t);
   }, [step, last, reduceMotion]);
 
@@ -51,7 +51,7 @@ export function ShoreOverlay({
     const key = (e: KeyboardEvent) => {
       if (e.key !== ' ' && e.key !== 'Enter') return;
       e.preventDefault();
-      if (step < last) setStep(last);
+      if (step < last) setStep(s=>s+1);
       else onDone();
     };
     window.addEventListener('keydown', key);
@@ -68,11 +68,11 @@ export function ShoreOverlay({
         <span className="shore-deed">{f.deed}</span>
       </div>
       <div className="shore-mono">
-        {f.monologue.map((line, i) => (
+        {f.monologue.map((line, i) => step===i+1 || (step>=last&&i===f.monologue.length-1) ? (
           <p key={i} className={`shore-line${step > i ? ' is-in' : ''}`}>
             {line}
           </p>
-        ))}
+        ) : null)}
         <span className={`shore-tag${step > 0 ? ' is-in' : ''}`}>独白为创作</span>
       </div>
       {f.quote && (
@@ -85,8 +85,8 @@ export function ShoreOverlay({
         <span className="shore-spirit">{story.spirit.word}</span>
         <p>{f.meaning}</p>
       </div>
-      <button className="cine-link shore-go" type="button" onClick={() => (step < last ? setStep(last) : onDone())}>
-        {step < last ? '听完' : '去落印'}
+      <button className="cine-link shore-go" type="button" onClick={() => (step < last ? setStep(s=>s+1) : onDone())}>
+        {step < last ? '下一段 · 空格' : '去落印'}
       </button>
     </div>
   );
@@ -250,16 +250,16 @@ function GateTale({ state }: { state: FableState }) {
       {/* 河：从左上流来 */}
       <path className="pg-draw" d="M10 40 C 90 60, 120 90, 170 110 S 300 150, 510 170" fill="none" stroke="#5a8aa0" strokeWidth="10" strokeLinecap="round" opacity="0.75" />
       {/* 第一座岛：闸与两块田 */}
-      <g className="pg-fade" style={{ animationDelay: '0.4s' }}>
+      <g className="pg-fade" transform="translate(170 0)" style={{ animationDelay: '1.2s' }}>
         <ellipse cx="120" cy="120" rx="62" ry="30" fill="#c8b48a" stroke="#6a5034" strokeWidth="1.5" />
         <rect x="80" y="108" width="30" height="22" fill={fieldL} stroke="#5a4428" />
         <rect x="130" y="108" width="30" height="22" fill={fieldR} stroke="#5a4428" />
         {!even && <path d="M136 112 l6 8 l-4 6 M150 110 l-3 10" stroke="#5a4428" fill="none" />}
         <rect x="116" y="100" width="8" height="34" fill="#6a5034" />
-        <text x="120" y="160" textAnchor="middle" className="pg-label">看水的人</text>
+        <text x="120" y="160" textAnchor="middle" className="pg-label">禹 · 分水</text>
       </g>
       {/* 第二座岛：一圈桩 */}
-      <g className="pg-fade" style={{ animationDelay: '1.2s' }}>
+      <g className="pg-fade" transform="translate(-170 0)" style={{ animationDelay: '0.4s' }}>
         <ellipse cx="290" cy="128" rx="58" ry="28" fill="#c8b48a" stroke="#6a5034" strokeWidth="1.5" />
         <rect x="262" y="116" width="56" height="24" fill="url(#pg-hatch)" stroke="#5a4428" />
         {Array.from({ length: 14 }, (_, i) => {
@@ -272,7 +272,7 @@ function GateTale({ state }: { state: FableState }) {
         ) : (
           <circle cx="238" cy="128" r="9" fill="none" stroke="#5a8aa0" strokeWidth="3" />
         )}
-        <text x="290" y="168" textAnchor="middle" className="pg-label">立桩的人</text>
+        <text x="290" y="168" textAnchor="middle" className="pg-label">鲧 · 筑堤</text>
       </g>
       {/* 下游的村子：淹没淹 */}
       <g className="pg-fade" style={{ animationDelay: '2s' }}>

@@ -2510,3 +2510,23 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 .enc:has(.enc-water) .enc-scrim { opacity: 0.55; }
 .enc:has(.enc-water) .enc-talk { display: none; }
 .enc:has(.enc-water) .enc-line { display: none; }
+
+/* Native story choices stay over the original scene. Touch sailing passes through. */
+.enc > .enc-scrim {position:absolute}
+.enc:has(.enc-water) {pointer-events:none}
+.enc > .encounter-return {position:absolute;right:20px;top:80px;pointer-events:auto}
+.enc-decision {width:min(680px,94vw);max-height:56vh;overflow:auto;text-align:left;padding:18px;background:rgb(10 22 28 / .94);border:1px solid #a88d59;border-radius:8px;color:#f4ead8;pointer-events:auto}
+.enc-decision h3 {margin:0 0 10px;line-height:1.5}
+.enc-decision p {font-size:14px;line-height:1.7;margin:8px 0}
+.enc-decision > div {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.enc-decision button {white-space:normal;display:grid;text-align:left;gap:7px;padding:14px;line-height:1.6}
+.enc-decision small {color:#eed19b}
+.shore {overflow-y:auto;max-height:100dvh}
+.shore > .shore-scrim {position:fixed;pointer-events:none}
+.shore-mono {min-height:5em}
+@media(max-width:600px){.enc-decision > div{grid-template-columns:1fr}.enc{padding:0 12px 100px;gap:8px}.enc > .encounter-return{top:65px;right:12px}.enc-name{font-size:22px}.enc-role{max-width:90vw}.enc-cause{max-height:18vh;overflow:auto}.shore{padding:65px 18px 100px}.shore-arrival{letter-spacing:.05em}.shore-line{font-size:16px}}
+
+.water-feedback{position:fixed;z-index:65;left:50%;top:38%;transform:translate(-50%,0);pointer-events:none;padding:12px 22px;border:1px solid #e6ca87;background:#10282bd9;color:#ffe9b8;font-size:22px;white-space:nowrap;animation:water-feedback .8s ease both}.water-feedback.is-error{border-color:#ed997d;color:#ffd5c4}.water-feedback.is-water{border-color:#84d1d4;color:#c0f3ef}@keyframes water-feedback{0%{opacity:0;transform:translate(-50%,10px) scale(.95)}20%,65%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-12px)}}
+@media(prefers-reduced-motion:reduce){.water-feedback{animation-name:water-feedback-still}@keyframes water-feedback-still{0%,80%{opacity:1}100%{opacity:0}}}
+
+.hud-history-step{font-size:12px;line-height:1.7;color:#e6cca0;margin-top:5px;max-width:28em}

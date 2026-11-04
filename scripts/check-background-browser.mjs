@@ -27,7 +27,7 @@ try{
   await page.getByRole('button',{name:'图片背景 · 鲧',exact:true}).waitFor();
   const snapshot=()=>page.evaluate(()=>({stats:localStorage.getItem('cv.stats.v1'),progress:localStorage.getItem('cv.story.v1')}));
   const before=await snapshot();await page.getByRole('button',{name:'图片背景 · 鲧',exact:true}).click();
-  await page.getByRole('dialog',{name:'鲧的图片背景',exact:true}).waitFor();await page.locator('.island-background img').evaluate(img=>img.decode());
+  await page.getByRole('dialog',{name:'鲧的图片背景',exact:true}).waitFor();await page.locator('.island-background img').first().evaluate(img=>img.decode());
   await page.screenshot({path:join(folder,'picture-background.png')});
   await page.setViewportSize({width:390,height:844});assert(await page.locator('.island-background-paper').evaluate(node=>node.scrollWidth<=node.clientWidth+1));
   await page.keyboard.press('Escape');await page.locator('.island-background').waitFor({state:'hidden'});

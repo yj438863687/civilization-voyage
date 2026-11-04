@@ -2,34 +2,56 @@
   "id": "D",
   "version": 1,
   "status": "pending",
-  "label": "AI 推荐，待组员确认：智能 · 从驾驶到设定目的地",
-  "background": "第四段航程：船开始自己看星、自己画航线、自己生成下一个港口；人只负责说去哪里。航程从「人划桨」变成「人定方向，机器航行」。",
-  "cultural_core": "把方向交出去之前，先弄清你还想不想改。",
+  "label": "人工智能时代",
+  "background": "内海：中国。先看发展规划，再看个人信息保护，最后进入明确虚构的未来港口。能力、边界与责任，要一起上船。 外海：世界。从图灵提出的问题，到 ELIZA 的对话，再到 AlphaGo 的棋局。机器的表现越来越强，我们对它的期待与判断也需要改变。",
+  "cultural_core": "技术与文明：补给维持航行，人心维持合作。",
   "questions": [
-    "船能自己生成下一个港口。你要它去的地方，是谁的地方？"
+    "当技术能够替人作判断，怎样保留人的知情与决定？",
+    "机器表现出智能时，人应该相信到哪一步？"
   ],
   "fragments": [
-    "模型自绘星图（创作）",
-    "目的地的定义（创作）",
-    "被略过的港（创作）"
+    "一张更快的调度表",
+    "多问一句同不同意",
+    "像在理解你",
+    "棋盘上的一手"
   ],
   "interactions": [
-    "给船写一个目的地，再让它自己找一条你没想过的路",
-    "审一遍它略过的港，决定要不要加回去"
+    "航行到岛旁，听人物讲述并完成水上互动",
+    "决定怎样使用成果，带着三站经历回港回顾"
   ],
-  "economy": "以虚构的算力与航次讨论自动化的成本，不把「更自动」当成「更对」",
-  "educational_value": "练习在自动化系统前保留判断：目标由谁设定、路径由谁审",
+  "economy": "补给与人心为游戏数值：补给可整修船体，人心可解锁船员行装；不代表历史价格。",
+  "educational_value": "按先后年代比较中国与世界的技术选择，区分传说、史实背景、创作对话与未来推演。",
   "sources": [
     {
-      "id": "D-source",
-      "title": "本项目创作（无外部史料）",
-      "url": "https://github.com/yj438863687/civilization-voyage",
-      "license": "MIT",
-      "verification": "unverified"
+      "id": "D-log",
+      "title": "国务院：2017 年新一代人工智能发展规划",
+      "url": "https://app.www.gov.cn/govdata/gov/201707/20/408540/article.html",
+      "license": "链接与原创概述；配图许可见游戏内图片来源",
+      "verification": "verified"
+    },
+    {
+      "id": "D-skip",
+      "title": "全国人大：2021 年个人信息保护法",
+      "url": "https://en.npc.gov.cn.cdurl.cn/2021-12/29/c_694559.htm",
+      "license": "链接与原创概述；配图许可见游戏内图片来源",
+      "verification": "verified"
+    },
+    {
+      "id": "D-star",
+      "title": "计算机历史博物馆：ELIZA（1966）",
+      "url": "https://www.computerhistory.org/timeline/ai-robotics/",
+      "license": "链接与原创概述；配图许可见游戏内图片来源",
+      "verification": "verified"
+    },
+    {
+      "id": "D-weight",
+      "title": "DeepMind：AlphaGo 与李世石（2016）",
+      "url": "https://deepmind.google/research/alphago/",
+      "license": "链接与原创概述；配图许可见游戏内图片来源",
+      "verification": "verified"
     }
   ],
   "needs_verification": [
-    "本段全部为创作与推演，不得标为史实",
-    "「AI 生成航线」的具体能力边界需与实现一致"
+    "人物对话、资源数值与故事选择均为创作，不能作为历史原文引用。"
   ]
 }

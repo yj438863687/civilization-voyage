@@ -1,3 +1,4 @@
+import { crewAppearance } from './progression';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -48,6 +49,8 @@ export interface ControlInput {
 }
 
 interface Props {
+  shipLevel?: number;
+  crewLevel?: number;
   mode: CamMode;
   reduceMotion: boolean;
   canSail: boolean;
@@ -78,6 +81,7 @@ interface Props {
   /** 水上的玩法：浮标门、光环、漂着的东西 */
   water?: WaterSpec | null;
   onWaterDone?: (r: WaterResult) => void;
+  onWaterCue?: (cue: 'dot'|'error'|'water')=>void;
   /** 开局大殿里亮着的那扇窗 */
   highlightEra?: EraKey | null;
   /** 显卡上下文丢失/恢复：由界面明确提示，不静默 */
@@ -420,17 +424,19 @@ function Rig({
   onShip,
   onBlend,
   world,
-  collectedIds,
+  collectedIds: _collectedIds,
   laneId,
   struck,
   landingT = 0,
   landingRelic = null,
   autopilot = false,
+  shipLevel = 0, crewLevel = 0,
   stageAt = null,
   player: playerName = null,
   squall = null,
   water = null,
   onWaterDone,
+  onWaterCue,
 }: Props) {
   const waterDoneFor = useRef<number>(0);
   /** 每道门被船头对准了多久 */
@@ -623,13 +629,12 @@ function Rig({
     approach = approachHold.current;
     let nearFragment: string | null = null;
     for (const f of world.fragments) {
-      if (collectedIds.includes(f.id)) continue;
       // 不在这一条航道上的东西，既看不见也拾不到
       if (f.lane !== 'both' && f.lane !== laneId) continue;
       const staged = !!encounterFor(f.id)?.stage;
       const cx = staged ? f.x + ISLAND_OFFSET.x : f.x;
       const cz = staged ? f.z + ISLAND_OFFSET.z : f.z;
-      const rr = staged ? 6.2 + world.ship.radius * 0.3 + 3.5 : f.pickupRadius;
+      const rr = staged ? 14 + world.ship.radius * 0.3 : f.pickupRadius;
       const dx = g.position.x - cx;
       const dz = g.position.z - cz;
       if (dx * dx + dz * dz < rr * rr) nearFragment = f.id;
@@ -707,7 +712,7 @@ function Rig({
           if (input.forward > 0) {
             const hd = Math.atan2(tmpFwd.x, -tmpFwd.z);
             water.gates.forEach((gt, i) => {
-              const bd = Math.atan2(gt.x - g_pos_x(), gt.z - g_pos_z());
+              const bd = Math.atan2(gt.x - g_pos_x(), -(gt.z - g_pos_z()));
               let err = bd - hd;
               while (err > Math.PI) err -= Math.PI * 2;
               while (err < -Math.PI) err += Math.PI * 2;
@@ -721,6 +726,7 @@ function Rig({
         } else if (water.kind === 'ring' && water.ring) {
           const r = water.ring;
           const d = Math.hypot(r.x - g_pos_x(), r.z - g_pos_z());
+          if(d<r.r&&!waterLive.inside)onWaterCue?.('water');
           waterLive.inside = d < r.r;
           waterLive.target = { x: r.x, z: r.z };
           if (waterLive.inside) {
@@ -742,9 +748,9 @@ function Rig({
             const dist = Math.hypot(d.x - g_pos_x(), d.z - g_pos_z());
             if (dist < 2.6) {
               waterLive.taken.add(d.id);
-              if (d.good) waterLive.got += 1;
+              if (d.good) {waterLive.got += 1;onWaterCue?.('dot');}
               else {
-                waterLive.bad += 1;
+                waterLive.bad += 1;onWaterCue?.('error');
                 waterLive.got = Math.max(0, waterLive.got - 1);
                 speed.current *= 0.5;
               }
@@ -1059,7 +1065,8 @@ function Rig({
               <TreasureShip
                 reduceMotion={reduceMotion}
                 style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']}
-                crew={DECK_CREW[propsScene] ?? DECK_CREW.test}
+                crew={crewAppearance(DECK_CREW[propsScene] ?? DECK_CREW.test,crewLevel)}
+                shipLevel={shipLevel} crewLevel={crewLevel}
                 player={playerName ? { name: playerName, look: PLAYER_LOOK[propsScene] ?? PLAYER_LOOK.test } : null}
               />
             </Suspense>

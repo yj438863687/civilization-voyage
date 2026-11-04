@@ -1,3 +1,6 @@
+import { MusicDirector, MusicControls, voyageCue } from './components/VoyageMusic';
+import { ShipyardDialog } from './components/Shipyard';
+import { historyFor, historyScene, supportedEncounter } from './world/voyageHistory';
 import { IslandBackground } from './components/IslandBackground';
 import { ISLAND_BACKGROUNDS } from './world/islandBackgrounds';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -316,6 +319,7 @@ export function App() {
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem(MOTION_KEY) === '1' || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [comms, setComms] = useState(false);
   const [backgroundId,setBackgroundId]=useState<string|null>(null);
+  const [yardOpen,setYardOpen]=useState(false);
   const [webgl, setWebgl] = useState(true);
   const [title, setTitle] = useState('玄览一问');
   const [scenePick, setScenePick] = useState<Scene | null>(null);
@@ -383,6 +387,8 @@ export function App() {
   const [secret, setSecret] = useState<string | null>(null);
   /** 水上的玩法：对话说完，东西就摆到船头前面；船开到哪，答案就是哪 */
   const [water, setWater] = useState<WaterSpec | null>(null);
+  const [waterFeedback,setWaterFeedback]=useState<{cue:'dot'|'error'|'water';at:number}|null>(null);
+  const dismissedCrisis=useRef('');
   const [waterResult, setWaterResult] = useState<WaterResult | null>(null);
   const [encPhase, setEncPhase] = useState<'intro' | 'talk' | 'play' | 'result'>('intro');
   const phaseHandler = (game: Game, timeLimit?: number) => (phase: 'intro' | 'talk' | 'play' | 'result') => {
@@ -391,6 +397,7 @@ export function App() {
       const s = shipRef.current;
       if (!s) return;
       resetWaterLive();
+      setWaterFeedback(null);
       setWaterResult(null);
       // 空水面：避开岛、礁石、码头、村子，东西才不会摆到岸上去
       const obstacles = [
@@ -400,14 +407,16 @@ export function App() {
         ...(story ? [{ x: story.crisis.at.x + VILLAGE_OFFSET.x, z: story.crisis.at.z + VILLAGE_OFFSET.z, r: 13 }] : []),
       ];
       setWater(buildWaterSpec(game, s, { timeLimit, obstacles }));
-    } else if (phase === 'result' || phase === 'intro') {
+    } else {
       setWater(null);
     }
   };
   const encRef = useRef<string | null>(null);
   // 听人说话、看结果时船停下；轮到你做事时，键盘归船
-  encRef.current = backgroundId ? 'background-reading' : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
+  encRef.current = yardOpen ? 'shipyard' : backgroundId ? 'background-reading' : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
   const shipRef = useRef<ShipSnapshot | null>(null);
+
+  useEffect(()=>{const openYard=(event:KeyboardEvent)=>{if(event.key.toLowerCase()!=='b'||event.repeat||(event.target instanceof HTMLElement&&event.target.closest('input,textarea,select,[contenteditable]')))return;if(enc||crisis||secret||backgroundId||shoreOpen||intro||sealBeat||storyPage||landing>0)return;event.preventDefault();setYardOpen(value=>!value);};window.addEventListener('keydown',openYard);return()=>window.removeEventListener('keydown',openYard);},[enc,crisis,secret,backgroundId,shoreOpen,intro,sealBeat,storyPage,landing]);
 
   const connected = models.length > 0;
   const sea = useMemo(
@@ -738,7 +747,7 @@ export function App() {
       if (!scene) throw new Error('没有可用场景');
       // 从标题页重新开一局：补给与人心回到起点；过门换段则一路带下去
       if (!seed) updateStats(() => freshStats());
-      const seedQuestion = scene.questions[0] ?? '';
+      const seedQuestion = historyFor(scene.id,laneId)?.question ?? scene.questions[0] ?? '';
       const created = await api.createVoyage({
         title: title.trim() || TITLE_PRESETS[scene.id] || '未命名航程',
         scene_id: scene.id,
@@ -858,7 +867,7 @@ export function App() {
 
   useEffect(() => {
     // 只有在海上开着船才算过门：在港口、在演戏、在岸上，船停在门边也不算
-    if (view !== 'world' || sealBeat || enc || crisis || landing > 0) return;
+    if (view !== 'world' || !sealedHere || sealBeat || enc || crisis || secret || yardOpen || backgroundId || landing > 0) return;
     if (!nearPortal || portalCross) return;
     // 开进门就换段。没落印也放行：海图上这一段留白，过门时说清楚
     setPortalCross(true);
@@ -868,7 +877,7 @@ export function App() {
     }, 1100);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nearPortal, view, sealBeat, enc, crisis, landing]);
+  }, [nearPortal, view, sealedHere, sealBeat, enc, crisis, secret, yardOpen, backgroundId, landing]);
 
   /** 这一段的下一段是谁。neutral-test 不进主线。 */
   function nextEpochId(cur: string): string | null {
@@ -889,6 +898,7 @@ export function App() {
       const snap = shipRef.current;
       await persist({
         stage: 'world',
+        question:historyFor(voyage.scene_id,laneId)?.question??question,
         route,
         world: { ...worldState(voyage, snap, 'at-sea', sea), lane: laneId },
       });
@@ -911,6 +921,7 @@ export function App() {
       const snap = shipRef.current;
       await persist({
         stage: 'world',
+        question:historyFor(voyage.scene_id,laneId)?.question??question,
         route,
         // 航道同时写进 world：刷新后仍然走同一条，不会悄悄换路
         world: { ...worldState(voyage, snap, 'at-sea', sea), lane: laneId },
@@ -926,13 +937,11 @@ export function App() {
   }
 
   async function dock() {
-    if (!voyage || !nearPort || landing > 0 || crisis) return;
+    if (!voyage || !nearPort || landing > 0 || enc || crisis || secret || yardOpen || backgroundId) return;
+    const missing=historyFor(voyage.scene_id,laneId)?.islands.find(scene=>!collectedIds.has(scene.id)&&!progress.state[`history:${scene.id}`]);
+    if(missing){setError(`先完成「${missing.title}」，再回港回顾。`);return;}
     // 「转」不能跳过：那件事还没发生，就先让它发生
-    if (story && !progress.crisis.includes(story.crisis.id)) {
-      setCaption(null);
-      setCrisis(story.crisis.id);
-      return;
-    }
+    if(story&&!progress.crisis.includes(story.crisis.id)){setError('还有最后一站没有完成。沿罗盘回到现场，再来港口回顾。');return;}
     setBusy(true);
     setError(null);
     try {
@@ -1008,7 +1017,10 @@ export function App() {
 
   /** 靠近一件东西：有人守着就先打照面、做一件事；没人守着就直接收 */
   function startEncounter() {
-    if (!nearFragment || enc) return;
+    if (!nearFragment || enc || crisis || yardOpen || backgroundId) return;
+    const route=historyFor(voyage?.scene_id,laneId),index=route?.islands.findIndex(scene=>scene.id===nearFragment)??-1;
+    if(route&&index>0&&!collectedIds.has(route.islands[index-1].id)&&!progress.state[`history:${route.islands[index-1].id}`]){setError(`先完成「${route.islands[index-1].title}」，再来见这里的人。`);return;}
+    setError(null);
     if (encounterFor(nearFragment)) {
       fableLive.island = nearFragment;
       setEnc(nearFragment);
@@ -1016,12 +1028,13 @@ export function App() {
   }
 
   const settledIds = useRef<Set<string>>(new Set());
+  useEffect(()=>{settledIds.current.clear();dismissedCrisis.current='';},[voyage?.id]);
   function finishEncounter(id: string, o: Outcome, summary: string) {
     if (settledIds.current.has(id)) return;
     settledIds.current.add(id);
     const e = encounterFor(id);
     const tag = `${e?.who ?? '海上'}（${summary}）`;
-    updateStats((s) => scoreOutcome(applyOutcome(s, o, tag, voyage?.scene_id ?? 'test', e?.who ?? '海上的人'), o.trust >= 0, 120));
+    updateStats((s) => scoreOutcome(applyOutcome(s, o, tag, voyage?.scene_id ?? 'test', e?.who ?? '海上的人'), o.skillSucceeded ?? o.trust >= 0, 120));
     // 你做过的事留在岛上：后面的危机、岸上的人、最后一页都会读它
     if (o.set) markProgress((p) => ({ ...p, state: { ...p.state, ...o.set } }));
     fableLive.island = '';
@@ -1101,6 +1114,9 @@ export function App() {
    * 航道上还没收的东西 → 港口 → 落印后指向门。
    */
   const story = storyFor(voyage?.scene_id, laneId);
+  const currentHistory=historyFor(voyage?.scene_id,laneId);
+  const pendingHistory=currentHistory?[...currentHistory.islands,currentHistory.crisis].findIndex(scene=>!progress.state[`history:${scene.id}`]&&!collectedIds.has(scene.id)&&!progress.crisis.includes(scene.id)):-1;
+  const nearbyBackground=nearFrag?.id??(story&&ship&&Math.hypot(ship.x-story.crisis.at.x-VILLAGE_OFFSET.x,ship.z-story.crisis.at.z-VILLAGE_OFFSET.z)<22?story.crisis.id:null);
 
   // 换了航程：读回这一程已经看过的戏
   useEffect(() => {
@@ -1132,7 +1148,7 @@ export function App() {
 
   // 船经过旁白点、危机点：戏自己发生
   useEffect(() => {
-    if (view !== 'world' || !ship || backgroundId || enc || crisis || secret || landing > 0 || intro) return;
+    if (view !== 'world' || !ship || yardOpen || backgroundId || enc || crisis || secret || landing > 0 || intro) return;
     // 暗线 · 桃花源：铜针不指它，只有顺着桃花瓣才找得到
     const era = voyage?.scene_id ?? '';
     const tao = stats.secrets.taoyuan;
@@ -1180,7 +1196,8 @@ export function App() {
       return bestAlong;
     };
     const c = story.crisis;
-    if (!progress.crisis.includes(c.id) && Math.hypot(ship.x - c.at.x, ship.z - c.at.z) < 7) {
+    if(Math.hypot(ship.x-c.at.x-VILLAGE_OFFSET.x,ship.z-c.at.z-VILLAGE_OFFSET.z)>24)dismissedCrisis.current='';
+    if (dismissedCrisis.current!==c.id && (historyFor(era,laneId)?.islands.every(scene=>collectedIds.has(scene.id)||!!progress.state[`history:${scene.id}`])??true) && !progress.crisis.includes(c.id) && Math.hypot(ship.x - (c.at.x+VILLAGE_OFFSET.x), ship.z - (c.at.z+VILLAGE_OFFSET.z)) < 15) {
       setCaption(null);
       setCrisis(c.id);
       return;
@@ -1196,7 +1213,7 @@ export function App() {
         return;
       }
     }
-  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id, backgroundId]);
+  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id, backgroundId, yardOpen]);
 
   function finishSecret(o: Outcome, summary: string) {
     if (!voyage) return;
@@ -1236,11 +1253,11 @@ export function App() {
   // 旁白只在真的露出来的时候计时：遭遇、危机把它遮住的那几秒不算，结束后接着读
   // 桃花那一句是暗示，短一些，别把这一程的开场「起」顶到岛后面去
   useEffect(() => {
-    if (!caption || enc || crisis || backgroundId) return;
+    if (!caption || enc || crisis || yardOpen || backgroundId) return;
     const secs = caption.id === 'tao-hint' ? 3500 : reduceMotion ? 4000 : 7000;
     const t = window.setTimeout(() => setCaption(null), secs);
     return () => window.clearTimeout(t);
-  }, [caption, reduceMotion, enc, crisis, backgroundId]);
+  }, [caption, reduceMotion, enc, crisis, backgroundId, yardOpen]);
 
   // 靠岸后，先见岸上的人，再落印
   useEffect(() => {
@@ -1253,7 +1270,7 @@ export function App() {
     if (settledIds.current.has(c.id)) return;
     settledIds.current.add(c.id);
     const tag = `${c.kicker} · ${c.enc.who}（${summary}）`;
-    updateStats((st) => scoreOutcome(applyOutcome(st, o, tag, voyage.scene_id, c.enc.who), o.trust >= 0, 200));
+    updateStats((st) => scoreOutcome(applyOutcome(st, o, tag, voyage.scene_id, c.enc.who), o.skillSucceeded ?? o.trust >= 0, 200));
     markProgress((p) => ({ ...p, crisis: [...p.crisis, c.id], state: { ...p.state, ...(o.set ?? {}) } }));
     setCrisis(null);
     void api
@@ -1289,7 +1306,7 @@ export function App() {
     // 铜针指岛，不指岛背后那个看不见的点
     if (next) return encounterFor(next.id)?.stage ? { x: next.x + ISLAND_OFFSET.x, z: next.z + ISLAND_OFFSET.z } : { x: next.x, z: next.z };
     // 东西收齐了，还有一场躲不开的事在前面
-    if (story && !progress.crisis.includes(story.crisis.id)) return story.crisis.at;
+    if (story && !progress.crisis.includes(story.crisis.id)) return {x:story.crisis.at.x+VILLAGE_OFFSET.x,z:story.crisis.at.z+VILLAGE_OFFSET.z};
     return portPlace ?? null;
   }, [sealedHere, sea, laneId, collectedIds, portPlace, story, progress]);
 
@@ -1324,14 +1341,20 @@ export function App() {
 
   return (
     <>
+      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||!!backgroundId||yardOpen||shoreOpen}/>
+      {water&&waterFeedback&&<div key={waterFeedback.at} className={`water-feedback is-${waterFeedback.cue}`} role="status">{waterFeedback.cue==='dot'?'接住了':waterFeedback.cue==='error'?'碰到杂物，重新稳住':'进圈了，稳住船'}</div>}
+      {yardOpen&&<ShipyardDialog stats={stats} sceneId={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} allowPurchase={view!=='embark'} onUpdate={updateStats} onClose={()=>setYardOpen(false)}/>}
       {webgl ? (
         <VoyageCanvas
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !backgroundId && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
+          shipLevel={stats.shipLevel} crewLevel={stats.crewLevel}
+          canSail={view === 'world' && !yardOpen && !backgroundId && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
           water={water}
+          onWaterCue={cue=>{voyageCue(cue);setWaterFeedback({cue,at:performance.now()});}}
           onWaterDone={(r) => {
+            voyageCue(r.kind==='gates'?'confirm':r.won?'success':'error');
             setWaterResult(r);
             setWater(null);
           }}
@@ -1399,6 +1422,7 @@ export function App() {
             {view === 'world' ? (
               <div className="hud-world-card">
                 <div className="hud-quest">{story?.logline ?? voyage?.question ?? ''}</div>
+                {currentHistory&&<div className="hud-history-step">{currentHistory.region} · {pendingHistory<0?'三站已完成，回港回顾':`第 ${pendingHistory+1}/3 站 · ${[...currentHistory.islands,currentHistory.crisis][pendingHistory].date}`}</div>}
                 {/* 靠近一件实物时，先告诉眼睛"那是什么"，文字后补 */}
                 {nearFrag ? (
                   <div className="hud-relic" key={nearFrag.id}>
@@ -1521,6 +1545,8 @@ export function App() {
             )}
           </div>
           <div className="hud hud-br">
+            <MusicControls/>
+            <button className="btn btn-icon hud-action" type="button" disabled={!!enc||!!crisis||!!secret||!!backgroundId||landing>0} onClick={()=>{setInput({forward:0,turn:0});setYardOpen(true);}}>船坞与换装 · B</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setView('embark')}>启航</button>
             <button
               className="btn btn-icon hud-action"
@@ -1634,7 +1660,7 @@ export function App() {
             <span className="portal-hint-kicker">{sealedHere ? '门已开' : '还没落印'}</span>
             <span className="portal-hint-name">{sea.portal.label}</span>
             <span className="portal-hint-sub">
-              {sealedHere ? '驶入门内，这一段就结束' : '驶入就直接去下一段，这一段在海图上留白'}
+              {sealedHere ? '驶入门内，这一段就结束' : '完成三站故事、回港回顾并落印后，才能前往下一段'}
             </span>
           </div>
         )}
@@ -1642,11 +1668,14 @@ export function App() {
       {/* 承：沿途的旁白，从画面里浮出来 */}
       {view === 'world' && caption && !enc && !crisis && <StoryCaption beat={caption} title={story?.title ?? ''} />}
 
+      {view==='world'&&story&&nearbyBackground===story.crisis.id&&!crisis&&!enc&&!secret&&!backgroundId&&!yardOpen&&!progress.crisis.includes(story.crisis.id)&&historyFor(voyage?.scene_id,laneId)?.islands.every(scene=>collectedIds.has(scene.id)||!!progress.state[`history:${scene.id}`])&&<button className="interact-prompt" type="button" onClick={()=>{dismissedCrisis.current='';setCrisis(story.crisis.id);}}>继续故事 · {story.crisis.enc.who}</button>}
+
       {/* 转：躲不开的那件事 */}
       {view === 'world' && crisis && story && (
         <EncounterOverlay
           key={crisis}
-          enc={story.crisis.enc}
+          enc={supportedEncounter(story.crisis.enc,progress.state)}
+          onCancel={()=>{dismissedCrisis.current=crisis;setCrisis(null);setWater(null);setWaterResult(null);}}
           title={story.crisis.kicker}
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishCrisis(o, summary)}
@@ -1706,7 +1735,8 @@ export function App() {
       {view === 'world' && enc && encounterFor(enc) && (
         <EncounterOverlay
           key={enc}
-          enc={encounterFor(enc)!}
+          enc={supportedEncounter(encounterFor(enc)!,progress.state)}
+          onCancel={()=>{setEnc(null);fableLive.island='';setWater(null);setWaterResult(null);}}
           title={sea.fragments.find((f) => f.id === enc)?.title ?? ''}
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishEncounter(enc, o, summary)}
@@ -1765,7 +1795,7 @@ export function App() {
             </div>
 
             <div className="cine-embark-actions">
-              <SealButton label="启航" disabled={busy} hint="" onSeal={() => void createVoyage()} />
+              <SealButton label="启航" disabled={busy} hint="" onSeal={() => void createVoyage()} /><MusicControls/><button className="btn" type="button" onClick={()=>setYardOpen(true)}>船坞与换装 · 先看看外形</button>
               <button className="cine-link" type="button" onClick={() => setReduceMotion((v) => !v)}>
                 {reduceMotion ? '已减少动态' : '减少动态效果'}
               </button>
@@ -1905,7 +1935,7 @@ export function App() {
       )}
 
       {backgroundId&&<IslandBackground id={backgroundId} onClose={()=>setBackgroundId(null)}/>}
-      {view==='world'&&nearFrag&&ISLAND_BACKGROUNDS[nearFrag.id]&&!enc&&!crisis&&!secret&&<button className="island-background-entry" type="button" onClick={()=>{setInput({forward:0,turn:0});setBackgroundId(nearFrag.id);}}>图片背景 · {encounterFor(nearFrag.id)?.who}</button>}
+      {view==='world'&&nearbyBackground&&ISLAND_BACKGROUNDS[nearbyBackground]&&!enc&&!crisis&&!secret&&<button className="island-background-entry" type="button" onClick={()=>{setInput({forward:0,turn:0});setBackgroundId(nearbyBackground);}}>图片背景 · {historyScene(nearbyBackground)?.who}</button>}
 
       {view === 'world' && nearFragment && nearFrag && !nearFragCollected && !enc && (
         <button className={`interact-prompt${nearPort ? ' interact-prompt-with-port' : ''}`} type="button" disabled={busy} onClick={() => startEncounter()}>

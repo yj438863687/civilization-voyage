@@ -2,43 +2,49 @@
   "id": "A",
   "version": 2,
   "status": "pending",
-  "label": "AI 推荐，待组员确认：宋元泉州港",
-  "background": "10–14 世纪，泉州（刺桐）是东亚与印度洋贸易网络中的重要港口，多种族群与宗教在此共处。本场景用体块、海图和材料对照来问「一座港口如何让不同习惯的人长期共事」，不复原任何一座历史建筑。",
-  "cultural_core": "和而不同：商贸制度、多元信仰与地方社会如何共存。",
+  "label": "农业时代",
+  "background": "内海：中国。船从洪水传说驶向战国的岷江。你将看见，治水从一种本领，渐渐变成需要两岸共同维护的生活秩序。 外海：世界。船驶向两河流域。灌溉带来余粮，余粮聚成粮仓，粮仓又需要记录；沿途要问的是，记录会照顾谁，又会漏掉谁。",
+  "cultural_core": "技术与文明：补给维持航行，人心维持合作。",
   "questions": [
-    "一座港口如何让不同语言、信仰和商业习惯的人长期合作？这种共处靠什么维系，又在什么条件下瓦解？"
+    "能改变河流以后，谁来决定水的去向？",
+    "有了粮仓与记账，丰收能不能成为每个人的保障？"
   ],
   "fragments": [
-    "市舶抽解残页（史实候选·待核实）",
-    "多语宗教石刻说明（史实候选·待核实）",
-    "水密隔舱笔记（史实候选·待核实）"
+    "堤外还有人",
+    "一条渠，两岸田",
+    "把收成留下来",
+    "泥板记得谁"
   ],
   "interactions": [
-    "对照不同来源对同一港口的记述",
-    "用一份材料说明：货物如何被登记、谁被看见"
+    "航行到岛旁，听人物讲述并完成水上互动",
+    "决定怎样使用成果，带着三站经历回港回顾"
   ],
-  "economy": "剧情货物为瓷器、丝织品、香料的测试数值，不推定历史价格或税率。",
-  "educational_value": "练习比较官方文书、旅行记与考古概述；区分交流证据与单一文明叙事。",
+  "economy": "补给与人心为游戏数值：补给可整修船体，人心可解锁船员行装；不代表历史价格。",
+  "educational_value": "按先后年代比较中国与世界的技术选择，区分传说、史实背景、创作对话与未来推演。",
   "sources": [
     {
-      "id": "A-unesco-1561",
-      "title": "UNESCO World Heritage: Quanzhou: Emporium of the World in Song-Yuan China",
-      "url": "https://whc.unesco.org/en/list/1561/",
-      "license": "仅链接与原创概述；原文及图像授权待核实，不随项目 MIT 自动授权",
-      "verification": "unverified"
+      "id": "A-water",
+      "title": "《史记·夏本纪》：治水传说的文献记录",
+      "url": "https://ctext.org/shiji/xia-ben-ji/zh",
+      "license": "链接与原创概述；配图许可见游戏内图片来源",
+      "verification": "verified"
     },
     {
-      "id": "A-zhao-zhufanzhi",
-      "title": "赵汝适《诸蕃志》（南宋）公开文本线索",
-      "url": "https://zh.wikisource.org/wiki/%E8%AB%B8%E8%95%83%E5%BF%97",
-      "license": "公有领域文本线索；版本与标点待核实",
-      "verification": "unverified"
+      "id": "A-n-flood",
+      "title": "联合国教科文组织：都江堰",
+      "url": "https://whc.unesco.org/en/list/1001/",
+      "license": "链接与原创概述；配图许可见游戏内图片来源",
+      "verification": "verified"
+    },
+    {
+      "id": "A-bone",
+      "title": "大都会艺术博物馆：乌鲁克",
+      "url": "https://www.metmuseum.org/essays/uruk-the-first-city",
+      "license": "链接与原创概述；配图许可见游戏内图片来源",
+      "verification": "verified"
     }
   ],
   "needs_verification": [
-    "「刺桐」与泉州的对应及马可·波罗是否亲至，学界有不同观点，需列出而非下结论",
-    "宋元市舶司税率与流程的时期差异",
-    "宗教石刻图片的拍摄与使用授权",
-    "海船复原图的版本与来源；本场景不用复原图，只用体块"
+    "人物对话、资源数值与故事选择均为创作，不能作为历史原文引用。"
   ]
 }

@@ -598,9 +598,37 @@ function GoBoard({ id, state, reduceMotion }: P) {
   );
 }
 
+/** A stationary workshop engine, so the 1769 episode does not show a later railway. */
+function SteamWorkshop({id,state,reduceMotion}:P){
+  const wheel=useRef<THREE.Group>(null),needle=useRef<THREE.Mesh>(null);
+  useFrame(()=>{const active=fableLive.island===id,pressure=active?fableLive.value:state.machine==='yes'?.55:.15;if(wheel.current&&!reduceMotion)wheel.current.position.y=1.2+Math.sin(performance.now()*.002)*(active?pressure*.3:.08);if(needle.current)needle.current.rotation.z=-1.1+pressure*2.2;});
+  return <group position={[0,1.3,0]}>
+    <mesh position={[0,.1,0]}><boxGeometry args={[5,.2,3]}/>{mat('#574936')}</mesh>
+    <mesh position={[-.6,1.1,0]} rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.85,.85,2.8,20]}/>{mat('#9a7e4e',{metalness:.5,roughness:.55})}</mesh>
+    <mesh position={[-1.5,2.4,0]}><cylinderGeometry args={[.2,.27,1.5,12]}/>{mat('#3b3730')}</mesh>
+    <group ref={wheel} position={[1.8,1.2,.8]}><mesh><cylinderGeometry args={[.38,.38,1.3,12]}/>{mat('#4a4840',{metalness:.65})}</mesh><mesh position={[0,.9,0]}><cylinderGeometry args={[.07,.07,1.8,8]}/>{mat('#9a7e4e')}</mesh></group>
+    <group position={[-.5,1.5,.88]}><mesh rotation={[Math.PI/2,0,0]}><cylinderGeometry args={[.34,.34,.08,20]}/>{mat('#e4d4a9')}</mesh><mesh ref={needle} position={[0,0,.06]}><boxGeometry args={[.035,.45,.04]}/>{mat('#9b4933')}</mesh></group>
+    <mesh position={[1,1.7,-.6]}><boxGeometry args={[.5,2.8,.4]}/>{mat('#5c4a37')}</mesh><mesh position={[.5,3.1,-.6]} rotation={[0,0,-.15]}><boxGeometry args={[3.2,.22,.28]}/>{mat('#7d643d')}</mesh>
+  </group>;
+}
+/** Telegraph key and physical wires, not a radio mast before wireless existed. */
+function WiredTelegraph({id,state,reduceMotion}:P){
+  const key=useRef<THREE.Mesh>(null),lamp=useRef<THREE.MeshStandardMaterial>(null);
+  useFrame(({clock})=>{const active=fableLive.island===id,pulse=active&&!reduceMotion?Math.max(0,Math.sin(clock.elapsedTime*4)):0;if(key.current)key.current.rotation.x=pulse*.12;if(lamp.current)lamp.current.emissiveIntensity=state.warning==='off'?.2:1+pulse*2;});
+  return <group position={[0,1.3,0]}>
+    {[-3.4,3.4].map(x=><group key={x} position={[x,0,-1]}><mesh position={[0,1.8,0]}><cylinderGeometry args={[.12,.18,3.6,8]}/>{mat('#6e5031')}</mesh><mesh position={[0,3.4,0]}><boxGeometry args={[1.4,.18,.18]}/>{mat('#9a7e4e')}</mesh></group>)}
+    {[-.45,0,.45].map(z=><mesh key={z} position={[0,3.45,-1+z]} rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.018,.018,6.8,5]}/>{mat('#353b37')}</mesh>)}
+    <mesh position={[0,.8,0]}><boxGeometry args={[2.8,.2,1.6]}/>{mat('#74543a')}</mesh>{[-1,1].map(x=><mesh key={x} position={[x,.35,0]}><boxGeometry args={[.15,.8,1.1]}/>{mat('#5c4a37')}</mesh>)}
+    <mesh position={[-.45,1.05,.2]}><boxGeometry args={[1,.2,.6]}/>{mat('#9a7e4e')}</mesh><mesh ref={key} position={[-.45,1.25,.2]}><boxGeometry args={[1,.1,.15]}/>{mat('#333a38',{metalness:.5})}</mesh>
+    <mesh position={[.8,1.1,.1]}><sphereGeometry args={[.18,12,8]}/><meshStandardMaterial ref={lamp} color="#e5ca83" emissive="#b59244" emissiveIntensity={1}/></mesh>
+  </group>;
+}
+
 export function IslandStage({ stage, id, state, reduceMotion }: { stage: Stage } & P) {
   const p = { id, state, reduceMotion };
   switch (stage) {
+    case 'engine':return <SteamWorkshop {...p}/>;
+    case 'telegraph':return <WiredTelegraph {...p}/>;
     case 'tally':
       return <Tally {...p} />;
     case 'jars':

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install the original game with optional image notes, preserving all saves."""
+"""Install the native story game with history, music and upgrades, preserving all saves."""
 import datetime
 import json
 from pathlib import Path
@@ -33,11 +33,11 @@ for era in ['A','B','C','D']:
     with urllib.request.urlopen(request,timeout=15) as response:assert json.load(response)['id']==era
 staged=support/('webdist-original-next-'+stamp)
 shutil.copytree(build,staged)
-(staged/'release.json').write_text(json.dumps({'release':'original-c1a8fe8-background-only','baseline':'c1a8fe8','background_notes':16,'installed_at':stamp}))
+(staged/'release.json').write_text(json.dumps({'release':'history-music-refit-v1','baseline':'c1a8fe8','background_notes':24,'routes':8,'features':['chronology','music','ship-refit','crew-outfits'],'installed_at':stamp}))
 installed=support/'webdist'
 if installed.exists():installed.rename(backup/'webdist')
 try:staged.rename(installed)
 except OSError:
     if (backup/'webdist').exists():(backup/'webdist').rename(installed)
     raise
-print('原版+图片背景已安装；保留存档，备份：'+str(backup))
+print('历史、配乐与船坞版已安装；保留存档，备份：'+str(backup))

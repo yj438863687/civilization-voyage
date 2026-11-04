@@ -124,5 +124,86 @@
     "license": "Public domain",
     "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
     "caption": "中国“龙号”蒸汽机车的历史图像；游戏中的人物对话与选择为创作。"
+  },
+  "grain": {
+    "src": "/background/grain.jpg",
+    "title": "Tablet recording allocation of barley, 2350 BCE, Girsu, British Museum.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Tablet_recording_allocation_of_barley,_2350_BCE,_Girsu,_British_Museum.jpg",
+    "author": "SpeakingArch",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "caption": "吉尔苏大麦分配泥板，约公元前 2350 年。作为后世记账实物对照，晚于本航程的乌鲁克背景。"
+  },
+  "tablet": {
+    "src": "/background/tablet.jpg",
+    "title": "British Museum Middle east 14022019 Gypsum tablet with archaic numbers Late Uruk Period 3667.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:British_Museum_Middle_east_14022019_Gypsum_tablet_with_archaic_numbers_Late_Uruk_Period_3667.jpg",
+    "author": "Vassil",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "caption": "晚乌鲁克时期的数字泥板，现藏大英博物馆。"
+  },
+  "watt": {
+    "src": "/background/watt.jpg",
+    "title": "James Watt Thomas Lawrence (1812).jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:James_Watt_Thomas_Lawrence_(1812).jpg",
+    "author": "Thomas Lawrence",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "托马斯·劳伦斯所绘瓦特肖像，1812 年，晚于本航程的专利背景。"
+  },
+  "sheng": {
+    "src": "/background/sheng.jpg",
+    "title": "Sheng Xuanhuai.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Sheng_Xuanhuai.jpg",
+    "author": "Unknown authorUnknown author",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "盛宣怀肖像。"
+  },
+  "morse": {
+    "src": "/background/morse.jpg",
+    "title": "Samuel Morse 1840.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Samuel_Morse_1840.jpg",
+    "author": "Unidentified photographer",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "摩尔斯肖像，1840 年。"
+  },
+  "shannon": {
+    "src": "/background/shannon.jpg",
+    "title": "ClaudeShannon MFO3807.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:ClaudeShannon_MFO3807.jpg",
+    "author": "Jacobs, Konrad",
+    "license": "CC BY-SA 2.0 de",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/de/deed.en",
+    "caption": "克劳德·香农的照片。"
+  },
+  "turing": {
+    "src": "/background/turing.jpg",
+    "title": "Alan Turing Aged 16.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Alan_Turing_Aged_16.jpg",
+    "author": "Possibly Arthur Reginald Chaffin (1893-1954)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "少年时期的图灵照片。这里只作机器智能问题的历史回望，非后来事件的见证者。"
+  },
+  "cable": {
+    "src": "/background/cable.jpg",
+    "title": "Great Eastern 1866.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:Great_Eastern_1866.jpg",
+    "author": "most likely Robert Edward Holloway (d. 1904) according to source",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "《大东方号》，1866 年，跨洋铺缆的历史图像。"
+  },
+  "zhan": {
+    "src": "/background/zhan.jpg",
+    "title": "1918年詹天佑.jpg",
+    "url": "https://commons.wikimedia.org/wiki/File:1918%E5%B9%B4%E8%A9%B9%E5%A4%A9%E4%BD%91.jpg",
+    "author": "\nUnknown authorUnknown author",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "caption": "1918 年的詹天佑照片，晚于本航程的京张铁路通车背景。"
   }
 }
