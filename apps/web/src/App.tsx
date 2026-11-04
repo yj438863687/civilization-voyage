@@ -846,7 +846,14 @@ export function App() {
 
   /** 开进传送门：先把画面压黑，再换到下一段。 */
   const [portalCross, setPortalCross] = useState(false);
+  // 不在海上时，过门的黑幕不能留着
   useEffect(() => {
+    if (view !== 'world' && portalCross) setPortalCross(false);
+  }, [view, portalCross]);
+
+  useEffect(() => {
+    // 只有在海上开着船才算过门：在港口、在演戏、在岸上，船停在门边也不算
+    if (view !== 'world' || sealBeat || enc || crisis || landing > 0) return;
     if (!nearPortal || portalCross) return;
     // 开进门就换段。没落印也放行：海图上这一段留白，过门时说清楚
     setPortalCross(true);
@@ -856,7 +863,7 @@ export function App() {
     }, 1100);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nearPortal]);
+  }, [nearPortal, view, sealBeat, enc, crisis, landing]);
 
   /** 这一段的下一段是谁。neutral-test 不进主线。 */
   function nextEpochId(cur: string): string | null {
@@ -1003,7 +1010,10 @@ export function App() {
     } else void collectFragment();
   }
 
+  const settledIds = useRef<Set<string>>(new Set());
   function finishEncounter(id: string, o: Outcome, summary: string) {
+    if (settledIds.current.has(id)) return;
+    settledIds.current.add(id);
     const e = encounterFor(id);
     const tag = `${e?.who ?? '海上'}（${summary}）`;
     updateStats((s) => scoreOutcome(applyOutcome(s, o, tag, voyage?.scene_id ?? 'test', e?.who ?? '海上的人'), o.trust >= 0, 120));
@@ -1229,6 +1239,8 @@ export function App() {
   function finishCrisis(o: Outcome, summary: string) {
     if (!story || !voyage) return;
     const c = story.crisis;
+    if (settledIds.current.has(c.id)) return;
+    settledIds.current.add(c.id);
     const tag = `${c.kicker} · ${c.enc.who}（${summary}）`;
     updateStats((st) => scoreOutcome(applyOutcome(st, o, tag, voyage.scene_id, c.enc.who), o.trust >= 0, 200));
     markProgress((p) => ({ ...p, crisis: [...p.crisis, c.id], state: { ...p.state, ...(o.set ?? {}) } }));

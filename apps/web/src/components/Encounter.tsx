@@ -113,7 +113,11 @@ export function EncounterOverlay({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [waterResult, phase]);
 
+  /** 只结算一次：结果被重复读到、组件重挂，都不能重复加连击分 */
+  const settled = useRef(false);
   const finish = (o: Outcome, summary: string) => {
+    if (settled.current) return;
+    settled.current = true;
     setOut({ o, summary });
     setPhase('result');
   };
