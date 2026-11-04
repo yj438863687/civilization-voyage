@@ -1,18 +1,21 @@
 # 现场操作稿 / Live Demonstration Script
 
-本版演示与实际游戏共用代码，没有另做替代Demo。右上角可切换中文／English与大字，不清空航程；人物对白由空格或“下一句”按钮推进。下列为现场操作稿，尚未录制或完成整场排练。
-This demonstration uses the actual game. Use the top-right language and text controls without resetting the voyage; advance dialogue with Space or Next Line. This is a live-operation draft, with no new recording or complete rehearsal.
+本版采用实际游戏录像加后期，提供英文主讲和中文理解视频，包含真实游戏声音、合成旁白、字幕与章节。预置演示存档和剪辑已经标注；不是连续通关录像。详见[制作与边界](resource-consequences-and-demo.md)。
+The edited demo uses actual gameplay and game audio, synthetic narration, captions and prepared saves. It is not an uninterrupted playthrough.
 
 ## 五人顺序 / Five Speakers
 
 |主讲|内容 / Topic|PPT页 / Slides|
 |---|---|---|
-|A|技术与共同生活 / Technology and shared life|1–2|
-|B|中国与世界时间线 / Timelines in China and the world|3–4|
-|C|史料、传说与配图 / Sources, legends and images|5–6|
-|D|游戏操作、升级与声音 / Gameplay, upgrades and audio|7–10|
-|E|AI工具与商业验证 / AI tools and business validation|11–12|
-|全组 / All|边界与问答 / Scope and questions|13|
+|A|主题、原型与问题 / Theme, prototype and problem|1–4|
+|B|路线和资源后果 / Routes and resource consequences|5–7|
+|C|史料与可见成长 / Sources and visible progress|8–9|
+|D|播放视频、玩法与验证 / Video, mechanics and checks|10–12|
+|E|本机工作流、Lovable联系与试点BP / Workflow, Lovable comparison and pilot BP|13–20|
+|全组 / All|分工、来源与假设 / Roles, sources and assumptions|21–22|
+
+第10页点击视频播放。若播放软件不支持嵌入媒体，直接打开 Video/Civilization-Voyage-Demo-EN.mp4；中文版本用于理解。PDF不播放视频。以下操作稿供问答时补充现场演示，不必再在台上通关。
+Click the video on slide 10, or open the MP4 backup. The Chinese version supports understanding; PDF contains a poster only. Use the following live instructions for questions if needed.
 
 ## 操作顺序 / Operation Sequence
 

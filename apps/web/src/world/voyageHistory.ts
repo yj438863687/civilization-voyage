@@ -19,11 +19,12 @@ export function historyRecap(route:HistoricalRoute,state:FableState):string[] {
   return [...route.islands,route.crisis].map(scene=>`${scene.date}，${scene.title}：${state[`history:${scene.id}:text`]??'这段旧记录没有保留具体安排，可从本次日志回看。'}`);
 }
 /** Earlier cooperation returns materials in the next chapter; never a second payout. */
-export function supportedEncounter(enc:Encounter,state:FableState):Encounter {
+export function supportedEncounter(enc:Encounter,state:FableState,trust=100):Encounter {
   if(!enc.historyId)return enc;
   const route=Object.values(HISTORY_ROUTES).find(item=>[...item.islands,item.crisis].some(scene=>scene.id===enc.historyId));
   const scenes=route?[...route.islands,route.crisis]:[],index=scenes.findIndex(scene=>scene.id===enc.historyId);
   if(index<1||state[`history:${scenes[index-1].id}`]!=='care')return enc;
+  if(trust<=20)return {...enc,line:'人心不足，上一站的合作伙伴暂不提供支援。 '+enc.line};
   const support=(out:Outcome):Outcome=>({...out,supply:out.supply+3,text:out.text+' 上一站留下的合作省回了3份补给。',set:{...out.set,[`history:${enc.historyId}:supported`]:'yes'}});
   return {...enc,line:'上一站愿意合作的人帮忙准备了工料，这一站可省回3份补给。 '+enc.line,
     game:enc.game.kind==='choice'?{...enc.game,options:enc.game.options.map(option=>({...option,out:support(option.out)}))}:enc.game,

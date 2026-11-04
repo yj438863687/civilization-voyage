@@ -1,0 +1,493 @@
+[
+  {
+    "role": "A",
+    "kind": "cover",
+    "en": "Technology gives us power.\nWhat keeps us together?",
+    "zh": "技术给我们力量。\n什么让我们共同远行？",
+    "en_points": [
+      "Civilization Voyage",
+      "A playable history experience about technology and shared life.",
+      "Prototype + edited gameplay demo + pilot business plan"
+    ],
+    "zh_points": [
+      "文明航程",
+      "以技术与共同生活为主线的可玩历史体验。",
+      "游戏原型＋实录后期Demo＋试点商业计划"
+    ],
+    "capture": "closing-poster.png"
+  },
+  {
+    "role": "A",
+    "kind": "snapshot",
+    "en": "A playable prototype,\nwith a clear next test.",
+    "zh": "从可玩原型，\n走向一项清楚的验证。",
+    "en_points": [
+      "Four eras; eight China/world routes; 24 story scenes.",
+      "Chinese/English stories, visible upgrades and original game audio.",
+      "Next: test whether players can explain benefits, costs and whose experience is missing."
+    ],
+    "zh_points": [
+      "四个时代、八条中国／世界航线、24个故事场景。",
+      "中英文故事、可见外观升级与原创游戏音频。",
+      "下一步验证：玩家能否讲清收益、代价，以及谁的经历被遗漏。"
+    ],
+    "metrics": [
+      [
+        "4",
+        "ERAS",
+        "时代"
+      ],
+      [
+        "8",
+        "ROUTES",
+        "航线"
+      ],
+      [
+        "24",
+        "SCENES",
+        "场景"
+      ]
+    ],
+    "note_en": "The counts describe implemented content, not active users. The game is a prototype. No paying-customer traction is claimed.",
+    "note_zh": "这些数字描述已经实现的内容，不是活跃用户。当前仍为原型，不声称已有付费客户。"
+  },
+  {
+    "role": "A",
+    "kind": "problem",
+    "en": "History is easy to read.\nTradeoffs are harder to feel.",
+    "zh": "历史可以读懂，\n选择的代价却不容易感受。",
+    "en_points": [
+      "A timeline can explain what happened without letting a learner make an arrangement.",
+      "A correct-answer quiz can hide the cost that different people bear.",
+      "A technology story needs a clear chain from capability to resources, cooperation and consequences."
+    ],
+    "zh_points": [
+      "时间线可以讲清发生了什么，却未必让学习者亲自做一次安排。",
+      "只有标准答案的问答，容易掩盖不同人承担的代价。",
+      "技术故事需要把能力、物资、合作与后果连成一条线。"
+    ],
+    "light": true
+  },
+  {
+    "role": "A",
+    "kind": "why",
+    "en": "Why test this now?\nThe prototype can be inspected.",
+    "zh": "为什么现在可以试？\n因为原型已经能够被检验。",
+    "en_points": [
+      "Local tools make code, scenes and revisions reviewable.",
+      "Bilingual delivery lets the same scene support an English presentation and Chinese understanding.",
+      "A small facilitated session can test comprehension before a larger content or sales commitment."
+    ],
+    "zh_points": [
+      "本机工具让代码、场景与修改过程可以被检查。",
+      "同一故事支持英文展示与中文理解。",
+      "先用小规模引导式体验测理解，再扩大内容与商业投入。"
+    ]
+  },
+  {
+    "role": "B",
+    "kind": "journey",
+    "en": "One voyage.\nA connected sequence of decisions.",
+    "zh": "一条航程，\n一组相互接续的决定。",
+    "en_points": [
+      "Choose China or the world within an era.",
+      "Meet two island characters, then face a final shared problem.",
+      "Return to the shore: the closing speaker recalls the choices actually made."
+    ],
+    "zh_points": [
+      "在每个时代选择中国或世界航线。",
+      "依次遇见两座岛的人物，再面对最后一个共同难题。",
+      "回到岸边，由适配时段的人物回看实际做过的选择。"
+    ],
+    "capture": "interaction-poster.png",
+    "flow": [
+      "CHOOSE",
+      "MEET",
+      "ACT",
+      "REFLECT"
+    ],
+    "flow_zh": [
+      "选线",
+      "相遇",
+      "行动",
+      "回顾"
+    ]
+  },
+  {
+    "role": "B",
+    "kind": "timelines",
+    "en": "Eight routes.\nDates and perspectives stay explicit.",
+    "zh": "八条航线，\n年代与视角都有明确位置。",
+    "en_points": [
+      "China: flood-control legends → Warring States; 1839–1909; 1871–1896; 2017–imagined 2035.",
+      "World: c.3500–3200 BCE; 1769–1842; 1844–1948; 1950–2016.",
+      "Each route moves forward in time. Different eras can overlap; legends and future scenarios are labelled."
+    ],
+    "zh_points": [
+      "中国：治水传说至战国；1839—1909；1871—1896；2017至未来推演2035。",
+      "世界：约前3500—前3200；1769—1842；1844—1948；1950—2016。",
+      "每条线内部按年代向后展开；时代范围可以重叠，传说与推演明确标注。"
+    ],
+    "light": true
+  },
+  {
+    "role": "B",
+    "kind": "consequences",
+    "en": "Supplies and trust\ncan both run out.",
+    "zh": "补给与人心，\n都可能走到尽头。",
+    "en_points": [
+      "Supplies ≤15: 30% slower sailing. At zero, the ship must stop.",
+      "Trust ≤20: cooperative support pauses. At zero, the crew stops working together.",
+      "Recovery: −200 score; supply failure costs hull condition and a refit tier; trust failure costs an outfit tier. Choices remain saved."
+    ],
+    "zh_points": [
+      "补给不多于15时，航速降低30%；归零后停航。",
+      "人心不多于20时，合作支援暂停；归零后船员停止协作。",
+      "重整扣200分；断粮损失耐久与整修等级，失信损失行装等级。原选择保留。"
+    ],
+    "capture": "supply_failure-poster.png",
+    "note_en": "Recovery floors are 35 supplies or 30 trust. Hull loss is 20, down to zero. Each relevant tier falls by one, never below zero. Ending a voyage records a bad outcome instead.",
+    "note_zh": "重整后相应资源恢复至35补给或30人心；船身耐久减20，最低0；对应外观等级减1，最低0。也可结束航程并记录坏结局。"
+  },
+  {
+    "role": "C",
+    "kind": "sources",
+    "en": "The story is creative.\nIts historical context is checkable.",
+    "zh": "故事是创作，\n历史背景需要可核对。",
+    "en_points": [
+      "Distinguish legend, historical context, fictional dialogue and imagined futures.",
+      "Images explain context: later portraits and modern photographs are not eyewitness records.",
+      "Source credits stay in the optional image notes; reading does not award resources or advance a chapter."
+    ],
+    "zh_points": [
+      "区分传说、史实背景、创作对白与未来推演。",
+      "后世画像和现代照片用于解释背景，不当作故事现场。",
+      "图片入口保留出处与授权；阅读不发资源，也不推进章节。"
+    ],
+    "light": true,
+    "capture": "interaction-poster.png"
+  },
+  {
+    "role": "C",
+    "kind": "progress",
+    "en": "Progress is visible.\nIt still needs people to sustain it.",
+    "zh": "成长看得见，\n也需要有人共同维持。",
+    "en_points": [
+      "Supplies buy three ship-refit tiers while keeping 15 in reserve.",
+      "Trust unlocks crew outfits at 55, 65 and 75, without being spent.",
+      "Matte clothing, fitted caps and a small brass insignia replace exaggerated upgrade ornaments."
+    ],
+    "zh_points": [
+      "补给购买三级船体整修，至少留下15份口粮。",
+      "人心达到55、65、75解锁行装，不因换装扣除。",
+      "哑光衣料、合身软帽和小型黄铜徽章，替代夸张升级装饰。"
+    ],
+    "capture": "upgrades-poster.png"
+  },
+  {
+    "role": "D",
+    "kind": "video",
+    "en": "Watch the actual game.\nThen judge the choices.",
+    "zh": "先看实际游戏，\n再讨论其中的选择。",
+    "en_points": [
+      "Edited browser capture with recorded game audio, synthetic narration and subtitles.",
+      "Prepared saves are disclosed; zero-resource outcomes are triggered through real game actions.",
+      "The MP4 is embedded in this slide and supplied separately as a playback backup."
+    ],
+    "zh_points": [
+      "实际浏览器画面与游戏声音，配合合成旁白、字幕和后期。",
+      "预置存档明确说明；资源归零由真实操作触发。",
+      "本页内嵌MP4，同时提供独立视频备用。"
+    ],
+    "capture": "supply_failure-poster.png"
+  },
+  {
+    "role": "D",
+    "kind": "mechanics",
+    "en": "Four ways to participate.\nOne shared question.",
+    "zh": "四种参与方式，\n围绕同一个问题。",
+    "en_points": [
+      "Steer through a buoy gate to make an arrangement.",
+      "Hold inside a ring, collect useful objects and verify a sequence.",
+      "A completed skill and the social use of its result settle separately. Failure can still lead to a meaningful decision."
+    ],
+    "zh_points": [
+      "驶入浮标门，决定怎样安排眼前的事。",
+      "稳住光环、收集有用物件，并完成顺序核对。",
+      "操作结果与如何使用成果分开结算；未做成，也仍需作出安排。"
+    ],
+    "light": true
+  },
+  {
+    "role": "D",
+    "kind": "evidence",
+    "en": "Checked behaviour,\nwith limits stated plainly.",
+    "zh": "说清检查过什么，\n也说清它的边界。",
+    "en_points": [
+      "24 English story entries; language switching preserves the current dialogue and progress.",
+      "Resource failure, recovery costs, repeated callbacks, bad-ending records and reloads are checked.",
+      "Native keyboard interactions and phone layouts are checked. This is not a continuous manual playthrough of all routes."
+    ],
+    "zh_points": [
+      "检查24站英文入口，以及切换语言不重开对话与进度。",
+      "检查资源归零、重整代价、重复回调、坏结局记录与刷新保存。",
+      "检查真实键盘互动与手机布局；不等同于所有航线连续人工通关。"
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "workflow",
+    "en": "How this project\nwas actually built locally.",
+    "zh": "这个项目，\n实际上怎样在本机搭建。",
+    "en_points": [
+      "28 Oct: an independent GitHub framework and project boundaries.",
+      "30 Oct: documented handoffs for visual design, FastAPI/contracts and the React/Three.js frontend; local worktrees and integration.",
+      "Then: one-command startup, SQLite saves, browser checks, desktop installation, historical routes and bilingual iteration."
+    ],
+    "zh_points": [
+      "10月28日：建立独立GitHub框架与项目边界。",
+      "10月30日：设计、FastAPI／契约和React／Three.js前端留下交接文档，在本机工作树联调。",
+      "随后补一键启动、SQLite存档、浏览器检查、桌面安装、历史主线与双语迭代。"
+    ],
+    "flow": [
+      "BRIEF",
+      "GIT",
+      "LOCAL BUILD",
+      "VERIFY"
+    ],
+    "flow_zh": [
+      "需求",
+      "版本库",
+      "本机实现",
+      "验证"
+    ],
+    "note_en": "Repository evidence: c150efd; 7a6442b; 0c44dab; 21ae8f3; b228a51; 65016f9; 2921924. Handoff documents assign design to Claude, API to Codex and web/3D to Grok; this records the documented workflow, not independently verified model-call logs or measured productivity gains. Reproducible local setup is documented in scripts/dev.sh and docs/handoffs/codex-to-grok.md: create the Python environment, install API requirements, run the FastAPI server and Vite frontend, verify the browser flow, build the frontend and install the desktop wrapper. These are repository-backed steps; individual shell history and paid model usage were not independently audited.",
+    "note_zh": "依据提交c150efd、7a6442b、0c44dab、21ae8f3、b228a51、65016f9、2921924。交接文档把设计、API与前端分别交给Claude、Codex与Grok；这说明文档记录的工作流，不是独立核验的模型调用日志或效率提升指标。 可复现搭建步骤见启动脚本和交接文档：创建Python环境，安装API依赖，启动FastAPI与Vite，验证浏览器流程，构建前端并安装桌面启动器。以上有仓库依据，不声称逐条核验过个人Shell历史或付费模型用量。"
+  },
+  {
+    "role": "E",
+    "kind": "lovable",
+    "en": "Lovable explains the pattern.\nThe repository supplies the evidence.",
+    "zh": "Lovable帮助解释方式，\n仓库证据决定我们怎样表述。",
+    "en_points": [
+      "Lovable documents natural-language app building and GitHub synchronization for local development.",
+      "Our verified path is local: React + Three.js, FastAPI + SQLite, typed contracts, worktree handoffs and browser regression.",
+      "No Lovable project export has been found here. It is a workflow comparison, not a claim about this project’s origin."
+    ],
+    "zh_points": [
+      "Lovable提供自然语言构建应用与GitHub同步、本机开发的工作方式。",
+      "本项目可核对的是本机React＋Three.js、FastAPI＋SQLite、类型契约、工作树交接和浏览器回归。",
+      "目前未找到本项目由Lovable导出的证据；这里作流程联系，不声称它就是项目起点。"
+    ],
+    "light": true,
+    "note_en": "Primary sources: docs.lovable.dev/introduction/welcome and docs.lovable.dev/integrations/github. The existing repository, setup script and three handoff documents establish the local workflow. No paid-model access or Lovable subscription is required by the current scripted game.",
+    "note_zh": "Lovable能力依据官方介绍和GitHub同步文档。本机过程依据仓库、启动脚本与三份交接文件。当前剧本主线不依赖付费模型或Lovable订阅。"
+  },
+  {
+    "role": "E",
+    "kind": "business",
+    "en": "Sell a facilitated experience,\nnot an untested learning promise.",
+    "zh": "交付可引导的体验，\n不出售未经验证的学习承诺。",
+    "en_points": [
+      "Pilot offer: the game, sourced story notes, a facilitator guide and a debrief rubric.",
+      "Possible customers: schools, cultural institutions and exhibition operators. These are customer hypotheses.",
+      "After validation: content packs, term licences or installation/support services. No paid traction is claimed."
+    ],
+    "zh_points": [
+      "试点交付：游戏、带出处的故事资料、引导手册和回顾评价表。",
+      "学校、文化机构与展项运营方是待验证的客户方向。",
+      "验证之后再考虑内容包、学期许可或安装支持；不声称已有付费增长。"
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "growth",
+    "en": "A pilot funnel\nthat measures understanding.",
+    "zh": "用试点漏斗，\n衡量是否真的理解。",
+    "en_points": [
+      "Invite facilitators → run a guided session → finish a choice → explain its tradeoff → request another session.",
+      "Proposed pilot: three classes of twenty learners. This is a recruitment target, not attendance achieved.",
+      "Track completion, source recognition, explanation quality, repeat requests and paid-pilot acceptance."
+    ],
+    "zh_points": [
+      "邀请引导者→体验→完成选择→解释代价→提出再次体验。",
+      "拟议试点为三班、每班20人；这是招募目标，不是已到场人数。",
+      "记录完成情况、来源辨认、解释质量、复用意愿和付费试点接受度。"
+    ],
+    "light": true,
+    "metrics": [
+      [
+        "3",
+        "CLASSES · TARGET",
+        "班 · 目标"
+      ],
+      [
+        "20",
+        "LEARNERS EACH",
+        "人／班"
+      ],
+      [
+        "60",
+        "PROPOSED PARTICIPANTS",
+        "拟议参与人数"
+      ]
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "economics",
+    "en": "Unit economics are a model,\nnot a sales result.",
+    "zh": "单位经济是待测模型，\n不是已经实现的业绩。",
+    "en_points": [
+      "Illustrative pilot price: ¥3,000; direct delivery cost: ¥1,200; contribution: ¥1,800 before acquisition and overhead.",
+      "An illustrative acquisition ceiling of ¥600 leaves ¥1,200 before fixed costs, tax and further development.",
+      "Price, delivery effort and conversion must be tested. Retention and LTV/CAC cannot be established from the prototype."
+    ],
+    "zh_points": [
+      "示例试点价3000元，直接交付成本1200元，获客与固定支出前贡献1800元。",
+      "若示例获客上限为600元，则固定成本、税费和后续开发前余1200元。",
+      "价格、交付工时与转化都待测；原型不能证明留存或LTV／CAC。"
+    ],
+    "light": true,
+    "assumption": true,
+    "metrics": [
+      [
+        "¥3,000",
+        "ASSUMED PRICE",
+        "假设单价"
+      ],
+      [
+        "¥1,200",
+        "ASSUMED DIRECT COST",
+        "假设直接成本"
+      ],
+      [
+        "¥1,800",
+        "CONTRIBUTION BEFORE CAC",
+        "获客前贡献"
+      ]
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "budget",
+    "en": "An illustrative ¥30,000 pilot.\nSpend to remove uncertainty.",
+    "zh": "3万元示例试点预算，\n先消除最大的未知。",
+    "en_points": [
+      "An illustrative ¥30,000 plan: source/content review 40%; facilitation/evaluation 30%; product hardening 20%; hosting/support 10%.",
+      "This is a planning scenario, not money already raised or a supplier quote.",
+      "The first decision gate is evidence of comprehension and willingness to reuse, before scaling sales."
+    ],
+    "zh_points": [
+      "3万元示例预算：资料与内容审读40%，引导与评价30%，产品加固20%，托管支持10%。",
+      "这是计划情境，不是已融资款，也不是供应商报价。",
+      "先验证理解与复用意愿，再决定是否扩大销售。"
+    ],
+    "assumption": true,
+    "budget": [
+      [
+        "40%",
+        "SOURCE & CONTENT",
+        "资料与内容"
+      ],
+      [
+        "30%",
+        "FACILITATION & EVALUATION",
+        "引导与评价"
+      ],
+      [
+        "20%",
+        "PRODUCT HARDENING",
+        "产品加固"
+      ],
+      [
+        "10%",
+        "HOSTING & SUPPORT",
+        "托管与支持"
+      ]
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "roadmap",
+    "en": "Build evidence\nbefore adding complexity.",
+    "zh": "先积累证据，\n再增加复杂度。",
+    "en_points": [
+      "Month 1: recruit facilitators, confirm sources and run the first guided sessions.",
+      "Months 2–3: revise unclear stories, test completion and measure repeat interest.",
+      "Months 4–6: consider more content and optional retrieval only if the pilot shows a clear need."
+    ],
+    "zh_points": [
+      "第1个月：邀请引导者，核对资料，完成首轮体验。",
+      "第2—3个月：修正不清楚的故事，检查完成率和再次体验意愿。",
+      "第4—6个月：只有试点显示需求，才扩展内容与可选检索。"
+    ],
+    "flow": [
+      "FIRST SESSIONS",
+      "REVISE",
+      "DECIDE"
+    ],
+    "flow_zh": [
+      "首轮体验",
+      "修正",
+      "决定"
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "ask",
+    "en": "The next ask:\nthree pilot classrooms.",
+    "zh": "下一步，\n寻找三个试点课堂。",
+    "en_points": [
+      "Seek facilitators willing to run a session and assess explanations.",
+      "Seek historical/content reviewers and accessibility feedback.",
+      "Use the game, video and editable decks to make the pilot reviewable. Funding and customer commitments remain unestablished."
+    ],
+    "zh_points": [
+      "寻找愿意组织体验并评价玩家解释的引导者。",
+      "寻找历史内容审读与无障碍反馈。",
+      "用游戏、视频和可编辑演示稿支撑检查；融资与客户承诺尚未建立。"
+    ],
+    "capture": "closing-poster.png"
+  },
+  {
+    "role": "ALL",
+    "kind": "roles",
+    "en": "Five speakers.\nOne coherent demonstration.",
+    "zh": "五人分工，\n讲清同一条主线。",
+    "en_points": [
+      "A — theme, prototype snapshot and problem; B — routes and resource consequences.",
+      "C — historical sources and visible progress; D — edited demo, gameplay and test scope.",
+      "E — the actual local workflow, Lovable comparison and pilot business model."
+    ],
+    "zh_points": [
+      "A讲主题、原型与问题；B讲航线和资源后果。",
+      "C讲史料与可见成长；D讲视频、玩法和检查范围。",
+      "E讲真实本机工作流、Lovable联系与商业试点。"
+    ],
+    "light": true
+  },
+  {
+    "role": "ALL",
+    "kind": "sources",
+    "en": "Sources, assumptions\nand what this does not prove.",
+    "zh": "资料、假设，\n以及尚未被证明的部分。",
+    "en_points": [
+      "History and image credits are available in game; local workflow evidence is in Git history and docs/handoffs/.",
+      "Lovable references: official introduction and GitHub-sync documentation. Visual reference: harbourmind.ai; BP structure: the user-provided Deep Space Signal deck.",
+      "Prepared saves, scripted keyboard capture and synthetic narration are disclosed. The video is edited, not a continuous playthrough. Pricing, market fit, learning gains and paid traction remain hypotheses."
+    ],
+    "zh_points": [
+      "史料与图像署名见游戏；本机过程见Git记录与交接文档。",
+      "Lovable依据官方介绍与GitHub同步文档；视觉参考harbourmind.ai，BP结构参考用户指定深空信号版。",
+      "预置存档、脚本键盘录制和合成旁白均说明。视频经过剪辑，不是连续通关。价格、需求、学习收益和付费增长仍需验证。"
+    ],
+    "light": true,
+    "links": [
+      "https://docs.lovable.dev/introduction/welcome",
+      "https://docs.lovable.dev/integrations/github",
+      "https://harbourmind.ai",
+      "https://github.com/yj438863687/civilization-voyage"
+    ]
+  }
+]

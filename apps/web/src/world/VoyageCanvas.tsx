@@ -51,6 +51,7 @@ export interface ControlInput {
 interface Props {
   shipLevel?: number;
   crewLevel?: number;
+  crewAvailable?: boolean;
   mode: CamMode;
   reduceMotion: boolean;
   canSail: boolean;
@@ -430,7 +431,7 @@ function Rig({
   landingT = 0,
   landingRelic = null,
   autopilot = false,
-  shipLevel = 0, crewLevel = 0,
+  shipLevel = 0, crewLevel = 0, crewAvailable = true,
   stageAt = null,
   player: playerName = null,
   squall = null,
@@ -834,6 +835,7 @@ function Rig({
         g.position.z = THREE.MathUtils.clamp(g.position.z, world.bounds.minZ, world.bounds.maxZ);
       }
     } else {
+      reefHit.current = 0;
       speed.current *= 1 - Math.min(1, 4 * clamped);
     }
 
@@ -1066,7 +1068,7 @@ function Rig({
                 reduceMotion={reduceMotion}
                 style={HULL_STYLES[STYLE_BY_SCENE[propsScene] ?? 'junk']}
                 crew={crewAppearance(DECK_CREW[propsScene] ?? DECK_CREW.test,crewLevel)}
-                shipLevel={shipLevel} crewLevel={crewLevel}
+                shipLevel={shipLevel} crewLevel={crewLevel} crewAvailable={crewAvailable}
                 player={playerName ? { name: playerName, look: PLAYER_LOOK[propsScene] ?? PLAYER_LOOK.test } : null}
               />
             </Suspense>

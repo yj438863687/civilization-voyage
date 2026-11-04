@@ -33,11 +33,11 @@ for era in ['A','B','C','D']:
     with urllib.request.urlopen(request,timeout=15) as response:assert json.load(response)['id']==era
 staged=support/('webdist-original-next-'+stamp)
 shutil.copytree(build,staged)
-(staged/'release.json').write_text(json.dumps({'release':'bilingual-readable-crew-v2','baseline':'c1a8fe8','background_notes':24,'routes':8,'features':['chronology','music','ship-refit','crew-outfits','zh-en','larger-text','refined-crew'],'installed_at':stamp}))
+(staged/'release.json').write_text(json.dumps({'release':'resource-endings-demo-v3','baseline':'c1a8fe8','background_notes':24,'routes':8,'features':['chronology','music','ship-refit','crew-outfits','zh-en','larger-text','refined-crew','resource-failure','costly-recovery','recorded-endings'],'installed_at':stamp}))
 installed=support/'webdist'
 if installed.exists():installed.rename(backup/'webdist')
 try:staged.rename(installed)
 except OSError:
     if (backup/'webdist').exists():(backup/'webdist').rename(installed)
     raise
-print('中英双语与船员精修版已安装；保留存档，备份：'+str(backup))
+print('资源后果与结局版已安装；保留存档，备份：'+str(backup))

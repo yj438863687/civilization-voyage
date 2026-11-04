@@ -1,0 +1,58 @@
+[
+  {
+    "id": "opening",
+    "title_en": "Technology and shared life",
+    "title_zh": "技术与共同生活",
+    "en": "Civilization Voyage explores a question that follows technology through agriculture, industry, information, and artificial intelligence: who benefits from a new capability, and who bears its cost? This is the actual playable prototype.",
+    "zh": "文明航程沿着农业、工业、信息和人工智能四个时代，追问同一个问题：获得新技术之后，谁享受便利，谁承担代价？下面展示的是实际可玩的游戏。"
+  },
+  {
+    "id": "routes",
+    "title_en": "China and the world",
+    "title_zh": "中国与世界",
+    "en": "The inner sea follows stories in China; the outer sea follows the wider world. Each route moves forward in time. Sources distinguish legend, historical context, and imagined futures. Chinese and English can be switched without restarting the story.",
+    "zh": "内海对应中国，外海对应世界。每条航线都按年代向后讲述，资料区分传说、史实背景和未来推演。切换中文与英文，不会重开当前故事。"
+  },
+  {
+    "id": "interaction",
+    "title_en": "Try the skill, then choose its use",
+    "title_zh": "先试本领，再决定怎样使用",
+    "en": "On each island, a character introduces a practical problem. The player steers through choices, holds a position, or collects and checks objects. Completing a task and choosing how to use its result are separate decisions.",
+    "zh": "岛上的人物先讲清眼前的难题。玩家通过开船选择、稳住光环、收集与核对物件来参与。完成操作只是第一步，接下来还要决定怎样使用这份本领。"
+  },
+  {
+    "id": "upgrades",
+    "title_en": "Visible progress, shared responsibilities",
+    "title_zh": "看得见的成长，离不开共同维持",
+    "en": "Supplies pay for visible ship refits and keep the voyage moving. Trust unlocks crew outfits and cooperation. The same models appear in the preview and at sea. More cargo is useful, but it cannot replace the people who keep the ship working.",
+    "zh": "补给用于维持航行和整修船体，人心解锁船员行装，也维持沿途合作。预览和海上使用同一套模型。货舱里多装一些东西很有用，却不能替代愿意一起维持航程的人。"
+  },
+  {
+    "id": "supply_failure",
+    "title_en": "An empty hold stops the voyage",
+    "title_zh": "补给归零，航程中断",
+    "en": "Here we use a prepared save with only two supplies. A successful task earns four, but the cooperative arrangement costs six. The balance reaches zero. The voyage stops. Emergency recovery costs hull condition, a refit tier, and score: helping others also requires planning what the ship can afford.",
+    "zh": "这里使用预置演示存档，补给只剩两份。成功操作获得四份，但合作安排需要六份，于是补给归零。船必须停航。紧急重整还要付出耐久、整修等级和得分的代价。愿意帮助别人，也要认真安排船上能够负担的物资。"
+  },
+  {
+    "id": "trust_failure",
+    "title_en": "Orders nobody answers",
+    "title_zh": "人心归零，无人响应",
+    "en": "A second prepared save starts with five trust points. Protecting the ship’s immediate advantage costs five. At zero trust the crew refuses to continue. Recovery restores limited trust, but one outfit tier and score are lost. The choice remains in the log.",
+    "zh": "另一个演示存档从五点人心开始。优先照顾本船的安排消耗五点人心。归零之后，船员停止协作。可以接受重整，但只能恢复有限信任，还会失去一级行装和部分得分。之前的选择会继续留在日志中。"
+  },
+  {
+    "id": "outcomes",
+    "title_en": "Consequences, recovery and reflection",
+    "title_zh": "代价、重整与回顾",
+    "en": "Players can accept a costly recovery or end the voyage with its recorded bad ending. Later summaries also distinguish balanced progress, plentiful cargo with weak trust, and cooperation without enough provisions. Technology and shared life must be sustained together.",
+    "zh": "玩家可以承担代价重新出发，也可以让这次航程以坏结局结束并留下记录。最后的回顾还会区分平衡的远行、满舱却缺少信任，以及愿意同行却物资不足。技术能力和共同生活，都需要持续维持。"
+  },
+  {
+    "id": "closing",
+    "title_en": "From a playable prototype to a classroom pilot",
+    "title_zh": "从可玩原型到课堂试点",
+    "en": "This version includes eight historical routes, bilingual stories, original music, visible upgrades, and resource consequences. It is a tested prototype, not evidence of paying customers. The next step is a small classroom pilot that measures whether players can explain their choices.",
+    "zh": "这一版包含八条历史航线、中英文故事、原创音乐、外观升级和资源后果。它是经过检查的游戏原型，还不是已经获得付费客户的商业成绩。下一步用小规模课堂试点，验证玩家能否讲清一次选择的收益和代价。"
+  }
+]

@@ -1,3 +1,5 @@
+import { ResourceConsequences, ResourceWarning } from './components/ResourceConsequences';
+import { resourceFailure, recoverVoyage, voyageVerdict, FAILURE_STORIES } from './world/consequences';
 import { localize, useLanguage } from './i18n';
 import { LanguageControls } from './components/LanguageControls';
 import { MusicDirector, MusicControls, voyageCue } from './components/VoyageMusic';
@@ -323,6 +325,8 @@ export function App() {
   const [comms, setComms] = useState(false);
   const [backgroundId,setBackgroundId]=useState<string|null>(null);
   const [yardOpen,setYardOpen]=useState(false);
+  const [towCount,setTowCount]=useState(0);
+  const [sealedStats,setSealedStats]=useState<VoyageStats|null>(null);
   const [webgl, setWebgl] = useState(true);
   const [title, setTitle] = useState('玄览一问');
   const [scenePick, setScenePick] = useState<Scene | null>(null);
@@ -368,6 +372,11 @@ export function App() {
   const [stats, setStats] = useState<VoyageStats>(loadStats);
   const statsRef = useRef(stats);
   statsRef.current = stats;
+  const failure=resourceFailure(stats);
+  const savedEnding=voyage?.world.voyage_ending as {status?:string;kind?:string}|undefined;
+  const endedVoyage=savedEnding?.status==='ended';
+  const endedKind=savedEnding?.kind;
+  const verdict=endedVoyage&&(endedKind==='supplies'||endedKind==='trust'||endedKind==='both')?FAILURE_STORIES[endedKind]:voyageVerdict(sealedStats??stats);
   const updateStats = useCallback((fn: (s: VoyageStats) => VoyageStats) => {
     setStats((prev) => {
       const next = fn(prev);
@@ -416,10 +425,10 @@ export function App() {
   };
   const encRef = useRef<string | null>(null);
   // 听人说话、看结果时船停下；轮到你做事时，键盘归船
-  encRef.current = yardOpen ? 'shipyard' : backgroundId ? 'background-reading' : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
+  encRef.current = failure ? 'resource-ending' : yardOpen ? 'shipyard' : backgroundId ? 'background-reading' : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
   const shipRef = useRef<ShipSnapshot | null>(null);
 
-  useEffect(()=>{const openYard=(event:KeyboardEvent)=>{if(event.key.toLowerCase()!=='b'||event.repeat||(event.target instanceof HTMLElement&&event.target.closest('input,textarea,select,[contenteditable]')))return;if(enc||crisis||secret||backgroundId||shoreOpen||intro||sealBeat||storyPage||landing>0)return;event.preventDefault();setYardOpen(value=>!value);};window.addEventListener('keydown',openYard);return()=>window.removeEventListener('keydown',openYard);},[enc,crisis,secret,backgroundId,shoreOpen,intro,sealBeat,storyPage,landing]);
+  useEffect(()=>{const openYard=(event:KeyboardEvent)=>{if(event.key.toLowerCase()!=='b'||event.repeat||(event.target instanceof HTMLElement&&event.target.closest('input,textarea,select,[contenteditable]')))return;if(failure||endedVoyage||enc||crisis||secret||backgroundId||shoreOpen||intro||sealBeat||storyPage||landing>0)return;event.preventDefault();setYardOpen(value=>!value);};window.addEventListener('keydown',openYard);return()=>window.removeEventListener('keydown',openYard);},[failure,endedVoyage,enc,crisis,secret,backgroundId,shoreOpen,intro,sealBeat,storyPage,landing]);
 
   const connected = models.length > 0;
   const sea = useMemo(
@@ -655,7 +664,7 @@ export function App() {
         }
       }
       // 补给见底：定量配给，船慢下来
-      const ration = statsRef.current.supply <= 0;
+      const ration = statsRef.current.supply <= 15;
       const crippled = statsRef.current.hull <= 0;
       setInput((prev) =>
         prev.forward === forward && prev.turn === turn && (prev.boost ?? 0) === boost && !!prev.ration === ration && !!prev.crippled === crippled
@@ -741,6 +750,31 @@ export function App() {
     if (view === 'reflection') return 'reflection';
     return 'follow';
   }, [view, landing, finale]);
+
+  useEffect(()=>{if(endedVoyage&&view==='world')setView('reflection');},[endedVoyage,view]);
+
+  useEffect(()=>{
+    if(!failure||view!=='world')return;
+    keys.current={w:false,a:false,s:false,d:false,shift:false};setInput({forward:0,turn:0});
+    setWater(null);setWaterResult(null);setEnc(null);setCrisis(null);setSecret(null);
+    setYardOpen(false);setBackgroundId(null);setIntro(null);setCaption(null);setFinale(false);setSquall(null);
+    voyageCue('error');
+  },[failure,view]);
+
+  async function resolveResourceFailure(action:'recover'|'end'){
+    const before=statsRef.current,kind=resourceFailure(before);if(!voyage||!kind||busy)return;
+    setBusy(true);setError(null);
+    try{
+      const next=action==='recover'?recoverVoyage(before,kind):{...before,setbacks:before.setbacks+1,combo:0,log:[...before.log,FAILURE_STORIES[kind].title+'：这次航程在这里结束。'].slice(-40)};
+      const ending={kind,status:action==='end'?'ended':'recovered',title:FAILURE_STORIES[kind].title,supply:before.supply,trust:before.trust,at:new Date().toISOString()};
+      await persist({stage:action==='end'?'reflection':'world',world:{...voyage.world,...(action==='recover'?{ship:{...sea.spawn},port_id:'at-sea'}:{}),voyage_ending:ending}});
+      updateStats(()=>next);
+      if(action==='recover'){setTowCount(count=>count+1);setView('world');}
+      else setView('reflection');
+      await api.addRecord(voyage.id,{kind:action==='end'?'reflection':'log',text:ending.title+'\n'+FAILURE_STORIES[kind].body+'\n'+(action==='recover'?'接受代价，返航重整':'以这个结局结束航程'),classification:'creative',sources:[],material_ids:[],version:1,access:'private'});
+      setRecords(await api.records(voyage.id));
+    }catch(error){setError(errText(error));}finally{setBusy(false);}
+  }
 
   async function createVoyage(seed?: { sceneId: string; carried?: string[] }) {
     setError(null);
@@ -871,7 +905,7 @@ export function App() {
   useEffect(() => {
     // 只有在海上开着船才算过门：在港口、在演戏、在岸上，船停在门边也不算
     if (view !== 'world' || !sealedHere || sealBeat || enc || crisis || secret || yardOpen || backgroundId || landing > 0) return;
-    if (!nearPortal || portalCross) return;
+    if (!nearPortal || portalCross || failure || endedVoyage) return;
     // 开进门就换段。没落印也放行：海图上这一段留白，过门时说清楚
     setPortalCross(true);
     const t = window.setTimeout(() => {
@@ -940,7 +974,7 @@ export function App() {
   }
 
   async function dock() {
-    if (!voyage || !nearPort || landing > 0 || enc || crisis || secret || yardOpen || backgroundId) return;
+    if (failure || endedVoyage || !voyage || !nearPort || landing > 0 || enc || crisis || secret || yardOpen || backgroundId) return;
     const missing=historyFor(voyage.scene_id,laneId)?.islands.find(scene=>!collectedIds.has(scene.id)&&!progress.state[`history:${scene.id}`]);
     if(missing){setError(`先完成「${missing.title}」，再回港回顾。`);return;}
     // 「转」不能跳过：那件事还没发生，就先让它发生
@@ -1020,7 +1054,7 @@ export function App() {
 
   /** 靠近一件东西：有人守着就先打照面、做一件事；没人守着就直接收 */
   function startEncounter() {
-    if (!nearFragment || enc || crisis || yardOpen || backgroundId) return;
+    if (failure || endedVoyage || !nearFragment || enc || crisis || yardOpen || backgroundId) return;
     const route=historyFor(voyage?.scene_id,laneId),index=route?.islands.findIndex(scene=>scene.id===nearFragment)??-1;
     if(route&&index>0&&!collectedIds.has(route.islands[index-1].id)&&!progress.state[`history:${route.islands[index-1].id}`]){setError(`先完成「${route.islands[index-1].title}」，再来见这里的人。`);return;}
     setError(null);
@@ -1125,7 +1159,7 @@ export function App() {
   useEffect(() => {
     // 换航程会重建画布：上一块画布的「上下文丢失」不算数
     setGlLost(false);
-    setProgress(loadProgress(voyage?.id));
+    setProgress(loadProgress(voyage?.id));setSealedStats(null);
     setCaption(null);
     setCrisis(null);
     setShoreOpen(false);
@@ -1151,7 +1185,7 @@ export function App() {
 
   // 船经过旁白点、危机点：戏自己发生
   useEffect(() => {
-    if (view !== 'world' || !ship || yardOpen || backgroundId || enc || crisis || secret || landing > 0 || intro) return;
+    if (failure || endedVoyage || view !== 'world' || !ship || yardOpen || backgroundId || enc || crisis || secret || landing > 0 || intro) return;
     // 暗线 · 桃花源：铜针不指它，只有顺着桃花瓣才找得到
     const era = voyage?.scene_id ?? '';
     const tao = stats.secrets.taoyuan;
@@ -1345,16 +1379,19 @@ export function App() {
   return (
     <>
       <LanguageControls/>
-      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||!!backgroundId||yardOpen||shoreOpen}/>
+      {view==='world'&&failure&&!endedVoyage&&<ResourceConsequences kind={failure} stats={stats} busy={busy} error={error} onRecover={()=>void resolveResourceFailure('recover')} onEnd={()=>void resolveResourceFailure('end')}/>}
+      {view==='world'&&!failure&&!enc&&!crisis&&!secret&&!yardOpen&&!backgroundId&&<ResourceWarning stats={stats}/>}
+
+      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!failure||!!enc||!!crisis||!!secret||!!backgroundId||yardOpen||shoreOpen}/>
       {water&&waterFeedback&&<div key={waterFeedback.at} className={`water-feedback is-${waterFeedback.cue}`} role="status">{localize(waterFeedback.cue==='dot'?'接住了':waterFeedback.cue==='error'?'碰到杂物，重新稳住':'进圈了，稳住船')}</div>}
       {yardOpen&&<ShipyardDialog stats={stats} sceneId={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} allowPurchase={view!=='embark'} onUpdate={updateStats} onClose={()=>setYardOpen(false)}/>}
       {webgl ? (
         <VoyageCanvas
-          key={voyage?.id ?? 'dock'}
+          key={`${voyage?.id ?? 'dock'}:${towCount}`}
           mode={camMode}
           reduceMotion={reduceMotion}
-          shipLevel={stats.shipLevel} crewLevel={stats.crewLevel}
-          canSail={view === 'world' && !yardOpen && !backgroundId && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
+          shipLevel={stats.shipLevel} crewLevel={stats.crewLevel} crewAvailable={stats.trust>0}
+          canSail={!failure && !endedVoyage && view === 'world' && !yardOpen && !backgroundId && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
           water={water}
           onWaterCue={cue=>{voyageCue(cue);setWaterFeedback({cue,at:performance.now()});}}
           onWaterDone={(r) => {
@@ -1379,7 +1416,7 @@ export function App() {
           struck={struck}
           landingT={landing > 0 && landing < 1 ? landing : 0}
           landingRelic={landingRelicId}
-          autopilot={finale}
+          autopilot={finale&&!failure}
           input={input}
           restored={restored}
           onShip={onShip}
@@ -1524,10 +1561,10 @@ export function App() {
                   <span className={`hud-stat is-hull${stats.hull < 30 ? ' is-low' : ''}`} title={localize("船身：船体还剩多少。撞礁会掉，掉到 0 船只剩一半速度。")}>{localize("船身")}<b>{localize(stats.hull)}</b>
                     <i style={{ width: `${stats.hull}%` }} />
                   </span>
-                  <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`} title={localize("补给：船上的粮和水。按 Shift 全速会烧补给，烧光了船走不快。")}>{localize("补给")}<b>{localize(stats.supply)}</b>
+                  <span className={`hud-stat${stats.supply <= 15 ? ' is-low' : ''}`} title={localize("补给：船上的粮和水。按 Shift 全速会消耗补给。不多于15时减速30%，归零后停航。")}>{localize("补给")}<b>{localize(stats.supply)}</b>
                     <i style={{ width: `${stats.supply}%` }} />
                   </span>
-                  <span className="hud-stat is-trust" title={localize("人心：船员信你几分。岸上和海上的每一次选择都会改变它。")}>{localize("人心")}<b>{localize(stats.trust)}</b>
+                  <span className="hud-stat is-trust" title={localize("人心：船员对这条航程的信任。不多于20时合作支援暂停，归零后船员停止协作。")}>{localize("人心")}<b>{localize(stats.trust)}</b>
                     <i style={{ width: `${stats.trust}%` }} />
                   </span>
                 </div>
@@ -1537,7 +1574,9 @@ export function App() {
                     : stats.hull <= 0
                       ? '船身破了 · 速度减半，回港才能修'
                       : stats.supply <= 0
-                        ? '补给已空 · 船在减速'
+                        ? '补给耗尽 · 航程中断'
+                      : stats.supply <= 15
+                        ? '补给偏低 · 航速降低30%'
                       : `WASD 航行 · Shift ${BOOST_NAME[voyage?.scene_id ?? 'test'] ?? '全速'}`)}
                 </div>
               </div>
@@ -1605,6 +1644,7 @@ export function App() {
       {finale && (
         <div className="finale" aria-live="polite">
           <div className="finale-lines">
+            <section className="voyage-verdict"><h2>{localize(verdict.title)}</h2><p>{localize(verdict.body)}</p>{sealedStats&&<p className="verdict-balances">{localize("落印时的记录（靠港补充前）")} · {localize("补给")} {sealedStats.supply} · {localize("人心")} {sealedStats.trust}</p>}</section>
             <p style={{ animationDelay: '1.2s' }}>{localize("你把目的地交了出去。")}</p>
             {stats.path.length > 0 ? (
               <p style={{ animationDelay: '4.2s' }} className="finale-path">
@@ -1664,7 +1704,7 @@ export function App() {
       {view === 'world' && crisis && story && (
         <EncounterOverlay
           key={crisis}
-          enc={supportedEncounter(story.crisis.enc,progress.state)}
+          enc={supportedEncounter(story.crisis.enc,progress.state,stats.trust)}
           onCancel={()=>{dismissedCrisis.current=crisis;setCrisis(null);setWater(null);setWaterResult(null);}}
           title={localize(story.crisis.kicker)}
           reduceMotion={reduceMotion}
@@ -1725,7 +1765,7 @@ export function App() {
       {view === 'world' && enc && encounterFor(enc) && (
         <EncounterOverlay
           key={enc}
-          enc={supportedEncounter(encounterFor(enc)!,progress.state)}
+          enc={supportedEncounter(encounterFor(enc)!,progress.state,stats.trust)}
           onCancel={()=>{setEnc(null);fableLive.island='';setWater(null);setWaterResult(null);}}
           title={localize(sea.fragments.find((f) => f.id === enc)?.title ?? '')}
           reduceMotion={reduceMotion}
@@ -1994,7 +2034,7 @@ export function App() {
                       void api
                         .addRecord(voyage.id, {
                           kind: 'choice',
-                          text: [`站位：${pick.label}`, `轴：${stance.axis.left} ↔ ${stance.axis.right}`].join('\n'),
+                          text: [`站位：${pick.label}`, `轴：${stance.axis.left} ↔ ${stance.axis.right}`, `结局：${voyageVerdict(statsRef.current).title}`, `落印时补给 ${statsRef.current.supply} · 人心 ${statsRef.current.trust}`].join('\n'),
                           classification: 'counterfactual',
                           sources: [],
                           material_ids: used.map((r) => r.id),
@@ -2004,6 +2044,7 @@ export function App() {
                         .then(async () => {
                           setRecords(await api.records(voyage.id));
                           // 印落下：先让这一下被看见，再把人送回海上去找门
+                          setSealedStats({...statsRef.current});
                           setSealBeat({
                             pick: pick.label,
                             epilogue: laneSealFor(voyage?.scene_id, laneId)?.epilogue(progress.state, pick.label) ?? stance.epilogue,
@@ -2038,6 +2079,7 @@ export function App() {
       {view === 'reflection' && voyage && (
         <div className="cine-scroll">
           <div className="cine-inner cine-journal">
+            {endedVoyage&&<section className="voyage-verdict"><h2>{localize(verdict.title)}</h2><p>{localize(verdict.body)}</p></section>}
             <div className="cine-kicker">
               {localize(voyage.title)}
               <span className="cine-tag">{localize("省 · 回头看这一程")}</span>
@@ -2050,7 +2092,7 @@ export function App() {
                   <span className="cine-chart-count">{localize("第 ")}{localize(struck.length)}{localize(" / 4 笔")}</span>
                 </div>
                 <ChartMap struck={struck} activeEpoch={voyage.scene_id} />
-                <pre className="cine-chart-text">{chartSummary(struck)}</pre>
+                <pre className="cine-chart-text">{chartSummary(struck).split('\n').map(line=>localize(line)).join('\n')}</pre>
                 {struck.length < 4 && (
                   <p className="cine-chart-foot">{localize("图上还空着 ")}{localize(4 - struck.length)}{localize(" 处。没走到的地方，仍然是空白。")}</p>
                 )}
@@ -2098,7 +2140,7 @@ export function App() {
             )}
 
             <div className="cine-actions">
-              {nextScene ? (
+              {nextScene && !endedVoyage ? (
                 <SealButton
                   label={localize(`进入${sceneShort(nextScene)}`)}
                   disabled={busy}
@@ -2109,7 +2151,7 @@ export function App() {
                   }}
                 />
               ) : null}
-              <button className="cine-link" type="button" onClick={() => setView('world')}>{localize("回到海上")}</button>
+              <button className="cine-link" type="button" onClick={() => setView(endedVoyage?'embark':'world')}>{localize(endedVoyage?'重新启航':'回到海上')}</button>
             </div>
           </div>
         </div>
