@@ -19,6 +19,7 @@ function LegacyEncounterOverlay({
   title,
   reduceMotion,
   onDone,
+  onCancel,
   crisis = false,
   cause,
   secret = false,
@@ -31,6 +32,7 @@ function LegacyEncounterOverlay({
   title: string;
   reduceMotion: boolean;
   onDone: (o: Outcome, summary: string) => void;
+  onCancel?: () => void;
   /** 危机：不是捡东西，是一件躲不开的事 */
   crisis?: boolean;
   /** 危机的来由：前面那几件事让它变成了什么样子 */
@@ -44,6 +46,7 @@ function LegacyEncounterOverlay({
   waterResult?: WaterResult | null;
 }) {
   const [phase, setPhase] = useState<Phase>('intro');
+  useEffect(()=>{const escape=(event:KeyboardEvent)=>{if(event.key==='Escape'&&onCancel){event.preventDefault();event.stopImmediatePropagation();onCancel();}};window.addEventListener('keydown',escape,true);return()=>window.removeEventListener('keydown',escape,true);},[onCancel]);
   /** 对话进行到第几句 */
   const [said, setSaid] = useState(0);
   const dialog = enc.dialog ?? [];
@@ -151,6 +154,7 @@ function LegacyEncounterOverlay({
   return (
     <div className={`enc${crisis ? ' is-crisis' : ''}${secret ? ' is-secret' : ''}`} role="dialog" aria-label={`${enc.who}：${title}`}>
       <div className="enc-scrim" aria-hidden />
+      {onCancel&&<button className="btn enc-return" type="button" onClick={onCancel}>暂时返回船上</button>}
       {crisis && <span className="enc-crisis">{title.startsWith('转') ? `${title} · 出事了` : title}</span>}
       {secret && <span className="enc-secret">暗线 · {title} · 引文出自陶渊明《桃花源记》</span>}
       <div className="enc-who">

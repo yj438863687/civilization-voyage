@@ -47,9 +47,10 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
   const chosenLabel = mixed ? '一封商单，一封急用消息' : scene.options[option].label;
   return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={scene.title} onKeyDown={event => {event.stopPropagation();if(event.key==='Escape'&&onCancel){event.preventDefault();onCancel();}}}>
     <div className="history-island" ref={panel} tabIndex={-1}>
+      <div className="history-session-bar"><span>{phase==='read'?'读故事 → 动手试验 → 作出安排 → 记入航程':phase==='play'?work?'试验已完成 · 现在决定怎样使用技术':'正在试验 · 先操作，再记录结果':'确认这一站 · 点下方按钮后才结算'}</span>{onCancel&&<button className="btn" type="button" onClick={onCancel}>{replay?'结束重读，回到船上':'暂时返回船上'}</button>}</div>
       <div className="history-visual"><HistoryImage name={scene.image} /><p>{scene.nature} · 互动人物、对话与选择为创作</p></div>
       <div className="history-reading">
-        <h2>{scene.title}</h2>{onCancel&&<button className="btn" type="button" onClick={onCancel}>结束重读，回到船上</button>}{replay&&<p className="replay-note" role="status">重读与练习：不改变补给、人心、升级或本次航程的原记录。</p>}<p className="history-date">{scene.date} · {scene.who}</p>
+        <h2>{scene.title}</h2>{replay&&<p className="replay-note" role="status">重读与练习：不改变补给、人心、升级或本次航程的原记录。</p>}<p className="history-date">{scene.date} · {scene.who}</p>
         {phase === 'read' && <>
           {(previousDecision(scene, state) || cause) && <div className="history-cause"><p>{previousDecision(scene, state) ?? cause}</p></div>}
           {arc && <div className="story-thread"><h3>{arc.arc.artifact} · 第{arc.index+1}/3章</h3><p>{arc.index===0?arc.arc.promise:arc.chapter.continuation}</p><strong>这一章要完成：{arc.chapter.objective}</strong>{arc.index===0&&<p className="history-source">连接各年代的物件、人物与情节为创作。</p>}</div>}
@@ -90,8 +91,8 @@ export function HistoryArrival({ route, state, onDone }: { route: HistoryRoute; 
   useModalFocus(panel);
   useEffect(() => { panel.current?.focus(); }, []);
   const arc=Object.values(STORY_ARCS).find(arc=>arc.chapters[0].scene===route.islands[0].id);
-  return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={`${route.ending.name}回顾这一程`} onKeyDown={event => event.stopPropagation()}><div className="history-island" tabIndex={-1} ref={panel}>
-    <div className="history-visual"><HistoryImage name={route.ending.image} /><p>{route.ending.fictional ? '回顾者为虚构人物' : '历史人物；回顾台词为创作'}</p></div>
+  return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={`${route.ending.name}回顾这一程`} onKeyDown={event => {event.stopPropagation();if(event.key==='Escape'){event.preventDefault();onDone();}}}><div className="history-island" tabIndex={-1} ref={panel}>
+    <div className="history-session-bar"><span>三章回顾 · 技术成果与共同生活</span><button className="btn" type="button" onClick={onDone}>继续，到港口写下看法</button></div><div className="history-visual"><HistoryImage name={route.ending.image} /><p>{route.ending.fictional ? '回顾者为虚构人物' : '历史人物；回顾台词为创作'}</p></div>
     <div className="history-reading"><h2>{route.ending.name}</h2><p className="history-date">{route.ending.date}</p><p>{route.ending.deed}</p>{arc&&<div className="story-thread"><h3>{arc.artifact}的最后一页</h3><p>{arcEnding(arc,state)}</p>{arc.chapters.map(chapter=><p key={chapter.scene}><strong>{CHALLENGES[chapter.scene].title}：</strong>{workSummary(chapter.scene,state)||'旧记录未保留操作过程'}</p>)}</div>}<RouteTimeline route={route} state={state} />{routeRecap(route, state).map(line => <p key={line}>{line}</p>)}<h3>技术与文明</h3><p>{route.ending.reflection}</p><button className="btn btn-primary" type="button" onClick={onDone}>写下这一程的看法</button></div>
   </div></div>;
 }

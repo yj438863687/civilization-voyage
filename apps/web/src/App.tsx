@@ -385,6 +385,7 @@ export function App() {
   const [storyPage, setStoryPage] = useState(false);
   /** 暗线进行中：桃花源 */
   const [secret, setSecret] = useState<string | null>(null);
+  const secretDismissed = useRef(false);
   /** 水上的玩法：对话说完，东西就摆到船头前面；船开到哪，答案就是哪 */
   const [water, setWater] = useState<WaterSpec | null>(null);
   const [waterResult, setWaterResult] = useState<WaterResult | null>(null);
@@ -1190,6 +1191,7 @@ export function App() {
     // 暗线 · 桃花源：铜针不指它，只有顺着桃花瓣才找得到
     const era = voyage?.scene_id ?? '';
     const tao = stats.secrets.taoyuan;
+    if (Math.hypot(ship.x - TAOYUAN.at.x, ship.z - TAOYUAN.at.z) > 12) secretDismissed.current = false;
     if (era === 'A' && !tao) {
       const [p0] = TAOYUAN.trail;
       if (!progress.beats.includes('tao-hint') && Math.hypot(ship.x - p0.x, ship.z - p0.z) < 6) {
@@ -1197,7 +1199,7 @@ export function App() {
         markProgress((p) => ({ ...p, beats: [...p.beats, 'tao-hint'] }));
         return;
       }
-      if (Math.hypot(ship.x - TAOYUAN.at.x, ship.z - TAOYUAN.at.z) < 10) {
+      if (!secretDismissed.current && Math.hypot(ship.x - TAOYUAN.at.x, ship.z - TAOYUAN.at.z) < 10) {
         setCaption(null);
         setSecret('taoyuan');
         return;
@@ -1234,7 +1236,7 @@ export function App() {
       return bestAlong;
     };
     const c = story.crisis;
-    if (!caption && story.beats.every(beat => progress.beats.includes(beat.id)) && (historyFor(era, laneId)?.islands.every(island => !!progress.state[`history:${island.id}`]||collectedIds.has(island.id)) ?? true) && !progress.crisis.includes(c.id) && inStoryReach(ship,crisisAnchor(story),era)) {
+    if (!story.crisis.enc.history && !caption && story.beats.every(beat => progress.beats.includes(beat.id)) && (historyFor(era, laneId)?.islands.every(island => !!progress.state[`history:${island.id}`]||collectedIds.has(island.id)) ?? true) && !progress.crisis.includes(c.id) && inStoryReach(ship,crisisAnchor(story),era)) {
       setCaption(null);
       setCrisis(c.id);
       return;
@@ -1457,7 +1459,7 @@ export function App() {
           <div className={`hud hud-tl${view === 'world' ? ' hud-world' : ' scrim'}`}>
             {view === 'world' ? (
               <div className="hud-world-card">
-                <div className="hud-quest">{story?.logline ?? voyage?.question ?? ''}</div>{storyArc&&<details className="voyage-thread-hud"><summary>{storyArc.artifact} · {nextChapter?`第${storyArc.chapters.indexOf(nextChapter)+1}/3章`: '到港回顾'}</summary><p>{storyArc.promise}</p>{nextChapter&&<><strong>{CHALLENGES[nextChapter.scene].title}</strong><p>{nextChapter.objective}</p></>}</details>}
+                <div className="hud-quest">{story?.logline ?? voyage?.question ?? ''}</div>{storyArc&&<p className="voyage-next-action">{nextChapter?`下一步：${CHALLENGES[nextChapter.scene].title}。沿罗盘前往，靠岸按 E 开始。`:sealedHere?'这一程已记录，驶向时空门继续。':'三章已完成。回港按 F 回顾，写下看法后驶向时空门。'}</p>}{storyArc&&<details className="voyage-thread-hud"><summary>{storyArc.artifact} · {nextChapter?`第${storyArc.chapters.indexOf(nextChapter)+1}/3章`: '到港回顾'}</summary><p>{storyArc.promise}</p>{nextChapter&&<><strong>{CHALLENGES[nextChapter.scene].title}</strong><p>{nextChapter.objective}</p></>}</details>}
                 {/* 靠近一件实物时，先告诉眼睛"那是什么"，文字后补 */}
                 {nearFrag ? (
                   <div className="hud-relic" key={nearFrag.id}>
@@ -1708,7 +1710,7 @@ export function App() {
           key={crisis}
           enc={story.crisis.enc}
           replay={replayCrisis}
-          onCancel={replayCrisis?()=>setCrisis(null):undefined}
+          onCancel={()=>{setCrisis(null);setWater(null);setWaterResult(null);resetWaterLive();}}
           supply={stats.supply}
           state={progress.state}
           title={story.crisis.kicker}
@@ -1728,6 +1730,7 @@ export function App() {
           key="taoyuan"
           enc={TAOYUAN_ENC}
           title="桃花源"
+          onCancel={()=>{secretDismissed.current=true;setSecret(null);setWater(null);setWaterResult(null);resetWaterLive();}}
           reduceMotion={reduceMotion}
           onDone={(o, summary) => finishSecret(o, summary)}
           secret
@@ -1774,7 +1777,7 @@ export function App() {
           key={enc}
           enc={encounterFor(enc)!}
           replay={replayEncounter}
-          onCancel={replayEncounter?()=>{fableLive.island='';setEnc(null);}:undefined}
+          onCancel={()=>{fableLive.island='';setEnc(null);setWater(null);setWaterResult(null);resetWaterLive();}}
           supply={stats.supply}
           state={progress.state}
           title={sea.fragments.find((f) => f.id === enc)?.title ?? ''}

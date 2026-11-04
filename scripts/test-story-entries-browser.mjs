@@ -30,7 +30,29 @@ async function pageAt(voyage,point,progress,records=[]){
   return {page,context};
 }
 try{
-  if(process.argv.includes('--legacy-crisis')){
+  if(process.argv.includes('--feedback-smoke')){
+    for(const key of ['B-far','C-far']){
+      const route=game.HISTORY_ROUTES[key],[era,lane]=key.split('-'),world=game.worldFor(era),story=game.storyFor(era,lane),scene=route.islands[0];
+      const target=game.fragmentAnchor(world.fragments.find(fragment=>fragment.id===scene.id));
+      const voyage=await request('/voyages',{title:`Desktop feedback ${key}`,scene_id:era,scene_version:3,scene_track:'candidate',question:route.question});voyage.world={lane};
+      const {page,context}=await pageAt(voyage,{x:target.x-game.storyReach(era)+1.5,z:target.z},{beats:story.beats.map(beat=>beat.id),crisis:[],shore:[],state:{}});
+      await page.locator('.interact-prompt').filter({hasText:scene.title}).waitFor();await page.keyboard.press('e');await page.getByRole('button',{name:/进入故事/}).click();
+      if(era==='B'){
+        for(const name of ['加煤','加煤','带动机器'])await page.getByRole('button',{name,exact:true}).click();
+        await page.waitForFunction(()=>document.querySelector('.challenge-feedback')?.getAttribute('data-cue')==='work');
+        assert((await page.locator('.engine-gauges').innerText()).includes('做功 2/8'));assert(await page.locator('.flywheel').evaluate(element=>element.getAnimations().length>0));
+        await page.screenshot({path:join(root,'.impeccable/review/desktop-feedback-live.png')});
+        await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'加煤',exact:true}).click();await page.screenshot({path:join(root,'.impeccable/review/desktop-feedback-mobile.png')});
+        assert(await page.getByRole('button',{name:'暂时返回船上',exact:true}).isVisible());assert(await page.locator('.history-island').evaluate(element=>element.scrollWidth<=element.clientWidth+1));
+      }else{
+        await page.getByRole('button',{name:'长划 —',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.challenge-feedback')?.getAttribute('data-cue')==='dash');
+        assert.equal(await page.locator('.challenge-feedback').getAttribute('data-audio'),'playing');
+        assert.equal(await page.locator('.telegraph-light').evaluate(element=>element.getAnimations()[0].effect.getTiming().duration),270);
+      }
+      await page.getByRole('button',{name:'暂时返回船上',exact:true}).click();await page.waitForTimeout(180);assert.equal(await page.locator('.history-overlay').count(),0);await page.keyboard.press('e');await page.getByRole('heading',{name:scene.title,exact:true}).waitFor();await page.keyboard.press('Escape');assert.equal(await page.locator('.history-overlay').count(),0);await context.close();
+    }
+    assert.deepEqual(errors,[]);console.log('通过：桌面生产包实际海域打开锅炉/电报，机件与声音同步、手机返回按钮可见、退出后可重入，无页面错误。');
+  }else if(process.argv.includes('--legacy-crisis')){
     const route=game.HISTORY_ROUTES['A-near'],story=game.storyFor('A','near'),target=game.crisisAnchor(story);
     const voyage=await request('/voyages',{title:'Legacy crisis replay test',scene_id:'A',scene_version:3,scene_track:'candidate',question:route.question});voyage.world={lane:'near'};
     const legacy=await pageAt(voyage,{x:target.x-game.storyReach('A')+1.5,z:target.z},{beats:[],crisis:[story.crisis.id],shore:[],state:{}});
@@ -53,7 +75,13 @@ try{
           const prompt=page.locator('.interact-prompt').filter({hasText:scene.title});await prompt.waitFor({timeout:15000});
           await page.keyboard.press('e');
         }
-        await heading.waitFor({timeout:15000});await page.getByRole('button',{name:/进入故事/}).click();await page.locator('.voyage-challenge').waitFor();entered++;
+        await heading.waitFor({timeout:15000});await page.getByRole('button',{name:/进入故事/}).click();await page.locator('.voyage-challenge').waitFor();
+        const beforeExit=await page.evaluate(()=>({stats:localStorage.getItem('cv.stats.v1'),progress:localStorage.getItem('cv.story.v1')}));
+        if(index===0)await page.getByRole('button',{name:'暂时返回船上',exact:true}).click();else await page.keyboard.press('Escape');
+        await page.waitForTimeout(180);assert.equal(await page.locator('.history-overlay').count(),0,'Cancel must not auto-reopen the story');
+        const afterExit=await page.evaluate(()=>({stats:localStorage.getItem('cv.stats.v1'),progress:localStorage.getItem('cv.story.v1')}));assert.equal(afterExit.progress,beforeExit.progress);
+        for(const field of ['trust','score','combo','shipLevel','crewLevel'])assert.equal(JSON.parse(afterExit.stats)[field],JSON.parse(beforeExit.stats)[field]);
+        await page.keyboard.press('e');await heading.waitFor();entered++;
       }catch(error){await page.screenshot({path:join(root,`.impeccable/review/entry-failure-${key}-${index}.png`)});throw new Error(`${key} 第${index+1}章「${scene.title}」未进入：${error.message}`);}finally{await context.close();}
     }
     // Approaching a later island must respond with the prerequisite, not silently fail.
@@ -83,6 +111,6 @@ try{
     console.log(`${key}：三章、港口总结、顺序提示与重读均正常。`);
   }
   assert.equal(entered,24);assert.equal(locked,8);assert.equal(replayed,8);assert.equal(summaries,8);assert.deepEqual(errors,[]);
-  console.log(`通过：真实3D海域24/24故事入口、8/8港口总结、8条顺序提示、8个重读入口，练习不改原资源与记录，无页面错误。`);
+  console.log(`通过：真实3D海域24/24故事入口与退出重入、8/8港口总结、8条顺序提示、8个重读入口，练习不改原资源与记录，无页面错误。`);
   }
 }finally{await browser.close();}
