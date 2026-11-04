@@ -1,0 +1,236 @@
+[
+  {
+    "role": "A",
+    "kind": "cover",
+    "en": "Technology changes what we can do.\nCivilization shapes how we live.",
+    "en_points": [
+      "Civilization Voyage",
+      "A history game about the choices that hold a society together.",
+      "Agriculture · Industry · Information · Artificial Intelligence"
+    ],
+    "note_en": "A | Opening. We began with a question about progress. A society can become better at producing, moving and calculating while still struggling to decide who benefits and who carries the cost. Civilization Voyage puts that question aboard a ship. The player needs both the means to keep moving and people willing to continue together. Everything we show today follows from that tension. We will first explain the voyage, then show the game, and finally discuss how we built it and where it could become useful.",
+    "capture": "opening-poster.png"
+  },
+  {
+    "role": "A",
+    "kind": "balances",
+    "en": "A fuller hold can still\nleave a weaker crew.",
+    "en_points": [
+      "Supplies keep the ship moving. Trust keeps people working together.",
+      "A decision can improve one balance while weakening the other.",
+      "The journey asks whether today’s gain leaves enough to sustain tomorrow."
+    ],
+    "note_en": "A | Explain the central tension before describing any feature. The two balances give players something concrete to protect. Supplies represent food, water and the material capacity to act. Trust represents a much broader relationship, compressed into a game mechanic. We do not claim these numbers measure civilization. Their purpose is to make an otherwise abstract tension visible. Hoarding can carry a social cost. Cooperation can demand food and time. A viable voyage has to keep both sides alive.",
+    "light": true
+  },
+  {
+    "role": "A",
+    "kind": "journey",
+    "en": "History becomes a sequence\nof consequences.",
+    "en_points": [
+      "An island introduces a problem through the people living with it.",
+      "A later scene inherits the arrangement made earlier.",
+      "At the shore, the final speaker asks what that arrangement has become."
+    ],
+    "note_en": "A | This explains why we chose a voyage. A collection of historical scenes could easily become a gallery of unrelated facts. Our unit is a connected route: two islands, a shared crisis and a return to shore. The player encounters an immediate need, sees how an arrangement changes cooperation, and eventually has to account for the journey. The closing speaker belongs to the route’s historical setting. Their role is to connect the decisions the player actually made. Hand over to B: what changes as this question travels through history?",
+    "capture": "interaction-poster.png"
+  },
+  {
+    "role": "B",
+    "kind": "era-questions",
+    "en": "Four eras change\nthe scale of responsibility.",
+    "en_points": [
+      "Agriculture and industry: allocating water; organizing power and labour.",
+      "Information: deciding whose experience enters a record and travels with it.",
+      "Artificial intelligence: deciding what to delegate, and who remains answerable."
+    ],
+    "note_en": "B | We use four eras to organize the inquiry, not to rank societies on a ladder. Irrigation makes common maintenance possible and necessary. Industrial power expands output and changes the organization of labour. Information systems extend memory and communication while shaping whose experience becomes visible. Artificial intelligence brings delegation into the foreground. These are recurring questions, not claims that an entire era had only one problem. Historical routes overlap in calendar time because different technologies and institutions coexist.",
+    "light": true
+  },
+  {
+    "role": "B",
+    "kind": "timelines",
+    "en": "Two seas widen the comparison.",
+    "en_points": [
+      "The inner sea follows Chinese stories; the outer sea follows world stories.",
+      "Each route has its own chronology, sources and closing voice.",
+      "The comparison concerns how people organize a capability in different settings."
+    ],
+    "note_en": "B | There are eight routes and twenty-four scenes. China and the world provide different settings for the same central inquiry. We avoid treating one route as a universal model that every other civilization must follow. Within a route, events move forward in time. The agricultural China route begins with earlier and later generations in flood-control legends, then reaches the historical setting of Dujiangyan. Legends have no invented calendar year. Future AI scenes are labelled imagined scenarios. These distinctions matter because the player should know what kind of story they are entering.",
+    "capture": "routes-poster.png"
+  },
+  {
+    "role": "B",
+    "kind": "river-chain",
+    "en": "A river needs more\nthan an engineering solution.",
+    "en_points": [
+      "Gun’s scene: protecting one village can send the flood towards another.",
+      "Yu’s scene: a working channel still needs an agreement about water.",
+      "Dujiangyan: the arrangement survives through shared maintenance."
+    ],
+    "note_en": "B | Use the China agriculture route as our concrete example. The first two encounters draw on the legends of Gun and Yu; their village dialogue and choices are our creative reconstruction. The later Dujiangyan setting has historical and archaeological context. The story moves from an immediate defence, to allocation, to upkeep. Li Bing closes this route in a dialogue written for the game. He is not issuing a verdict from outside the era. His place in the story allows the route to ask how engineering and everyday rules keep supporting each other. Sources: Shiji, Xia Ben Ji, https://ctext.org/shiji/xia-ben-ji/zh ; UNESCO Dujiangyan, https://whc.unesco.org/en/list/1001/ .",
+    "light": true
+  },
+  {
+    "role": "B",
+    "kind": "legacy",
+    "en": "The next island remembers\nhow you treated the last.",
+    "en_points": [
+      "An earlier cooperative choice can return three supplies through later support.",
+      "When trust falls to twenty or below, that support stops.",
+      "The cost of an arrangement continues after its first reward."
+    ],
+    "note_en": "B | This is where the theme becomes a causal rule. Cooperation uses resources now, but people who remain willing to work together can reduce a later material cost. The bonus is conditional: at low trust it disappears. We want the player to notice that a relationship is part of the infrastructure of the voyage. This does not make cooperation a guaranteed winning answer. Spending without keeping provisions can still end the journey. The task is to preserve the conditions under which a shared arrangement can last. C will show how this becomes visible on the ship."
+  },
+  {
+    "role": "C",
+    "kind": "progress",
+    "en": "The ship shows capacity.\nThe crew shows belonging.",
+    "en_points": [
+      "Supplies pay for hull refits, decks and navigation equipment.",
+      "Trust opens new crew outfits as cooperation develops.",
+      "Both forms of growth remain exposed to the consequences of later choices."
+    ],
+    "note_en": "C | Upgrades should express the voyage rather than interrupt it. Ship changes show the material means available to the player. Crew clothing shows a developing shared identity. Trust is a threshold for unlocking outfits; it is not deducted as a purchase currency. The current thresholds are fifty-five, sixty-five and seventy-five. Ship purchases keep a reserve of fifteen supplies. These are designed game rules. We use restrained clothing and insignia so that the people remain recognizable. Recovery after a resource failure can reduce the corresponding upgrade tier."
+  },
+  {
+    "role": "C",
+    "kind": "consequences",
+    "en": "Progress can come apart.",
+    "en_points": [
+      "Without provisions, the ship stops. Without trust, the crew withdraws.",
+      "Recovery costs score and a ship or outfit tier; an empty hold also costs hull condition.",
+      "Ending the voyage preserves the failure and the choices that led there."
+    ],
+    "note_en": "C | Failure gives the central question weight. Supplies at fifteen or below reduce speed by thirty percent. At zero, sailing stops. Trust at twenty or below suspends cooperative support; at zero, the crew leaves the deck. The player can end with An Empty Hold, Orders Nobody Answers, or An Empty Ship Returns. Recovery subtracts two hundred score and resets the combo. Supply recovery restores thirty-five supplies but costs twenty hull condition and one ship tier. Trust recovery restores thirty trust and costs one outfit tier. Values and tiers have zero floors. Story choices stay saved. A recovered journey carries that history into its final assessment."
+  },
+  {
+    "role": "C",
+    "kind": "sources",
+    "en": "A historical setting\nneeds visible boundaries.",
+    "en_points": [
+      "Sources support the historical context; dialogue makes the encounter playable.",
+      "Image notes distinguish later portraits and modern photographs from the period shown.",
+      "Legends and imagined futures are identified where the player encounters them."
+    ],
+    "note_en": "C | Interpretation is part of this project, so its boundaries need to be visible. We cannot present an invented conversation as a quotation from a historical person. The optional image entrance provides background and credits while leaving the original characters, scenery and subtitles in the main game. Reading it does not award resources or advance the story. A modern photograph can explain a water-diversion system without pretending to depict a legendary village. These distinctions are part of the educational experience. They help a player ask what evidence supports a scene and what the game has added.",
+    "capture": "picture-background.png",
+    "light": true
+  },
+  {
+    "role": "D",
+    "kind": "video",
+    "en": "Follow a choice through the voyage.",
+    "en_points": [
+      "Actual gameplay: sailing, island encounters, upgrades and endings.",
+      "Prepared demonstration saves; edited footage with synthetic narration.",
+      "The independent MP4 is the playback backup."
+    ],
+    "note_en": "D | Play the embedded film, approximately two minutes and forty-three seconds. Before pressing play, say: We have prepared short saves so we can show the important consequences within the presentation. The actions and outcomes are produced by the actual game. The film is edited and uses synthetic narration. During the film, let the original game audio and captions carry the explanation. Afterwards, ask the audience to recall one moment when material capacity and willingness to cooperate separated. The film is a demonstration of implemented behaviour; it is not evidence of learning outcomes."
+  },
+  {
+    "role": "D",
+    "kind": "mechanics",
+    "en": "The task proves a skill.\nThe choice gives it a purpose.",
+    "en_points": [
+      "Steer through gates, hold position, collect objects and check a sequence.",
+      "Completing a task and deciding how to use its result are separate moments.",
+      "The debrief asks who benefited, who paid and what the next scene inherited."
+    ],
+    "note_en": "D | The variety of tasks gives the player different ways to act. The deeper distinction is between doing something successfully and deciding what that success is for. A player can steer well and still choose an arrangement that damages cooperation. They can struggle with a task and still explain a difficult tradeoff. That separation gives us a useful discussion after play. We have checked story access, bilingual display, resource failure, recovery and saved endings, including evaluation before harbour replenishment. We have not established classroom effectiveness or completed an uninterrupted manual playthrough of every route. E now connects the product to the work of building and delivering it.",
+    "light": true
+  },
+  {
+    "role": "E",
+    "kind": "workflow",
+    "en": "We built the voyage\nby making each layer inspectable.",
+    "en_points": [
+      "The repository began with a framework and explicit project boundaries.",
+      "Design, API contracts and the 3D frontend were developed through documented handoffs.",
+      "Local saves, browser checks and the desktop build made revisions usable."
+    ],
+    "note_en": "E | My part connects AI tools to delivery. The repository records a framework on 28 October, followed by design, API and frontend work on 30 October. The handoff documents assign visual design to Claude, API work to Codex and the React/Three.js frontend to Grok. That is the documented division of work, not an audited account of every model call. Locally, the project uses FastAPI and SQLite behind a Vite, React and Three.js frontend. We then added startup scripts, persistent saves, browser checks and a desktop wrapper. Historical routes, music, visible upgrades and bilingual text were later iterations. Git evidence: c150efd, 7a6442b, 0c44dab, 21ae8f3, b228a51, 65016f9 and 2921924; setup in scripts/dev.sh and docs/handoffs/.",
+    "flow": [
+      "FRAMEWORK",
+      "CONTRACTS",
+      "LOCAL BUILD",
+      "PLAY & REVISE"
+    ],
+    "flow_zh": []
+  },
+  {
+    "role": "E",
+    "kind": "tools",
+    "en": "AI accelerates construction.\nThe project still needs judgment.",
+    "en_points": [
+      "Lovable offers a useful parallel: describe an app, keep its code in GitHub, then develop it further.",
+      "Our local workflow combines generated work with integration and playable checks.",
+      "Choosing the stories, preserving the characters and checking consequences remain editorial decisions."
+    ],
+    "note_en": "E | Lovable helps explain this style of work to an audience familiar with AI app builders. Its documentation describes natural-language building and GitHub synchronization for continued development. We have no evidence that this repository originated in Lovable, so I would not tell that origin story. Our evidence is the local code and its documented handoffs. The difficult work was deciding what belonged in this particular game: retaining the original characters, making the stories connect and ensuring that a resource cost had a visible consequence. Faster generation makes those decisions more important. Official references: https://docs.lovable.dev/introduction/welcome and https://docs.lovable.dev/integrations/github .",
+    "light": true
+  },
+  {
+    "role": "E",
+    "kind": "business",
+    "en": "The first offer is\na guided history session.",
+    "en_points": [
+      "A facilitator receives the game, sourced background notes and a discussion guide.",
+      "A class plays a route, compares its choices and explains the consequences.",
+      "Schools and cultural venues are the first customer groups to investigate."
+    ],
+    "note_en": "E | The business proposal follows the way the game is meant to be used. We would begin with a guided session, because interpretation and discussion are part of the value. The buyer would be paying for a usable session package: the game, checked background material, setup help and a facilitator guide. A school or cultural venue is a prospective customer, not an existing one. Reusable route packs, term licences and installation support are possible later offers. We need pilot evidence before deciding which form is worth selling. We have not established paid traction."
+  },
+  {
+    "role": "E",
+    "kind": "pilot",
+    "en": "The pilot should test\nwhat stays after the game.",
+    "en_points": [
+      "Can a learner connect a technical gain to its material and social cost?",
+      "Can they distinguish the source material from the game’s reconstruction?",
+      "Does a facilitator want to run another session?"
+    ],
+    "note_en": "E | Our proposed first pilot is three classes of twenty learners. Those sixty places are a recruitment target. We would collect a short explanation before play, a completed route and a comparable explanation afterwards, alongside facilitator observations. We would look for whether learners can explain who benefits, who bears a cost and how an earlier choice changes a later scene. Completion and enjoyment matter, but they do not by themselves demonstrate understanding. We would also record preparation time, technical problems and whether a facilitator requests another session. This is a proposed evaluation design, not a claim that the game has already improved learning.",
+    "light": true
+  },
+  {
+    "role": "E",
+    "kind": "economics",
+    "en": "Price must cover\nthe work around the game.",
+    "en_points": [
+      "Pilot scenario: ¥3,000 per session, with ¥1,200 in direct delivery costs.",
+      "The remaining ¥1,800 must also cover acquisition, overhead and future development.",
+      "Test preparation time, support effort and repeat demand before setting a licence price."
+    ],
+    "note_en": "E | These figures are a planning example, not sales or supplier quotes. At an assumed session price of three thousand yuan and direct costs of twelve hundred, the contribution is eighteen hundred before acquisition and overhead. A six-hundred-yuan acquisition cost would leave twelve hundred before fixed costs, tax and further development. Source review, facilitation and support all consume time even when the software already runs. An illustrative thirty-thousand-yuan pilot budget allocates forty percent to source/content review, thirty percent to facilitation/evaluation, twenty percent to product hardening and ten percent to hosting/support. The pilot must replace these assumptions with observed costs. We are not presenting a funding round or an established valuation.",
+    "metrics": [
+      [
+        "¥3,000",
+        "ASSUMED SESSION PRICE",
+        ""
+      ],
+      [
+        "¥1,200",
+        "ASSUMED DIRECT COST",
+        ""
+      ],
+      [
+        "¥1,800",
+        "BEFORE ACQUISITION",
+        ""
+      ]
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "closing",
+    "en": "The next voyage\nbegins with three classrooms.",
+    "en_points": [
+      "Invite facilitators and historical reviewers to test one connected route.",
+      "Revise the moments where choices, sources or consequences remain unclear.",
+      "Judge progress by what people can understand and sustain together."
+    ],
+    "note_en": "E | Close by returning to the opening question. The game asks whether a new capability can support shared life. The project faces the same test: we have gained the ability to build a playable world quickly, and now we need a setting in which people can use it well. Our next ask is practical: three pilot classrooms, facilitators willing to observe the session and reviewers willing to question the history. If those sessions reveal clear value and repeat demand, we can invest in more routes and a repeatable offer. The product is a working prototype. Its educational and commercial value are the next things to establish. Sources and credits: historical/image notes within the game; repository https://github.com/yj438863687/civilization-voyage ; local workflow docs/handoffs/ and scripts/dev.sh; Lovable official introduction and GitHub integration documentation. Visual direction references the public harbourmind.ai palette and tide-line motifs; business presentation structure references the user-provided HarbourMind Deep Space Signal BP. No private financial results or assets are reused.",
+    "capture": "closing-poster.png"
+  }
+]

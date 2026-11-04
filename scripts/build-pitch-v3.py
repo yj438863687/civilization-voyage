@@ -11,11 +11,12 @@ from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 import fitz
 ROOT=Path(__file__).resolve().parents[1]
-OUT=Path.home()/'Desktop/文明航程演讲包/资源后果与实录Demo-深海信号版'
+parser=argparse.ArgumentParser();parser.add_argument('--preview',action='store_true');parser.add_argument('--content',type=Path);parser.add_argument('--output',type=Path);parser.add_argument('--final-talk',action='store_true');ARGS=parser.parse_args()
+OUT=ARGS.output or Path.home()/'Desktop/文明航程演讲包/资源后果与实录Demo-深海信号版'
 RAW=ROOT/'.impeccable/demo-v3/raw-sync'
 W,H=1920,1080
 INK='071B29';DEEP='0B3046';JADE='35C5A5';FOAM='EDF6F5';MUTED='A4BDC3';PAPER='F1F6F5';DARK='152D39'
-DATA=json.loads((ROOT/'docs/pitch-v3-content.json').read_text())
+DATA=json.loads((ARGS.content or ROOT/'docs/pitch-v3-content.json').read_text())
 FONTS={'en':('/System/Library/Fonts/Avenir Next.ttc',7,0),'zh':('/System/Library/Fonts/Hiragino Sans GB.ttc',0,1)}
 
 def rgb(value):return '#'+value
@@ -46,9 +47,9 @@ class Slide:
   self.slide=deck.slides.add_slide(deck.slide_layouts[6]);self.slide.background.fill.solid();self.slide.background.fill.fore_color.rgb=RGBColor.from_string(PAPER if light else INK)
   self.image=Image.new('RGB',(W,H),rgb(PAPER if light else INK));self.draw=ImageDraw.Draw(self.image)
   self.artwork();self.text('CIVILIZATION VOYAGE',96,42,900,44,25,self.accent,bold=True)
-  self.text(f'{index+1:02d} / {len(DATA):02d}   ·   '+('SPEAKER ' if lang=='en' else '主讲 ')+role,1370,42,460,44,22,self.muted)
+  self.text(f'{index+1:02d} / {len(DATA):02d}'+('' if ARGS.final_talk else '   ·   '+('SPEAKER ' if lang=='en' else '主讲 ')+role),1370,42,460,44,22,self.muted)
   self.line(96,1004,1824,1004,self.muted,1)
-  self.text('PLAYABLE PROTOTYPE  /  PROPOSED CLASSROOM PILOT' if lang=='en' else '可玩原型  /  拟议课堂试点',96,1033,1500,35,21,self.muted)
+  self.text(('CIVILIZATION VOYAGE' if ARGS.final_talk else 'PLAYABLE PROTOTYPE  /  PROPOSED CLASSROOM PILOT') if lang=='en' else '可玩原型  /  拟议课堂试点',96,1033,1500,35,21,self.muted)
  def artwork(self):
   # Native shapes reflect the public site's tide rings without copying its logo or assets.
   color='D3E5E0' if self.light else '103946'
@@ -80,7 +81,7 @@ class Slide:
  def points(self,values,x,y,w,h,size=43):
   per=(h-26*(len(values)-1))/len(values)
   for index,value in enumerate(values):
-   self.text(f'{index+1:02d}',x,y+index*(per+26),55,45,24,self.accent,bold=True,minsize=20)
+   self.line(x,y+index*(per+26)+20,x+32,y+index*(per+26)+20,self.accent,3) if ARGS.final_talk else self.text(f'{index+1:02d}',x,y+index*(per+26),55,45,24,self.accent,bold=True,minsize=20)
    self.text(value,x+78,y+index*(per+26),w-78,per,size,self.fore,minsize=32)
  def flow(self,labels,y):
   width=1580/len(labels)
@@ -105,7 +106,7 @@ def render_row(deck,row,lang,index,target,movie):
  s=Slide(deck,lang,index,row['role'],row.get('light',False));title=row[lang];points=row[lang+'_points'];kind=row['kind'];photo=capture(row)
  if kind=='cover':
   s.text(points[0],96,136,1050,100,65,s.accent,bold=True)
-  s.text(title,96,278,1040,340,102,s.fore,bold=True,minsize=76)
+  s.text(title,96,278,1040,340,102,s.fore,bold=True,minsize=66 if ARGS.final_talk else 76)
   s.text(points[1],100,661,1020,180,45,s.muted,minsize=38)
   s.text(points[2],100,881,1000,85,28,s.muted,minsize=24)
   s.picture(photo,1190,235,650,625)
@@ -121,6 +122,23 @@ def render_row(deck,row,lang,index,target,movie):
   if movie.exists():
    poster_shape=s.slide.shapes[-1]._element;media=s.slide.shapes[-2]._element;poster_shape.addnext(media)
   s.text('ACTUAL GAME CAPTURE · PREPARED SAVES DISCLOSED · SYNTHETIC NARRATION' if lang=='en' else '实际游戏录制 · 预置存档已说明 · 合成旁白',96,1041,1728,28,20,s.muted,minsize=18)
+ elif kind in ['balances','era-questions','river-chain']:
+  s.text(title,96,145,1728,210,77,s.fore,bold=True,minsize=60)
+  if kind=='balances':
+   for x,label,meaning,detail in [(96,'SUPPLIES','Capacity to act','Food, water and the means to keep moving.'),(1010,'TRUST','Willingness to cooperate','People who will continue the journey together.')]:
+    s.line(x,432,x+810,432,s.accent,3);s.text(label,x,466,810,60,29,s.accent,bold=True);s.text(meaning,x,552,810,130,60,s.fore,bold=True,minsize=46);s.text(detail,x,718,810,125,39,s.muted,minsize=34)
+   s.text('What does today’s choice leave for tomorrow?',96,895,1728,75,48,s.fore,bold=True,minsize=40)
+  elif kind=='era-questions':
+   entries=[('AGRICULTURE','Who receives the water?'),('INDUSTRY','Who organizes power and labour?'),('INFORMATION','Whose experience enters the record?'),('ARTIFICIAL INTELLIGENCE','Who answers for a delegated decision?')]
+   for i,(label,question) in enumerate(entries):
+    y=410+i*139;s.line(96,y+110,1824,y+110,s.muted,1);s.text(label,96,y,595,95,32,s.accent,bold=True,minsize=28);s.text(question,735,y-2,1080,102,47,s.fore,minsize=38)
+  else:
+   entries=[('GUN','Defend a village','A higher dike can move the danger downstream.'),('YU','Allocate the water','A working channel needs an agreement about access.'),('DUJIANGYAN','Maintain the system','The agreement depends on continuing work together.')]
+   for i,(label,action,detail) in enumerate(entries):
+    x=96+i*576;s.rect(x,430,18,18,s.accent)
+    if i<2:s.line(x+30,438,x+550,438,s.muted,2)
+    s.text(label,x,482,510,55,29,s.accent,bold=True);s.text(action,x,572,440,145,48,s.fore,bold=True,minsize=42);s.text(detail,x,735,440,155,34,s.muted,minsize=30)
+   s.text('Engineering and shared rules have to endure together.',96,913,1728,63,40,s.fore,minsize=34)
  else:
   s.text(title,96,145,1728,210,77,s.fore,bold=True,minsize=60)
   if row.get('assumption'):
@@ -171,9 +189,9 @@ def build(lang,folder,indices,label,main=False):
     if lang=='en':assert not re.search(r'[\u3400-\u9fff]',shape.text),shape.text
  return target
 
-parser=argparse.ArgumentParser();parser.add_argument('--preview',action='store_true');ARGS=parser.parse_args()
-for lang,name in [('en','English'),('zh','中文理解')]:
+for lang,name in ([('en','English')] if ARGS.final_talk else [('en','English'),('zh','中文理解')]):
  folder=OUT/name;build(lang,folder,list(range(len(DATA))),lang,True)
- for role in 'ABCDE':build(lang,folder,[i for i,s in enumerate(DATA) if s['role']==role or s['role']=='ALL'],role)
-(OUT/'presentation-metadata.json').write_text(json.dumps({'status':'editable-draft','languages':['en','zh'],'slides':len(DATA),'reference':'HarbourMind public visual style; user-supplied BP structure only','financials':'illustrative assumptions, not validated results','video_embedded':not ARGS.preview},ensure_ascii=False,indent=2))
+ if not ARGS.final_talk:
+  for role in 'ABCDE':build(lang,folder,[i for i,s in enumerate(DATA) if s['role']==role or s['role']=='ALL'],role)
+(OUT/'presentation-metadata.json').write_text(json.dumps({'status':'presentation-ready' if ARGS.final_talk else 'editable-draft','languages':['en'] if ARGS.final_talk else ['en','zh'],'slides':len(DATA),'reference':'HarbourMind public visual style; user-supplied BP structure only','financials':'illustrative assumptions, not validated results','video_embedded':not ARGS.preview},ensure_ascii=False,indent=2))
 print('PPT and PDF generation complete:',OUT,flush=True)
