@@ -10,6 +10,7 @@
 - [五人分工与写作方式](CONTRIBUTING.md)
 - 文明场景：[A](scenes/A.md)、[B](scenes/B.md)、[C](scenes/C.md)
 - [初始任务清单](project-plan.json)
+- [A 岗文化驾驶舱离线原型](docs/prototypes/a-cockpit/)（`file://` 打开 `cockpit.html`；非 apps/web）
 
 ## 四段航程
 

@@ -1,0 +1,54 @@
+文化航程 · A 岗文化驾驶舱讲稿提纲
+任务：CV-20261104-01 · 四航段文明航程 · 罗盘传代
+时长：约 3–5 分钟（中文主讲）· 可选英文开场 ≤280 词
+日期：2026-11-04 HKT
+
+============================================================
+一、诚实披露（开场必说 · 约 30 秒）
+============================================================
+1. 本页是 A 岗「玄览玄通」离线驾驶舱原型，用 file:// 打开即可。
+2. 船员席位（大副 Claude / 二副 GPT）是**示例预设台词**，**不是实时模型**，未接入真实 AI。
+3. **本页 ≠ 同学侧 3D 航程 Demo**：不做引擎、传送门、关卡；文案可互文，代码不耦合。
+4. 导出问题卡 schema 1.0；group_status 恒为 pending；个人确认 ≠ 全组共识。
+
+============================================================
+二、立意锚（约 45 秒）
+============================================================
+人类一直在同一条航程上——从靠天漂流，到自己造岸、造动力、造信息、造智能。
+终点不是某个港口，而是：人类能把自身能力扩展到多远。
+
+主问题（念一遍）：
+「在四段航程里，什么算『自己造出下一段能力』？你依据哪张海图/罗盘做出判断，又把什么未知交给下一岗？」
+
+============================================================
+三、四步演示动线（约 2.5–3.5 分钟）
+============================================================
+01 起点
+  - 写下「我原先以为人类进步是……」
+  - 确认「共同确认的航程任务」字段（可先用示例）
+
+02 四航段材料（侧栏可见罗盘四态）
+  - 泥板河岸（农）→ 蒸汽海图（工）→ 网络航图（信息）→ 模型星图（AI）
+  - 每张卡先读 support / limit；AI 卡禁止说成「已证实课堂学习效果」
+  - 判断贴签：事实依据 / 我的解释 / 尚不能断
+
+03 修订
+  - 请大副/二副预设台词追问（点一下即可，强调非 live）
+  - **必须指出哪张罗盘形态改变了判断**，并引用材料编号 M1–M4
+  - 写清仍未知的事情（资源字段 pending）
+
+04 导出问题卡
+  - 个人确认 → 导出 JSON / 文字卡
+  - 强调携带：共同任务、文化碎片、选择记录；真正发群另等体验 PASS + 用户批
+
+============================================================
+四、边界收束（约 20 秒）
+============================================================
+A 岗交付：场景正文 + 离线驾驶舱 + 问题卡 + 讲稿。
+D 岗 3D / B 航线资源 / E 商业：本单不做。
+谢谢。欢迎对照验收表提问。
+
+============================================================
+五、Optional English opener (≤280 words · measured 168)
+============================================================
+This is the HarbourMind cultural cockpit for station A — an offline, file-based prototype, not a live AI product and not the classmates' 3D voyage demo. Crew lines for the first and second mates are preset scripts. Our theme is one continuous voyage: from drifting with the weather, to building shores, power, information networks, and finally the capacity to set a destination while machines help navigate. The question is not which port we reach, but how far humans can extend their own capabilities. In four legs — agriculture, industry, information, and AI — what counts as building the next capability yourself? Which chart or compass form grounds that judgment, and which unknowns do we hand to the next station? Please read each source's support and limits; the AI card is a public principles text, not proof of classroom learning outcomes. We will walk four steps, tag claims, name the compass form that changed our view, and export a schema 1.0 question card with group_status still pending.

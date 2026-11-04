@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>文化航程 · A 文化驾驶舱</title>
+<style>
+/* 文明航程 · A 文化驾驶舱 · 墨海铜灯对齐（离线单文件，无 CDN） */
+:root{
+  --cv-ink-950:#0b1418;--cv-ink-900:#102027;--cv-ink-850:#142830;--cv-ink-800:#18303a;--cv-ink-700:#24434f;--cv-ink-600:#345966;--cv-ink-500:#4b7280;
+  --cv-paper-50:#f3ebdd;--cv-paper-100:#e8dcc6;--cv-paper-200:#dccaa9;--cv-paper-300:#cdb994;
+  --cv-paper-ink:#2a2620;--cv-paper-ink-muted:#5d5446;
+  --cv-brass-300:#dcbd84;--cv-brass-400:#c9a15a;--cv-brass-500:#ad8443;--cv-brass-600:#8e6b32;
+  --cv-sea-300:#8cc4ca;--cv-sea-400:#5fa6ae;
+  --cv-cinnabar-400:#d9694c;--cv-cinnabar-500:#b6452c;--cv-cinnabar-600:#9e3a26;
+  --cv-jade-400:#6faf8a;--cv-amber-400:#d9973f;--cv-slate-400:#8a979c;
+  --cv-bg:var(--cv-ink-950);
+  --cv-surface-1:var(--cv-ink-900);
+  --cv-surface-2:var(--cv-ink-850);
+  --cv-surface-3:var(--cv-ink-800);
+  --cv-surface-paper:var(--cv-paper-50);
+  --cv-surface-paper-2:var(--cv-paper-100);
+  --cv-text:var(--cv-paper-50);
+  --cv-text-muted:#b9b0a0;
+  --cv-text-faint:#857e72;
+  --cv-text-on-paper:var(--cv-paper-ink);
+  --cv-text-on-paper-muted:var(--cv-paper-ink-muted);
+  --cv-line:rgb(232 220 198 / 0.14);
+  --cv-line-strong:rgb(232 220 198 / 0.28);
+  --cv-line-on-paper:rgb(42 38 32 / 0.18);
+  --cv-focus-ring:var(--cv-brass-300);
+  --cv-action-primary-bg:var(--cv-cinnabar-500);
+  --cv-action-primary-text:var(--cv-paper-50);
+  --cv-action-primary-hover:var(--cv-cinnabar-400);
+  --cv-action-secondary-border:var(--cv-brass-500);
+  --cv-action-secondary-text:var(--cv-brass-300);
+  --cv-font-display:"Noto Serif CJK SC","Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",serif;
+  --cv-font-body:"Noto Sans CJK SC","Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --cv-font-mono:"IBM Plex Mono","SFMono-Regular",ui-monospace,monospace;
+  --cv-text-xs:0.75rem;--cv-text-sm:0.875rem;--cv-text-md:1rem;--cv-text-lg:1.25rem;--cv-text-xl:1.625rem;--cv-text-2xl:2.25rem;
+  --cv-leading-tight:1.25;--cv-leading-body:1.7;--cv-tracking-label:0.08em;
+  --cv-space-1:4px;--cv-space-2:8px;--cv-space-3:12px;--cv-space-4:16px;--cv-space-5:20px;--cv-space-6:24px;--cv-space-8:32px;--cv-space-10:40px;
+  --cv-radius-xs:2px;--cv-radius-sm:4px;--cv-radius-md:8px;
+  --cv-shadow-paper:0 1px 0 rgb(255 255 255 / 0.35) inset,0 8px 24px rgb(0 0 0 / 0.35);
+  --cv-shadow-panel:0 12px 32px rgb(0 0 0 / 0.45);
+  --cv-shadow-lamp:0 0 0 1px rgb(201 161 90 / 0.25),0 0 24px rgb(201 161 90 / 0.12);
+  --cv-hud-scrim:rgb(11 20 24 / 0.72);
+  --cv-touch-min:44px;
+  --cv-control-md:40px;--cv-control-lg:48px;
+  --cv-dur-instant:80ms;--cv-dur-fast:160ms;--cv-dur-base:240ms;
+  --cv-ease-out:cubic-bezier(0.2,0.7,0.2,1);
+  --cv-scene-accent:#c58b4b;
+  --cv-scene-sky-top:#1b2430;
+  --cv-scene-sky-horizon:#b98a5e;
+  --cv-scene-water:#23413f;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--cv-text);
+  font-family:var(--cv-font-body);
+  font-size:var(--cv-text-md);
+  line-height:var(--cv-leading-body);
+  -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(ellipse 70% 50% at 72% 8%, rgb(240 180 106 / 0.09), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 18% 100%, rgb(35 65 63 / 0.35), transparent 60%),
+    linear-gradient(180deg, var(--cv-scene-sky-top) 0%, var(--cv-ink-950) 42%, var(--cv-bg) 100%);
+}
+button,input,textarea,select{font:inherit;color:inherit}
+button,a,input,textarea,select{outline:none}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.step:focus-visible{
+  outline:2px solid var(--cv-focus-ring);outline-offset:2px;box-shadow:none;
+}
+button{
+  cursor:pointer;
+  border:1px solid var(--cv-line-strong);
+  border-radius:var(--cv-radius-sm);
+  padding:10px 16px;
+  min-height:var(--cv-control-md);
+  background:transparent;
+  color:var(--cv-text);
+  font-weight:500;
+  transition:background var(--cv-dur-fast) var(--cv-ease-out),border-color var(--cv-dur-fast),color var(--cv-dur-fast),transform var(--cv-dur-instant),box-shadow var(--cv-dur-fast);
+}
+button:hover{border-color:var(--cv-brass-500);color:var(--cv-brass-300);background:rgb(201 161 90 / 0.06)}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{cursor:not-allowed;opacity:.4;transform:none}
+a{color:var(--cv-sea-400);text-underline-offset:3px}
+a:hover{color:var(--cv-sea-300)}
+
+/* 按钮阶梯：一屏一处朱砂主印 */
+.primary{
+  background:var(--cv-action-primary-bg);
+  color:var(--cv-action-primary-text);
+  border-color:var(--cv-cinnabar-600);
+  box-shadow:0 1px 0 rgb(255 255 255 / 0.12) inset, 0 8px 18px rgb(182 69 44 / 0.28);
+  letter-spacing:.02em;
+}
+.primary:hover{background:var(--cv-action-primary-hover);color:var(--cv-action-primary-text);border-color:var(--cv-cinnabar-400)}
+.subtle{
+  padding:7px 12px;min-height:36px;font-size:var(--cv-text-sm);font-weight:500;
+  background:transparent;border-color:transparent;color:var(--cv-text-muted);
+}
+.subtle:hover{background:rgb(232 220 198 / 0.08);border-color:transparent;color:var(--cv-text)}
+.danger{color:var(--cv-cinnabar-400)}
+.danger:hover{background:rgb(185 69 44 / 0.12);border-color:rgb(185 69 44 / 0.35);color:var(--cv-cinnabar-400)}
+
+.shell{max-width:1280px;margin:auto;padding:0 var(--cv-space-8)}
+
+/* HUD 顶栏：舱内通讯条，非 SaaS 营销头 */
+header{
+  position:relative;
+  background:linear-gradient(180deg, rgb(11 20 24 / 0.92), rgb(16 32 39 / 0.88));
+  color:var(--cv-text);
+  padding:var(--cv-space-6) 0 var(--cv-space-8);
+  border-bottom:1px solid var(--cv-line);
+}
+header::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:linear-gradient(90deg, transparent 4%, var(--cv-brass-500) 18%, var(--cv-brass-300) 42%, var(--cv-brass-500) 62%, transparent 96%);
+  opacity:.85;
+}
+.brand{
+  font-family:var(--cv-font-mono);
+  font-size:var(--cv-text-xs);
+  letter-spacing:var(--cv-tracking-label);
+  color:var(--cv-brass-400);
+  text-transform:uppercase;
+}
+.headrow{display:flex;justify-content:space-between;gap:var(--cv-space-5);align-items:center}
+.headrow button{
+  color:var(--cv-brass-300);border-color:var(--cv-brass-600);
+  background:rgb(201 161 90 / 0.06);min-height:40px;
+}
+.headrow button:hover{background:rgb(201 161 90 / 0.14);border-color:var(--cv-brass-400);color:var(--cv-brass-300)}
+.eyebrow{
+  font-size:var(--cv-text-xs);letter-spacing:var(--cv-tracking-label);font-weight:600;
+  color:var(--cv-brass-400);margin:0 0 var(--cv-space-2);
+  font-family:var(--cv-font-mono);
+}
+h1{
+  font-family:var(--cv-font-display);
+  font-size:clamp(2rem, 3.4vw, 2.75rem);
+  line-height:var(--cv-leading-tight);
+  margin:var(--cv-space-3) 0 var(--cv-space-3);
+  font-weight:600;letter-spacing:.06em;
+  max-width:14em;
+}
+header p{max-width:38em;color:var(--cv-text-muted);margin:0;font-size:var(--cv-text-md);line-height:1.55}
+.notice{
+  margin-top:var(--cv-space-5);color:var(--cv-amber-400);font-size:var(--cv-text-sm);
+  border-top:1px dashed rgb(217 151 63 / 0.35);padding-top:var(--cv-space-4);line-height:1.55;
+  max-width:52em;
+}
+
+/* 非对称：窄仪器轨 + 宽纸面 */
+.layout{
+  display:grid;
+  grid-template-columns:220px minmax(0,1fr);
+  gap:var(--cv-space-8);
+  padding-top:var(--cv-space-8);
+  padding-bottom:var(--cv-space-10);
+  align-items:start;
+}
+.sidebar{
+  align-self:start;position:sticky;top:var(--cv-space-4);
+  background:var(--cv-surface-1);
+  border:1px solid var(--cv-line);
+  border-radius:var(--cv-radius-md);
+  box-shadow:var(--cv-shadow-panel);
+  padding:var(--cv-space-5) var(--cv-space-4);
+}
+.route-title{
+  font-size:var(--cv-text-xs);letter-spacing:var(--cv-tracking-label);
+  color:var(--cv-text-faint);margin:0 0 var(--cv-space-3);font-weight:500;
+}
+.steps{display:grid;gap:2px;position:relative}
+.steps::before{
+  content:"";position:absolute;left:21px;top:18px;bottom:18px;width:1px;
+  background:linear-gradient(180deg, var(--cv-brass-600), rgb(142 107 50 / 0.15));
+  pointer-events:none;
+}
+.step{
+  display:flex;text-align:left;align-items:flex-start;
+  padding:var(--cv-space-3) var(--cv-space-3);gap:var(--cv-space-3);
+  border:1px solid transparent;background:transparent;width:100%;
+  border-radius:var(--cv-radius-sm);min-height:52px;font-weight:500;color:var(--cv-text-muted);
+  position:relative;z-index:1;
+}
+.step:hover{background:rgb(232 220 198 / 0.05);border-color:transparent;color:var(--cv-text)}
+.step .n{
+  width:28px;height:28px;border:1px solid var(--cv-brass-600);
+  display:grid;place-items:center;border-radius:999px;font-size:11px;flex-shrink:0;
+  margin-top:1px;background:var(--cv-ink-950);color:var(--cv-brass-300);
+  font-family:var(--cv-font-mono);letter-spacing:0;transition:border-color var(--cv-dur-fast),background var(--cv-dur-fast),color var(--cv-dur-fast),box-shadow var(--cv-dur-fast);
+}
+.step small{display:block;font-weight:400;color:var(--cv-text-faint);line-height:1.4;font-size:11px;margin-top:2px}
+.step.active{
+  background:rgb(201 161 90 / 0.1);
+  color:var(--cv-text);
+  border-color:rgb(201 161 90 / 0.28);
+  box-shadow:var(--cv-shadow-lamp);
+}
+.step.active small{color:var(--cv-text-muted)}
+.step.active .n{
+  border-color:var(--cv-brass-300);background:var(--cv-brass-500);color:var(--cv-ink-950);
+  box-shadow:0 0 12px rgb(201 161 90 / 0.35);
+}
+.step[aria-current="step"] .n{font-weight:700}
+
+.mission{
+  border-top:1px solid var(--cv-line);margin-top:var(--cv-space-5);padding-top:var(--cv-space-4);
+  font-size:var(--cv-text-sm);color:var(--cv-text-muted);
+}
+.mission h3{
+  margin:0 0 var(--cv-space-2);font-size:var(--cv-text-sm);
+  font-family:var(--cv-font-display);color:var(--cv-brass-300);font-weight:600;letter-spacing:.04em;
+}
+.mission p{margin:6px 0;color:var(--cv-text-muted)}
+.saveinfo{font-size:var(--cv-text-xs);color:var(--cv-text-faint);margin:var(--cv-space-4) 0 var(--cv-space-2)}
+
+/* 纸面任务卡：灯下焦点 */
+.panel{
+  display:none;
+  background:var(--cv-surface-paper);
+  color:var(--cv-text-on-paper);
+  border:1px solid var(--cv-line-on-paper);
+  border-radius:var(--cv-radius-sm);
+  padding:var(--cv-space-8) var(--cv-space-8) var(--cv-space-6);
+  box-shadow:var(--cv-shadow-paper), var(--cv-shadow-lamp);
+  position:relative;
+}
+.panel::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg, var(--cv-brass-600), var(--cv-brass-300) 35%, transparent 70%);
+  border-radius:var(--cv-radius-sm) var(--cv-radius-sm) 0 0;
+  opacity:.9;
+}
+.panel.active{display:block;animation:panelIn var(--cv-dur-base) var(--cv-ease-out) both}
+@keyframes panelIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel h2{
+  font-size:var(--cv-text-2xl);line-height:var(--cv-leading-tight);
+  margin:2px 0 var(--cv-space-3);font-family:var(--cv-font-display);font-weight:600;letter-spacing:.02em;
+  color:var(--cv-text-on-paper);max-width:16em;
+}
+.panel .eyebrow{color:var(--cv-brass-600)}
+.lede{color:var(--cv-text-on-paper-muted);margin:0 0 var(--cv-space-5);max-width:42em;font-size:var(--cv-text-md)}
+.field{margin:var(--cv-space-5) 0}
+.field label,.label{display:block;font-weight:600;margin-bottom:7px;color:var(--cv-text-on-paper);font-size:var(--cv-text-sm)}
+.help{color:var(--cv-text-on-paper-muted);font-size:var(--cv-text-sm);margin:6px 0 0;line-height:1.5}
+textarea,input[type=text],select{
+  width:100%;border:1px solid rgb(42 38 32 / 0.22);border-radius:var(--cv-radius-sm);
+  background:#fffdf8;color:var(--cv-text-on-paper);padding:12px 14px;resize:vertical;
+  transition:border-color var(--cv-dur-fast),box-shadow var(--cv-dur-fast);
+}
+textarea{min-height:104px}
+textarea:focus,input:focus,select:focus{
+  border-color:var(--cv-brass-500);
+  box-shadow:0 0 0 2px rgb(201 161 90 / 0.22);
+}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spaced{justify-content:space-between}
+.sectionline{border:0;border-top:1px solid var(--cv-line-on-paper);margin:var(--cv-space-6) 0}
+.callout{
+  background:var(--cv-surface-paper-2);
+  border-left:3px solid var(--cv-brass-500);
+  padding:var(--cv-space-4);margin:var(--cv-space-5) 0;font-size:var(--cv-text-sm);
+  border-radius:0 var(--cv-radius-sm) var(--cv-radius-sm) 0;
+  color:var(--cv-text-on-paper);
+}
+.callout strong{display:block;margin-bottom:5px;font-family:var(--cv-font-display)}
+.nextrow{
+  border-top:1px solid var(--cv-line-on-paper);margin-top:var(--cv-space-6);padding-top:var(--cv-space-5);
+  display:flex;gap:10px;justify-content:space-between;align-items:center;
+}
+.nextrow > button:not(.primary){
+  background:transparent;color:var(--cv-brass-600);border:1px solid var(--cv-brass-500);
+}
+.nextrow > button:not(.primary):hover{background:rgb(201 161 90 / 0.08);color:var(--cv-brass-600)}
+.smalltag{
+  font-size:11px;border:1px solid rgb(42 38 32 / 0.2);border-radius:var(--cv-radius-xs);
+  padding:1px 7px;display:inline-block;font-weight:500;color:var(--cv-text-on-paper-muted);
+  background:transparent;vertical-align:middle;letter-spacing:.04em;
+}
+
+/* 材料：纸签，选中铜边 + 灯影 */
+.material{
+  border:1px solid var(--cv-line-on-paper);border-radius:var(--cv-radius-sm);
+  margin:var(--cv-space-3) 0;background:#fffdf8;
+  transition:border-color var(--cv-dur-fast),background var(--cv-dur-fast),box-shadow var(--cv-dur-fast);
+}
+.material.selected{
+  border-color:var(--cv-brass-500);
+  background:linear-gradient(90deg, rgb(201 161 90 / 0.12), #fffdf8 28%);
+  box-shadow:inset 3px 0 0 var(--cv-brass-400), var(--cv-shadow-lamp);
+}
+.material-head{display:flex;gap:var(--cv-space-3);padding:var(--cv-space-4) var(--cv-space-5)}
+.material-head input{width:18px;height:18px;margin-top:6px;accent-color:var(--cv-brass-500);flex-shrink:0}
+.material-main{flex:1;min-width:0}
+.material h3{margin:0 0 3px;font-size:var(--cv-text-lg);font-family:var(--cv-font-display);font-weight:600}
+.material p{margin:6px 0}
+.meta{font-size:var(--cv-text-xs);color:var(--cv-text-on-paper-muted);letter-spacing:.02em}
+blockquote{
+  font-family:var(--cv-font-display);font-size:1.25rem;line-height:1.55;
+  margin:var(--cv-space-3) 0;padding-left:var(--cv-space-4);
+  border-left:2px solid var(--cv-brass-500);color:var(--cv-text-on-paper);
+}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--cv-brass-600);font-weight:600;font-size:var(--cv-text-sm)}
+details .body{padding:12px 0 3px}
+.material-notes{min-height:70px;font-size:var(--cv-text-sm)}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:var(--cv-space-4)}
+.support{border-top:1px solid var(--cv-line-on-paper);padding-top:10px;margin-top:10px}
+.support b{font-size:var(--cv-text-sm)}
+.support p{font-size:var(--cv-text-sm)}
+.source-link{overflow-wrap:anywhere;font-size:var(--cv-text-xs)}
+.classification{
+  padding:var(--cv-space-5);background:var(--cv-surface-paper-2);
+  border-radius:var(--cv-radius-sm);margin-top:var(--cv-space-6);
+  border:1px solid rgb(174 124 54 / 0.22);
+}
+.classification .field:first-child{margin-top:0}
+.classification h3{font-family:var(--cv-font-display)}
+
+.crew{display:flex;gap:8px;flex-wrap:wrap}
+.crew button{
+  flex:1;min-width:120px;min-height:44px;
+  background:#fffdf8;color:var(--cv-text-on-paper);border-color:rgb(42 38 32 / 0.2);
+}
+.crew button:hover{border-color:var(--cv-brass-500);color:var(--cv-brass-600);background:rgb(201 161 90 / 0.08)}
+.crew button.active{
+  border-color:var(--cv-brass-500);background:rgb(201 161 90 / 0.16);
+  box-shadow:inset 0 -2px 0 var(--cv-brass-500);color:var(--cv-text-on-paper);
+}
+.crew-prompt{
+  padding:var(--cv-space-4) var(--cv-space-5);background:var(--cv-surface-paper-2);
+  border-top:3px solid var(--cv-brass-500);margin:var(--cv-space-3) 0;
+  color:var(--cv-text-on-paper);border-radius:0 0 var(--cv-radius-sm) var(--cv-radius-sm);
+}
+.crew-prompt p{margin:5px 0}
+.crew-prompt .meta{color:var(--cv-text-on-paper-muted)}
+.logitem{
+  border-left:2px solid var(--cv-brass-400);padding-left:12px;font-size:13px;margin:10px 0;
+  white-space:pre-wrap;overflow-wrap:anywhere;color:var(--cv-text-on-paper-muted);
+}
+.numlabel{color:var(--cv-cinnabar-500);margin-right:7px;font-weight:700;font-family:var(--cv-font-mono)}
+
+.preview{
+  border:1px solid var(--cv-line-on-paper);background:#fffdf8;
+  padding:var(--cv-space-6);border-radius:var(--cv-radius-sm);box-shadow:var(--cv-shadow-paper);
+}
+.preview h3{font-family:var(--cv-font-display);font-size:var(--cv-text-xl);margin:5px 0 12px}
+.preview .pair{padding:12px 0;border-top:1px solid var(--cv-line-on-paper)}
+.pair b{font-size:12px;letter-spacing:var(--cv-tracking-label);color:var(--cv-text-on-paper-muted);display:block;margin-bottom:5px;font-weight:600}
+.pair p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.preview-source{border-top:1px solid var(--cv-line-on-paper);padding-top:10px;margin-top:10px;font-size:13px;overflow-wrap:anywhere}
+.preview-source h4{margin:5px 0;font-family:var(--cv-font-display)}
+.preview-source p{margin:4px 0;white-space:pre-wrap}
+.statusbox{
+  padding:12px 15px;background:rgb(217 151 63 / 0.16);color:#71501e;
+  border-radius:var(--cv-radius-sm);margin-bottom:16px;font-size:13px;
+  border:1px solid rgb(217 151 63 / 0.35);
+}
+.statusbox.confirmed{background:rgb(111 175 138 / 0.18);color:#24583d;border-color:rgb(78 140 105 / 0.35)}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.actions button,.panel .actions button{
+  background:#fffdf8;color:var(--cv-text-on-paper);border:1px solid var(--cv-brass-500);
+}
+.validation{
+  color:#7a2e1f;background:rgb(185 69 44 / 0.1);padding:13px 16px;
+  border-radius:var(--cv-radius-sm);margin:15px 0;display:none;border:1px solid rgb(185 69 44 / 0.25);
+}
+.validation.visible{display:block}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translate(-50%,12px);
+  max-width:min(420px,calc(100% - 28px));padding:12px 18px;
+  background:var(--cv-hud-scrim);color:var(--cv-text);border:1px solid var(--cv-line-strong);
+  border-radius:var(--cv-radius-sm);z-index:100;box-shadow:var(--cv-shadow-panel);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity var(--cv-dur-base) var(--cv-ease-out),transform var(--cv-dur-base) var(--cv-ease-out),visibility var(--cv-dur-base);
+  font-size:var(--cv-text-sm);text-align:center;
+}
+.toast.visible{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.footer{font-size:var(--cv-text-xs);color:var(--cv-text-faint);border-top:1px solid var(--cv-line);padding:var(--cv-space-5) 0 var(--cv-space-8)}
+.count{font-size:var(--cv-text-xs);color:var(--cv-text-on-paper-muted)}
+.hidden{display:none!important}
+.print-meta{display:none}
+.pair.empty p{color:var(--cv-text-on-paper-muted)}
+.checkline{display:flex;gap:9px;align-items:flex-start;margin:18px 0}
+.checkline input{margin-top:7px;accent-color:var(--cv-cinnabar-500);width:18px;height:18px}
+.checkline label{font-size:14px;color:var(--cv-text-on-paper)}
+footer a{color:inherit}
+.full-width{width:100%;min-height:48px}
+
+/* 纸面内次要按钮颜色 */
+.panel button.subtle{color:var(--cv-text-on-paper-muted)}
+.panel button.subtle:hover{background:rgb(42 38 32 / 0.06);color:var(--cv-text-on-paper)}
+.panel button.danger{color:var(--cv-cinnabar-600)}
+.panel .nextrow .count{color:var(--cv-text-on-paper-muted)}
+
+@media(prefers-reduced-motion:reduce){
+  :root{--cv-dur-fast:0ms;--cv-dur-base:120ms;--cv-dur-instant:0ms}
+  .panel.active{animation:none}
+  .toast{transition:none}
+  button{transition:none}
+  button:active:not(:disabled){transform:none}
+  .material,.step .n{transition:none}
+}
+@media(prefers-contrast:more){
+  :root{--cv-text-muted:#ddd3c2;--cv-text-faint:#b9b0a0;--cv-line:rgb(232 220 198 / 0.4)}
+}
+@media(max-width:900px){
+  .shell{padding:0 var(--cv-space-5)}
+  .layout{grid-template-columns:1fr;gap:var(--cv-space-4);padding-top:var(--cv-space-5);padding-bottom:var(--cv-space-6)}
+  .sidebar{position:static;padding:var(--cv-space-4)}
+  .steps{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .steps::before{display:none}
+  .step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 4px;font-size:12px;min-height:56px;gap:4px}
+  .step .n{margin:0}
+  .step small{display:none}
+  .mission{display:none}
+  .sidebar .saveinfo{margin:10px 0 0}
+  .sidebar .danger{display:none}
+  .panel{padding:var(--cv-space-6) var(--cv-space-5)}
+  .headrow{align-items:flex-start}
+  .brand{font-size:10px}
+  .headrow button{font-size:12px;padding:8px 10px;min-height:40px}
+  .columns{grid-template-columns:1fr}
+  .panel h2{font-size:var(--cv-text-xl)}
+  h1{font-size:32px}
+}
+@media(max-width:520px){
+  .shell{padding:0 14px}
+  header{padding:18px 0 22px}
+  h1{font-size:28px;letter-spacing:.04em}
+  .headrow{gap:8px}
+  .panel{padding:18px 16px}
+  .panel h2{font-size:23px}
+  .material-head{padding:14px 12px;gap:9px}
+  .preview{padding:16px}
+  .step .n{width:24px;height:24px}
+  .step{font-size:11px;min-height:52px}
+  .nextrow{align-items:stretch;flex-wrap:wrap}
+  .nextrow button{font-size:13px;padding:11px 12px;min-height:44px}
+  .nextrow .count{max-width:100%}
+  .notice{font-size:12px}
+  .actions button{flex:1;font-size:13px;min-height:44px}
+  .row.spaced{gap:8px}
+  .classification{padding:14px}
+  .brand{letter-spacing:.08em}
+  .crew button{min-width:calc(50% - 4px)}
+}
+@media print{
+  body{background:white;font-size:10pt;color:#182c30}
+  header,.sidebar,.panel:not(#panel-4),.no-print,.footer,.toast{display:none!important}
+  .shell{padding:0;max-width:none}
+  .layout{display:block;margin:0;padding:0}
+  .panel#panel-4{display:block!important;padding:0;border:0;box-shadow:none;animation:none}
+  .panel#panel-4::before{display:none}
+  .panel#panel-4>.eyebrow,.panel#panel-4>h2,.panel#panel-4>.lede{display:none}
+  .preview{border:0;padding:0;box-shadow:none}
+  .preview h3{font-size:20pt}
+  .preview .pair,.preview-source{break-inside:avoid}
+  .print-meta{display:block;font-size:9pt;color:#536164}
+  .statusbox{padding:8px;border:1px solid #bbc3bc;background:none!important}
+  .preview-source a{color:#182c30;text-decoration:none}
+  .preview-source a:after{content:' (' attr(href) ')';font-size:8pt}
+  .pair b{font-size:9pt}
+  .pair p{font-size:10pt}
+  .preview-source{font-size:9pt}
+  @page{size:A4;margin:17mm}
+}
+</style></head>
+<body><header><div class="shell"><div class="headrow"><div class="brand">HARBOURMIND / CULTURAL JOURNEY</div><button id="load-demo" type="button">载入完整演示</button></div><h1>文化驾驶舱</h1><p>玄览玄通 · 从自己的经验出发，带着材料提出一个值得共同探索的问题。</p><div class="notice">交互提案 · v1.1（K3 升级版）· 2026.11.02 · 船员提示为预设脚本 · 未接入真实 AI · 所有输入仅保存在当前浏览器</div></div></header>
+<main class="shell layout"><aside class="sidebar no-print"><p class="route-title">A 的第一段航程</p><nav class="steps" aria-label="驾驶舱流程"><button class="step active" data-step="1"><span class="n">01</span><span>我的起点<small>先留下原先的理解</small></span></button><button class="step" data-step="2"><span class="n">02</span><span>阅读材料<small>看见证据的边界</small></span></button><button class="step" data-step="3"><span class="n">03</span><span>修订问题<small>让追问有依据</small></span></button><button class="step" data-step="4"><span class="n">04</span><span>问题卡<small>交给下一位同行者</small></span></button></nav><div class="mission"><h3>本次共同场景</h3><p>为不同背景的同学设计一场关于“团圆”的校园微展。</p><p>30 分钟 / 中英双语 / 示例预算 300 元。</p><p>3 个主推机制：材料证明范围 / 判断贴签 / 理解修订记录。</p><p>本页只准备文化问题与材料。具体观点协商由 B 接续，作品由 C、D 整合。</p></div><p class="saveinfo" id="save-state" role="status">草稿保存在本机浏览器</p><button class="subtle danger" id="reset-draft">重置本机草稿</button></aside>
+<section class="panel active" id="panel-1" aria-labelledby="title-1"><p class="eyebrow">01 / DEPARTURE</p><h2 id="title-1" tabindex="-1">你原先怎样理解“团圆”？</h2><p class="lede">先记录自己的经验。稍后回看，你会更容易说清楚哪一条材料改变了哪一个判断。</p><div class="field"><div class="row spaced"><label for="initial-view">我的初始理解 <span class="smalltag">个人经验</span></label><button class="subtle" id="fill-initial">使用示例</button></div><textarea id="initial-view" maxlength="1600" placeholder="例如：我以前觉得，团圆就是所有人都回家。"></textarea><p class="help">可写观察或经历。不必填写姓名、家庭照片或私人故事。</p></div><div class="field"><label for="confidence">我对这个理解的把握</label><select id="confidence"><option value="unsure">还不确定</option><option value="partly">有些把握</option><option value="sure">比较确信</option></select><p class="help">这只是自我记录，不是正确性分数或学习成绩。</p></div><div class="callout"><strong>本次想弄明白的事情</strong>当“团圆”对不同人意味着不同的事，我们怎样做一场让大家都能选择参与方式的微展？这是设计问题，答案需要材料与参与者的真实反馈。</div><details><summary>为什么叫“玄览玄通”？</summary><div class="body"><p>“玄览玄通”是项目组合名称。本提案采用《道德经》王弼注本，第 10 章“涤除玄览，能无疵乎？”、第 15 章“微妙玄通，深不可识”。引用其他版本应重新核对文字与注释，不混用异文。</p><p>我们借此设计“省察自己的理解、仔细看材料”的现代学习操作，不声称《道德经》原本提出了这套四步教学流程。原典与版本说明见提案 PDF。<a href="https://zh.wikisource.org/wiki/道德經_(王弼本)" target="_blank" rel="noopener noreferrer">查看王弼注本</a></p></div></details><div class="nextrow"><span class="count">保留起点，才看得见修订</span><button class="primary" data-go="2">带着理解看材料 →</button></div></section>
+<section class="panel" id="panel-2" aria-labelledby="title-2"><p class="eyebrow">02 / SOURCE ROOM</p><h2 id="title-2" tabindex="-1">材料能说什么，也有什么没说</h2><p class="lede">选择至少一张材料作为问题卡的依据。古诗、地方节俗与当代同学的经验，分别能回答不同的问题。</p><p class="help">建议先读“可支持/不能推出”再勾选材料。</p><div id="materials"></div><div class="classification"><h3 style="margin:0 0 12px;font-size:18px">给一个判断贴签</h3><div class="field"><label for="statement">我正在判断的这句话</label><textarea id="statement" maxlength="1000" placeholder="例如：苏轼词中的祝愿，可以不以同处一地为条件。"></textarea></div><div class="columns"><div class="field" style="margin-top:0"><label for="statement-tag">这句话属于</label><select id="statement-tag"><option value="interpretation">我的解释</option><option value="direct_text">材料直接写到</option><option value="unverified">仍待核实</option></select></div><div class="field" style="margin-top:0"><label for="statement-reason">为什么这样分类？</label><input type="text" id="statement-reason" maxlength="700" placeholder="说明所依据的词句或证据缺口"></div></div><p class="help">这个标签由你选择。原型不自动判断文化解释是否正确，教师或同伴可以进一步核查。</p></div><div class="nextrow"><button data-go="1">← 回看起点</button><button class="primary" data-go="3">请船员帮我追问 →</button></div></section>
+<section class="panel" id="panel-3" aria-labelledby="title-3"><p class="eyebrow">03 / REFRAME</p><h2 id="title-3" tabindex="-1">把一个答案，打开成一个问题</h2><p class="lede">船员只提供追问角度。你来决定是否采纳，并说明材料怎样影响了自己的判断。</p><div class="crew" role="group" aria-label="预设船员提示"><button data-crew="source" class="active" aria-pressed="true">材料员</button><button data-crew="question" aria-pressed="false">追问员</button><button data-crew="boundary" aria-pressed="false">边界提醒</button></div><div class="crew-prompt" aria-live="polite"><p class="meta">预设脚本 · 当前提示不由模型生成</p><p id="crew-prompt"></p></div><details><summary>记录我对这条提示的回应（可选）</summary><div class="body"><div class="columns"><select id="crew-adoption" aria-label="提示采纳状态"><option value="modified">改写后采纳</option><option value="accepted">采纳</option><option value="deferred">暂不采纳</option></select><input id="crew-response" type="text" maxlength="700" aria-label="回应与理由" placeholder="写下你的回应或保留理由"></div><p><button class="subtle" id="record-crew">记录这条回应</button></p><div id="crew-log"></div></div></details><hr class="sectionline"><div class="field"><label for="revised-view"><span class="numlabel">①</span>我现在的理解</label><textarea id="revised-view" maxlength="1600" placeholder="保留哪些原先的理解？增加了什么限定或不同可能？"></textarea></div><div class="field"><label for="unknown"><span class="numlabel">②</span>我仍不知道的事情</label><textarea id="unknown" maxlength="1200" placeholder="例如：参加微展的同学各自希望怎样参与？这需要真实询问，诗词不能替他们回答。"></textarea></div><div class="field"><label for="revised-question"><span class="numlabel">③</span>交给大家共同探索的问题</label><textarea id="revised-question" maxlength="1600" placeholder="把问题写得具体一些：为谁、在什么场景、想了解什么？"></textarea></div><div class="field"><label for="revision-reason"><span class="numlabel">④</span>哪条材料改变了哪个判断？</label><textarea id="revision-reason" maxlength="1800" placeholder="请引用已勾选的材料编号，如：M1 中的‘千里’让我重新考虑团圆是否只能以空间相聚表达……"></textarea><p class="help">请至少写出一个已选材料的编号 M1、M2 或 M3，说明依据与变化。编号只检查关联，解释仍需人来核对。</p></div><div class="field"><label for="participation-boundaries">参与边界（可选）</label><textarea id="participation-boundaries" maxlength="1000" placeholder="例如：不要求公开家庭经历或照片；可以匿名写一句祝愿，也可以只观看。" style="min-height:75px"></textarea></div><div class="nextrow"><button data-go="2">← 回看材料</button><button class="primary" data-go="4">查看我的问题卡 →</button></div></section>
+<section class="panel" id="panel-4" aria-labelledby="title-4"><p class="eyebrow">04 / QUESTION CARD</p><h2 id="title-4" tabindex="-1">一张能继续讨论的问题卡</h2><p class="lede">保留原先的想法、修订的理由与还没回答的问题。个人确认之后，交给 B 开始观点协商。</p><div class="validation no-print" id="validation" role="alert"></div><div class="preview" id="card-preview"><p class="eyebrow">文化航程 · 玄览玄通</p><h3>团圆微展 / 文化问题卡</h3><div class="statusbox" id="card-status"></div><p class="print-meta">交互提案 · 船员提示为预设脚本 · 未接入真实 AI</p><div id="preview-body"></div><div class="pair"><b>所选材料及其使用边界</b><div id="preview-sources"></div></div><div class="pair"><b>下一站交接</b><p>交给 B 比较参与者的观点，并分别取得确认；交给 D 保留来源与修订记录。这里的个人确认不代表任何其他成员同意。</p></div><p class="meta">本卡为本地交互原型输出，不是已经开展的访谈、全组共识或学习效果证明。</p></div><div class="no-print"><div class="checkline"><input type="checkbox" id="confirm-check"><label for="confirm-check">我已核对这张卡表达了我的理解，知道它只代表个人确认。成员协商仍为待确认。</label></div><button class="primary full-width" id="confirm-card">确认我的问题卡</button><div class="actions"><button id="export-json">导出 JSON</button><button id="export-text">导出文字卡</button><button id="print-card">打印 / 保存 PDF</button></div><p class="help">JSON 可交给 D 继续开发；文字卡适合发给组员。浏览器打印时可选择“另存为 PDF”。导出草稿会保留草稿标识。</p><div class="nextrow"><button data-go="3">← 继续修订</button><button class="subtle danger" id="reset-bottom">重置本机草稿</button></div></div></section>
+</main><footer class="shell footer"><div class="row spaced"><span>A 岗交互提案 · v1.1（K3 升级版）· 2026.11.02 · 建议先双击文件，用桌面浏览器打开</span><span>内容离线可读，点击出处链接需要联网</span></div></footer><div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script id="source-data" type="application/json">[{"id":"M1","title":"苏轼《水调歌头·明月几时有》","kind":"文学文本","context":"北宋词作；采用 Project Gutenberg #27123《水调歌头》所录文本。","quote":"但愿人长久，千里共婵娟。","support":"词中把相隔千里的思念与共同望月联系起来。","limit":"文学表达不等于所有人的生活经验，也不能证明现代学生都认同某种团圆方式。","question":"空间上没有相聚，是否仍可表达联结？需要问哪些参与者？","url":"https://www.gutenberg.org/cache/epub/27123/pg27123.html"},{"id":"M2","title":"中秋节（中秋博饼）","kind":"非遗项目记录","context":"中国非物质文化遗产网；福建厦门申报，项目编号Ⅹ-5。节选只用于地方活动形式。","quote":"以家庭或社团为单位","support":"项目记录描述了闽南及台湾地区以家庭或社团组织博饼的活动形式。","limit":"地方项目不能外推为全国统一习俗；参与活动不能自动等于每个人都感到归属。","question":"我们的微展能否提供不依赖家庭叙事的共同参与方式？","url":"https://www.ihchina.cn/project_details/14932/"},{"id":"M3","title":"中秋节—大坑舞火龙","kind":"地方非遗记录，含起源传说","context":"香港非物质文化遗产办事处；范围是香港大坑的节庆传统。","quote":"以保大坑合境平安","support":"官方记录呈现了中秋前后村民举行活动、祈愿社区平安的地方传统。","limit":"原文以“据传”引出驱瘟故事；不能将仪式治病说成科学事实，也不能推断全体居民的个人态度。","question":"当节日也承载社区愿望，微展应如何标注史料、传说与自己的解释？","url":"https://www.icho.hk/sc/web/icho/representative_list_taihang.html"}]</script>
+<script>
+'use strict';
+const SOURCES=JSON.parse(document.getElementById('source-data').textContent);
+const STORE='harbourmind-a-cockpit-v1';
+const DISCLOSURE='交互提案；船员提示为预设脚本；未接入真实AI；不代表真实访谈、全组共识或学习效果证明。';
+const fields=['initial-view','confidence','statement','statement-tag','statement-reason','revised-view','unknown','revised-question','revision-reason','participation-boundaries'];
+const prompts={source:'你准备引用哪条材料？它直接写了什么？请将文本中的词句与你自己的解释分开。',question:'如果有人无法回家，或者不想谈家庭经历，你原先的问题还能给他们留下怎样的位置？这需要向谁进一步求证？',boundary:'一位诗人的表达或一个地方的节俗记录，能代表所有人吗？请写出证据的范围，以及你仍然不知道的事情。'};
+const crewNames={source:'材料员',question:'追问员',boundary:'边界提醒'};
+const adoptionNames={accepted:'采纳',modified:'改写后采纳',deferred:'暂不采纳'};
+const tagNames={direct_text:'材料直接写到',interpretation:'我的解释',unverified:'仍待核实'};
+const confidenceNames={unsure:'还不确定',partly:'有些把握',sure:'比较确信'};
+const blank=()=>({schema_version:'1.0',created_at:new Date().toISOString(),updated_at:new Date().toISOString(),step:1,values:{confidence:'unsure','statement-tag':'interpretation'},selected:[],notes:{},crew_records:[],personal_confirmation:{status:'draft',confirmed_at:null},group_status:'pending'});
+let state=blank(),storageOK=true,currentCrew='source',toastTimer;
+try{const raw=localStorage.getItem(STORE);if(raw){const saved=JSON.parse(raw);if(saved.schema_version==='1.0'&&saved.values&&Array.isArray(saved.selected)){state={...blank(),...saved};state.selected=state.selected.filter(id=>SOURCES.some(s=>s.id===id));state.notes=state.notes||{};state.crew_records=Array.isArray(state.crew_records)?state.crew_records:[];state.personal_confirmation=state.personal_confirmation||{status:'draft',confirmed_at:null};state.step=[1,2,3,4].includes(state.step)?state.step:1;state.group_status='pending';}}}catch(e){storageOK=false;}
+const $=id=>document.getElementById(id);
+const el=(tag,txt,cls)=>{const x=document.createElement(tag);if(txt!==undefined)x.textContent=txt;if(cls)x.className=cls;return x;};
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),4200);}
+function save(){state.updated_at=new Date().toISOString();try{localStorage.setItem(STORE,JSON.stringify(state));storageOK=true;}catch(e){storageOK=false;}$('save-state').textContent=storageOK?'草稿已保存在当前浏览器 · 刷新可恢复':'当前浏览器无法保存草稿，请及时导出文件';}
+function changed(){if(state.personal_confirmation.status==='confirmed'){state.personal_confirmation={status:'draft',confirmed_at:null};$('confirm-check').checked=false;toast('内容已修改，个人确认已撤销，请重新核对。');}save();if(state.step===4)renderPreview();}
+function goStep(n,focus=true){state.step=n;document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+n));document.querySelectorAll('.step').forEach(b=>{b.classList.toggle('active',Number(b.dataset.step)===n);b.setAttribute('aria-current',Number(b.dataset.step)===n?'step':'false');});if(n===4)renderPreview();save();if(focus){$('title-'+n).focus({preventScroll:true});window.scrollTo({top:document.querySelector('.layout').offsetTop-12,behavior:(window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth')});}}
+function renderSources(){const wrap=$('materials');wrap.replaceChildren();for(const source of SOURCES){const card=el('article',undefined,'material'+(state.selected.includes(source.id)?' selected':''));card.dataset.source=source.id;const head=el('div',undefined,'material-head');const check=el('input');check.type='checkbox';check.id='select-'+source.id;check.checked=state.selected.includes(source.id);check.setAttribute('aria-label','选用 '+source.id+' '+source.title);check.addEventListener('change',()=>{state.selected=check.checked?[...new Set([...state.selected,source.id])]:state.selected.filter(x=>x!==source.id);card.classList.toggle('selected',check.checked);changed();});const main=el('div',undefined,'material-main');const title=el('h3');const label=el('label',source.id+' · '+source.title);label.htmlFor=check.id;title.append(label);main.append(title,el('div',source.kind+' / '+source.context,'meta'));main.append(el('blockquote',source.quote));const details=el('details');details.append(el('summary','展开来源、使用边界与我的记录'));const body=el('div',undefined,'body');const support=el('div',undefined,'support');support.append(el('b','可支持的判断'),el('p',source.support),el('b','不能直接推出'),el('p',source.limit),el('b','仍可追问'),el('p',source.question));const link=el('a','打开材料出处','source-link');link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';support.append(link);body.append(support);const notesLabel=el('label','我的材料记录（可选）','label');notesLabel.htmlFor='note-'+source.id;notesLabel.style.marginTop='14px';const notes=el('textarea',undefined,'material-notes');notes.id='note-'+source.id;notes.maxLength=1200;notes.value=state.notes[source.id]||'';notes.placeholder='哪句值得记下？它支持什么，还不能说明什么？';notes.addEventListener('input',()=>{state.notes[source.id]=notes.value;changed();});body.append(notesLabel,notes);details.append(body);main.append(details);head.append(check,main);card.append(head);wrap.append(card);}}
+function renderCrew(){document.querySelectorAll('[data-crew]').forEach(b=>{const on=b.dataset.crew===currentCrew;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});$('crew-prompt').textContent=prompts[currentCrew];const existing=state.crew_records.find(r=>r.role===currentCrew);$('crew-adoption').value=existing?existing.adoption:'modified';$('crew-response').value=existing?existing.response:'';const log=$('crew-log');log.replaceChildren();for(const r of state.crew_records){log.append(el('div',crewNames[r.role]+' · '+adoptionNames[r.adoption]+'\n'+r.response,'logitem'));}}
+function pair(label,value){const d=el('div',undefined,'pair'+(!value?' empty':''));d.append(el('b',label),el('p',value||'尚未填写'));return d;}
+function pack(){return{schema_version:'1.0',product:'文化航程',module:'A_玄览玄通_文化驾驶舱',scenario_id:'reunion_micro_exhibition',scenario:{name:'团圆微展',duration_minutes:30,budget_example_cny:300,note:'场景与预算均为设计示例'},created_at:state.created_at,updated_at:state.updated_at,initial_view:state.values['initial-view']||'',confidence:{value:state.values.confidence,label:confidenceNames[state.values.confidence],meaning:'自评，不是正确性或学习成绩'},classification:{statement:state.values.statement||'',tag:state.values['statement-tag'],tag_label:tagNames[state.values['statement-tag']],reason:state.values['statement-reason']||''},revised_view:state.values['revised-view']||'',unknown:state.values.unknown||'',revised_question:state.values['revised-question']||'',revision_reason:state.values['revision-reason']||'',participation_boundaries:state.values['participation-boundaries']||'',sources:SOURCES.filter(s=>state.selected.includes(s.id)).map(s=>({...s,student_note:state.notes[s.id]||''})),crew_records:state.crew_records.map(r=>({...r,prompt:prompts[r.role],origin:'preset_script'})),personal_confirmation:{...state.personal_confirmation},group_status:'pending',handoff:'B负责成员观点与异议确认；D负责页面整合与状态传递。',prototype_disclosure:DISCLOSURE};}
+function renderPreview(){const data=pack();const confirmed=data.personal_confirmation.status==='confirmed';$('card-status').className='statusbox'+(confirmed?' confirmed':'');$('card-status').textContent=confirmed?'个人已确认 · 小组仍待确认 · 修改内容将撤销个人确认':'个人草稿 · 尚未确认 · 小组仍待确认';$('confirm-card').textContent=confirmed?'已个人确认；修改后需重新确认':'确认我的问题卡';$('confirm-card').disabled=confirmed;const body=$('preview-body');body.replaceChildren(pair('原先的理解',data.initial_view),pair('起点的把握（仅自评）',data.confidence.label),pair('判断贴签',data.classification.statement?(data.classification.tag_label+'：'+data.classification.statement+'\n分类理由：'+(data.classification.reason||'尚未填写')):''),pair('我现在的理解',data.revised_view),pair('仍然未知',data.unknown),pair('共同探索的问题',data.revised_question),pair('变化及材料依据',data.revision_reason));if(data.participation_boundaries)body.append(pair('参与边界',data.participation_boundaries));if(data.crew_records.length)body.append(pair('我对船员预设提示的回应',data.crew_records.map(r=>crewNames[r.role]+' / '+adoptionNames[r.adoption]+'：'+r.response).join('\n')));const sw=$('preview-sources');sw.replaceChildren();if(!data.sources.length)sw.append(el('p','尚未选用材料'));for(const s of data.sources){const node=el('div',undefined,'preview-source');node.append(el('h4',s.id+' · '+s.title),el('p',s.kind+' / '+s.context),el('p','原文片段：'+s.quote),el('p','可支持：'+s.support),el('p','使用边界：'+s.limit),el('p','尚未知：'+s.question));if(s.student_note)node.append(el('p','我的记录：'+s.student_note));const a=el('a','材料出处');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';node.append(a);sw.append(node);}}
+function validate(){const errors=[];const required=[['initial-view','初始理解'],['statement','用于贴签的判断'],['statement-reason','判断分类的理由'],['revised-view','修订后的理解'],['unknown','仍未知的问题'],['revised-question','共同探索的问题'],['revision-reason','变化及材料依据']];for(const [key,label]of required)if(!(state.values[key]||'').trim())errors.push('请填写'+label+'。');if(!state.selected.length)errors.push('请至少选用一张材料。');const reason=state.values['revision-reason']||'';const referenced=[...new Set([...reason.matchAll(/(?:^|[^A-Za-z0-9])(M[0-9]+)(?![A-Za-z0-9])/gi)].map(m=>m[1].toUpperCase()))];if(state.selected.length&&!referenced.some(id=>state.selected.includes(id)))errors.push('请在变化理由中引用至少一个已选材料编号（如 M1）。');for(const id of referenced){if(!SOURCES.some(s=>s.id===id))errors.push('材料编号 '+id+' 不存在，请核对编号。');else if(!state.selected.includes(id))errors.push('变化理由引用了 '+id+'，请先在材料页选用该材料，让导出包含其来源。');}return errors;}
+function showErrors(errors){const box=$('validation');box.replaceChildren();if(errors.length){box.append(el('strong','还有这些内容需要补齐：'));const ul=el('ul');errors.forEach(e=>ul.append(el('li',e)));box.append(ul);box.classList.add('visible');box.scrollIntoView({behavior:'smooth',block:'center'});}else box.classList.remove('visible');}
+function download(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);toast('文件已交给浏览器下载。');}
+function exportText(){const p=pack();const lines=['文化航程 / A 文化问题卡','场景：团圆微展','个人状态：'+(p.personal_confirmation.status==='confirmed'?'已确认':'草稿'),'小组状态：待确认','', '原先的理解：'+p.initial_view,'自评把握：'+p.confidence.label+'（非正确性分数）','','判断贴签：'+p.classification.tag_label,'判断：'+p.classification.statement,'分类理由：'+p.classification.reason,'','我现在的理解：'+p.revised_view,'仍未知：'+p.unknown,'共同探索的问题：'+p.revised_question,'变化及依据：'+p.revision_reason,'参与边界：'+(p.participation_boundaries||'未填写'),'','材料来源：'];for(const s of p.sources)lines.push(s.id+' / '+s.title,s.kind+' / '+s.context,'片段：'+s.quote,'可支持：'+s.support,'使用边界：'+s.limit,'尚未知：'+s.question,'记录：'+s.student_note,'出处：'+s.url,'');for(const r of p.crew_records)lines.push('船员预设提示：'+crewNames[r.role]+' / '+prompts[r.role],'回应：'+adoptionNames[r.adoption]+' / '+r.response,'');lines.push(p.handoff,'个人确认时间：'+(p.personal_confirmation.confirmed_at||'尚未确认'),p.prototype_disclosure);return lines.join('\n');}
+function reset(){if(!window.confirm('重置会删除此浏览器里的当前草稿。已下载的文件不会改变。确定重置吗？'))return;state=blank();try{localStorage.removeItem(STORE);}catch(e){}fillForm();renderSources();renderCrew();$('confirm-check').checked=false;showErrors([]);goStep(1);toast('本机草稿已重置。');}
+function fillForm(){for(const id of fields)$(id).value=state.values[id]||((id==='confidence')?'unsure':(id==='statement-tag')?'interpretation':'');}
+for(const id of fields)$(id).addEventListener('input',()=>{state.values[id]=$(id).value;changed();});
+document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>goStep(Number(b.dataset.step))));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>goStep(Number(b.dataset.go))));document.querySelectorAll('[data-crew]').forEach(b=>b.addEventListener('click',()=>{currentCrew=b.dataset.crew;renderCrew();}));
+$('record-crew').addEventListener('click',()=>{const response=$('crew-response').value.trim();if(!response){toast('先写一句回应或保留理由。');return;}state.crew_records=state.crew_records.filter(r=>r.role!==currentCrew);state.crew_records.push({role:currentCrew,adoption:$('crew-adoption').value,response,recorded_at:new Date().toISOString()});changed();renderCrew();toast('已记录你的回应。');});
+$('fill-initial').addEventListener('click',()=>{if((state.values['initial-view']||'').trim()&&!confirm('用示例替换目前的初始理解？'))return;state.values['initial-view']='我原先觉得，团圆就是所有人都回家。';$('initial-view').value=state.values['initial-view'];changed();});
+$('confirm-card').addEventListener('click',()=>{const errors=validate();if(!$('confirm-check').checked)errors.push('请勾选个人核对声明。');showErrors(errors);if(errors.length)return;state.personal_confirmation={status:'confirmed',confirmed_at:new Date().toISOString()};save();renderPreview();toast('已确认你的问题卡。其他成员仍为待确认。');});
+$('export-json').addEventListener('click',()=>download('文化航程_A_问题卡.json',JSON.stringify(pack(),null,2),'application/json;charset=utf-8'));$('export-text').addEventListener('click',()=>download('文化航程_A_问题卡.txt',exportText(),'text/plain;charset=utf-8'));$('print-card').addEventListener('click',()=>{renderPreview();window.print();});$('reset-draft').addEventListener('click',reset);$('reset-bottom').addEventListener('click',reset);
+$('load-demo').addEventListener('click',()=>{if((Object.values(state.values).some(v=>typeof v==='string'&&v.trim()&&!['unsure','partly','sure','interpretation','direct_text','unverified'].includes(v))||state.selected.length)&&!confirm('载入完整演示会替换本机当前草稿。要继续吗？'))return;state=blank();state.values={'initial-view':'我原先觉得，团圆就是所有人都回家。',confidence:'sure',statement:'我把苏轼词中的祝愿理解为：相隔千里也可以表达联结。','statement-tag':'interpretation','statement-reason':'M1 的“千里”与“共婵娟”是文本依据，“表达联结”是我的解释；不据此推断所有人的生活。','revised-view':'团圆可以包含相聚的愿望，也可能通过异地的祝愿与联系来表达。我还不能替当代同学定义它。',unknown:'参加微展的同学希望怎样表达团圆？哪些参与方式会让他们不自在？','revised-question':'在校园团圆微展里，怎样同时呈现相聚与异地联系，并让不愿公开家庭经历的同学也能自主参与？','revision-reason':'M1 中“千里共婵娟”的祝愿让我修订了“团圆只能是所有人回家”的预设；M2 的社团博饼提供了另一种共同参与的参考。两者都不能代表每位同学的想法，所以仍需询问参与者。','participation-boundaries':'不要求公开家庭照片或经历。可匿名写一句祝愿，也可只观看。'};state.selected=['M1','M2'];state.notes={M1:'注意区分词中的祝愿与现实中的普遍事实。',M2:'社团参与提供活动形式的参考，不代表每个人的主观感受。'};fillForm();renderSources();renderCrew();$('confirm-check').checked=false;showErrors([]);goStep(1);toast('已载入虚构教学示例，当前仍为草稿。');});
+fillForm();renderSources();renderCrew();goStep(state.step,false);
+</script></body></html>

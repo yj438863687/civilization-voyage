@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0",
+  "product": "文化航程",
+  "module": "A_玄览玄通_文化驾驶舱",
+  "deliverable_version": "CV-20261104-01",
+  "scenario_id": "four_legs_compass",
+  "scenario": {
+    "name": "四航段文明航程·罗盘传代",
+    "duration_minutes": 30,
+    "note": "场景为设计示例；非3D Demo；非真API"
+  },
+  "created_at": "2026-11-04T02:00:00.000Z",
+  "updated_at": "2026-11-04T02:05:00.000Z",
+  "initial_view": "我原先以为人类进步就是技术越来越新，终点是某个更先进的港口。",
+  "shared_mission": "弄清四段航程里什么算造出下一段能力，并写出依据的罗盘与未知。",
+  "confidence": {
+    "value": "sure",
+    "label": "比较确信",
+    "meaning": "自评，不是正确性或学习成绩"
+  },
+  "classification": {
+    "statement": "蒸汽相对风力的独立性，说明人类开始自己造动力，而不只是更会读风。",
+    "tag": "interpretation",
+    "tag_label": "我的解释",
+    "reason": "M2 原文写到 steam’s independence of wind 与 regular schedule；“自己造动力”是我的解释，不是材料替所有时代下的定义。"
+  },
+  "revised_view": "进步更像同一条航程上的能力扩展：造岸、造动力、造信息、造智能；终点不是港口名称，而是我们能把能力扩展多远。",
+  "unknown": "下一岗如何接住共同任务与文化碎片？资源线路仍是 pending；AI 段也不能被说成已证实课堂效果。",
+  "revised_question": "在四段航程里，什么算“自己造出下一段能力”？依据哪张海图/罗盘判断，又把什么未知交给下一岗？",
+  "compass_shift": {
+    "value": "steam_chart",
+    "label": "蒸汽海图",
+    "meaning": "指出哪张罗盘形态改变了判断，并可传给下一段"
+  },
+  "revision_reason": "M2 蒸汽海图改变了我的判断：从“更快的船”修订为“自造动力、可预期航程”；M1 泥板河岸提醒定居与储存是更早的造岸；M4 只支持“需要人类干预”的原则讨论，不能证明学习效果。",
+  "participation_boundaries": "讲解时声明：预设台词/非实时模型；本页≠3D Demo；不声称接通过真实模型。",
+  "sources": [
+    {
+      "id": "M1",
+      "title": "新石器时代革命：定居、耕作与余粮储存",
+      "kind": "公开教材概述",
+      "context": "OpenStax《World History Volume 1》§2.3 The Neolithic Revolution；概述农业如何支持更大定居社群与可储存余粮。航段：农业革命·泥板河岸。",
+      "quote": "When functioning well, agriculture created a constant supply of food and even a surplus that could be stored.",
+      "support": "可支持：从采集漂流到主动耕作/定居后，出现可储存的食物余粮，并支撑更大规模的定居人口。",
+      "limit": "不能推出：所有地区同步发生同一场“革命”；也不能把余粮储存直接等同于现代港口粮仓或商业港口制度。教材是通史概述，非单一考古点报告。",
+      "question": "在“泥板河岸”航段里，什么算人类自己造出的下一段能力——定居本身，还是把余粮变成可交接的储存与分工？",
+      "url": "https://openstax.org/books/world-history-volume-1/pages/2-3-the-neolithic-revolution",
+      "compass": "泥板河岸",
+      "student_note": "余粮可储存≠现代港口制度。"
+    },
+    {
+      "id": "M2",
+      "title": "从风帆到蒸汽：航运日程可预期",
+      "kind": "公开海事史叙述",
+      "context": "英国皇家博物馆格林威治（RMG）故事文《Sail to steam》；描述蒸汽船相对风力的独立性与定期航线。航段：工业革命·蒸汽海图。",
+      "quote": "the more fundamental advantage for both passengers and owners was steam’s independence of wind – and thus the capacity to set a regular and reliable schedule.",
+      "support": "可支持：蒸汽动力使船舶不再完全依赖风向，航运可建立更规律的时刻与路线规划。",
+      "limit": "不能推出：早期蒸汽船已全面取代帆船，或蒸汽必然带来公平与繁荣；文中亦提到早期蒸汽昂贵、耗煤、舱容被燃料占用等代价。",
+      "question": "“蒸汽海图”上，自造动力是否等于造出下一段能力？还要把哪些未知（燃料、成本、航线选择）交给下一岗？",
+      "url": "https://www.rmg.co.uk/stories/ocean/sailing-ships-steam-power-how-industrial-revolution-changed-life-sea-forever",
+      "compass": "蒸汽海图",
+      "student_note": "独立于风是能力跃迁，但有燃料与成本代价。"
+    },
+    {
+      "id": "M4",
+      "title": "OECD AI 原则：人定方向与机器辅助",
+      "kind": "政府间原则文本（公开讨论材料）",
+      "context": "OECD AI Principles（2019 通过，后续更新）；强调以人为本的价值与人类能动/监督。航段：AI·模型星图。禁止当作课堂学习效果证明。",
+      "quote": "AI systems should be designed in a way that respects the rule of law, human rights, democratic values and diversity, and they should include appropriate safeguards–for example, enabling human intervention where necessary–to ensure a fair and just society.",
+      "support": "可支持：公开原则讨论把“人类干预/监督”写成可信 AI 的设计要求之一，对应“人定方向、机器航行”的分工隐喻。",
+      "limit": "不能推出：本驾驶舱或任何课堂接通过真实模型、证实了学习效果，或原则文本等于产品已落地；原则是规范讨论，不是实验报告。",
+      "question": "在“模型星图”上，怎样判断我们是在设定目的地，而不是把判断完全交给黑箱？还要把什么未知交给 B/D？",
+      "url": "https://www.oecd.org/en/topics/sub-issues/ai-principles.html",
+      "compass": "模型星图",
+      "student_note": "原则文本≠课堂效果证明。"
+    }
+  ],
+  "crew_records": [
+    {
+      "role": "question",
+      "crew_name": "二副（示例）",
+      "origin": "preset_script",
+      "prompt": "二副（示例·预设台词）：在四段航程里，什么算“自己造出下一段能力”？你的判据能交给下一岗复核吗？还要把什么未知写进问题卡？",
+      "adoption": "modified",
+      "response": "我把判据写成“自造可交接的下一能力”，并把资源线路标为 pending。",
+      "note": "预设台词示例，未接入真实 AI。"
+    }
+  ],
+  "carry": {
+    "common_task": "弄清四段航程里什么算造出下一段能力，并写出依据的罗盘与未知。",
+    "cultural_fragments": [
+      "M1",
+      "M2",
+      "M4"
+    ],
+    "choice_records": {
+      "classification_tag": "interpretation",
+      "compass_shift": "steam_chart",
+      "revision_reason": "M2 蒸汽海图改变了我的判断：从“更快的船”修订为“自造动力、可预期航程”；M1 泥板河岸提醒定居与储存是更早的造岸；M4 只支持“需要人类干预”的原则讨论，不能证明学习效果。"
+    },
+    "resources": "pending"
+  },
+  "personal_confirmation": {
+    "status": "confirmed",
+    "confirmed_at": "2026-11-04T02:05:00.000Z"
+  },
+  "group_status": "pending",
+  "handoff": "B负责成员观点与异议确认；D负责页面整合与罗盘传代状态；资源线路 pending。",
+  "prototype_disclosure": "交互提案；预设台词/非实时模型；本页≠3D航程Demo；未接入真实AI；不代表真实访谈、全组共识、学习效果证明或引擎已落地。",
+  "integration_note": "给 B/D：①引用仅限 sources 已选材料；②personal_confirmation 仅个人核对；③group_status 恒 pending；④crew_records.origin=preset_script 不得被引用为真实 AI 输出；⑤carry.resources=pending，不实现 API。"
+}
