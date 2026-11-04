@@ -46,7 +46,8 @@ export interface WaterSpec {
   startedAt: number;
 }
 
-export type WaterResult = { kind: 'gates'; idx: number } | { kind: 'ring'; won: boolean } | { kind: 'catch'; won: boolean; got: number };
+/** at：结果产生的时刻。每一场只认自己开始之后的结果，上一场的不会串到下一场 */
+export type WaterResult = ({ kind: 'gates'; idx: number } | { kind: 'ring'; won: boolean } | { kind: 'catch'; won: boolean; got: number }) & { at: number; timedOut?: boolean };
 
 /** 每帧写、界面 10Hz 读的进度 */
 export const waterLive = {
@@ -133,6 +134,11 @@ export function buildWaterSpec(
   const ship = { ...shipIn, headingDeg: clearHeading(shipIn, opts.obstacles ?? [], reach, halfWidth) };
   if (game.kind === 'choice') {
     const n = game.options.length;
+    // 到点没选，就是最被动的那一种结局：人心最低的那一项
+    let fallbackIdx = 0;
+    game.options.forEach((o, i) => {
+      if (o.out.trust < game.options[fallbackIdx].out.trust) fallbackIdx = i;
+    });
     const gates: Gate[] = game.options.map((o, i) => {
       const side = (i - (n - 1) / 2) * 13;
       const p = place(ship, 18, side);
@@ -144,7 +150,7 @@ export function buildWaterSpec(
       gates,
       startedAt: now,
       deadline: opts.timeLimit ? now + opts.timeLimit * 1000 : undefined,
-      fallbackIdx: n - 1,
+      fallbackIdx,
     };
   }
   if (game.kind === 'hold') {
@@ -164,14 +170,14 @@ export function buildWaterSpec(
   const drops: Drop[] = [];
   let id = 0;
   for (let i = 0; i < total; i++) {
-    const p = place(ship, 12 + i * 7, ((i * 7919) % 11) - 5);
+    const p = place(ship, 10 + i * 5.5, ((i * 7919) % 9) - 4);
     drops.push({ id: id++, ...p, good: true, label: game.kind === 'rhythm' ? game.verb : game.good });
   }
   for (let i = 0; i < bads; i++) {
-    const p = place(ship, 15 + i * 9 + 3, (i % 2 ? 1 : -1) * (3 + (i % 3)));
+    const p = place(ship, 13 + i * 7, (i % 2 ? 1 : -1) * (3 + (i % 3)));
     drops.push({ id: id++, ...p, good: false, label: game.kind === 'rhythm' ? '偏' : game.bad });
   }
-  const secs = game.kind === 'rhythm' ? 24 : game.secs + 14;
+  const secs = 14 + total * 4;
   return {
     kind: 'catch',
     verb: game.kind === 'rhythm' ? `${game.verb} · ${game.label}` : game.verb,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Encounter, Outcome } from '../world/encounters';
 import { waterLive, type WaterResult } from '../world/waterGame';
 
@@ -90,18 +90,21 @@ export function EncounterOverlay({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, said]);
 
+  /** 这一场什么时候开始做事：比它早的结果都是上一场的 */
+  const playAt = useRef(0);
   useEffect(() => {
+    if (phase === 'play') playAt.current = performance.now();
     onPhase?.(phase);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
   // 船做完了：把水上的结果换成这一场的结局
   useEffect(() => {
-    if (phase !== 'play' || !waterResult) return;
+    if (phase !== 'play' || !waterResult || waterResult.at <= playAt.current) return;
     const g = enc.game;
     if (waterResult.kind === 'gates' && g.kind === 'choice') {
       const o = g.options[waterResult.idx] ?? g.options[g.options.length - 1];
-      finish(o.out, o.label);
+      finish(waterResult.timedOut ? { ...o.out, text: `没来得及决定。${o.out.text}` } : o.out, waterResult.timedOut ? `没来得及 · ${o.label}` : o.label);
     } else if (waterResult.kind === 'ring') {
       finish(waterResult.won ? enc.win! : enc.lose!, waterResult.won ? '成' : '未成');
     } else if (waterResult.kind === 'catch') {

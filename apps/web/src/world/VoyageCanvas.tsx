@@ -433,6 +433,8 @@ function Rig({
   onWaterDone,
 }: Props) {
   const waterDoneFor = useRef<number>(0);
+  /** 每道门被船头对准了多久 */
+  const gateAim = useRef<Record<number, number>>({});
   const ship = useRef<THREE.Group>(null);
   const rock = useRef<THREE.Group>(null);
   const exterior = useRef<THREE.Group>(null);
@@ -624,9 +626,13 @@ function Rig({
       if (collectedIds.includes(f.id)) continue;
       // 不在这一条航道上的东西，既看不见也拾不到
       if (f.lane !== 'both' && f.lane !== laneId) continue;
-      const dx = g.position.x - f.x;
-      const dz = g.position.z - f.z;
-      if (dx * dx + dz * dz < f.pickupRadius * f.pickupRadius) nearFragment = f.id;
+      const staged = !!encounterFor(f.id)?.stage;
+      const cx = staged ? f.x + ISLAND_OFFSET.x : f.x;
+      const cz = staged ? f.z + ISLAND_OFFSET.z : f.z;
+      const rr = staged ? 6.2 + world.ship.radius * 0.3 + 3.5 : f.pickupRadius;
+      const dx = g.position.x - cx;
+      const dz = g.position.z - cz;
+      if (dx * dx + dz * dz < rr * rr) nearFragment = f.id;
     }
 
     let nearPortal: string | null = null;
@@ -697,8 +703,21 @@ function Rig({
             }
           });
           waterLive.target = nd < 9 && nearest >= 0 ? water.gates[nearest] : mid;
-          if (nd < 2.8) result = { kind: 'gates', idx: nearest };
-          else if (water.deadline && now > water.deadline) result = { kind: 'gates', idx: water.fallbackIdx ?? water.gates.length - 1 };
+          // 把船头对准某道门、并且往前开，也算选它：岛缝里开不到门心，指得准就算数
+          if (input.forward > 0) {
+            const hd = Math.atan2(tmpFwd.x, -tmpFwd.z);
+            water.gates.forEach((gt, i) => {
+              const bd = Math.atan2(gt.x - g_pos_x(), gt.z - g_pos_z());
+              let err = bd - hd;
+              while (err > Math.PI) err -= Math.PI * 2;
+              while (err < -Math.PI) err += Math.PI * 2;
+              const d = Math.hypot(gt.x - g_pos_x(), gt.z - g_pos_z());
+              gateAim.current[i] = Math.abs(err) < 0.36 && d < 30 ? (gateAim.current[i] ?? 0) + clamped : 0;
+              if (gateAim.current[i] > 0.6) result = { kind: 'gates', idx: i, at: now };
+            });
+          }
+          if (nd < 4.2) result = { kind: 'gates', idx: nearest, at: now };
+          else if (water.deadline && now > water.deadline) result = { kind: 'gates', idx: water.fallbackIdx ?? water.gates.length - 1, at: now, timedOut: true };
         } else if (water.kind === 'ring' && water.ring) {
           const r = water.ring;
           const d = Math.hypot(r.x - g_pos_x(), r.z - g_pos_z());
@@ -713,8 +732,8 @@ function Rig({
             g.position.x += ox * k + Math.sin(now * 0.0021) * 0.6 * clamped;
             g.position.z += oz * k + Math.cos(now * 0.0017) * 0.6 * clamped;
           }
-          if (waterLive.insideSec >= r.secs) result = { kind: 'ring', won: true };
-          else if (water.deadline && now > water.deadline) result = { kind: 'ring', won: false };
+          if (waterLive.insideSec >= r.secs) result = { kind: 'ring', won: true, at: now };
+          else if (water.deadline && now > water.deadline) result = { kind: 'ring', won: false, at: now };
         } else if (water.kind === 'catch' && water.drops) {
           let nearestGood: { x: number; z: number } | null = null;
           let nd = Infinity;
@@ -738,8 +757,8 @@ function Rig({
           }
           waterLive.target = nearestGood;
           const need = water.need ?? 1;
-          if (waterLive.got >= need) result = { kind: 'catch', won: true, got: waterLive.got };
-          else if (!nearestGood || (water.deadline && now > water.deadline)) result = { kind: 'catch', won: waterLive.got >= need, got: waterLive.got };
+          if (waterLive.got >= need) result = { kind: 'catch', won: true, got: waterLive.got, at: now };
+          else if (!nearestGood || (water.deadline && now > water.deadline)) result = { kind: 'catch', won: waterLive.got >= need, got: waterLive.got, at: now };
         }
         if (result) {
           waterDoneFor.current = water.startedAt;
@@ -764,8 +783,8 @@ function Rig({
           }
         }
       }
-      // 岛：船开不上去，贴着边滑过去，不扣耐久
-      if (!autopilot) {
+      // 岛：船开不上去，贴着边滑过去，不扣耐久。正在跟你说话做事时，地形不挡道
+      if (!autopilot && !water) {
         for (const f of world.fragments) {
           if (!encounterFor(f.id)?.stage) continue;
           const ix = f.x + ISLAND_OFFSET.x;
@@ -782,10 +801,10 @@ function Rig({
           }
         }
       }
-      // 礁石：撞上就弹开、掉速、扣耐久
+      // 礁石：撞上就弹开、掉速、扣耐久。做事时不撞
       reefHit.current = 0;
       reefNear.current = Infinity;
-      if (!autopilot) {
+      if (!autopilot && !water) {
         for (const rf of seaNow.reefs) {
           const dx = g.position.x - rf.x;
           const dz = g.position.z - rf.z;

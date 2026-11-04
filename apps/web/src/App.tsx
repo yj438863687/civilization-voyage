@@ -6,6 +6,7 @@ import { kernelBeat } from './crew';
 import { VoyageCanvas, type CamMode, type ControlInput, type ShipSnapshot } from './world/VoyageCanvas';
 import { laneStops, worldFor, type WorldConfig } from './world/world.config';
 import { stanceFor } from './world/stances';
+import { laneSealFor } from './world/laneSeals';
 import { chartSummary } from './world/chart';
 import { BOOST_NAME, addPath, addSupply, hullHit, loadBoard, pushBoard, repairHull, scoreOutcome, applyOutcome, encounterFor, freshStats, loadStats, metLine, saveStats, trustLine, type Outcome, type VoyageStats } from './world/encounters';
 import { EncounterOverlay } from './components/Encounter';
@@ -411,7 +412,14 @@ export function App() {
     [voyage?.scene_id, scenePick?.id],
   );
   const portPlace = sea.ports[0];
-  const stance = useMemo(() => stanceFor(voyage?.scene_id ?? scenePick?.id), [voyage?.scene_id, scenePick?.id]);
+  const stance = useMemo(() => {
+    const base = stanceFor(voyage?.scene_id ?? scenePick?.id);
+    const seal = laneSealFor(voyage?.scene_id, laneId);
+    if (!base) return null;
+    if (!seal) return base;
+    // 这条线自己的刻度：港口那一下要收束的是两座岛和危机里做过的事
+    return { ...base, axis: { question: seal.question, left: seal.left, right: seal.right, choices: seal.choices } };
+  }, [voyage?.scene_id, scenePick?.id, laneId]);
   /**
    * 靠港戏的主角：这一程最后拾到的那件东西。
    * 什么都没拾就靠港，就用这条航道上的标志物 —— 戏不能没有主角。
@@ -1255,7 +1263,8 @@ export function App() {
   const guideTarget = useMemo(() => {
     if (sealedHere && sea.portal) return { x: sea.portal.x, z: sea.portal.z };
     const next = laneStops(sea, laneId).find((f) => !collectedIds.has(f.id));
-    if (next) return { x: next.x, z: next.z };
+    // 铜针指岛，不指岛背后那个看不见的点
+    if (next) return encounterFor(next.id)?.stage ? { x: next.x + ISLAND_OFFSET.x, z: next.z + ISLAND_OFFSET.z } : { x: next.x, z: next.z };
     // 东西收齐了，还有一场躲不开的事在前面
     if (story && !progress.crisis.includes(story.crisis.id)) return story.crisis.at;
     return portPlace ?? null;
@@ -1366,7 +1375,7 @@ export function App() {
           <div className={`hud hud-tl${view === 'world' ? ' hud-world' : ' scrim'}`}>
             {view === 'world' ? (
               <div className="hud-world-card">
-                <div className="hud-quest">{voyage?.question || '未形成文化问题'}</div>
+                <div className="hud-quest">{story?.logline ?? voyage?.question ?? ''}</div>
                 {/* 靠近一件实物时，先告诉眼睛"那是什么"，文字后补 */}
                 {nearFrag ? (
                   <div className="hud-relic" key={nearFrag.id}>
@@ -1956,7 +1965,7 @@ export function App() {
                           // 印落下：先让这一下被看见，再把人送回海上去找门
                           setSealBeat({
                             pick: pick.label,
-                            epilogue: stance.epilogue,
+                            epilogue: laneSealFor(voyage?.scene_id, laneId)?.epilogue(progress.state, pick.label) ?? stance.epilogue,
                             met: metLine(statsRef.current, voyage?.scene_id ?? 'test'),
                           });
                           // 港口给这一程补一次给养、修一次船；这条航线在精神图谱上亮起；这一程的分上榜
