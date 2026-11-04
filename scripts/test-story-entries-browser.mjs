@@ -37,8 +37,9 @@ try{
       const voyage=await request('/voyages',{title:`Desktop feedback ${key}`,scene_id:era,scene_version:3,scene_track:'candidate',question:route.question});voyage.world={lane};
       const {page,context}=await pageAt(voyage,{x:target.x-game.storyReach(era)+1.5,z:target.z},{beats:story.beats.map(beat=>beat.id),crisis:[],shore:[],state:{}});
       await page.locator('.interact-prompt').filter({hasText:scene.title}).waitFor();await page.keyboard.press('e');await page.getByRole('button',{name:/进入故事/}).click();
+      await page.locator('.voyage-challenge').waitFor({timeout:10000}).catch(async error=>{console.error('FEEDBACK_SMOKE',errors,(await page.locator('body').innerText()).slice(-6000));await page.screenshot({path:join(root,'.impeccable/review/feedback-smoke-failure.png')});throw error;});
       if(era==='B'){
-        for(const name of ['加煤','加煤','带动机器'])await page.getByRole('button',{name,exact:true}).click();
+        for(const name of ['加煤','加煤','带动机器'])await page.getByRole('button',{name,exact:true}).click({timeout:5000}).catch(async error=>{console.error('ENGINE_SMOKE',errors,(await page.locator('body').innerText()).slice(-6000));await page.screenshot({path:join(root,'.impeccable/review/feedback-smoke-failure.png')});throw error;});
         await page.waitForFunction(()=>document.querySelector('.challenge-feedback')?.getAttribute('data-cue')==='work');
         assert((await page.locator('.engine-gauges').innerText()).includes('做功 2/8'));assert(await page.locator('.flywheel').evaluate(element=>element.getAnimations().length>0));
         await page.screenshot({path:join(root,'.impeccable/review/desktop-feedback-live.png')});
