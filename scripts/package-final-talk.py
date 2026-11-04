@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Package the final English talk: one MP4 and one editable presentation."""
-import hashlib,re,shutil,zipfile,subprocess,tempfile
+import hashlib,re,shutil,zipfile,subprocess,tempfile,argparse
 from pathlib import Path
 from pptx import Presentation
 ROOT=Path(__file__).resolve().parents[1]
-WORK=ROOT/'.impeccable/final-talk'
+parser=argparse.ArgumentParser();parser.add_argument('--work',type=Path,default=ROOT/'.impeccable/final-talk');parser.add_argument('--slides',type=int,default=18);parser.add_argument('--output',type=Path,default=Path.home()/'Desktop/Civilization-Voyage-Final');args=parser.parse_args()
+WORK=args.work
 PPT=WORK/'English/Civilization-Voyage-Deep-Sea-Pitch-EN.pptx'
 MOVIE=WORK/'Video/Civilization-Voyage-Demo-EN.mp4'
 slides=Presentation(PPT).slides
-assert len(slides)==18
+assert len(slides)==args.slides
 for index,slide in enumerate(slides):
     assert len(slide.notes_slide.notes_text_frame.text)>200,(index,'Missing speaker notes')
     for shape in slide.shapes:
@@ -19,7 +20,7 @@ with zipfile.ZipFile(PPT) as archive:
     movies=[name for name in archive.namelist() if name.endswith('.mp4')]
     assert len(movies)==1
     assert hashlib.sha256(archive.read(movies[0])).digest()==hashlib.sha256(MOVIE.read_bytes()).digest()
-folder=Path.home()/'Desktop/Civilization-Voyage-Final'
+folder=args.output
 folder.mkdir(exist_ok=True)
 expected={'Civilization-Voyage-Presentation.pptx','Civilization-Voyage-Demo.mp4'}
 assert {p.name for p in folder.iterdir()}<=expected,'Preserve unexpected files; choose a new output folder'
@@ -37,5 +38,5 @@ with tempfile.TemporaryDirectory(prefix='voyage-unpack-check-') as temporary:
     assert len(unpacked)==2
     for p in unpacked:
         assert hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256((folder/p.name).read_bytes()).digest()
-print('Verified: 18 English slides, speaker notes, exact MP4 embedded, two-file ZIP, actual macOS extraction.')
+print(f'Verified: {len(slides)} English slides, speaker notes, exact MP4 embedded, two-file ZIP, actual macOS extraction.')
 print(path,path.stat().st_size,'bytes')
