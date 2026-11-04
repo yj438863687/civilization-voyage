@@ -2,7 +2,7 @@ import { crisisAnchor, fragmentAnchor, inStoryReach } from './world/storyAccess'
 import { STORY_ARCS } from './world/storyArcs';
 import { CHALLENGES } from './world/challenges';
 import { historyFor } from './world/history';
-import { HistoryArrival, RouteTimeline } from './components/History';
+import { HistoryArrival, RouteTimeline, StoryCouncil } from './components/History';
 import { PresentationDemo } from './components/PresentationDemo';
 import { CULTURE_CORPUS, DEMO_ROUTES, type DemoRoute, type publicDemoSnapshot } from './world/presentationDemo';
 import { ShipyardDialog } from './components/Shipyard';
@@ -787,7 +787,7 @@ export function App() {
       }
       setChat([]);
       await loadVoyage(created.id, 'cockpit');
-      setWorkspaceOpen(true);
+      setWorkspaceOpen(false);
       await refreshLists();
     } catch (e) {
       setError(errText(e));
@@ -1627,7 +1627,7 @@ export function App() {
             </button>
             <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => void goReflect()}>日志</button>
             <button className="btn btn-icon hud-action" type="button" disabled={!!enc || !!crisis || !!secret || shoreOpen || storyPage || !!sealBeat || !!intro} title="按 B 打开，航行会暂停" onClick={() => setYardOpen(true)}>船坞与换装 · B</button>
-            <button className="btn btn-icon hud-action" type="button" disabled={!voyage||!!enc||!!crisis||!!secret||shoreOpen||yardOpen} onClick={()=>{setInput({forward:0,turn:0});setWorkspaceOpen(true);}}>驾驶舱与Agents</button><button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
+            <button className="btn btn-icon hud-action" type="button" disabled={!voyage||!!enc||!!crisis||!!secret||shoreOpen||yardOpen} onClick={()=>{setInput({forward:0,turn:0});setWorkspaceOpen(true);}}>船上书房 · 资料与模型</button><button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setReduceMotion((v) => !v)}>
               {reduceMotion ? '减少动态开' : '减少动态'}
             </button>
@@ -1958,8 +1958,9 @@ export function App() {
                 );
               })}
             </div>
+            {historyFor(voyage.scene_id,laneId)&&<StoryCouncil key={`${voyage.id}-${laneId}`} route={historyFor(voyage.scene_id,laneId)!}/>}
             <div className="cine-actions">
-              <button className="btn" type="button" onClick={()=>setWorkspaceOpen(true)}>与船员商议任务与线路</button>
+              <button className="cine-link" type="button" onClick={()=>setWorkspaceOpen(true)}>船上书房 · 可选资料与模型设置</button>
               <SealButton label="出海" disabled={busy} hint="" onSeal={() => void departNow()} />
               <button className="cine-link" type="button" onClick={() => setView('embark')}>换一段</button>
             </div>
@@ -2135,7 +2136,7 @@ export function App() {
       {/* 航海日志：同样没有卡片。图、印、材料都浮在画面上 */}
       {view === 'reflection' && voyage && (
         <div className="cine-scroll">
-          <div className="cine-inner cine-journal"><button className="btn" type="button" onClick={()=>setWorkspaceOpen(true)}>查看共建港城、Agent记录与知识检索</button>
+          <div className="cine-inner cine-journal"><button className="btn" type="button" onClick={()=>setWorkspaceOpen(true)}>和船员整理见闻 · 共建港城</button>
             <div className="cine-kicker">
               {voyage.title}
               <span className="cine-tag">省 · 回头看这一程</span>
