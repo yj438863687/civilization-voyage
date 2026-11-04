@@ -1,0 +1,551 @@
+{
+  "title": "文明航程：技术与文明的关系",
+  "subtitle": "五人课程演讲与商业BP",
+  "version": 1,
+  "date": "2026-11-04",
+  "duration_seconds": 900,
+  "names": {
+    "A": "同学A",
+    "B": "同学B",
+    "C": "同学C",
+    "D": "同学D",
+    "E": "AI工具与商业BP"
+  },
+  "roles": {
+    "A": "玄览玄通 · 文化理解",
+    "B": "和而不同 · 路径比较",
+    "C": "知行合一 · 文明重现",
+    "D": "整体产品 · 实机Demo",
+    "E": "AI工具 · 商业BP落地"
+  },
+  "slides": [
+    {
+      "speaker": "A",
+      "seconds": 45,
+      "title": "技术越来越强，文明怎样跟上？",
+      "subtitle": "文明航程｜一段能对话、能行动、能回头看的文化旅程",
+      "bullets": [
+        "问题：技术能力与共同生活如何相处",
+        "载体：同一艘船、四个时代、八条历史航程",
+        "产物：有出处的碎片、人的选择、可见的文明成果"
+      ],
+      "notes": "大家好，我们展示的是文明航程。它从一个问题开始：技术越来越强之后，文明怎样跟上？我们把农业、工业、信息与人工智能四个时代放进同一个航海游戏。玩家不只是读知识，而是带着问题出发，亲手完成故事中的操作，决定技术怎样用于共同生活。接下来五个人分别从文化理解、路径比较、文明实践、产品演示和商业落地来说明。",
+      "kind": "hero",
+      "image": "04-three-chapters",
+      "extra": {},
+      "en": {
+        "title": "As technology grows stronger, how does civilization keep pace?",
+        "subtitle": "Civilization Voyage | A cultural journey from inquiry to action",
+        "bullets": [
+          "Our question: technical capability and shared life",
+          "One ship, four eras, eight historical routes",
+          "Evidence, human choices and a visible civilization artifact"
+        ],
+        "notes": "Good afternoon. Our project is Civilization Voyage. We begin with a question: as technology becomes more powerful, how does civilization keep pace? The game follows agriculture, industry, information and artificial intelligence. Players do more than read facts. They discuss a cultural question, visit historical islands, operate small systems and decide how technical capabilities should serve shared life. Five speakers will explain cultural understanding, route comparison, civilization building, the actual product and its business case. Our central idea is that technology creates possibilities, while people remain responsible for the choices that shape a civilization."
+      }
+    },
+    {
+      "speaker": "A",
+      "seconds": 60,
+      "title": "驾驶舱里，先把问题问清楚",
+      "subtitle": "玄览玄通｜LLM参与提问，船长保留决定权",
+      "bullets": [
+        "大副：追问依据与尚未证实的部分",
+        "二副：追问谁受益、谁承担代价",
+        "共同确认的问题，进入同一条游戏航程"
+      ],
+      "notes": "这是游戏中的文化驾驶舱。我们给大副和二副安排不同的职责：一位追问依据，一位追问受影响的人。Claude和GPT是可配置的工具，不是两种文明的代名词，这些角色职责是我们设计的。没有密钥时，界面明确标注为预设引导；接入真实模型后，每次请求由玩家主动发起。讨论形成的文化问题会交给后面的线路、岛屿与反思，不会停留在一个独立聊天窗口。",
+      "kind": "image",
+      "image": "01-cockpit",
+      "extra": {},
+      "en": {
+        "title": "Clarify the question before setting sail",
+        "subtitle": "Cultural understanding | Models advise; the captain decides",
+        "bullets": [
+          "First mate: ask for evidence and uncertainty",
+          "Second mate: ask who benefits and who bears the cost",
+          "Carry one shared question into the same game voyage"
+        ],
+        "notes": "This is the cultural cockpit inside the existing game. We give the first mate and second mate different responsibilities. One asks what supports a claim; the other asks who is affected. Claude and GPT are configurable tools, not representatives of different civilizations. These perspectives are designed roles. When no API key is configured, the interface explicitly identifies the guidance as scripted. With a real connection, each request is initiated by the player. The cultural question then travels into the selected route, historical encounters and final reflection. It does not remain in a separate chat window."
+      }
+    },
+    {
+      "speaker": "A",
+      "seconds": 45,
+      "title": "有来源，才有继续讨论的起点",
+      "subtitle": "材料、解释与创作分开",
+      "bullets": [
+        "史实背景、古代传说、未来推演分别标注",
+        "历史配图保留作者、来源与许可",
+        "文明重建是采用文化经验的创作成果"
+      ],
+      "notes": "我们把三种内容分开：材料的历史背景，玩家和船员对材料的解释，以及游戏为了互动而创作的情境。比如治水传说不能当作有可靠纪年的史实，未来港口也不能说成已经发生过的事件。图片保留出处和授权，最后建成的港城明确属于创作。这样既能发挥想象，也不会让模型输出取代来源。",
+      "kind": "evidence",
+      "image": "03-first-island",
+      "extra": {},
+      "en": {
+        "title": "A source is a starting point, not a final judgment",
+        "subtitle": "Separate historical material, interpretation and creative design",
+        "bullets": [
+          "Label history, ancient legends and future scenarios",
+          "Keep image attribution and original references",
+          "Treat the rebuilt port as a creative artifact"
+        ],
+        "notes": "We distinguish three layers: historical material, interpretations of that material, and situations created for interaction. A flood-control legend is not presented as a securely dated event. A future port is not described as something that has already happened. Images retain attribution and links to their original sources. The port built at the end is clearly a creative artifact informed by cultural experience. This separation allows imaginative learning without letting either a model response or a game mechanic replace evidence. Players can revisit the original references and question the conclusions they draw."
+      }
+    },
+    {
+      "speaker": "B",
+      "seconds": 60,
+      "title": "海域与方法，是两个不同的选择",
+      "subtitle": "和而不同｜先选中国或世界，再选投入的步骤",
+      "bullets": [
+        "内海：中国；外海：世界",
+        "轻装线：少量材料与一次核对",
+        "考察线：三章材料、反例与两方案比较"
+      ],
+      "notes": "这里有两个维度。内海与外海决定我们沿着中国还是世界的历史前进；轻装线与考察线决定怎样研究同一个问题。轻装线先整理少量材料，做一次核对；考察线保留三章记录，再追问反例并比较方案。我们把成本对应到实际步骤，避免直接用模型价格给观点排序。花得更多可以多做核查，但不能因此免去对证据的判断。",
+      "kind": "image",
+      "image": "02-route",
+      "extra": {},
+      "en": {
+        "title": "Choose a sea, then choose a method",
+        "subtitle": "Route comparison | Geography and research depth are separate decisions",
+        "bullets": [
+          "Inner sea: China | Outer sea: the wider world",
+          "Light route: selected materials and one source check",
+          "Inquiry route: three chapters, counterexamples and alternatives"
+        ],
+        "notes": "There are two independent choices. The inner and outer seas determine whether the voyage follows Chinese or world history. The light and inquiry routes determine how the same question is investigated. The light route starts with a smaller set of materials and one check. The inquiry route retains all three chapter records, asks counterexamples and compares alternatives. We connect cost to observable steps rather than ranking views by the price of a model. More preparation can support more checking, but a conclusion still has to be assessed against the evidence and the people affected by the decision."
+      }
+    },
+    {
+      "speaker": "B",
+      "seconds": 60,
+      "title": "两本账：游戏资源与真实调用",
+      "subtitle": "筹备补给会影响航程，API账单由上游计量",
+      "bullets": [
+        "轻装线准备6份补给，考察线准备12份",
+        "同一航程只记一次准备，不重复扣除",
+        "真实请求另记模型、输入Token与输出Token"
+      ],
+      "notes": "这张账表区分两件事。线路筹备消耗游戏中的补给，分别是六份和十二份，还要给船上留下口粮。补给会继续影响真实游戏里的航行、故事安排和船只改造，因此是有后果的选择。API费用则来自真实服务商，另记请求次数和Token，不把补给、HMT或人民币混在一起。返回工作台时不会再扣一次准备成本；没有真实调用就如实显示零次。",
+      "kind": "ledger",
+      "image": "02-route",
+      "extra": {},
+      "en": {
+        "title": "Two ledgers: game supplies and real API usage",
+        "subtitle": "Preparation changes the voyage; the provider meters real calls",
+        "bullets": [
+          "Light route: 6 supplies | Inquiry route: 12 supplies",
+          "Charge preparation once per voyage",
+          "Record real requests and input/output tokens separately"
+        ],
+        "notes": "The product keeps two ledgers. Route preparation consumes game supplies: six for the light route or twelve for the inquiry route, while preserving a minimum food reserve. Those supplies continue to matter during navigation, historical choices and ship refits. Real API usage is different. We record the model, request count and input and output tokens. We do not equate food, HMT or Chinese yuan with API tokens. Reopening the workbench does not charge preparation again. If no real model request has been made, the product reports zero requests rather than inventing usage or cost figures."
+      }
+    },
+    {
+      "speaker": "B",
+      "seconds": 30,
+      "title": "比较的重点，是多做了什么",
+      "subtitle": "成本对应步骤，结论仍须看依据",
+      "bullets": [
+        "保留不同建议，显示具体核查动作",
+        "遇到反例，可以修改原先的安排",
+        "用行动结果回看路径，而不是用价格宣布胜负"
+      ],
+      "notes": "我们希望玩家比较的是，多看了什么材料，多检查了哪一个前提，以及最后的安排有没有照顾到被忽略的人。不同意见会留下来。等到航程结束，再用行动结果评估路径，这就是和而不同在产品里的具体体现。",
+      "kind": "quote",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "Compare the work performed, then revisit the decision",
+        "subtitle": "A higher price does not replace evidence",
+        "bullets": [
+          "Keep different suggestions visible",
+          "Revise a premise when a counterexample matters",
+          "Judge the path through actions and outcomes"
+        ],
+        "notes": "The useful comparison is what additional work was performed: which materials were read, which premise was checked, and whether the final arrangement considered people who might otherwise be overlooked. Different suggestions remain visible. At the end, players revisit the route using their actions and outcomes. This is how we turn harmony without uniformity into a concrete product behavior."
+      }
+    },
+    {
+      "speaker": "C",
+      "seconds": 60,
+      "title": "文化碎片来自玩家真正完成的故事",
+      "subtitle": "知行合一｜Agents整理实际记录",
+      "bullets": [
+        "在现有海图航行，依次完成三章操作",
+        "资料员整理已收入的材料与原始来源",
+        "复核员与建造员等待足够的实际记录"
+      ],
+      "notes": "文化碎片不是点击一个按钮就凭空出现的。玩家需要在现有海图里到岛上读故事、连渠试水、安排物资，并确认每一章的结果。资料员只整理这条航程已经完成的内容；资料还不够时，复核和建造就不能提前结束。Agent的输入、动作、输出和关联材料都能查看，因此我们展示的是可观察的工作流，而不是看不到执行依据的一句结论。",
+      "kind": "image",
+      "image": "05-agents",
+      "extra": {},
+      "en": {
+        "title": "Cultural fragments come from completed game encounters",
+        "subtitle": "Learning through action | Agents work on actual voyage records",
+        "bullets": [
+          "Navigate the existing map and complete three chapters",
+          "The researcher organizes collected material and references",
+          "Verification and planning wait for sufficient evidence"
+        ],
+        "notes": "Cultural fragments do not appear simply because a button says collect. Players navigate the existing game map, read a historical story, connect canals or arrange cargo, and confirm the consequences of their decisions. The researcher can only organize material from encounters completed in this voyage. Verification and final planning remain unavailable until all three chapters are complete. Each agent exposes its input, tool action, output and source references. We therefore demonstrate an observable workflow. We do not present an unexplained model answer as proof that an action or a source check has taken place."
+      }
+    },
+    {
+      "speaker": "C",
+      "seconds": 60,
+      "title": "由人批准，港城才会建成",
+      "subtitle": "同一航程、同一日志、同一座原港口",
+      "bullets": [
+        "比较产能与共同生活的表达方式",
+        "玩家批准后生成文明成果记录",
+        "原海图上的港口同步改变，不重复发放奖励"
+      ],
+      "notes": "Agent可以提出方案，但最后由玩家批准。港城的仓库、工坊、学堂和住屋表达不同的取舍，它不是某一座历史城市的复原。批准后，成果会写入本航程的后端日志，原海图上的港口也会改变。补给和人心仍沿用岛屿里已经发生的结算，建城展示不会再奖励一次。这样，讨论、操作和文明成果就连在同一段游戏经历里。",
+      "kind": "image",
+      "image": "06-city",
+      "extra": {},
+      "en": {
+        "title": "The port is built only after human approval",
+        "subtitle": "One voyage, one journal and the same original harbor",
+        "bullets": [
+          "Compare production and shared-life arrangements",
+          "Write the approved civilization artifact into the voyage log",
+          "Update the existing harbor without duplicating rewards"
+        ],
+        "notes": "The agents can propose a plan, but the player approves it. Warehouses, workshops, schools and homes express different priorities. This is not a reconstruction of a specific historical city. Approval creates an artifact record in the same voyage journal and changes the original harbor on the existing map. Supplies and trust continue to reflect the actual chapter outcomes; displaying the city does not award those resources a second time. This links discussion, practical interaction and a civilization artifact within one game experience, rather than placing a separate demonstration beside the game."
+      }
+    },
+    {
+      "speaker": "C",
+      "seconds": 30,
+      "title": "反思，再带着证据出发",
+      "subtitle": "检索是回到材料的办法",
+      "bullets": [
+        "回顾实际的来源、成本与安排",
+        "本地检索返回片段和原始链接",
+        "接入模型后，可生成带引用的检索增强回答"
+      ],
+      "notes": "最后回到材料。当前已经实现本地关键词检索和带来源的提取式摘要；接入模型后，可以把取回的材料交给模型作引用回答。检索不是自动事实认证，玩家仍需区分材料与判断。我们希望反思能变成下一轮更具体的问题。",
+      "kind": "image",
+      "image": "07-reflection",
+      "extra": {},
+      "en": {
+        "title": "Reflect, then return to the evidence",
+        "subtitle": "Retrieval reopens the question",
+        "bullets": [
+          "Review actual sources, preparation and decisions",
+          "Retrieve local fragments with original reference links",
+          "Use a connected model for an optional cited answer"
+        ],
+        "notes": "Reflection returns the player to the material. The current build includes local keyword retrieval and an extractive summary with sources. When a model is connected, the retrieved fragments can be passed into a cited generated answer. Retrieval is not automatic fact certification. The goal is to turn a broad conclusion into a more specific question for the next voyage."
+      }
+    },
+    {
+      "speaker": "D",
+      "seconds": 120,
+      "title": "现在，走完一条真实游戏路径",
+      "subtitle": "实机演示｜驾驶舱 → 航线 → 岛屿 → Agents → 港城",
+      "bullets": [
+        "启动桌面App，进入农业时代",
+        "完成三章的实际操作与共同生活安排",
+        "批准港城，返回原港口，再查看反思"
+      ],
+      "notes": "操作提示：现场版从桌面App启动农业时代，先展示驾驶舱和两条线路，再演示第一岛的连渠与选择。完整实机录像包含三章航行、操作、Agents、建城与反思；时间紧时播放两分钟快览，原速录像同时保留。录像来自实际点击和WASD航行，不跳写完成状态；船员预设引导和零次真实模型调用均在画面中标注。播放后指出港城改变的是同一条游戏航程的原港口。",
+      "kind": "demo",
+      "image": "08-world-city",
+      "extra": {},
+      "en": {
+        "title": "Watch one complete route through the actual game",
+        "subtitle": "Live product | Cockpit, route, islands, agents, port and reflection",
+        "bullets": [
+          "Start the desktop app and select the agricultural era",
+          "Complete chapter operations and shared-life decisions",
+          "Approve the port, return to the map and inspect the record"
+        ],
+        "notes": "We will now show the product rather than another diagram. The recording follows actual interface actions and keyboard navigation through the existing game. It includes the three historical encounters, the agents, approval of the port and reflection. Scripted crew guidance and the absence of paid model calls are visible in the interface. No completion flags are injected to skip the encounters. Please notice that the final harbor is the same harbor on this voyage, and that the artifact is saved in the same journal. [Play the complete walkthrough or the short captioned version.]"
+      }
+    },
+    {
+      "speaker": "D",
+      "seconds": 60,
+      "title": "验收看结果，也看没有发生的副作用",
+      "subtitle": "来自本机测试记录",
+      "bullets": [
+        "三章操作、真实碎片、Agent与成果记录闭环",
+        "准备仅扣一次，建城不重复结算",
+        "退出、刷新恢复、手机触控与音画反馈回归"
+      ],
+      "notes": "我们验证了完整闭环，也验证副作用。准备补给只扣一次，重新打开工作台不会再收费；建城不会重复奖励。实际材料、文明成果和反思都能在同一条航程的后端记录中查到。原有十二种玩法、船坞、退出和手机触控也做了回归。需要说明的是，真实Claude和GPT接口的请求格式与失败分支已经测试，但当前没有账户密钥，所以没有把模拟传输测试说成付费服务已实调。",
+      "kind": "checks",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "Verify the outcome and the absence of unwanted side effects",
+        "subtitle": "Evidence from local end-to-end tests",
+        "bullets": [
+          "Real chapters feed the agent and artifact workflow",
+          "One preparation charge; no duplicate construction reward",
+          "Check exits, restoration, touch controls and audiovisual feedback"
+        ],
+        "notes": "We test both completion and side effects. Preparation is charged once; reopening the workbench does not charge it again. Building the port does not duplicate chapter rewards. Materials, the civilization artifact and reflection can be inspected in the same backend voyage records. Existing minigames, the shipyard, exits and touch controls are also covered by regression checks. We should be precise about model integration: official request formats, response parsing and failure paths have been tested with simulated transport. No provider account key was configured, so we do not describe those tests as completed paid Claude or GPT calls."
+      }
+    },
+    {
+      "speaker": "E",
+      "seconds": 50,
+      "title": "LLM → API → Agents → 检索与反思",
+      "subtitle": "AI工具不是功能清单，而是一条可解释的工作链",
+      "bullets": [
+        "LLM：提出问题、比较解释、辅助复核",
+        "API Key：授权调用；API：执行与记录用量",
+        "Agents：使用工具；人：批准；检索：回到来源"
+      ],
+      "notes": "我负责AI工具与商业BP落地。这里最重要的是把概念分清。LLM参与理解、表达和复核；API Key是身份和计费凭据，不是思考能力本身。API负责发出请求、返回结果和记录用量。Agents把工具组织成检索、核对和规划的动作，人保留批准权。反思阶段再把问题送回知识检索。产品价值来自这条工作链，而不是简单堆叠几个模型名称。",
+      "kind": "architecture",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "LLM, API, agents and retrieval form one explainable workflow",
+        "subtitle": "AI tools and business implementation",
+        "bullets": [
+          "LLM: inquiry, interpretation and assisted review",
+          "API key: authorization | API: execution and usage records",
+          "Agents use tools; humans approve; retrieval returns to sources"
+        ],
+        "notes": "My responsibility is AI tools and business implementation. The first requirement is to separate the concepts. An LLM helps with interpretation, expression and review. An API key identifies and authorizes access; it is not itself a level of intelligence. The API sends a request and returns a result with usage information. Agents organize tools into retrieval, checking and planning steps, while a human keeps approval authority. Reflection can then reopen the evidence through retrieval. The value is this connected workflow, not a collection of fashionable model names or a claim that one brand inherently understands a culture better."
+      }
+    },
+    {
+      "speaker": "E",
+      "seconds": 50,
+      "title": "把成本、密钥和失败都做成可管理的边界",
+      "subtitle": "已实现的接入方式",
+      "bullets": [
+        "Key仅留页面内存，经本机接口直连官方服务",
+        "每次请求由用户点击，显示真实Token用量",
+        "重复请求保护；超时不自动再次付费调用"
+      ],
+      "notes": "落地还要回答三件事：凭据放哪里，费用怎样看，出错怎么办。我们把密钥留在当前页面内存，不写进游戏存档、PPT或导出记录；请求经本机接口到官方服务。每次调用由用户点击，实际Token另记。重复请求有保护，超时后不会自动再调用一次。线路的准备补给和真实模型账单分开，这能让后续课堂预算与商业成本都保持可追溯。",
+      "kind": "architecture-small",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "Make credentials, cost and failure manageable",
+        "subtitle": "Implemented connection boundaries",
+        "bullets": [
+          "Keep keys in page memory; forward through a loopback gateway",
+          "Initiate each real request explicitly and record token usage",
+          "Protect duplicate requests; never automatically repeat an uncertain paid call"
+        ],
+        "notes": "Implementation also requires operational boundaries. Keys remain in page memory and are not written into game saves, presentation files or exported records. The loopback gateway forwards a request to the selected official provider. Each call is initiated explicitly, and actual token usage is recorded separately from game supplies. Duplicate requests are protected. If an upstream timeout makes the outcome uncertain, the product does not automatically send another paid request. These controls help teachers or future customers understand and manage spending. They also preserve an honest distinction between a reproducible local workflow and a live model-assisted session."
+      }
+    },
+    {
+      "speaker": "E",
+      "seconds": 60,
+      "title": "先验证一门课，再扩展到更多文化场景",
+      "subtitle": "商业BP｜优先客群是假设，尚无付费验证",
+      "bullets": [
+        "首批验证：大学通识、人文与AI工具课程",
+        "交付：课堂航程、教师引导、来源与反思记录",
+        "付费单元：班级/学期授权＋文化内容包"
+      ],
+      "notes": "我们的首批验证客群是大学通识、人文与AI工具课程。这是基于产品结构提出的客群假设，并不代表已经有学校合作。老师获得的是一条可组织的课堂航程、讨论引导和可复核的学习过程；学生得到的不是一份生成答案，而是一次带证据作出安排的经历。商业上先验证按班级或学期授权，再考虑文化内容包和文博轻定制。早期先解决老师是否愿意重复使用，而不是急着宣称规模化。",
+      "kind": "business",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "Validate one course before expanding the market",
+        "subtitle": "Business plan | Target customers remain a hypothesis",
+        "bullets": [
+          "First test: university humanities and AI-literacy courses",
+          "Deliver a classroom voyage, teaching prompts and evidence records",
+          "Test class/term licensing, then cultural content packages"
+        ],
+        "notes": "Our first customer hypothesis is university general education, humanities and AI-literacy courses. This follows from the product structure; it is not a claim that a university has already become a customer. Teachers would receive an organized classroom voyage, discussion prompts and an inspectable learning process. Students would receive an evidence-based experience of making a decision, rather than just a generated answer. We would first validate class or term licensing, then consider cultural content packages and limited customization for cultural institutions. Early on, repeat use by teachers matters more than an unsupported story about immediate scale."
+      }
+    },
+    {
+      "speaker": "E",
+      "seconds": 70,
+      "title": "一张能改参数的试点账表",
+      "subtitle": "情景测算，不是服务商报价或收入预测",
+      "bullets": [
+        "试验报价假设：999元/班·4周，40人",
+        "1920轮 × 0.03元/轮假设＝57.6元模型成本",
+        "再计审核、支持与运维；单独看成本敏感性"
+      ],
+      "notes": "为了让BP可以讨论，我们提供一组可替换的情景参数，不把它当成已验证定价。假设四十人上四周，每人每周十二轮，共一千九百二十轮。若每轮平均模型成本假设为三分钱，模型部分是五十七点六元，再加内容审核一百六十元、支持八十元和运维二十元，总可变成本三百一十七点六元。假设试验报价为九百九十九元，贡献余额为六百八十一点四元，尚未扣研发、获客和税费。真实试点要用导出的Token与工时替换这些假设，并看高成本情形是否仍可承受。",
+      "kind": "economics",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "A pilot model with editable assumptions",
+        "subtitle": "Illustrative economics, not a provider quote or revenue forecast",
+        "bullets": [
+          "Assume CNY 999 per class: 40 students over four weeks",
+          "1,920 interactions × CNY 0.03 assumed average cost = CNY 57.60",
+          "Add review, support and hosting; test cost sensitivity"
+        ],
+        "notes": "To make the business plan discussable, we provide replaceable assumptions. Assume forty students, four weeks and twelve interactions per student per week: that is one thousand nine hundred and twenty interactions. At an assumed average model cost of three fen each, the model component is fifty-seven yuan and sixty fen. Add one hundred and sixty yuan for content review, eighty for support and twenty for hosting. Total variable cost is three hundred and seventeen yuan and sixty fen. Against an experimental class price of nine hundred and ninety-nine yuan, contribution is six hundred and eighty-one yuan and forty fen, before development, acquisition and tax. These are not validated prices. A pilot must replace the assumptions with actual token usage and labor, and test the higher-cost scenario."
+      }
+    },
+    {
+      "speaker": "E",
+      "seconds": 40,
+      "title": "下一步，用可验证的试点决定是否继续",
+      "subtitle": "技术提供能力，文明由共同的判断塑造",
+      "bullets": [
+        "招募一门课，验证完整航程与来源回溯",
+        "访谈教师：是否愿意再用、愿为哪项价值付费",
+        "用真实用量、审核工时与反馈更新BP"
+      ],
+      "notes": "下一步我们希望招募一门课做小范围试点。先看学生能否走完、来源能否回溯、反思能否把证据和判断分开，再问老师愿不愿意重复使用，愿意为什么价值付费。用真实调用和审核工时更新成本，符合预设门槛再扩展。我们的核心观点是：技术提供能力，文明需要共同的判断；文明航程把这件事变成可以亲手做、也可以回头检查的过程。",
+      "kind": "closing",
+      "image": "08-world-city",
+      "extra": {},
+      "en": {
+        "title": "Let a verifiable pilot determine the next step",
+        "subtitle": "Technology enables; shared judgment shapes civilization",
+        "bullets": [
+          "Test completion, source traceability and evidence-based reflection",
+          "Ask teachers whether and why they would use it again",
+          "Update the business case with actual usage, labor and feedback"
+        ],
+        "notes": "The next step is a small course pilot. First ask whether students can complete a voyage, whether references remain traceable, and whether reflection separates evidence from judgment. Then ask teachers whether they would use it again, and which value they would pay for. Real usage and review time should replace our cost assumptions before expansion. Our conclusion is simple: technology creates capabilities, while civilization requires shared judgment. Civilization Voyage turns that relationship into something people can act on, inspect and reconsider."
+      }
+    },
+    {
+      "speaker": "附录",
+      "seconds": 0,
+      "title": "五人分工与交接",
+      "subtitle": "主讲15分钟；扩展问答与原速演示另计",
+      "bullets": [
+        "A 文化理解：01—03页；B 路径比较：04—06页",
+        "C 文明实践：07—09页；D 产品演示：10—11页",
+        "E AI工具与商业BP：12—16页"
+      ],
+      "notes": "姓名未提供，暂按仓库A—E岗位制作。A交接：问题已经明确，接下来比较怎样走。B交接：路径选好，看看能做成什么。C交接：理念进入操作，交给D演示。D交接：产品闭环已展示，交给E解释工具与落地。E负责总结与商业相关问答。",
+      "kind": "team",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "Five speakers, one handoff chain",
+        "subtitle": "15-minute main presentation; optional appendix and discussion",
+        "bullets": [
+          "A: Cultural understanding, slides 01–03 | B: Route comparison, 04–06",
+          "C: Civilization practice, 07–09 | D: Product demo, 10–11",
+          "E: AI tools and business plan, slides 12–16"
+        ],
+        "notes": "Names have not been supplied, so the deck uses the repository's A–E role assignments. Handoffs: A passes from a clear question to route comparison. B passes from the route to action. C passes from the design principle to the actual product. D passes from product evidence to E's implementation and business case. E leads the closing and business-related questions."
+      }
+    },
+    {
+      "speaker": "附录",
+      "seconds": 0,
+      "title": "答辩时，把边界说清楚",
+      "subtitle": "常见追问",
+      "bullets": [
+        "离线引导明确标注；真实模型服务仍需账户Key",
+        "本地关键词检索不等于事实认证或完整向量RAG",
+        "客群、定价、贡献余额与试点指标均待验证"
+      ],
+      "notes": "问：不是现场调用LLM是否造假？答：界面明确标注预设台词，Agent和游戏操作是真正执行；接口可接真实模型，但当前没有Key，不声称已经实调。问：为什么高价路线不保证更好？答：费用只购买更多步骤，结果仍看材料和人的判断。问：RAG能避免幻觉吗？答：检索提供证据，不保证资料正确；没有依据应明确说不知道。问：已有商业客户吗？答：没有据此作任何已成交声明，当前是可演示原型与待验证BP。",
+      "kind": "questions",
+      "image": null,
+      "extra": {},
+      "en": {
+        "title": "Be precise about what has and has not been demonstrated",
+        "subtitle": "Questions for discussion",
+        "bullets": [
+          "Scripted guidance is labeled; live provider access still needs an account key",
+          "Keyword retrieval is neither fact certification nor a full vector-RAG claim",
+          "Customer, price, contribution and pilot targets still require validation"
+        ],
+        "notes": "Is the offline guidance misleading? No: it is labeled as scripted, while the game and tool workflow actually execute. Are the agents all autonomous LLMs? No: they are observable tool workflows with optional model assistance and human approval. Does a more expensive route guarantee a better result? No: it purchases additional steps, not correctness. Does retrieval remove hallucination? No: sources still need checking, and missing evidence must be acknowledged. Do we already have paying customers? No such claim is made; this is a functioning prototype and a business hypothesis awaiting pilot evidence."
+      }
+    },
+    {
+      "speaker": "附录",
+      "seconds": 0,
+      "title": "材料与技术参考",
+      "subtitle": "保留可核对的出处",
+      "bullets": [
+        "游戏：本仓库历史片段、图片授权与实机记录",
+        "技术：OpenAI Responses API、Claude Messages API",
+        "课程：iSpace入口需登录，评分标准尚未取得"
+      ],
+      "notes": "技术文档核对日期为2026年11月4日。模型型号是可修改的示例，不承诺任何账户均有权限。课程入口目前跳转登录页，未获取课程作业与评分标准，因此没有宣称已逐项满足课程评分要求。历史背景的来源与图片许可仍在游戏各站的来源栏目中。",
+      "kind": "sources",
+      "image": null,
+      "extra": {
+        "links": [
+          {
+            "title": "项目与当前PR",
+            "url": "https://github.com/yj438863687/civilization-voyage/pull/8",
+            "title_en": "Project and current pull request"
+          },
+          {
+            "title": "OpenAI官方开发快速开始",
+            "url": "https://developers.openai.com/api/docs/quickstart",
+            "title_en": "Official OpenAI developer quickstart"
+          },
+          {
+            "title": "GPT-5.4 mini模型文档（可配置示例）",
+            "url": "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+            "title_en": "GPT-5.4 mini documentation (editable example)"
+          },
+          {
+            "title": "Claude Messages官方接口",
+            "url": "https://platform.claude.com/docs/en/api/messages/create",
+            "title_en": "Official Claude Messages API"
+          },
+          {
+            "title": "iSpace课程入口（需登录）",
+            "url": "https://ispace.bnbu.edu.cn/my/",
+            "title_en": "iSpace course portal (login required)"
+          }
+        ]
+      },
+      "en": {
+        "title": "References and evidence",
+        "subtitle": "Original sources and explicit implementation boundaries",
+        "bullets": [
+          "Game material, image attribution and actual test records in the project",
+          "Official OpenAI Responses and Claude Messages documentation",
+          "iSpace requires login; the course marking rubric was not accessible"
+        ],
+        "notes": "Technical documentation was checked on November 4, 2026. Model identifiers are editable examples, not a promise of account access. The provided iSpace address redirects to a login page. We have not accessed the assignment or marking rubric and therefore do not claim rubric-by-rubric compliance. Original-language historical references and image licenses remain available in the game."
+      }
+    }
+  ],
+  "financial_assumptions": {
+    "students": 40,
+    "weeks": 4,
+    "rounds_per_student_per_week": 12,
+    "pilot_price_cny": 999,
+    "per_round_cny": 0.03,
+    "review_cost_cny": 160,
+    "support_cost_cny": 80,
+    "hosting_cny": 20,
+    "sensitivity_per_round_cny": [
+      0.01,
+      0.03,
+      0.15
+    ],
+    "note": "全部为演算假设，需以试点真实用量和工时替换；不是服务商报价，未包含研发、获客、税费。"
+  },
+  "title_en": "Civilization Voyage: Technology and Shared Life",
+  "subtitle_en": "Five-person presentation and business case",
+  "roles_en": {
+    "A": "Cultural Understanding",
+    "B": "Route Comparison",
+    "C": "Civilization Practice",
+    "D": "Product and Live Demo",
+    "E": "AI Tools and Business Plan"
+  }
+}

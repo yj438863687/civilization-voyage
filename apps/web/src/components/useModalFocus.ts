@@ -1,8 +1,9 @@
 import { useEffect, type RefObject } from 'react';
 
 /** Keep keyboard navigation inside an open story, and return to its entry control. */
-export function useModalFocus(panel: RefObject<HTMLElement>) {
+export function useModalFocus(panel: RefObject<HTMLElement>, active = true) {
   useEffect(() => {
+    if(!active)return;
     const element = panel.current;
     if (!element) return;
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -23,5 +24,5 @@ export function useModalFocus(panel: RefObject<HTMLElement>) {
       document.removeEventListener('focusin', contain);
       if (previous?.isConnected) previous.focus();
     };
-  }, [panel]);
+  }, [panel,active]);
 }

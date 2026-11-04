@@ -15,3 +15,10 @@ __pycache__/
 
 # Local visual review screenshots
 .impeccable/review/
+
+# Generated rehearsal recordings, slides and private voyage exports
+.impeccable/presentation/
+deliverables/
+apps/web/public/presentation/*.pptx
+apps/web/public/presentation/*.pdf
+apps/web/public/presentation/*.mp4

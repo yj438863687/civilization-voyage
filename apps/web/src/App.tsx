@@ -3,6 +3,8 @@ import { STORY_ARCS } from './world/storyArcs';
 import { CHALLENGES } from './world/challenges';
 import { historyFor } from './world/history';
 import { HistoryArrival, RouteTimeline } from './components/History';
+import { PresentationDemo } from './components/PresentationDemo';
+import { CULTURE_CORPUS, DEMO_ROUTES, type DemoRoute, type publicDemoSnapshot } from './world/presentationDemo';
 import { ShipyardDialog } from './components/Shipyard';
 import { MusicDirector, MusicControls } from './components/VoyageMusic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -320,6 +322,8 @@ export function App() {
   const [bootError, setBootError] = useState<string | null>(null);
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem(MOTION_KEY) === '1' || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [comms, setComms] = useState(false);
+  const [workspaceOpen,setWorkspaceOpen]=useState(false);
+  const preparingWorkspace=useRef(false);
   const [webgl, setWebgl] = useState(true);
   const [title, setTitle] = useState('玄览一问');
   const [scenePick, setScenePick] = useState<Scene | null>(null);
@@ -413,7 +417,7 @@ export function App() {
   const encRef = useRef<string | null>(null);
   // 听人说话、看结果时船停下；轮到你做事时，键盘归船
   const nestedEncounter = !!(enc && encounterFor(enc)?.history) || !!(crisis && historyFor(voyage?.scene_id, laneId));
-  encRef.current = yardOpen ? 'shipyard' : nestedEncounter ? (enc ?? crisis) : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
+  encRef.current = workspaceOpen ? 'workspace' : yardOpen ? 'shipyard' : nestedEncounter ? (enc ?? crisis) : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
   const shipRef = useRef<ShipSnapshot | null>(null);
 
   useEffect(() => {
@@ -783,6 +787,7 @@ export function App() {
       }
       setChat([]);
       await loadVoyage(created.id, 'cockpit');
+      setWorkspaceOpen(true);
       await refreshLists();
     } catch (e) {
       setError(errText(e));
@@ -1030,7 +1035,7 @@ export function App() {
 
   /** 靠近一件东西：有人守着就先打照面、做一件事；没人守着就直接收 */
   function startEncounter(id: string | null = nearFragment) {
-    if (!id || view!=='world' || enc || crisis || secret || busy || yardOpen || landing>0) return;
+    if (!id || view!=='world' || enc || crisis || secret || busy || yardOpen || workspaceOpen || landing>0) return;
     if(id==='shore'){if(!nearPort){setError('再靠近港口，按F靠岸后回顾这一程。');return;}void dock();return;}
     if(story?.crisis.id===id){startCrisis();return;}
     const fragment=sea.fragments.find(fragment=>fragment.id===id);
@@ -1045,7 +1050,7 @@ export function App() {
   }
 
   function startCrisis() {
-    if(!story||!voyage||view!=='world'||enc||crisis||secret||busy||yardOpen||landing>0)return;
+    if(!story||!voyage||view!=='world'||enc||crisis||secret||busy||yardOpen||workspaceOpen||landing>0)return;
     if(!shipRef.current||!inStoryReach(shipRef.current,crisisAnchor(story),voyage.scene_id)){setError(`再靠近「${story.crisis.kicker}」的图片标识，按E进入。`);return;}
     const unfinished=historyFor(voyage.scene_id,laneId)?.islands.find(island=>!progress.state[`history:${island.id}`]&&!collectedIds.has(island.id));
     if(unfinished&&!progress.crisis.includes(story.crisis.id)){setError(`先完成「${unfinished.title}」，再进入第三章。`);return;}
@@ -1155,6 +1160,32 @@ export function App() {
   const crisisMissing=story&&progress.crisis.includes(story.crisis.id)?undefined:historyFor(voyage?.scene_id,laneId)?.islands.find(island=>!progress.state[`history:${island.id}`]&&!collectedIds.has(island.id));
   const replayEncounter=!!enc&&(!!progress.state[`history:${enc}`]||collectedIds.has(enc));
   const replayCrisis=!!story&&progress.crisis.includes(story.crisis.id);
+  const workspaceHistory=historyFor(voyage?.scene_id,laneId);
+  const workspaceFragments=workspaceHistory?[...workspaceHistory.islands,workspaceHistory.crisis].filter(scene=>!!progress.state[`history:${scene.id}`]||collectedIds.has(scene.id)||(scene.id===workspaceHistory.crisis.id&&!!story&&progress.crisis.includes(story.crisis.id))).map(scene=>CULTURE_CORPUS.find(chunk=>chunk.id===scene.id)!).filter(Boolean):[];
+  async function prepareWorkspace(mission:string,kind:DemoRoute){
+    if(!voyage||preparingWorkspace.current)return;preparingWorkspace.current=true;
+    try{
+      const current=await api.records(voyage.id),prior=current.find(record=>record.kind==='log'&&record.text.startsWith('线路准备记录\n'));
+      if(prior){const saved=JSON.parse(prior.text.slice(prior.text.indexOf('\n')+1));if(saved.route!==kind)throw new Error('本航程已经确认另一种准备方式；可新开航程比较，当前不会重复扣除补给。');}
+      else{
+        const cost=DEMO_ROUTES[kind].cost;if(statsRef.current.supply-cost<15)throw new Error(`需要${cost}份准备补给，并至少留下15份口粮。`);
+        await api.addRecord(voyage.id,{kind:'log',text:'线路准备记录\n'+JSON.stringify({route:kind,supply_cost:cost,mission}),classification:'creative',sources:[],material_ids:[],version:1,access:'private'});
+        updateStats(previous=>({...previous,supply:Math.max(0,previous.supply-cost),log:[...previous.log,`${DEMO_ROUTES[kind].name}准备：用去${cost}份补给，API费用另记。`].slice(-40)}));
+      }
+      const selected=ROUTES.find(route=>route.id===(kind==='deep'?'deep':'simple'))!;setQuestion(mission);setRouteId(selected.id);
+      await persist({stage:'world',question:mission,route:selected,world:{...worldState(voyage,shipRef.current,'at-sea',sea),lane:laneId}});
+      setRecords(await api.records(voyage.id));setView('world');
+    }finally{preparingWorkspace.current=false;}
+  }
+  async function approveWorkspace(snapshot:ReturnType<typeof publicDemoSnapshot>){
+    if(!voyage||workspaceFragments.length<3)throw new Error('先在当前海图上完成三章故事，再批准文明成果。');
+    const current=await api.records(voyage.id);
+    if(!current.some(record=>record.kind==='artifact'&&record.text.startsWith('文明共建成果\n'))){await api.addRecord(voyage.id,{kind:'artifact',text:'文明共建成果\n'+JSON.stringify({...snapshot,game_supply:statsRef.current.supply,game_trust:statsRef.current.trust}),classification:'creative',sources:workspaceFragments.map(item=>({id:item.id,title:item.source.title,url:item.source.url,license:'见原始来源许可',verification:'unverified' as const})),material_ids:workspaceFragments.map(item=>item.id),version:1,access:'private'});}
+    markProgress(previous=>({...previous,state:{...previous.state,'city:built':snapshot.priority,'city:style':snapshot.city_style}}));
+    setRecords(await api.records(voyage.id));
+  }
+  async function reflectWorkspace(text:string){if(!voyage)return;await api.addRecord(voyage.id,{kind:'reflection',text,classification:'creative',sources:workspaceFragments.map(item=>({id:item.id,title:item.source.title,url:item.source.url,license:'见原始来源许可',verification:'unverified' as const})),material_ids:workspaceFragments.map(item=>item.id),version:1,access:'private'});setRecords(await api.records(voyage.id));}
+
   actRef.current.canInteract=!!nearFragment||nearCrisis;
   actRef.current.collect=()=>{if(nearFragment)startEncounter();else if(nearCrisis)startCrisis();};
 
@@ -1188,7 +1219,7 @@ export function App() {
 
   // 船经过旁白点、危机点：戏自己发生
   useEffect(() => {
-    if (view !== 'world' || !ship || enc || crisis || secret || landing > 0 || intro) return;
+    if (view !== 'world' || !ship || enc || crisis || secret || workspaceOpen || landing > 0 || intro) return;
     // 暗线 · 桃花源：铜针不指它，只有顺着桃花瓣才找得到
     const era = voyage?.scene_id ?? '';
     const tao = stats.secrets.taoyuan;
@@ -1253,7 +1284,7 @@ export function App() {
         return;
       }
     }
-  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id]);
+  }, [view, story, ship, enc, crisis, secret, landing, intro, caption, progress, markProgress, stats.secrets.taoyuan, voyage?.scene_id, workspaceOpen]);
 
   function finishSecret(o: Outcome, summary: string) {
     if (!voyage) return;
@@ -1383,13 +1414,13 @@ export function App() {
 
   return (
     <>
-      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||shoreOpen||yardOpen}/>
+      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||shoreOpen||yardOpen||workspaceOpen}/>
       {webgl ? (
         <VoyageCanvas
           key={voyage?.id ?? 'dock'}
           mode={camMode}
           reduceMotion={reduceMotion}
-          canSail={view === 'world' && !yardOpen && !nestedEncounter && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
+          canSail={view === 'world' && !workspaceOpen && !yardOpen && !nestedEncounter && !sealBeat && (encPhase === 'play' || (!enc && !crisis && !secret))}
           water={water}
           onWaterDone={(r) => {
             setWaterResult(r);
@@ -1596,7 +1627,7 @@ export function App() {
             </button>
             <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => void goReflect()}>日志</button>
             <button className="btn btn-icon hud-action" type="button" disabled={!!enc || !!crisis || !!secret || shoreOpen || storyPage || !!sealBeat || !!intro} title="按 B 打开，航行会暂停" onClick={() => setYardOpen(true)}>船坞与换装 · B</button>
-            <button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
+            <button className="btn btn-icon hud-action" type="button" disabled={!voyage||!!enc||!!crisis||!!secret||shoreOpen||yardOpen} onClick={()=>{setInput({forward:0,turn:0});setWorkspaceOpen(true);}}>驾驶舱与Agents</button><button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setReduceMotion((v) => !v)}>
               {reduceMotion ? '减少动态开' : '减少动态'}
             </button>
@@ -1741,6 +1772,7 @@ export function App() {
         />
       )}
 
+      {voyage&&<PresentationDemo key={`workspace-${voyage.id}`} open={workspaceOpen} voyageId={voyage.id} mission={question||voyage.question} sceneLabel={EPOCH_INTRO[voyage.scene_id]?.era??voyage.title} laneId={laneId} lanes={sea.lanes??[]} fragments={workspaceFragments} supply={stats.supply} trust={stats.trust} onLaneChange={setLaneId} onPrepare={prepareWorkspace} onApprove={approveWorkspace} onReflection={reflectWorkspace} onClose={()=>setWorkspaceOpen(false)}/>}
       {yardOpen && <ShipyardDialog stats={stats} sceneId={(view==='embark'?scenePick?.id:voyage?.scene_id) ?? 'A'} allowPurchase={view!=='embark'} onUpdate={updateStats} onClose={() => setYardOpen(false)} />}
       {/* 合：岸上的人 */}
       {view === 'port' && shoreOpen && story && historyFor(voyage?.scene_id, laneId) && <HistoryArrival route={historyFor(voyage?.scene_id, laneId)!} state={progress.state} onDone={() => { setShoreOpen(false); if (voyage) markProgress(previous => ({ ...previous, shore: [...previous.shore, voyage.id] })); }} />}
@@ -1927,6 +1959,7 @@ export function App() {
               })}
             </div>
             <div className="cine-actions">
+              <button className="btn" type="button" onClick={()=>setWorkspaceOpen(true)}>与船员商议任务与线路</button>
               <SealButton label="出海" disabled={busy} hint="" onSeal={() => void departNow()} />
               <button className="cine-link" type="button" onClick={() => setView('embark')}>换一段</button>
             </div>
@@ -2102,7 +2135,7 @@ export function App() {
       {/* 航海日志：同样没有卡片。图、印、材料都浮在画面上 */}
       {view === 'reflection' && voyage && (
         <div className="cine-scroll">
-          <div className="cine-inner cine-journal">
+          <div className="cine-inner cine-journal"><button className="btn" type="button" onClick={()=>setWorkspaceOpen(true)}>查看共建港城、Agent记录与知识检索</button>
             <div className="cine-kicker">
               {voyage.title}
               <span className="cine-tag">省 · 回头看这一程</span>
@@ -2187,7 +2220,7 @@ export function App() {
       {comms && (
         <div className="drawer">
           <h2 className="display title-panel">通讯台</h2>
-          <p className="muted">这里只查看模型是否已接入。本基础版不在网页里填密钥，避免写进浏览器。要接模型，请到 apps/api 按 .env.example 配置后重启后端。没接也能把测试航程走完。</p>
+          <p className="muted">文化驾驶舱支持本次页面内存中的Claude/GPT密钥接入，凭据不写入存档。这里保留查看服务器预配置模型的入口；两种接法均可使用，真实费用与剧情资源分账。</p>
           <div className={connected ? '' : 'unconnected'}>
             {connected
               ? models.map((m) => (
@@ -2200,7 +2233,7 @@ export function App() {
           <p className="muted">
             HMT：{health?.hmt ?? 'unknown'}。真实费用与剧情资源分账。
           </p>
-          <p className="faint">在 apps/api 导出 VOYAGE_MODEL_URL / NAME / KEY 后重启后端。</p>
+          <button className="btn" type="button" disabled={!voyage} onClick={()=>{setComms(false);setWorkspaceOpen(true);}}>进入驾驶舱设置模型</button><p className="faint">服务器预配置仍可使用 VOYAGE_MODEL_URL / NAME / KEY。</p>
           <button className="btn btn-ghost" type="button" onClick={() => setComms(false)}>关闭</button>
         </div>
       )}
