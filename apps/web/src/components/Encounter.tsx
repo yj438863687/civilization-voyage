@@ -106,7 +106,7 @@ export function EncounterOverlay({
       const o = g.options[waterResult.idx] ?? g.options[g.options.length - 1];
       finish(waterResult.timedOut ? { ...o.out, text: `没来得及决定。${o.out.text}` } : o.out, waterResult.timedOut ? `没来得及 · ${o.label}` : o.label);
     } else if (waterResult.kind === 'ring') {
-      finish(waterResult.won ? enc.win! : enc.lose!, waterResult.won ? '成' : '未成');
+      finish(waterResult.won ? enc.win! : enc.lose!, waterResult.won ? '做成了' : '没做成');
     } else if (waterResult.kind === 'catch') {
       finish(waterResult.won ? enc.win! : enc.lose!, `接住 ${waterResult.got}`);
     }
@@ -145,7 +145,7 @@ export function EncounterOverlay({
   return (
     <div className={`enc${crisis ? ' is-crisis' : ''}${secret ? ' is-secret' : ''}`} role="dialog" aria-label={`${enc.who}：${title}`}>
       <div className="enc-scrim" aria-hidden />
-      {crisis && <span className="enc-crisis">{title}</span>}
+      {crisis && <span className="enc-crisis">{title.startsWith('转') ? `${title} · 出事了` : title}</span>}
       {secret && <span className="enc-secret">暗线 · {title} · 引文出自陶渊明《桃花源记》</span>}
       <div className="enc-who">
         <span className="enc-name">{enc.who}</span>
@@ -173,7 +173,7 @@ export function EncounterOverlay({
           <p className="enc-result-delta">
             <Delta label="补给" v={out.o.supply} />
             <Delta label="人心" v={out.o.trust} />
-            {!crisis && !secret && <span className="enc-got">收入货舱 · {title}</span>}
+            {!crisis && !secret && <span className="enc-got">记进航海日志 · {title}</span>}
           </p>
         </div>
       )}

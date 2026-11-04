@@ -2,12 +2,20 @@ import { useEffect, useState } from 'react';
 import type { FableState } from '../world/fable';
 import { STORIES, type Beat, type Story } from '../world/stories';
 
+/** 起承转合：中国叙事的四步。字留着，但每一步在故事里是什么，要让玩家一眼看懂 */
+const ACT_GLOSS: Record<string, string> = { 起: '故事开始', 承: '一路所见', 转: '出事了', 合: '靠岸' };
+function glossKicker(kicker: string) {
+  const act = kicker.trim().charAt(0);
+  const gloss = ACT_GLOSS[act];
+  return gloss ? `${kicker} · ${gloss}` : kicker;
+}
+
 /** 承：船过时浮出来的一段旁白。左上是这一幕叫什么，下面是一句话 */
 export function StoryCaption({ beat, title }: { beat: Beat; title: string }) {
   return (
     <div className="story-cap" key={beat.id} aria-live="polite">
       <span className="story-cap-title">「{title}」</span>
-      <span className="story-cap-kicker">{beat.kicker}</span>
+      <span className="story-cap-kicker">{glossKicker(beat.kicker)}</span>
       <p className="story-cap-text">{beat.text}</p>
     </div>
   );

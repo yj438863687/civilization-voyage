@@ -210,7 +210,7 @@ type GuideCtx = {
 function guide(view: View, ctx: GuideCtx) {
   if (view === 'embark') {
     return {
-      step: '第 1 拍 · 问',
+      step: '问 · 想弄清什么',
       title: '先选海域，再开一条航程',
       body: ctx.connected
         ? '右边每张卡片只问一件事。启航港是练习的第一程；泉州、集装箱、漂浮港仍待组员确认。起个名字，开一条。大副和二副已在席。'
@@ -220,7 +220,7 @@ function guide(view: View, ctx: GuideCtx) {
   }
   if (view === 'cockpit') {
     return {
-      step: ctx.crewReplies > 0 ? '第 2 拍 · 查' : '第 1 拍 · 问',
+      step: ctx.crewReplies > 0 ? '查 · 先看依据' : '问 · 想弄清什么',
       title: '你想弄清什么？',
       body: '左边是大副与二副。中间问一件你想理解的事。大副查依据，二副问谁还没开口。他们只对照，不替你下结论。问题和一句理由齐了，按住落印。',
       next: !ctx.hasQuestion ? '先写下你想弄清的一件事。' : !ctx.hasReason ? '写下问题和一句理由，才能落印。' : '按住落印，确认此行的问题。',
@@ -228,9 +228,9 @@ function guide(view: View, ctx: GuideCtx) {
   }
   if (view === 'route') {
     return {
-      step: '第 4 拍 · 行',
+      step: '行 · 出海',
       title: '选一条路，去港口做事',
-      body: '问题已经落下。两条路线粗细颜色一样。步骤多不等于更对，费用高也不等于更文明。没接入计价时显示「尚未接入」。',
+      body: '两条航线各有一座岛、一次危机、一位岸上的人。粗细颜色一样：没有哪条更对。',
       next: '选一条，按「按此航线启航」。出海后按 E 靠过去、F 靠港。',
     };
   }
@@ -247,7 +247,7 @@ function guide(view: View, ctx: GuideCtx) {
             ? `铜针已对准 ${ctx.portName}。再靠近一些，压进港区就会提示靠港。`
             : '铜针对准目的港，按 W 前进。';
     return {
-      step: '第 4 拍 · 行',
+      step: '行 · 出海',
       title: ctx.nearPort ? '已经靠近港口' : '朝海图上的目的港航行',
       body: ctx.nearPort ? ctx.nearHint : ctx.seaHint,
       next,
@@ -255,7 +255,7 @@ function guide(view: View, ctx: GuideCtx) {
   }
   if (view === 'port') {
     return {
-      step: `第 4 拍 · 行 · ${ctx.portTitle}`,
+      step: `行 · 靠岸 · ${ctx.portTitle}`,
       title: '用材料做一件事',
       body: ctx.portBody,
       next: ctx.unusedFragments > 0 ? '选一份材料，用它说明你的安排。' : '打开一份材料，先看它从哪里来。',
@@ -263,7 +263,7 @@ function guide(view: View, ctx: GuideCtx) {
   }
   if (view === 'collaborate') {
     return {
-      step: '第 2 拍 · 查',
+      step: '查 · 先看依据',
       title: '过程要看得见，选择由你来定',
       body: ctx.connected
         ? '船员查阅时只列出可观察事件。大副问依据，二副问谁被看见。你可以都不采纳。'
@@ -272,7 +272,7 @@ function guide(view: View, ctx: GuideCtx) {
     };
   }
   return {
-    step: '第 5 拍 · 省',
+    step: '省 · 回头看这一程',
     title: '你相信了什么？又凭什么相信？',
     body: '材料与出处在上面。两本账分开。下面三问帮你回看：信了什么、求快时漏了什么、后来的人还能不能改。',
     next: '带上没解决的问题，再走一程。',
@@ -1401,14 +1401,15 @@ export function App() {
             ) : (
               <>
                 <div className="label">{voyage?.title ?? '文明航程'}</div>
-                <div>{voyage?.question || '未形成文化问题'}</div>
+                <div>{voyage?.question || ''}</div>
                 <StageBar current={beat.current} reached={beat.reached} />
                 <StatusBanner kind={status.kind} text={status.text} />
               </>
             )}
           </div>
           <div className={`hud hud-tr${view === 'world' ? ' hud-tr-world' : ' scrim'}`}>
-            {view !== 'world' && (
+            {/* 用量、余额、测试货舱这些账目对玩家没有意义，不再显示 */}
+            {false && (
             <Ledgers
               connected={connected}
               usage={usage}
@@ -1482,16 +1483,16 @@ export function App() {
                     {stats.score}
                   </span>
                 </div>
-                <div className="hud-stats" aria-label="补给与人心">
-                  <span className={`hud-stat is-hull${stats.hull < 30 ? ' is-low' : ''}`}>
+                <div className="hud-stats" aria-label="船身、补给与人心">
+                  <span className={`hud-stat is-hull${stats.hull < 30 ? ' is-low' : ''}`} title="船身：船体还剩多少。撞礁会掉，掉到 0 船只剩一半速度。">
                     船身 <b>{stats.hull}</b>
                     <i style={{ width: `${stats.hull}%` }} />
                   </span>
-                  <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`}>
+                  <span className={`hud-stat${stats.supply < 15 ? ' is-low' : ''}`} title="补给：船上的粮和水。按 Shift 全速会烧补给，烧光了船走不快。">
                     补给 <b>{stats.supply}</b>
                     <i style={{ width: `${stats.supply}%` }} />
                   </span>
-                  <span className="hud-stat is-trust">
+                  <span className="hud-stat is-trust" title="人心：船员信你几分。岸上和海上的每一次选择都会改变它。">
                     人心 <b>{stats.trust}</b>
                     <i style={{ width: `${stats.trust}%` }} />
                   </span>
@@ -1816,7 +1817,7 @@ export function App() {
               {EPOCH_INTRO[voyage.scene_id]?.era ?? '启航港'}
               <span className="cine-tag">这一程问的是</span>
             </div>
-            <p className="cine-line cine-q cine-depart-q">{question || voyage.question || '未形成文化问题'}</p>
+            <p className="cine-line cine-q cine-depart-q">{question || voyage.question || ''}</p>
             <p className="cine-line cine-prompt">两条航道都到同一个港，路上遇见的东西不一样</p>
             <div className="cine-costs">
               {(sea.lanes ?? []).map((lane) => {
@@ -1922,6 +1923,7 @@ export function App() {
           <div className="cine-inner">
             <div className="cine-kicker">
               {portPlace?.name ?? ports[0]?.name}
+              <span className="cine-tag">落印 · 把你这一程的站位盖在海图上</span>
             </div>
 
             {stance ? (
@@ -1957,7 +1959,7 @@ export function App() {
                   <SealButton
                     label="按住落印"
                     disabled={busy || stanceIdx == null}
-                    hint="在刻度上选一个位置。"
+                    hint="先在上面三个位置里选一个，再按住。"
                     onSeal={() => {
                       if (!voyage || stanceIdx == null) return;
                       const pick = stance.axis.choices[stanceIdx];
@@ -2013,7 +2015,7 @@ export function App() {
           <div className="cine-inner cine-journal">
             <div className="cine-kicker">
               {voyage.title}
-              <span className="cine-tag">第 5 拍 · 省</span>
+              <span className="cine-tag">省 · 回头看这一程</span>
             </div>
 
             {struck.length > 0 && (

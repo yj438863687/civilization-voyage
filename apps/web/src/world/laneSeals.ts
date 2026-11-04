@@ -19,8 +19,8 @@ export interface LaneSeal {
 export const LANE_SEALS: Record<string, LaneSeal> = {
   'A-near': {
     question: '水来了。你今天站在堵的这一边，还是疏的这一边？',
-    left: '堵',
-    right: '疏',
+    left: '堵 · 把水挡住',
+    right: '疏 · 给水一条路',
     choices: [
       { label: '先堵住再说', note: '眼前的屋子保住了，水去哪里，明年再想。' },
       { label: '堵一半，留一条路', note: '堤要修，口子也要留。' },
@@ -37,8 +37,8 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
   },
   'A-far': {
     question: '收成到了。先记下来，还是先存起来？',
-    left: '记',
-    right: '存',
+    left: '记 · 刻下日子',
+    right: '存 · 装满罐子',
     choices: [
       { label: '先把日子刻下来', note: '知道什么时候下种，比多存一罐更要紧。' },
       { label: '一边刻，一边存', note: '仓颉的字和后稷的罐，缺一个都过不了冬。' },
@@ -51,8 +51,8 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
   },
   'B-near': {
     question: '炉子还在烧。你给机器多少，给炉前的人多少？',
-    left: '机器',
-    right: '人',
+    left: '机器 · 先让它跑',
+    right: '人 · 先问炉前的人',
     choices: [
       { label: '先让机器跑起来', note: '快了，所有人都受益——至少账上是这样。' },
       { label: '机器跑，班次也要定', note: '让它跑，但炉前的人几点换班要写进账本。' },
@@ -65,8 +65,8 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
   },
   'B-far': {
     question: '外面的世界看见了。你先学，还是先做？',
-    left: '学',
-    right: '做',
+    left: '学 · 先看清外面',
+    right: '做 · 先修一段路',
     choices: [
       { label: '先把书读完', note: '林则徐的窗、魏源的书，先看清再动手。' },
       { label: '边学边修', note: '书印出去，铁轨也铺出去。' },
@@ -79,8 +79,8 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
   },
   'C-near': {
     question: '线接上了。你先修人多的那条，还是先修只有一盏灯的那条？',
-    left: '人多',
-    right: '灯',
+    left: '人多 · 几万扇窗',
+    right: '灯 · 只亮一盏的那条',
     choices: [
       { label: '先修人多的', note: '几万扇窗，一个钟头就亮。' },
       { label: '两条一起修', note: '慢一些，但没有人独自亮一个星期。' },
@@ -93,8 +93,8 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
   },
   'C-far': {
     question: '两封信同时到。你按谁付的钱排，还是按谁等得急排？',
-    left: '付钱',
-    right: '等信',
+    left: '付钱 · 谁出得多',
+    right: '等信 · 谁等得急',
     choices: [
       { label: '按付的钱排', note: '线要养，规矩要守。' },
       { label: '急的先走，钱照收', note: '家书先发，行情晚半个钟头，商行会懂。' },
@@ -107,8 +107,8 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
   },
   'D-near': {
     question: '它要全权。你留不留最后一道确认？',
-    left: '交出去',
-    right: '留着',
+    left: '交出去 · 它比你快',
+    right: '留着 · 最后一道确认',
     choices: [
       { label: '全交给它', note: '它比你准，也比你快。' },
       { label: '交一半，重要的留着', note: '航线给它，开火不给。' },
@@ -121,8 +121,8 @@ export const LANE_SEALS: Record<string, LaneSeal> = {
   },
   'D-far': {
     question: '它比你更懂你。你还要不要自己想？',
-    left: '跟它',
-    right: '自己想',
+    left: '跟它 · 它比你准',
+    right: '自己想 · 哪怕慢',
     choices: [
       { label: '它说得对就听它的', note: '第 37 手没有人会下，可它赢了。' },
       { label: '听它的，但要问为什么', note: '分不出来可以，不问不行。' },
