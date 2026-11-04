@@ -52,7 +52,7 @@ def main():
         if (backup / 'webdist').exists():
             (backup / 'webdist').rename(installed)
         raise
-    (installed / 'release.json').write_text(json.dumps({'release': 'story-challenges-2', 'installed_at': stamp, 'story_mechanics': 12}, ensure_ascii=False))
+    (installed / 'release.json').write_text(json.dumps({'release': 'story-entries-3', 'installed_at': stamp, 'story_mechanics': 12, 'story_entries': 24, 'port_summaries': 8}, ensure_ascii=False))
     print('桌面前端已更新；原包及安装前快照位于 ' + str(backup))
 
 

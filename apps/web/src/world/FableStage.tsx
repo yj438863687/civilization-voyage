@@ -216,6 +216,7 @@ function StakesIsland({ state, reduceMotion }: { state: FableState; reduceMotion
 /** 一座有人住的小岛。stage 决定岛上的景，action 决定他在做什么 */
 export function FableIsland({
   id,
+  onEnter,
   enc,
   state,
   active,
@@ -223,6 +224,7 @@ export function FableIsland({
   reduceMotion,
 }: {
   id: string;
+  onEnter?: ()=>void;
   enc: Encounter;
   state: FableState;
   active: boolean;
@@ -230,7 +232,7 @@ export function FableIsland({
   shipAt: { x: number; z: number } | null;
   reduceMotion: boolean;
 }) {
-  if (enc.history) return <group><Mound /><group position={[0, 1.2, -0.4]} rotation={[0, Math.PI * 0.75, 0]}><HistoryMarker image={enc.history.image} completed={!!state[`history:${id}`]} /></group>{[0, 1, 2].map(index => <mesh key={index} position={[-2 + index, 1.5, 2]}><boxGeometry args={[0.7, 0.7, 0.7]} /><meshStandardMaterial color={state[`history:${id}`] === 'care' ? '#728b65' : '#8a6a43'} roughness={0.9} /></mesh>)}<pointLight position={[0, 5, 1]} color="#ffcf8a" intensity={active ? 9 : 4} distance={14} decay={2} /></group>;
+  if (enc.history) return <group><Mound /><group position={[0, 1.2, -0.4]} rotation={[0, Math.PI * 0.75, 0]}><HistoryMarker onEnter={onEnter} image={enc.history.image} completed={!!state[`history:${id}`]} /></group>{[0, 1, 2].map(index => <mesh key={index} position={[-2 + index, 1.5, 2]}><boxGeometry args={[0.7, 0.7, 0.7]} /><meshStandardMaterial color={state[`history:${id}`] === 'care' ? '#728b65' : '#8a6a43'} roughness={0.9} /></mesh>)}<pointLight position={[0, 5, 1]} color="#ffcf8a" intensity={active ? 9 : 4} distance={14} decay={2} /></group>;
   return (
     <group>
       <Mound />

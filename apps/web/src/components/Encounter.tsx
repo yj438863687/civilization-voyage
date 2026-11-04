@@ -10,8 +10,8 @@ import { waterLive, type WaterResult } from '../world/waterGame';
  */
 type Phase = 'intro' | 'talk' | 'play' | 'result';
 
-export function EncounterOverlay(props: Parameters<typeof LegacyEncounterOverlay>[0] & { state?: FableState; supply?: number }) {
-  return props.enc.history ? <HistoryEncounter enc={props.enc} state={props.state} supply={props.supply} cause={props.cause} onDone={props.onDone} /> : <LegacyEncounterOverlay {...props} />;
+export function EncounterOverlay(props: Parameters<typeof LegacyEncounterOverlay>[0] & { state?: FableState; supply?: number; replay?: boolean; onCancel?: ()=>void }) {
+  return props.enc.history ? <HistoryEncounter onCancel={props.onCancel} replay={props.replay} enc={props.enc} state={props.state} supply={props.supply} cause={props.cause} onDone={props.onDone} /> : <LegacyEncounterOverlay {...props} />;
 }
 
 function LegacyEncounterOverlay({

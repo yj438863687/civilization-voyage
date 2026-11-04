@@ -26,7 +26,7 @@ export function RouteTimeline({ route, state = {} }: { route: HistoryRoute; stat
   </ol>;
 }
 
-export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, onDone }: { enc: Encounter; state?: FableState; supply?: number; cause?: string; onDone: (out: Outcome, summary: string) => void }) {
+export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, onDone, replay = false, onCancel }: { enc: Encounter; state?: FableState; supply?: number; replay?: boolean; onCancel?: ()=>void; cause?: string; onDone: (out: Outcome, summary: string) => void }) {
   const scene = enc.history!;
   const arc = arcForScene(scene.id);
   const mechanism = CHALLENGES[scene.id];
@@ -42,14 +42,14 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
   const option = scene.activity === 'dispatch' ? Number(selected.some(index => index >= 2)) : decision;
   const ready = !!work && (scene.activity !== 'dispatch' || selected.length === 2);
   const outcome = work ? challengeOutcome(scene, option, state, work, scene.activity === 'dispatch' ? selected : undefined) : { text:'', supply:0, trust:0 };
-  const affordable = supply + outcome.supply >= 0;
+  const affordable = replay || supply + outcome.supply >= 0;
   const mixed = scene.activity === 'dispatch' && selected.length === 2 && selected.filter(index => index >= 2).length === 1;
   const chosenLabel = mixed ? '一封商单，一封急用消息' : scene.options[option].label;
-  return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={scene.title} onKeyDown={event => event.stopPropagation()}>
+  return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={scene.title} onKeyDown={event => {event.stopPropagation();if(event.key==='Escape'&&onCancel){event.preventDefault();onCancel();}}}>
     <div className="history-island" ref={panel} tabIndex={-1}>
       <div className="history-visual"><HistoryImage name={scene.image} /><p>{scene.nature} · 互动人物、对话与选择为创作</p></div>
       <div className="history-reading">
-        <h2>{scene.title}</h2><p className="history-date">{scene.date} · {scene.who}</p>
+        <h2>{scene.title}</h2>{onCancel&&<button className="btn" type="button" onClick={onCancel}>结束重读，回到船上</button>}{replay&&<p className="replay-note" role="status">重读与练习：不改变补给、人心、升级或本次航程的原记录。</p>}<p className="history-date">{scene.date} · {scene.who}</p>
         {phase === 'read' && <>
           {(previousDecision(scene, state) || cause) && <div className="history-cause"><p>{previousDecision(scene, state) ?? cause}</p></div>}
           {arc && <div className="story-thread"><h3>{arc.arc.artifact} · 第{arc.index+1}/3章</h3><p>{arc.index===0?arc.arc.promise:arc.chapter.continuation}</p><strong>这一章要完成：{arc.chapter.objective}</strong>{arc.index===0&&<p className="history-source">连接各年代的物件、人物与情节为创作。</p>}</div>}
@@ -63,10 +63,10 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
           <div className="technical-result"><h3>你做出的技术成果</h3><p>{work.summary}</p><button className="cine-link" type="button" onClick={()=>setWork(null)}>重做这一章的操作</button></div>
           <h3>这个本领，怎样用下去？</h3><p>{mechanism.society}</p>
           {scene.activity === 'dispatch' ? <HistoryActivity scene={scene} selected={selected} onToggle={toggle} /> : <div className="history-decision" role="group" aria-label="对共同生活的安排">{scene.options.map((choice,index)=><button type="button" key={choice.label} aria-pressed={decision===index} onClick={()=>setDecision(index)}><strong>{choice.label}</strong><small>{choice.note}</small></button>)}</div>}
-          <div className="history-consequence" aria-live="polite"><strong>{chosenLabel}</strong><p>{mixed ? '保留一笔商单收入，同时让一封普通人的急用消息先发。另一封继续等待。' : scene.options[option].note}</p><p>操作与安排合计：补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p>{Number.isFinite(supply)&&<p>船上现有 {supply} 份补给{affordable?`，做完后剩 ${Math.min(100,supply+outcome.supply)} 份`:'，不足以承担这个安排，可以改选节省物资的办法'}</p>}{cooperationBonus(scene,state)>0&&<p>上一章留下的合作省回 3 份补给，已计入。</p>}</div>
+          <div className="history-consequence" aria-live="polite"><strong>{chosenLabel}</strong><p>{mixed ? '保留一笔商单收入，同时让一封普通人的急用消息先发。另一封继续等待。' : scene.options[option].note}</p><p>{replay?'练习的理论变化（不结算）':'操作与安排合计'}：补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p>{!replay&&Number.isFinite(supply)&&<p>船上现有 {supply} 份补给{affordable?`，做完后剩 ${Math.min(100,supply+outcome.supply)} 份`:'，不足以承担这个安排，可以改选节省物资的办法'}</p>}{cooperationBonus(scene,state)>0&&<p>上一章留下的合作省回 3 份补给，已计入。</p>}</div>
           <div className="history-actions"><button className="btn" type="button" onClick={()=>setPhase('read')}>再读一遍</button><button className="btn btn-primary" type="button" disabled={!ready||!affordable} onClick={()=>setPhase('result')}>{!affordable?'补给不足，请调整安排':ready?'照这个安排做':'请先选好两封消息'}</button></div>
         </>}
-        {phase === 'result' && <><p>{outcome.text}</p><p className="history-consequence">补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p><p>操作记录和你的安排将一起带到下一章。后来的工料、布局或交班会用到它们。</p><button type="button" className="btn btn-primary" onClick={() => { if (!done.current) { done.current = true; onDone(outcome, chosenLabel); } }}>记下这一站，回到船上</button></>}
+        {phase === 'result' && <><p>{outcome.text}</p><p className="history-consequence">{replay?'练习结果（不结算）：':''}补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p><p>{replay?'这次练习不会覆盖原来的选择或操作记录。':'操作记录和你的安排将一起带到下一章。后来的工料、布局或交班会用到它们。'}</p><button type="button" className="btn btn-primary" onClick={() => { if (!done.current) { done.current = true; onDone(outcome, chosenLabel); } }}>{replay?'结束练习，回到船上':'记下这一站，回到船上'}</button></>}
       </div>
     </div>
   </div>;

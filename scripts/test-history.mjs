@@ -10,7 +10,7 @@ const requireWeb = createRequire(join(root, 'apps/web/package.json'));
 const { build } = requireWeb('esbuild');
 const temp = mkdtempSync(join(tmpdir(), 'voyage-history-'));
 const outfile = join(temp, 'history.cjs');
-await build({ absWorkingDir: join(root, 'apps/web'), stdin: { contents: ['history', 'encounters', 'stories', 'world.config', 'progression', 'challenges', 'storyArcs', 'challengeOutcomes'].map(name => `export * from './src/world/${name}';`).join('\n'), resolveDir: join(root, 'apps/web') }, outfile, bundle: true, platform: 'node', format: 'cjs', logLevel: 'silent' });
+await build({ absWorkingDir: join(root, 'apps/web'), stdin: { contents: ['history', 'encounters', 'stories', 'world.config', 'progression', 'challenges', 'storyArcs', 'challengeOutcomes', 'storyAccess'].map(name => `export * from './src/world/${name}';`).join('\n'), resolveDir: join(root, 'apps/web') }, outfile, bundle: true, platform: 'node', format: 'cjs', logLevel: 'silent' });
 const require = createRequire(import.meta.url);
 const game = require(outfile);
 const media = JSON.parse(readFileSync(join(root, 'apps/web/src/world/historyMedia.json'), 'utf8'));
@@ -118,4 +118,20 @@ assert(!game.arcEnding(game.STORY_ARCS['A-near'],failedState).includes('变成�
 assert(game.arcEnding(game.STORY_ARCS['A-near'],failedState).includes('尚未建立'));
 const sharedState=Object.fromEntries(game.STORY_ARCS['A-near'].chapters.flatMap(chapter=>[[`history:${chapter.scene}`,'care'],[`work:${chapter.scene}:quality`,'100']]));
 assert.equal(game.arcEnding(game.STORY_ARCS['A-near'],sharedState),game.STORY_ARCS['A-near'].ending);
+for(const [id,route] of Object.entries(game.HISTORY_ROUTES)){
+  const [era,lane]=id.split('-'),world=game.worldFor(era),story=game.storyFor(era,lane);
+  for(const island of route.islands){
+    const fragment=world.fragments.find(item=>item.id===island.id),target=game.fragmentAnchor(fragment);
+    for(const [dx,dz]of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const ship={x:target.x+dx*(game.storyReach(era)-0.5),z:target.z+dz*(game.storyReach(era)-0.5)};
+      assert.equal(game.nearestFragment(world,lane,ship,era,[]),island.id,`${id}/${island.id}:船头靠近四面岸边均应出现入口`);
+      assert.equal(game.nearestFragment(world,lane,ship,era,[island.id]),island.id,'已完成的历史岛仍能重读');
+    }
+    assert.equal(game.nearestFragment(world,lane==='near'?'far':'near',target,era,[]),null,'不可拾取另一航线的不可见岛屿');
+  }
+  const target=game.crisisAnchor(story);
+  assert.deepEqual(target,{x:story.crisis.at.x+11.5,z:story.crisis.at.z-11});
+  assert(game.inStoryReach({x:target.x-game.storyReach(era)+0.5,z:target.z},target,era),'第三章入口必须与可见标识对齐');
+  assert(!game.inStoryReach({x:target.x+game.storyReach(era)+0.5,z:target.z},target,era));
+}
 console.log('通过：8条连续故事、24章、12种操作；渠网、装仓、线路、锅炉、疲劳、编码、提子；技术与安排分开结算并跨章保存。');

@@ -935,6 +935,7 @@ export function Atmosphere({
   world,
   collectedIds,
   nearFragmentId,
+  onStorySelect,
   laneId,
   portalOpen = false,
   fableState = {},
@@ -948,6 +949,7 @@ export function Atmosphere({
   world: WorldConfig;
   collectedIds: string[];
   nearFragmentId: string | null;
+  onStorySelect?: (id:string)=>void;
   laneId: string;
   portalOpen?: boolean;
   /** 这条航线上已经发生的事 */
@@ -1060,7 +1062,7 @@ export function Atmosphere({
         .filter((f) => collectedIds.includes(f.id) && f.lane === laneId && encounterFor(f.id)?.stage)
         .map((f) => (
           <group key={`isle-${f.id}`} position={[f.x + ISLAND_OFFSET.x, 0, f.z + ISLAND_OFFSET.z]}>
-            <FableIsland id={f.id} enc={encounterFor(f.id)!} state={fableState} active={false} shipAt={fableLive.ship} reduceMotion={reduceMotion} />
+            <FableIsland id={f.id} onEnter={()=>onStorySelect?.(f.id)} enc={encounterFor(f.id)!} state={fableState} active={false} shipAt={fableLive.ship} reduceMotion={reduceMotion} />
           </group>
         ))}
       {(() => {
@@ -1072,7 +1074,7 @@ export function Atmosphere({
           <>
             {story.crisis.stage && (
               <group position={[story.crisis.at.x + VILLAGE_OFFSET.x, 0, story.crisis.at.z + VILLAGE_OFFSET.z]}>
-                {story.crisis.enc.history ? <HistoryMarker image={story.crisis.enc.history.image} completed={crisisDone} /> : story.crisis.stage === 'flood' ? (
+                {story.crisis.enc.history ? <HistoryMarker image={story.crisis.enc.history.image} completed={crisisDone} onEnter={()=>onStorySelect?.(story.crisis.id)} /> : story.crisis.stage === 'flood' ? (
                   <FloodVillage state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
                 ) : (
                   <CrisisScene stage={story.crisis.stage} state={fableState} resolved={crisisDone} reduceMotion={reduceMotion} />
@@ -1081,6 +1083,7 @@ export function Atmosphere({
             )}
             <ShoreFigure
               figure={story.figure}
+              onEnter={()=>onStorySelect?.('shore')}
               at={fig}
               face={Math.atan2(story.crisis.at.x - fig.x, story.crisis.at.z - fig.z)}
               reduceMotion={reduceMotion}
@@ -1099,6 +1102,7 @@ export function Atmosphere({
               <group position={[ISLAND_OFFSET.x, 0, ISLAND_OFFSET.z]}>
                 <FableIsland
                   id={f.id}
+                  onEnter={()=>onStorySelect?.(f.id)}
                   enc={encounterFor(f.id)!}
                   state={fableState}
                   active={nearFragmentId === f.id}

@@ -1,3 +1,4 @@
+import { crisisAnchor, fragmentAnchor, inStoryReach } from './world/storyAccess';
 import { STORY_ARCS } from './world/storyArcs';
 import { CHALLENGES } from './world/challenges';
 import { historyFor } from './world/history';
@@ -679,6 +680,7 @@ export function App() {
     nearPort: null as string | null,
     nearFragment: null as string | null,
     collected: new Set<string>(),
+    canInteract: false,
     dock: () => {},
     collect: () => {},
   });
@@ -696,7 +698,7 @@ export function App() {
       const a = actRef.current;
       if (a.view !== 'world' || a.busy || encRef.current) return;
       const k = e.key.toLowerCase();
-      if (k === 'e' && a.nearFragment && !a.collected.has(a.nearFragment)) {
+      if (k === 'e' && a.canInteract) {
         e.preventDefault();
         a.collect();
       }
@@ -942,7 +944,7 @@ export function App() {
   async function dock() {
     if (!voyage || !nearPort || landing > 0 || crisis) return;
     const route = historyFor(voyage.scene_id, laneId);
-    const unfinished = route?.islands.find(island => !progress.state[`history:${island.id}`]);
+    const unfinished = route?.islands.find(island => !progress.state[`history:${island.id}`]&&!collectedIds.has(island.id));
     if (unfinished) { setError(`先完成「${unfinished.title}」，再到港口回顾这一程。`); return; }
     const unread = story?.beats.find(beat => !progress.beats.includes(beat.id));
     if (unread) { setCaption(unread); markProgress(previous => ({ ...previous, beats: [...previous.beats, unread.id] })); return; }
@@ -1022,25 +1024,42 @@ export function App() {
   actRef.current.dock = () => {
     void dock();
   };
-  actRef.current.collect = () => {
-    startEncounter();
-  };
+
 
   /** 靠近一件东西：有人守着就先打照面、做一件事；没人守着就直接收 */
-  function startEncounter() {
-    if (!nearFragment || enc || crisis || busy) return;
-    const route = historyFor(voyage?.scene_id, laneId);
-    const index = route?.islands.findIndex(island => island.id === nearFragment) ?? -1;
-    if (index > 0 && route && !progress.state[`history:${route.islands[index - 1].id}`]) { setError(`先到「${route.islands[index - 1].title}」，故事要按先后走。`); return; }
-    if (progress.state[`history:${nearFragment}`]) { void collectFragment(); return; }
-    if (encounterFor(nearFragment)) {
-      fableLive.island = nearFragment;
-      setEnc(nearFragment);
-    } else void collectFragment();
+  function startEncounter(id: string | null = nearFragment) {
+    if (!id || view!=='world' || enc || crisis || secret || busy || yardOpen || landing>0) return;
+    if(id==='shore'){if(!nearPort){setError('再靠近港口，按F靠岸后回顾这一程。');return;}void dock();return;}
+    if(story?.crisis.id===id){startCrisis();return;}
+    const fragment=sea.fragments.find(fragment=>fragment.id===id);
+    if(!fragment||(fragment.lane!=='both'&&fragment.lane!==laneId))return;
+    if(encounterFor(id)?.history&&(!shipRef.current||!inStoryReach(shipRef.current,fragmentAnchor(fragment),voyage?.scene_id??'test'))){setError(`再靠近「${fragment.title}」，船头到岸边就能登岛。`);return;}
+    const route=historyFor(voyage?.scene_id,laneId);
+    const index=route?.islands.findIndex(island=>island.id===id)??-1;
+    const previous=index>0?route?.islands[index-1]:undefined;
+    if(previous&&!progress.state[`history:${id}`]&&!collectedIds.has(id)&&!progress.state[`history:${previous.id}`]&&!collectedIds.has(previous.id)){setError(`先完成「${previous.title}」，再进入「${fragment.title}」。`);return;}
+    setError(null);
+    if(encounterFor(id)){fableLive.island=id;setEnc(id);}else void collectFragment(id);
+  }
+
+  function startCrisis() {
+    if(!story||!voyage||view!=='world'||enc||crisis||secret||busy||yardOpen||landing>0)return;
+    if(!shipRef.current||!inStoryReach(shipRef.current,crisisAnchor(story),voyage.scene_id)){setError(`再靠近「${story.crisis.kicker}」的图片标识，按E进入。`);return;}
+    const unfinished=historyFor(voyage.scene_id,laneId)?.islands.find(island=>!progress.state[`history:${island.id}`]&&!collectedIds.has(island.id));
+    if(unfinished&&!progress.crisis.includes(story.crisis.id)){setError(`先完成「${unfinished.title}」，再进入第三章。`);return;}
+    setError(null);setCaption(null);
+    // 两章的前情会在第三章阅读页一起呈现，已开始的旁白不再挡住入口。
+    if(!progress.crisis.includes(story.crisis.id))markProgress(previous=>({...previous,beats:[...new Set([...previous.beats,...story.beats.map(beat=>beat.id)])]}));
+    setCrisis(story.crisis.id);
   }
 
   const settledIds = useRef<Set<string>>(new Set());
   function finishEncounter(id: string, o: Outcome, summary: string) {
+    if(progress.state[`history:${id}`]||collectedIds.has(id)){
+      fableLive.island='';setEnc(null);
+      if(!collectedIds.has(id))void collectFragment(id,progress.state[`history:${id}:text`]);
+      return;
+    }
     const settlementId = `${voyage?.id}:${id}`;
     if (settledIds.current.has(settlementId)) return;
     settledIds.current.add(settlementId);
@@ -1127,7 +1146,15 @@ export function App() {
    */
   const story = storyFor(voyage?.scene_id, laneId);
   const storyArc=STORY_ARCS[`${voyage?.scene_id}-${laneId}`];
-  const nextChapter=storyArc?.chapters.find(chapter=>!progress.state[`history:${chapter.scene}`]);
+  const nextChapter=storyArc?.chapters.find(chapter=>!progress.state[`history:${chapter.scene}`]&&!collectedIds.has(chapter.scene));
+  const nearCrisis=!!story&&!!ship&&inStoryReach(ship,crisisAnchor(story),voyage?.scene_id??'test');
+  const earlierIsland=nearFrag&&historyFor(voyage?.scene_id,laneId)?.islands.find((island,index,list)=>index>0&&island.id===nearFrag.id&&!progress.state[`history:${list[index-1].id}`]&&!collectedIds.has(list[index-1].id));
+  const lockedIsland=earlierIsland&&!nearFragCollected&&!progress.state[`history:${nearFrag?.id}`]?historyFor(voyage?.scene_id,laneId)!.islands[0]:null;
+  const crisisMissing=story&&progress.crisis.includes(story.crisis.id)?undefined:historyFor(voyage?.scene_id,laneId)?.islands.find(island=>!progress.state[`history:${island.id}`]&&!collectedIds.has(island.id));
+  const replayEncounter=!!enc&&(!!progress.state[`history:${enc}`]||collectedIds.has(enc));
+  const replayCrisis=!!story&&progress.crisis.includes(story.crisis.id);
+  actRef.current.canInteract=!!nearFragment||nearCrisis;
+  actRef.current.collect=()=>{if(nearFragment)startEncounter();else if(nearCrisis)startCrisis();};
 
   // 换了航程：读回这一程已经看过的戏
   useEffect(() => {
@@ -1182,7 +1209,7 @@ export function App() {
       markProgress((p) => ({ ...p, beats: [...p.beats, `tao-${era}`] }));
       return;
     }
-    if (!story) return;
+    if (!story || progress.crisis.includes(story.crisis.id)) return;
     // 旁白按「沿航线走了多远」触发，不只看离得多近：抄近路、被遭遇打断都不会漏
     const lane = (sea.lanes ?? []).find((l) => l.id === laneId);
     const path: { x: number; z: number }[] = lane ? [sea.spawn, ...lane.waypoints] : [];
@@ -1207,7 +1234,7 @@ export function App() {
       return bestAlong;
     };
     const c = story.crisis;
-    if (!caption && story.beats.every(beat => progress.beats.includes(beat.id)) && (historyFor(era, laneId)?.islands.every(island => !!progress.state[`history:${island.id}`]) ?? true) && !progress.crisis.includes(c.id) && Math.hypot(ship.x - c.at.x, ship.z - c.at.z) < 7) {
+    if (!caption && story.beats.every(beat => progress.beats.includes(beat.id)) && (historyFor(era, laneId)?.islands.every(island => !!progress.state[`history:${island.id}`]||collectedIds.has(island.id)) ?? true) && !progress.crisis.includes(c.id) && inStoryReach(ship,crisisAnchor(story),era)) {
       setCaption(null);
       setCrisis(c.id);
       return;
@@ -1277,6 +1304,7 @@ export function App() {
   function finishCrisis(o: Outcome, summary: string) {
     if (!story || !voyage) return;
     const c = story.crisis;
+    if(progress.crisis.includes(c.id)){setCrisis(null);return;}
     const settlementId = `${voyage.id}:${c.id}`;
     if (settledIds.current.has(settlementId)) return;
     settledIds.current.add(settlementId);
@@ -1313,11 +1341,11 @@ export function App() {
 
   const guideTarget = useMemo(() => {
     if (sealedHere && sea.portal) return { x: sea.portal.x, z: sea.portal.z };
-    const next = laneStops(sea, laneId).find((f) => !collectedIds.has(f.id));
+    const next = laneStops(sea, laneId).find((f) => !collectedIds.has(f.id)&&!progress.state[`history:${f.id}`]);
     // 铜针指岛，不指岛背后那个看不见的点
-    if (next) return encounterFor(next.id)?.stage ? { x: next.x + ISLAND_OFFSET.x, z: next.z + ISLAND_OFFSET.z } : { x: next.x, z: next.z };
+    if (next) return fragmentAnchor(next);
     // 东西收齐了，还有一场躲不开的事在前面
-    if (story && !progress.crisis.includes(story.crisis.id)) return story.crisis.at;
+    if (story && !progress.crisis.includes(story.crisis.id)) return crisisAnchor(story);
     return portPlace ?? null;
   }, [sealedHere, sea, laneId, collectedIds, portPlace, story, progress]);
 
@@ -1375,7 +1403,8 @@ export function App() {
           stageAt={stageAt}
           sceneId={voyage?.scene_id ?? scenePick?.id ?? 'test'}
           world={sea}
-          collectedIds={[...collectedIds]}
+          collectedIds={[...new Set([...collectedIds,...sea.fragments.filter(fragment=>!!progress.state[`history:${fragment.id}`]).map(fragment=>fragment.id)])]}
+          onStorySelect={id=>startEncounter(id)}
           nearFragmentId={nearFragment}
           laneId={laneId}
           portalOpen={sealedHere}
@@ -1678,6 +1707,8 @@ export function App() {
         <EncounterOverlay
           key={crisis}
           enc={story.crisis.enc}
+          replay={replayCrisis}
+          onCancel={replayCrisis?()=>setCrisis(null):undefined}
           supply={stats.supply}
           state={progress.state}
           title={story.crisis.kicker}
@@ -1742,6 +1773,8 @@ export function App() {
         <EncounterOverlay
           key={enc}
           enc={encounterFor(enc)!}
+          replay={replayEncounter}
+          onCancel={replayEncounter?()=>{fableLive.island='';setEnc(null);}:undefined}
           supply={stats.supply}
           state={progress.state}
           title={sea.fragments.find((f) => f.id === enc)?.title ?? ''}
@@ -1943,19 +1976,21 @@ export function App() {
         </div>
       )}
 
-      {view === 'world' && nearFragment && nearFrag && !nearFragCollected && !enc && (
+      {view === 'world' && nearFragment && nearFrag && (!nearFragCollected||!!encounterFor(nearFrag.id)?.history) && !enc && !crisis && !secret && !yardOpen && (
         <button className={`interact-prompt${nearPort ? ' interact-prompt-with-port' : ''}`} type="button" disabled={busy} onClick={() => startEncounter()}>
           <span className="interact-key">E</span>
           <span className="interact-copy">
             <strong>
               {encounterFor(nearFrag.id)
-                ? `登岛读故事 · ${nearFrag.title}`
+                ? `${lockedIsland?'暂未开放':nearFragCollected||progress.state[`history:${nearFrag.id}`]?'重读与练习':'登岛读故事'} · ${nearFrag.title}`
                 : `收入货舱 · ${nearFrag.title}`}
             </strong>
-            <span className="faint">{nearFrag.text}</span>
+            <span className="faint">{lockedIsland?`先完成「${lockedIsland.title}」，故事按先后展开。`:nearFragCollected||progress.state[`history:${nearFrag.id}`]?'已完成，可重读和练习；不会重复获得补给或人心。':'按E、点击这里或点击岛上的图片进入故事。'}</span>
           </span>
         </button>
       )}
+
+      {view==='world'&&nearCrisis&&story&&!nearFragment&&!enc&&!crisis&&!secret&&!yardOpen&&<button className="interact-prompt" type="button" disabled={busy} onClick={startCrisis}><span className="interact-key">E</span><span className="interact-copy"><strong>{replayCrisis?'重读与练习':crisisMissing?'暂未开放':'进入第三章'} · {story.crisis.kicker}</strong><span className="faint">{crisisMissing?`先完成「${crisisMissing.title}」。`:replayCrisis?'已完成，可以重读和练习；不会重复结算。':'按E或点击图片进入；不必把船开到标识正下方。'}</span></span></button>}
 
       {view === 'world' && nearPort && (
         <button className="interact-prompt interact-prompt-port" type="button" disabled={busy} onClick={() => void dock()}>
