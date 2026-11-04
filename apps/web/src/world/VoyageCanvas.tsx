@@ -670,7 +670,7 @@ function Rig({
       const sailFactor = STYLE_BY_SCENE[sceneIdForStyle] === 'junk' || STYLE_BY_SCENE[sceneIdForStyle] === 'raft' ? 1 : 0.4;
       const windMul = 1 + seaNow.wind.k * sailFactor * (along > 0 ? 0.3 * along : 0.4 * along);
       windAlong.current = along;
-      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * windMul * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0)) * (input.ration && !autopilot ? 0.7 : 1) * (input.crippled && !autopilot ? 0.5 : 1);
+      const cap = world.ship.maxSpeed * (autopilot ? 1 : capMul) * windMul * (1 + 0.65 * (autopilot ? 0 : input.boost ?? 0)) * (input.ration && !autopilot ? 0.7 : 1) * (input.crippled && !autopilot ? 0.7 : 1);
       // 收帆：不再听玩家的，匀速往前，一点点偏向外海
       if (autopilot) autoT.current += clamped;
       else autoT.current = 0;

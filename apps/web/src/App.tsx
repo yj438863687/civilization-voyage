@@ -566,6 +566,8 @@ export function App() {
   const onShip = useCallback(
     (s: ShipSnapshot, port: string | null, frag: string | null, portal: string | null) => {
       shipRef.current = s;
+      // 调试用：无头测试读船的位置。只写一个对象，不参与游戏逻辑
+      (window as unknown as { __cv?: unknown }).__cv = { ...s, port, frag, portal };
       if (s.reefHit > 0) {
         setStats((prev) => {
           const next = hullHit(prev, s.reefHit);

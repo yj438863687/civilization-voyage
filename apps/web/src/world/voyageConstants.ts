@@ -65,12 +65,12 @@ export const HARBOR_APPROACH = {
   mid: 1.5,
   exit: 2.6,
   inner: 1.1,
-  outerCap: 0.62,
-  midCap: 0.34,
-  innerCap: 0.18,
+  outerCap: 0.75,
+  midCap: 0.5,
+  innerCap: 0.3,
   alignDeg: 32,
   alignHardDeg: 90,
-  misalignCap: 0.32,
+  misalignCap: 0.5,
 };
 
 export const DEST_TRAIL = {

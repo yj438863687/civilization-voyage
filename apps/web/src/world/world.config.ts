@@ -71,7 +71,7 @@ export type WorldConfig = {
 
 const SHARED = {
   bounds: { minX: -70, maxX: 70, minZ: -70, maxZ: 70 },
-  ship: { maxSpeed: 11, reverseSpeed: 4, accel: 6, turn: 0.7, radius: 6 },
+  ship: { maxSpeed: 17, reverseSpeed: 7, accel: 6, turn: 1.1, radius: 6 },
   spawn: { x: SPAWN.x, z: SPAWN.z, yaw: 0 },
   camera: {
     followDistance: 27,
@@ -143,7 +143,7 @@ const TEST_SRC: Source = {
 const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   test: {
     ...SHARED,
-    ship: { maxSpeed: 10, reverseSpeed: 3.5, accel: 1.6, turn: 0.95, radius: 6 }, // 帆船：中速，好上手
+    ship: { maxSpeed: 16, reverseSpeed: 6, accel: 3.2, turn: 1.15, radius: 6 }, // 帆船：起步稍慢，跑起来快
     ports: [
       {
         id: 'test-port',
@@ -213,7 +213,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   A: {
     ...SHARED,
-    ship: { maxSpeed: 7.5, reverseSpeed: 3, accel: 1.3, turn: 0.95, radius: 6 }, // 木船靠桨与风：慢，但转得动
+    ship: { maxSpeed: 13, reverseSpeed: 5, accel: 3.0, turn: 1.15, radius: 6 }, // 木船靠桨与风：比帆船慢一点，但转得动
     ports: [
       {
         id: 'riverbank-port',
@@ -296,7 +296,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   B: {
     ...SHARED,
-    ship: { maxSpeed: 15, reverseSpeed: 4.5, accel: 0.7, turn: 0.72, radius: 6 }, // 蒸汽船：起步沉，跑起来最快，转弯笨
+    ship: { maxSpeed: 24, reverseSpeed: 7, accel: 2.2, turn: 0.95, radius: 6 }, // 蒸汽船：起步略沉，跑起来最快，转弯略笨
     ports: [
       {
         id: 'steam-port',
@@ -379,7 +379,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   C: {
     ...SHARED,
-    ship: { maxSpeed: 13, reverseSpeed: 5, accel: 1.5, turn: 0.9, radius: 6 }, // 电报时代的轮船：快而稳
+    ship: { maxSpeed: 20, reverseSpeed: 7, accel: 3.2, turn: 1.1, radius: 6 }, // 电报时代的轮船：快而稳
     ports: [
       {
         id: 'signal-port',
@@ -462,7 +462,7 @@ const WORLDS: Record<'test' | 'A' | 'B' | 'C' | 'D', WorldConfig> = {
   },
   D: {
     ...SHARED,
-    ship: { maxSpeed: 16, reverseSpeed: 7, accel: 3.0, turn: 1.25, radius: 6 }, // 自主船：几乎没有惯性
+    ship: { maxSpeed: 24, reverseSpeed: 9, accel: 5.0, turn: 1.4, radius: 6 }, // 自主船：几乎没有惯性
     ports: [
       {
         id: 'auto-port',
