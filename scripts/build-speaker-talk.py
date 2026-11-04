@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """A speaker-led talk with layouts chosen for the argument on each page."""
-import json,math,re,shutil,zipfile,hashlib
+import json,math,re,shutil,zipfile,hashlib,argparse
 from pathlib import Path
 from PIL import Image,ImageDraw
 from pptx import Presentation
@@ -9,8 +9,8 @@ from pptx.enum.shapes import MSO_SHAPE
 import fitz
 import presentation_core as core
 from presentation_core import Page,INK,PANEL,GREEN,PAPER,WHITE,MUTED,LINE
-ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'.impeccable/speaker-talk';OUT.mkdir(parents=True,exist_ok=True);core.OUT=OUT
-DATA=json.loads((ROOT/'docs/speaker-led-talk.json').read_text());OLD=ROOT/'.impeccable/harbour-talk';RAW=ROOT/'.impeccable/demo-v3/raw-sync'
+ROOT=Path(__file__).resolve().parents[1];parser=argparse.ArgumentParser();parser.add_argument('--content',type=Path,default=ROOT/'docs/speaker-led-talk.json');parser.add_argument('--output',type=Path,default=ROOT/'.impeccable/speaker-talk');args=parser.parse_args();OUT=args.output;OUT.mkdir(parents=True,exist_ok=True);core.OUT=OUT
+DATA=json.loads(args.content.read_text());OLD=ROOT/'.impeccable/harbour-talk';RAW=ROOT/'.impeccable/demo-v3/raw-sync'
 MOVIE=OUT/'Video/Civilization-Voyage-Demo-EN.mp4';MOVIE.parent.mkdir(exist_ok=True);shutil.copy2(OLD/'Video/Civilization-Voyage-Demo-EN.mp4',MOVIE)
 prs=Presentation();prs.slide_width=Inches(13.333333);prs.slide_height=Inches(7.5)
 images=[];RED='E7A086'
@@ -24,12 +24,12 @@ def circle(p,x,y,r,color,border=None):
  s=p.slide.shapes.add_shape(MSO_SHAPE.OVAL,Inches((x-r)/144),Inches((y-r)/144),Inches(2*r/144),Inches(2*r/144));s.fill.solid();s.fill.fore_color.rgb=core.RGBColor.from_string(color);s.line.color.rgb=core.RGBColor.from_string(border or color)
 def footer(p,assumed=False):p.footer('Illustrative assumptions · Customer and classroom hypotheses to test.' if assumed else 'Civilization Voyage · Sources, delivery limits and speaking cues in notes.')
 for index,row in enumerate(DATA):
- k=row['kind'];light=k in ['eras','ledger','seas','skills','alternatives','economics','gates'];p=Page(prs,row,index,light,True)
+ k=row['kind'];light=k in ['eras','ledger','seas','skills','alternatives','economics','gates','culture-comparison','cultural-reflection'];p=Page(prs,row,index,light,True)
  if k=='cover':
   p.picture(OLD/'temple-cover-composed.png',0,0,1920,1080)
   section(p,'CIVILIZATION VOYAGE · A PLAYABLE HISTORY')
   p.text('Civilization Voyage',96,157,1728,155,116,WHITE,kind='serif',minsize=92)
-  p.text('Who carries the cost of progress?',100,356,1700,118,64,GREEN,minsize=54)
+  p.text(row.get('subtitle','Who carries the cost of progress?'),100,356,1700,148,64,GREEN,minsize=46)
   p.text('Four eras. Eight routes. One question carried forward.',100,925,1700,83,35,WHITE,minsize=30)
  elif k=='case':
   p.rect(700,0,1220,1080,PAPER);p.rect(0,0,700,1080,INK)
@@ -44,12 +44,12 @@ for index,row in enumerate(DATA):
   p.text('BEGIN AT THE RIVER',80,75,560,42,22,GREEN,kind='mono');p.text(row['en'],80,218,550,400,69,WHITE,True,minsize=52)
   p.line(80,718,610,718,LINE,2);p.note('A local success changes someone else’s conditions.',80,790,535,38)
  elif k=='mechanism':
-  section(p,'THE QUESTION BENEATH THE SCENE');p.text('Follow the gain.',96,177,1728,140,108,WHITE,True,minsize=88);p.text('Then follow the cost.',96,321,1728,140,108,GREEN,True,minsize=88)
-  items=[('OBJECTIVE','What improves?'),('ALLOCATION','What must move?'),('INCIDENCE','Who carries the cost?'),('NEXT DECISION','What changes afterwards?')]
+  section(p,'UNDERSTANDING BEFORE JUDGMENT' if row.get('culture_lens') else 'THE QUESTION BENEATH THE SCENE');p.text('Understand the setting.' if row.get('culture_lens') else 'Follow the gain.',96,177,1728,140,98,WHITE,True,minsize=80);p.text('Then form a judgment.' if row.get('culture_lens') else 'Then follow the cost.',96,321,1728,140,98,GREEN,True,minsize=80)
+  items=[('SITUATION','What is happening?'),('EVIDENCE','What supports the story?'),('PERSPECTIVES','Whose voice is missing?'),('JUDGMENT','What can I explain?')] if row.get('culture_lens') else [('OBJECTIVE','What improves?'),('ALLOCATION','What must move?'),('INCIDENCE','Who carries the cost?'),('NEXT DECISION','What changes afterwards?')]
   for i,(a,b) in enumerate(items):
    x=96+i*441;p.text(a,x,612,385,45,23,GREEN,True,kind='mono');p.text(b,x,696,350,150,38,WHITE,True,minsize=31)
    if i<3:arrow(p,x+350,650,x+419,650)
-  p.note('A change in cooperation can become a change in tomorrow’s material constraint.',96,905,1728,34);footer(p)
+  p.note('Begin with the situation, the source and the voices a first impression may miss.' if row.get('culture_lens') else 'A change in cooperation can become a change in tomorrow’s material constraint.',96,905,1728,34);footer(p)
  elif k=='eras':
   section(p,'FOUR ERAS · EIGHT HISTORICAL ROUTES');heading(p,row['en'],size=66)
   for i,(era,capability,arrangement) in enumerate([('Agriculture','Water and surplus','Allocation and upkeep'),('Industry','Power and production','Labour and shared gains'),('Information','Records and communication','Visibility and access'),('Artificial intelligence','Prediction and delegation','Responsibility and judgment')]):
@@ -176,12 +176,39 @@ for index,row in enumerate(DATA):
   for i,(question,condition,response) in enumerate(checks):
    y=393+i*178;p.text(question,96,y,780,83,40,p.fg,True,minsize=33);p.text(condition,96,y+91,780,55,28,p.muted,minsize=26);arrow(p,880,y+58,1000,y+58,p.accent);p.text(response,1083,y+9,733,122,37,p.fg,minsize=31);p.line(96,y+150,1824,y+150,'BDCEC7',1)
   p.text('A small pilot should identify the next constraint.',96,954,1728,62,36,p.accent,True,minsize=30);footer(p,True)
+ elif k=='culture-comparison':
+  section(p,'HARMONY WITH DIFFERENCE');heading(p,row['en'],size=65)
+  for x,label,title,body,question in [(96,'CHINA','Water and maintenance','Gun and Yu’s legends lead towards the historical setting of Dujiangyan.','Who receives the water—and who keeps the arrangement working?'),(978,'MESOPOTAMIA','Grain and records','A storehouse and a written account organize surplus and claims.','Who receives protection—and whose claim appears in the record?')]:
+   p.text(label,x,397,800,50,25,p.accent,True,kind='mono');p.text(title,x,481,800,92,50,p.fg,True,minsize=40);p.text(body,x,607,780,130,34,p.muted,minsize=29);p.text(question,x,790,780,145,37,p.fg,True,minsize=30)
+  footer(p)
+ elif k=='cultural-reflection':
+  section(p,'UNDERSTANDING / ACTION / REFLECTION');heading(p,row['en'],size=71)
+  nodes=[(350,465,'UNDERSTAND',215,366),(1515,465,'ACT',1440,366),(1515,812,'ENCOUNTER',1360,866),(350,812,'REFLECT',245,866)]
+  arrow(p,390,465,1475,465,'789D91');arrow(p,1515,505,1515,772,'789D91');arrow(p,1475,812,390,812,'789D91');arrow(p,350,772,350,505,'789D91')
+  for x,y,a,tx,ty in nodes:circle(p,x,y,13,p.accent);p.text(a,tx,ty,min(520,1824-tx),56,26,p.accent,True,kind='mono',minsize=23)
+  p.text('Revise the explanation\nthrough what happened.',655,577,638,164,47,p.fg,True,minsize=39);p.note('A later consequence can change how we understand an earlier choice.',96,961,1728,26);footer(p)
+ elif k=='course-snapshot':
+  section(p,'THE IMPLEMENTED GAME');heading(p,row['en'],size=69)
+  for i,(value,label) in enumerate([('4','ERAS'),('8','CHINA / WORLD ROUTES'),('24','STORY SCENES'),('4','WATER-TASK FORMS')]):
+   x=96+(i%2)*882;y=397+(i//2)*258;p.rect(x,y,846,218,PANEL,LINE);p.text(value,x+32,y+24,760,116,98,GREEN,True,minsize=80);p.text(label,x+35,y+155,760,49,27,WHITE,True,kind='mono',minsize=23)
+  p.note('Characters, scenes, source notes, sailing, upgrades, audio and endings remain in one world.',96,951,1728,29);footer(p)
+ elif k=='course-validation':
+  section(p,'PRODUCT EVIDENCE / EDUCATIONAL QUESTIONS');heading(p,row['en'],size=65)
+  for x,label,items in [(96,'CHECKED IN THE GAME',['Story access and bilingual consistency','Resource failures, recovery and saved endings','Source notes and evaluation before harbour aid']),(978,'TO STUDY IN A CLASSROOM',['How learners explain a later consequence','Whether a teacher can run the route reliably','How the activity fits the course and lesson'])]:
+   p.text(label,x,398,800,59,27,GREEN,True,kind='mono')
+   for i,item in enumerate(items):p.text(item,x,509+i*143,780,113,36,WHITE,minsize=30)
+  p.note('The current voyage uses authored stories and local rules. Classroom evaluation is the next step.',96,954,1728,27);footer(p)
+ elif k=='anthropic-lens':
+  section(p,'ANTHROPIC AS A CONTEMPORARY REFERENCE');heading(p,row['en'],size=72)
+  for i,(label,title,body) in enumerate([('HONESTY','Make the evidence inspectable.','Distinguish historical context, legend and authored dialogue.'),('HUMAN AGENCY','Leave room to reach a judgment.','Show perspectives and consequences without replacing the player’s decision.'),('HUMAN OVERSIGHT','Keep choices open to review.','Let the journey be reconsidered through its recorded outcomes.')]):
+   x=96+i*588;p.text(label,x,412,515,54,25,GREEN,True,kind='mono');p.text(title,x,509,500,164,47,WHITE,True,minsize=37);p.text(body,x,718,500,155,33,MUTED,minsize=28)
+  p.note('Source: Anthropic, Claude’s Constitution. Applied here as design questions.',96,951,1728,26);footer(p)
  elif k=='closing':
-  section(p,'THE NEXT VOYAGE');p.text('Let the next class decide\nwhat deserves to grow.',96,162,1728,251,98,WHITE,True,minsize=80)
-  p.text('Three pilot classrooms.',96,538,1728,113,81,GREEN,kind='serif',minsize=68)
+  section(p,'THE NEXT VOYAGE');p.text(row['en'],96,162,1728,251,98,WHITE,True,minsize=80)
+  p.text('Understanding · Difference · Action · Reflection' if row.get('course_closing') else 'Three pilot classrooms.',96,538,1728,144,60 if row.get('course_closing') else 81,GREEN,kind='serif',minsize=46 if row.get('course_closing') else 68)
   p.line(96,733,1824,733,LINE,2)
-  p.text('A teacher to run it. A reviewer to question it. A buyer to assess its value.',96,795,1728,126,43,WHITE,minsize=35)
-  p.note('The next decision should make the value—and the work it requires—visible.',96,956,1728,29)
+  p.text('Chinese and world stories meet in the choices people make together.' if row.get('course_closing') else 'A teacher to run it. A reviewer to question it. A buyer to assess its value.',96,795,1728,126,43,WHITE,minsize=35)
+  p.note('Technology expands our abilities; cultural reflection asks how we should use them.' if row.get('course_closing') else 'The next decision should make the value—and the work it requires—visible.',96,956,1728,29)
  images.append(p.finish())
 folder=OUT/'English';folder.mkdir(exist_ok=True);target=folder/'Civilization-Voyage-Deep-Sea-Pitch-EN.pptx';prs.save(target)
 for slide in Presentation(target).slides:
@@ -196,5 +223,5 @@ sheet=Image.new('RGB',(4*404,math.ceil(len(images)/4)*246),'#172D39');d=ImageDra
 for i,path in enumerate(images):
  im=Image.open(path);im.thumbnail((384,216));x=(i%4)*404+10;y=(i//4)*246+22;sheet.paste(im,(x,y));d.text((x,y-18),f'{i+1:02d}',fill='#EDF6F5')
 sheet.save(OUT/'contact-sheet.jpg',quality=94)
-(OUT/'production-metadata.json').write_text(json.dumps({'slides':len(DATA),'language':'en','layouts':[r['kind'] for r in DATA],'reference_article':'Dr.Dan讲书：目标与代价的循环，从李录框架看中国资产切换 — user-opened WeChat article','source_use':'High-level reasoning sequence applied in original wording; no macroeconomic numbers, asset predictions, or claims of author endorsement','economics':'Illustrative first-purchase model; contribution=3000−delivery−600; fixed launch=18000; operating reserve=12000; reserve not double-counted','demo':'Actual existing edited recording, unchanged'},ensure_ascii=False,indent=2))
+(OUT/'production-metadata.json').write_text(json.dumps({'slides':len(DATA),'language':'en','outline_source':str(args.content),'teacher_rubric_verified':False,'anthropic_reference':'https://www.anthropic.com/constitution' if any(r['kind']=='anthropic-lens' for r in DATA) else None,'speaker_pages':{r:[i+1 for i,s in enumerate(DATA) if s['role']==r] for r in 'ABCDE'},'layouts':[r['kind'] for r in DATA],'reference_article':'Dr.Dan讲书：目标与代价的循环，从李录框架看中国资产切换 — user-opened WeChat article','source_use':'High-level reasoning sequence applied in original wording; no macroeconomic numbers, asset predictions, or claims of author endorsement','economics':'Illustrative first-purchase model; contribution=3000−delivery−600; fixed launch=18000; operating reserve=12000; reserve not double-counted','demo':'Actual existing edited recording, unchanged'},ensure_ascii=False,indent=2))
 print('Built',len(DATA),'speaker-led slides:',target,flush=True)

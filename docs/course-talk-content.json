@@ -1,0 +1,125 @@
+[
+  {
+    "role": "A",
+    "kind": "cover",
+    "en": "Civilization Voyage",
+    "note_en": "A | Course opening. Introduce Civilization Voyage as a cultural inquiry made playable. Across Chinese civilization and world cultures, new capabilities change the ways people share resources, cooperate and judge responsibility. The four eras organize cases, not a ranking of civilizations. Our central question is how technology can serve shared life while leaving room for human judgment. The five sections follow the existing team allocation: cultural understanding; harmony with difference; understanding through action; the game and demonstration; AI tools and a modest application proposal. These are aligned to repository responsibilities. The teacher’s assessment rubric and time limit have not yet been supplied.",
+    "subtitle": "Chinese civilization, world cultures and the human purposes of technology."
+  },
+  {
+    "role": "A",
+    "kind": "case",
+    "en": "The village is dry.\nThe next field is flooded.",
+    "note_en": "A | Begin inside the first agricultural China scene. The village raises its dike and protects its own fields. Water collects beyond the boundary. Ask the audience to hold two observations at once: the work has achieved a local objective, and somebody else bears a cost. This encounter is a fictional reconstruction of a flood-control legend; it is not a documented conversation. We chose it because the consequences can be understood before anyone needs an economic term. Let the scene establish the problem that the rest of the presentation will explain."
+  },
+  {
+    "role": "A",
+    "kind": "evidence",
+    "en": "Players should see where a story begins.",
+    "note_en": "C | A source supports a historical setting; it does not authenticate dialogue we have written. The optional image entrance distinguishes a modern explanatory photograph, a later portrait, a legendary account and an imagined future. It preserves the original island characters, scene and subtitles in the main game. Reading the notes does not award resources or complete a scene. This makes interpretation inspectable. Historical and image credits are maintained in the game; the Dujiangyan setting includes UNESCO material and the legends refer to Shiji, Xia Ben Ji."
+  },
+  {
+    "role": "A",
+    "kind": "mechanism",
+    "en": "What should we understand\nbefore deciding?",
+    "note_en": "A | Xuanlan Xuantong is the first member’s existing project responsibility. Our practical interpretation for the presentation is to understand the situation, inspect the evidence, notice whose perspective is missing and then form a judgment. This is a working presentation interpretation; formal definitions must follow the course materials. The flood-control scene introduces the difference between what a technique accomplishes locally and how it affects other people. Students are asked to explain the setting and its evidence before declaring which arrangement is right. Hand over to B to compare how different cultural settings organize a shared problem.",
+    "culture_lens": true
+  },
+  {
+    "role": "B",
+    "kind": "seas",
+    "en": "Two settings make the question harder.",
+    "note_en": "B | The inner sea follows China; the outer sea follows world settings. Together they give four eras, eight routes and twenty-four scenes. Compare arrangements in context rather than treating a civilization as a universal model. The China agriculture route moves from flood-control legends to Warring States Dujiangyan; the world agriculture route concerns grain and records in Mesopotamia. Later routes cover industrial power, communication and AI. Legends and imagined future scenes are labelled, and source notes remain available. Differences between settings are material to the inquiry."
+  },
+  {
+    "role": "B",
+    "kind": "eras",
+    "en": "Four eras. Four arrangements to examine.",
+    "note_en": "B | The eras organize questions rather than rank civilizations. Agriculture raises questions about allocation and upkeep. Industry changes production and the organization of labour. Information changes whose experience is recorded and transmitted. AI changes the scope of delegation and responsibility. Each historical route has its own chronology; the eras can overlap in calendar time. The same technology can operate under different arrangements. The player should therefore be able to explain a local choice, not simply memorize a verdict about an entire age."
+  },
+  {
+    "role": "B",
+    "kind": "culture-comparison",
+    "en": "Water sharing and grain records:\ndifferent arrangements, related questions.",
+    "note_en": "B | Harmony with difference means taking cultural contexts seriously while keeping room for comparison. In the China agriculture route, the player encounters flood-control legends, water allocation and the continuing maintenance of Dujiangyan. In the world route, Mesopotamian grain storage and records raise questions about who receives protection and whose claim is recorded. These scenes address related problems through different arrangements; we should not assume the two histories are identical or rank them on a single ladder. The game’s historical sources remain in its image notes, and dialogue and decisions are creative reconstruction. The term 和而不同 belongs to the existing team framework; its formal course interpretation should be confirmed against teaching materials."
+  },
+  {
+    "role": "B",
+    "kind": "ledger",
+    "en": "What does one decision change?",
+    "note_en": "B | Read the actual choice values rather than hiding behind the word tradeoff. At the first China agriculture encounter, protecting the village gives seven supplies and removes five trust; agreeing to a shared outlet costs six supplies and adds eight trust. A task result settles separately. Earlier cooperation can return three supplies at a later scene, but trust at twenty or below suspends that support. These are designed game values, not measurements of human welfare. Their function is to make a relationship between a decision now and a constraint later playable. Cooperation can still fail when material reserves are exhausted. B | Close the comparison by explaining why the resource display is a simplified model rather than a moral score that can settle all cultural disagreement. Cooperative arrangements also need material reserves; a numerical bonus is not proof of ethical superiority."
+  },
+  {
+    "role": "C",
+    "kind": "route",
+    "en": "A decision should outlive its island.",
+    "note_en": "C | Zhixing Heyi is the existing project responsibility for connecting understanding, practice and reflection. In the game, the player chooses an arrangement, performs a task, encounters its consequences and later reviews the choice. We use this loop to connect explanation with action; it is not a complete statement of Wang Yangming’s philosophy or a claim that a game score measures moral cultivation. The linked route makes an earlier choice relevant to a later problem. The historical closing voice belongs to the same setting and recalls actual decisions. Formal philosophical definitions should follow the course readings."
+  },
+  {
+    "role": "C",
+    "kind": "failure",
+    "en": "An exhausted resource stops the voyage.",
+    "note_en": "C | Failure gives the decisions a consequence. Supplies at fifteen or below reduce sailing speed by thirty percent; at zero the ship stops. Trust at twenty or below suspends cooperation support; at zero crew members withdraw. The player can record a bad ending or pay for recovery. Recovery removes two hundred score, resets the combo and lowers the relevant upgrade tier. Supply recovery restores thirty-five supplies but also costs twenty hull condition. Trust recovery restores thirty trust. Values and tiers have zero floors. Choices remain saved. We have checked the installed build, reload persistence and evaluation before harbour replenishment."
+  },
+  {
+    "role": "C",
+    "kind": "upgrades",
+    "en": "The ship and crew carry the history.",
+    "note_en": "C | The ship makes capacity visible: supplies pay for hull refits and navigation equipment that appear on the sailing model. Crew outfits show the development of shared identity. Trust is an unlock threshold, so buying an outfit does not consume trust. The original characters remain recognizable. Losing a tier during recovery gives an interruption a visible history; the player does not emerge untouched from a failed arrangement. These upgrades support the story about maintaining capability and cooperation rather than being a separate reward screen."
+  },
+  {
+    "role": "C",
+    "kind": "cultural-reflection",
+    "en": "An action leaves something\nto understand again.",
+    "note_en": "C | Return to the knowledge–action–reflection loop. The player first explains what an arrangement is meant to achieve, then makes a decision and carries it out. A later scene shows the material and social consequences, and the return to shore creates a chance to reconsider the earlier explanation. Ask what changed, whose voice was missed and whether a different arrangement would preserve both provisions and cooperation. The ship and crew record different aspects of the voyage; neither balance is a complete account of human wellbeing. This is the educational interpretation we propose to evaluate, not a measured learning outcome. Hand over to D for the implemented product and its demonstration."
+  },
+  {
+    "role": "D",
+    "kind": "video",
+    "en": "Follow a choice into its consequences.",
+    "note_en": "D | Introduce the film in one sentence, then let it play. This is actual gameplay recorded from prepared demonstration saves and edited with game sound, synthetic narration and captions. It shows sailing, island interaction, visible upgrades, resource failure, recovery, a saved bad ending and a return to shore. The MP4 lasts approximately two minutes and forty-three seconds and is embedded here. The independent MP4 is the backup. This demonstration establishes observable implemented behaviour; it is not a continuous playthrough or evidence of classroom impact."
+  },
+  {
+    "role": "D",
+    "kind": "skills",
+    "en": "Capability leaves a further decision.",
+    "note_en": "D | The four task forms ask the player to steer through gates, hold position, collect useful objects or verify a sequence. Successfully completing an action creates a possibility; the player then decides how its result is used. That separation supports discussion. After the demonstration, invite the audience to name who benefited from one choice, who carried a cost, and what the next scene inherited. The game gives a facilitator concrete choices to discuss. E will now ask whether packaging that experience can become a deliverable that a teacher and a purchaser value."
+  },
+  {
+    "role": "D",
+    "kind": "course-snapshot",
+    "en": "One game world.\nEight routes through cultural questions.",
+    "note_en": "D | Establish the scope of the actual product without turning the presentation into a feature inventory. The game contains four eras, eight China/world routes and twenty-four story scenes. It preserves the original 3D characters, scenes and subtitles, with optional image notes, four water-task forms, ship and crew upgrades, original audio and resource-dependent endings. The common structure links a cultural problem to action, consequences and a historically appropriate return to shore. The counts describe implemented content, not active learners. The English and Chinese display systems share the same game data and numerical consequences."
+  },
+  {
+    "role": "D",
+    "kind": "course-validation",
+    "en": "Show what works.\nName what still needs a classroom.",
+    "note_en": "D | Separate product evidence from educational evidence. Current checks cover bilingual text and numerical consistency across the twenty-four scenes, native story access, resource failure, recovery costs, reload persistence and the evaluation before harbour replenishment. The film records actual game operations from prepared saves. It is edited rather than a continuous manual playthrough of every route. Classroom comprehension, curriculum fit and whether teachers can run a complete session with manageable support still require a pilot. The main voyage uses authored stories and local state; a working paid LLM service, advanced RAG and Constitutional AI training are not demonstrated features. Hand over to E to discuss the AI perspective and the actual development workflow."
+  },
+  {
+    "role": "E",
+    "kind": "anthropic-lens",
+    "en": "Stronger capabilities\nneed room for human judgment.",
+    "note_en": "E | Use Anthropic as a contemporary AI case, not as a universal authority over Chinese or world cultures. Anthropic’s official Claude Constitution describes honesty, respect for human agency and epistemic autonomy, and human oversight as intended properties. We borrow three design questions: can a player inspect the evidence; can different perspectives remain visible; and does the player retain the responsibility to decide? These are our applications of the source, not a claim of Anthropic endorsement or of implementing Constitutional AI training. The game’s sources, labelled reconstruction, inspectable consequences and player choices give concrete points to discuss. Primary source: https://www.anthropic.com/constitution . Its stated ideals are not a guarantee of any model’s behaviour."
+  },
+  {
+    "role": "E",
+    "kind": "workflow",
+    "en": "AI changed the cost of building.\nSelection and delivery still take work.",
+    "note_en": "E | Connect the tools to the business argument. Git history records the independent framework, then design, FastAPI contracts and React/Three.js handoffs. Local integration added SQLite saves, browser checks and a desktop wrapper; history, sound, upgrades and bilingual display were later revisions. The documents assign design to Claude, API work to Codex and web/3D work to Grok; they are a record of handoffs, not an audit of every model call. Lovable is a useful parallel for describe, build, synchronize with GitHub and continue locally. The repository does not establish a Lovable origin. Faster construction leaves us responsible for choosing coherent stories and delivering a session people can use. Sources: scripts/dev.sh, docs/handoffs/, Git commits c150efd through a75e93b; https://docs.lovable.dev/introduction/welcome and /integrations/github ."
+  },
+  {
+    "role": "E",
+    "kind": "economics",
+    "en": "The first purchase must cover its real work.",
+    "note_en": "E | This is an illustrative first-purchase model, not observed pricing or cost. Assume three thousand yuan for one class, twelve hundred in direct delivery cost and six hundred to acquire that customer. Contribution after those variable costs is twelve hundred, before fixed costs, tax and further development. If direct delivery cost rises to eighteen hundred, contribution falls to six hundred; at six hundred delivery cost it rises to eighteen hundred. The pilot budget on the later page distinguishes eighteen thousand in fixed launch work from twelve thousand held for delivery operations. Covering that eighteen-thousand fixed amount would require fifteen baseline first purchases, thirty at the higher delivery cost or ten at the lower cost. This assumes every purchase bears the full acquisition cost. Repeat purchases would change the calculation; retention is unmeasured. The delivery reserve is cash held for operations and is not added again as fixed expense. E | Keep business in proportion to the course. The proposed first offer is one guided cultural-history class with reviewed source notes and a facilitator guide; the teacher is a potential champion and an institution may approve payment. This is an application hypothesis. It should follow cultural and educational value, not determine what the historical story says. No customer or revenue claims are made."
+  },
+  {
+    "role": "E",
+    "kind": "closing",
+    "en": "What should we carry\ninto the next voyage?",
+    "note_en": "E | Course conclusion. Return to Chinese civilization and world cultures, technology and human purposes. Our question is how people can use greater capability while sustaining cooperation, evidence-based understanding and the freedom to judge. The game brings that question into a concrete voyage: understand the setting, hear different perspectives, act, encounter consequences and reflect. A–C supply the cultural interpretation; D demonstrates the product; E connects it to contemporary AI and a limited application proposal. Anthropic is one reference for thinking about honesty and agency, not a replacement for the course’s cultural concepts. The proposed classroom pilot should test whether these connections are understood. Current alignment is to CONTRIBUTING.md and the user’s direction; compliance with a teacher’s rubric remains unverified until the assignment text and time requirements are provided. Official AI source: https://www.anthropic.com/constitution .",
+    "course_closing": true
+  }
+]
