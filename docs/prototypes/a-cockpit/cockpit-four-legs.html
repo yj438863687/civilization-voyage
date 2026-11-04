@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>文化航程 · A 四航段罗盘驾驶舱</title>
+<style>
+/* 文明航程 · A 文化驾驶舱 · 墨海铜灯对齐（离线单文件，无 CDN） */
+:root{
+  --cv-ink-950:#0b1418;--cv-ink-900:#102027;--cv-ink-850:#142830;--cv-ink-800:#18303a;--cv-ink-700:#24434f;--cv-ink-600:#345966;--cv-ink-500:#4b7280;
+  --cv-paper-50:#f3ebdd;--cv-paper-100:#e8dcc6;--cv-paper-200:#dccaa9;--cv-paper-300:#cdb994;
+  --cv-paper-ink:#2a2620;--cv-paper-ink-muted:#5d5446;
+  --cv-brass-300:#dcbd84;--cv-brass-400:#c9a15a;--cv-brass-500:#ad8443;--cv-brass-600:#8e6b32;
+  --cv-sea-300:#8cc4ca;--cv-sea-400:#5fa6ae;
+  --cv-cinnabar-400:#d9694c;--cv-cinnabar-500:#b6452c;--cv-cinnabar-600:#9e3a26;
+  --cv-jade-400:#6faf8a;--cv-amber-400:#d9973f;--cv-slate-400:#8a979c;
+  --cv-bg:var(--cv-ink-950);
+  --cv-surface-1:var(--cv-ink-900);
+  --cv-surface-2:var(--cv-ink-850);
+  --cv-surface-3:var(--cv-ink-800);
+  --cv-surface-paper:var(--cv-paper-50);
+  --cv-surface-paper-2:var(--cv-paper-100);
+  --cv-text:var(--cv-paper-50);
+  --cv-text-muted:#b9b0a0;
+  --cv-text-faint:#857e72;
+  --cv-text-on-paper:var(--cv-paper-ink);
+  --cv-text-on-paper-muted:var(--cv-paper-ink-muted);
+  --cv-line:rgb(232 220 198 / 0.14);
+  --cv-line-strong:rgb(232 220 198 / 0.28);
+  --cv-line-on-paper:rgb(42 38 32 / 0.18);
+  --cv-focus-ring:var(--cv-brass-300);
+  --cv-action-primary-bg:var(--cv-cinnabar-500);
+  --cv-action-primary-text:var(--cv-paper-50);
+  --cv-action-primary-hover:var(--cv-cinnabar-400);
+  --cv-action-secondary-border:var(--cv-brass-500);
+  --cv-action-secondary-text:var(--cv-brass-300);
+  --cv-font-display:"Noto Serif CJK SC","Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",serif;
+  --cv-font-body:"Noto Sans CJK SC","Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --cv-font-mono:"IBM Plex Mono","SFMono-Regular",ui-monospace,monospace;
+  --cv-text-xs:0.75rem;--cv-text-sm:0.875rem;--cv-text-md:1rem;--cv-text-lg:1.25rem;--cv-text-xl:1.625rem;--cv-text-2xl:2.25rem;
+  --cv-leading-tight:1.25;--cv-leading-body:1.7;--cv-tracking-label:0.08em;
+  --cv-space-1:4px;--cv-space-2:8px;--cv-space-3:12px;--cv-space-4:16px;--cv-space-5:20px;--cv-space-6:24px;--cv-space-8:32px;--cv-space-10:40px;
+  --cv-radius-xs:2px;--cv-radius-sm:4px;--cv-radius-md:8px;
+  --cv-shadow-paper:0 1px 0 rgb(255 255 255 / 0.35) inset,0 8px 24px rgb(0 0 0 / 0.35);
+  --cv-shadow-panel:0 12px 32px rgb(0 0 0 / 0.45);
+  --cv-shadow-lamp:0 0 0 1px rgb(201 161 90 / 0.25),0 0 24px rgb(201 161 90 / 0.12);
+  --cv-hud-scrim:rgb(11 20 24 / 0.72);
+  --cv-touch-min:44px;
+  --cv-control-md:40px;--cv-control-lg:48px;
+  --cv-dur-instant:80ms;--cv-dur-fast:160ms;--cv-dur-base:240ms;
+  --cv-ease-out:cubic-bezier(0.2,0.7,0.2,1);
+  --cv-scene-accent:#c58b4b;
+  --cv-scene-sky-top:#1b2430;
+  --cv-scene-sky-horizon:#b98a5e;
+  --cv-scene-water:#23413f;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--cv-text);
+  font-family:var(--cv-font-body);
+  font-size:var(--cv-text-md);
+  line-height:var(--cv-leading-body);
+  -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(ellipse 70% 50% at 72% 8%, rgb(240 180 106 / 0.09), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 18% 100%, rgb(35 65 63 / 0.35), transparent 60%),
+    linear-gradient(180deg, var(--cv-scene-sky-top) 0%, var(--cv-ink-950) 42%, var(--cv-bg) 100%);
+}
+button,input,textarea,select{font:inherit;color:inherit}
+button,a,input,textarea,select{outline:none}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.step:focus-visible{
+  outline:2px solid var(--cv-focus-ring);outline-offset:2px;box-shadow:none;
+}
+button{
+  cursor:pointer;
+  border:1px solid var(--cv-line-strong);
+  border-radius:var(--cv-radius-sm);
+  padding:10px 16px;
+  min-height:var(--cv-control-md);
+  background:transparent;
+  color:var(--cv-text);
+  font-weight:500;
+  transition:background var(--cv-dur-fast) var(--cv-ease-out),border-color var(--cv-dur-fast),color var(--cv-dur-fast),transform var(--cv-dur-instant),box-shadow var(--cv-dur-fast);
+}
+button:hover{border-color:var(--cv-brass-500);color:var(--cv-brass-300);background:rgb(201 161 90 / 0.06)}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{cursor:not-allowed;opacity:.4;transform:none}
+a{color:var(--cv-sea-400);text-underline-offset:3px}
+a:hover{color:var(--cv-sea-300)}
+
+/* 按钮阶梯：一屏一处朱砂主印 */
+.primary{
+  background:var(--cv-action-primary-bg);
+  color:var(--cv-action-primary-text);
+  border-color:var(--cv-cinnabar-600);
+  box-shadow:0 1px 0 rgb(255 255 255 / 0.12) inset, 0 8px 18px rgb(182 69 44 / 0.28);
+  letter-spacing:.02em;
+}
+.primary:hover{background:var(--cv-action-primary-hover);color:var(--cv-action-primary-text);border-color:var(--cv-cinnabar-400)}
+.subtle{
+  padding:7px 12px;min-height:36px;font-size:var(--cv-text-sm);font-weight:500;
+  background:transparent;border-color:transparent;color:var(--cv-text-muted);
+}
+.subtle:hover{background:rgb(232 220 198 / 0.08);border-color:transparent;color:var(--cv-text)}
+.danger{color:var(--cv-cinnabar-400)}
+.danger:hover{background:rgb(185 69 44 / 0.12);border-color:rgb(185 69 44 / 0.35);color:var(--cv-cinnabar-400)}
+
+.shell{max-width:1280px;margin:auto;padding:0 var(--cv-space-8)}
+
+/* HUD 顶栏：舱内通讯条，非 SaaS 营销头 */
+header{
+  position:relative;
+  background:linear-gradient(180deg, rgb(11 20 24 / 0.92), rgb(16 32 39 / 0.88));
+  color:var(--cv-text);
+  padding:var(--cv-space-6) 0 var(--cv-space-8);
+  border-bottom:1px solid var(--cv-line);
+}
+header::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:linear-gradient(90deg, transparent 4%, var(--cv-brass-500) 18%, var(--cv-brass-300) 42%, var(--cv-brass-500) 62%, transparent 96%);
+  opacity:.85;
+}
+.brand{
+  font-family:var(--cv-font-mono);
+  font-size:var(--cv-text-xs);
+  letter-spacing:var(--cv-tracking-label);
+  color:var(--cv-brass-400);
+  text-transform:uppercase;
+}
+.headrow{display:flex;justify-content:space-between;gap:var(--cv-space-5);align-items:center}
+.headrow button{
+  color:var(--cv-brass-300);border-color:var(--cv-brass-600);
+  background:rgb(201 161 90 / 0.06);min-height:40px;
+}
+.headrow button:hover{background:rgb(201 161 90 / 0.14);border-color:var(--cv-brass-400);color:var(--cv-brass-300)}
+.eyebrow{
+  font-size:var(--cv-text-xs);letter-spacing:var(--cv-tracking-label);font-weight:600;
+  color:var(--cv-brass-400);margin:0 0 var(--cv-space-2);
+  font-family:var(--cv-font-mono);
+}
+h1{
+  font-family:var(--cv-font-display);
+  font-size:clamp(2rem, 3.4vw, 2.75rem);
+  line-height:var(--cv-leading-tight);
+  margin:var(--cv-space-3) 0 var(--cv-space-3);
+  font-weight:600;letter-spacing:.06em;
+  max-width:14em;
+}
+header p{max-width:38em;color:var(--cv-text-muted);margin:0;font-size:var(--cv-text-md);line-height:1.55}
+.notice{
+  margin-top:var(--cv-space-5);color:var(--cv-amber-400);font-size:var(--cv-text-sm);
+  border-top:1px dashed rgb(217 151 63 / 0.35);padding-top:var(--cv-space-4);line-height:1.55;
+  max-width:52em;
+}
+
+/* 非对称：窄仪器轨 + 宽纸面 */
+.layout{
+  display:grid;
+  grid-template-columns:220px minmax(0,1fr);
+  gap:var(--cv-space-8);
+  padding-top:var(--cv-space-8);
+  padding-bottom:var(--cv-space-10);
+  align-items:start;
+}
+.sidebar{
+  align-self:start;position:sticky;top:var(--cv-space-4);
+  background:var(--cv-surface-1);
+  border:1px solid var(--cv-line);
+  border-radius:var(--cv-radius-md);
+  box-shadow:var(--cv-shadow-panel);
+  padding:var(--cv-space-5) var(--cv-space-4);
+}
+.route-title{
+  font-size:var(--cv-text-xs);letter-spacing:var(--cv-tracking-label);
+  color:var(--cv-text-faint);margin:0 0 var(--cv-space-3);font-weight:500;
+}
+.steps{display:grid;gap:2px;position:relative}
+.steps::before{
+  content:"";position:absolute;left:21px;top:18px;bottom:18px;width:1px;
+  background:linear-gradient(180deg, var(--cv-brass-600), rgb(142 107 50 / 0.15));
+  pointer-events:none;
+}
+.step{
+  display:flex;text-align:left;align-items:flex-start;
+  padding:var(--cv-space-3) var(--cv-space-3);gap:var(--cv-space-3);
+  border:1px solid transparent;background:transparent;width:100%;
+  border-radius:var(--cv-radius-sm);min-height:52px;font-weight:500;color:var(--cv-text-muted);
+  position:relative;z-index:1;
+}
+.step:hover{background:rgb(232 220 198 / 0.05);border-color:transparent;color:var(--cv-text)}
+.step .n{
+  width:28px;height:28px;border:1px solid var(--cv-brass-600);
+  display:grid;place-items:center;border-radius:999px;font-size:11px;flex-shrink:0;
+  margin-top:1px;background:var(--cv-ink-950);color:var(--cv-brass-300);
+  font-family:var(--cv-font-mono);letter-spacing:0;transition:border-color var(--cv-dur-fast),background var(--cv-dur-fast),color var(--cv-dur-fast),box-shadow var(--cv-dur-fast);
+}
+.step small{display:block;font-weight:400;color:var(--cv-text-faint);line-height:1.4;font-size:11px;margin-top:2px}
+.step.active{
+  background:rgb(201 161 90 / 0.1);
+  color:var(--cv-text);
+  border-color:rgb(201 161 90 / 0.28);
+  box-shadow:var(--cv-shadow-lamp);
+}
+.step.active small{color:var(--cv-text-muted)}
+.step.active .n{
+  border-color:var(--cv-brass-300);background:var(--cv-brass-500);color:var(--cv-ink-950);
+  box-shadow:0 0 12px rgb(201 161 90 / 0.35);
+}
+.step[aria-current="step"] .n{font-weight:700}
+
+.mission{
+  border-top:1px solid var(--cv-line);margin-top:var(--cv-space-5);padding-top:var(--cv-space-4);
+  font-size:var(--cv-text-sm);color:var(--cv-text-muted);
+}
+.mission h3{
+  margin:0 0 var(--cv-space-2);font-size:var(--cv-text-sm);
+  font-family:var(--cv-font-display);color:var(--cv-brass-300);font-weight:600;letter-spacing:.04em;
+}
+.mission p{margin:6px 0;color:var(--cv-text-muted)}
+.saveinfo{font-size:var(--cv-text-xs);color:var(--cv-text-faint);margin:var(--cv-space-4) 0 var(--cv-space-2)}
+
+/* 纸面任务卡：灯下焦点 */
+.panel{
+  display:none;
+  background:var(--cv-surface-paper);
+  color:var(--cv-text-on-paper);
+  border:1px solid var(--cv-line-on-paper);
+  border-radius:var(--cv-radius-sm);
+  padding:var(--cv-space-8) var(--cv-space-8) var(--cv-space-6);
+  box-shadow:var(--cv-shadow-paper), var(--cv-shadow-lamp);
+  position:relative;
+}
+.panel::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg, var(--cv-brass-600), var(--cv-brass-300) 35%, transparent 70%);
+  border-radius:var(--cv-radius-sm) var(--cv-radius-sm) 0 0;
+  opacity:.9;
+}
+.panel.active{display:block;animation:panelIn var(--cv-dur-base) var(--cv-ease-out) both}
+@keyframes panelIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel h2{
+  font-size:var(--cv-text-2xl);line-height:var(--cv-leading-tight);
+  margin:2px 0 var(--cv-space-3);font-family:var(--cv-font-display);font-weight:600;letter-spacing:.02em;
+  color:var(--cv-text-on-paper);max-width:16em;
+}
+.panel .eyebrow{color:var(--cv-brass-600)}
+.lede{color:var(--cv-text-on-paper-muted);margin:0 0 var(--cv-space-5);max-width:42em;font-size:var(--cv-text-md)}
+.field{margin:var(--cv-space-5) 0}
+.field label,.label{display:block;font-weight:600;margin-bottom:7px;color:var(--cv-text-on-paper);font-size:var(--cv-text-sm)}
+.help{color:var(--cv-text-on-paper-muted);font-size:var(--cv-text-sm);margin:6px 0 0;line-height:1.5}
+textarea,input[type=text],select{
+  width:100%;border:1px solid rgb(42 38 32 / 0.22);border-radius:var(--cv-radius-sm);
+  background:#fffdf8;color:var(--cv-text-on-paper);padding:12px 14px;resize:vertical;
+  transition:border-color var(--cv-dur-fast),box-shadow var(--cv-dur-fast);
+}
+textarea{min-height:104px}
+textarea:focus,input:focus,select:focus{
+  border-color:var(--cv-brass-500);
+  box-shadow:0 0 0 2px rgb(201 161 90 / 0.22);
+}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spaced{justify-content:space-between}
+.sectionline{border:0;border-top:1px solid var(--cv-line-on-paper);margin:var(--cv-space-6) 0}
+.callout{
+  background:var(--cv-surface-paper-2);
+  border-left:3px solid var(--cv-brass-500);
+  padding:var(--cv-space-4);margin:var(--cv-space-5) 0;font-size:var(--cv-text-sm);
+  border-radius:0 var(--cv-radius-sm) var(--cv-radius-sm) 0;
+  color:var(--cv-text-on-paper);
+}
+.callout strong{display:block;margin-bottom:5px;font-family:var(--cv-font-display)}
+.nextrow{
+  border-top:1px solid var(--cv-line-on-paper);margin-top:var(--cv-space-6);padding-top:var(--cv-space-5);
+  display:flex;gap:10px;justify-content:space-between;align-items:center;
+}
+.nextrow > button:not(.primary){
+  background:transparent;color:var(--cv-brass-600);border:1px solid var(--cv-brass-500);
+}
+.nextrow > button:not(.primary):hover{background:rgb(201 161 90 / 0.08);color:var(--cv-brass-600)}
+.smalltag{
+  font-size:11px;border:1px solid rgb(42 38 32 / 0.2);border-radius:var(--cv-radius-xs);
+  padding:1px 7px;display:inline-block;font-weight:500;color:var(--cv-text-on-paper-muted);
+  background:transparent;vertical-align:middle;letter-spacing:.04em;
+}
+
+/* 材料：纸签，选中铜边 + 灯影 */
+.material{
+  border:1px solid var(--cv-line-on-paper);border-radius:var(--cv-radius-sm);
+  margin:var(--cv-space-3) 0;background:#fffdf8;
+  transition:border-color var(--cv-dur-fast),background var(--cv-dur-fast),box-shadow var(--cv-dur-fast);
+}
+.material.selected{
+  border-color:var(--cv-brass-500);
+  background:linear-gradient(90deg, rgb(201 161 90 / 0.12), #fffdf8 28%);
+  box-shadow:inset 3px 0 0 var(--cv-brass-400), var(--cv-shadow-lamp);
+}
+.material-head{display:flex;gap:var(--cv-space-3);padding:var(--cv-space-4) var(--cv-space-5)}
+.material-head input{width:18px;height:18px;margin-top:6px;accent-color:var(--cv-brass-500);flex-shrink:0}
+.material-main{flex:1;min-width:0}
+.material h3{margin:0 0 3px;font-size:var(--cv-text-lg);font-family:var(--cv-font-display);font-weight:600}
+.material p{margin:6px 0}
+.meta{font-size:var(--cv-text-xs);color:var(--cv-text-on-paper-muted);letter-spacing:.02em}
+blockquote{
+  font-family:var(--cv-font-display);font-size:1.25rem;line-height:1.55;
+  margin:var(--cv-space-3) 0;padding-left:var(--cv-space-4);
+  border-left:2px solid var(--cv-brass-500);color:var(--cv-text-on-paper);
+}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--cv-brass-600);font-weight:600;font-size:var(--cv-text-sm)}
+details .body{padding:12px 0 3px}
+.material-notes{min-height:70px;font-size:var(--cv-text-sm)}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:var(--cv-space-4)}
+.support{border-top:1px solid var(--cv-line-on-paper);padding-top:10px;margin-top:10px}
+.support b{font-size:var(--cv-text-sm)}
+.support p{font-size:var(--cv-text-sm)}
+.source-link{overflow-wrap:anywhere;font-size:var(--cv-text-xs)}
+.classification{
+  padding:var(--cv-space-5);background:var(--cv-surface-paper-2);
+  border-radius:var(--cv-radius-sm);margin-top:var(--cv-space-6);
+  border:1px solid rgb(174 124 54 / 0.22);
+}
+.classification .field:first-child{margin-top:0}
+.classification h3{font-family:var(--cv-font-display)}
+
+.crew{display:flex;gap:8px;flex-wrap:wrap}
+.crew button{
+  flex:1;min-width:120px;min-height:44px;
+  background:#fffdf8;color:var(--cv-text-on-paper);border-color:rgb(42 38 32 / 0.2);
+}
+.crew button:hover{border-color:var(--cv-brass-500);color:var(--cv-brass-600);background:rgb(201 161 90 / 0.08)}
+.crew button.active{
+  border-color:var(--cv-brass-500);background:rgb(201 161 90 / 0.16);
+  box-shadow:inset 0 -2px 0 var(--cv-brass-500);color:var(--cv-text-on-paper);
+}
+.crew-prompt{
+  padding:var(--cv-space-4) var(--cv-space-5);background:var(--cv-surface-paper-2);
+  border-top:3px solid var(--cv-brass-500);margin:var(--cv-space-3) 0;
+  color:var(--cv-text-on-paper);border-radius:0 0 var(--cv-radius-sm) var(--cv-radius-sm);
+}
+.crew-prompt p{margin:5px 0}
+.crew-prompt .meta{color:var(--cv-text-on-paper-muted)}
+.logitem{
+  border-left:2px solid var(--cv-brass-400);padding-left:12px;font-size:13px;margin:10px 0;
+  white-space:pre-wrap;overflow-wrap:anywhere;color:var(--cv-text-on-paper-muted);
+}
+.numlabel{color:var(--cv-cinnabar-500);margin-right:7px;font-weight:700;font-family:var(--cv-font-mono)}
+
+.preview{
+  border:1px solid var(--cv-line-on-paper);background:#fffdf8;
+  padding:var(--cv-space-6);border-radius:var(--cv-radius-sm);box-shadow:var(--cv-shadow-paper);
+}
+.preview h3{font-family:var(--cv-font-display);font-size:var(--cv-text-xl);margin:5px 0 12px}
+.preview .pair{padding:12px 0;border-top:1px solid var(--cv-line-on-paper)}
+.pair b{font-size:12px;letter-spacing:var(--cv-tracking-label);color:var(--cv-text-on-paper-muted);display:block;margin-bottom:5px;font-weight:600}
+.pair p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.preview-source{border-top:1px solid var(--cv-line-on-paper);padding-top:10px;margin-top:10px;font-size:13px;overflow-wrap:anywhere}
+.preview-source h4{margin:5px 0;font-family:var(--cv-font-display)}
+.preview-source p{margin:4px 0;white-space:pre-wrap}
+.statusbox{
+  padding:12px 15px;background:rgb(217 151 63 / 0.16);color:#71501e;
+  border-radius:var(--cv-radius-sm);margin-bottom:16px;font-size:13px;
+  border:1px solid rgb(217 151 63 / 0.35);
+}
+.statusbox.confirmed{background:rgb(111 175 138 / 0.18);color:#24583d;border-color:rgb(78 140 105 / 0.35)}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.actions button,.panel .actions button{
+  background:#fffdf8;color:var(--cv-text-on-paper);border:1px solid var(--cv-brass-500);
+}
+.validation{
+  color:#7a2e1f;background:rgb(185 69 44 / 0.1);padding:13px 16px;
+  border-radius:var(--cv-radius-sm);margin:15px 0;display:none;border:1px solid rgb(185 69 44 / 0.25);
+}
+.validation.visible{display:block}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translate(-50%,12px);
+  max-width:min(420px,calc(100% - 28px));padding:12px 18px;
+  background:var(--cv-hud-scrim);color:var(--cv-text);border:1px solid var(--cv-line-strong);
+  border-radius:var(--cv-radius-sm);z-index:100;box-shadow:var(--cv-shadow-panel);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity var(--cv-dur-base) var(--cv-ease-out),transform var(--cv-dur-base) var(--cv-ease-out),visibility var(--cv-dur-base);
+  font-size:var(--cv-text-sm);text-align:center;
+}
+.toast.visible{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.footer{font-size:var(--cv-text-xs);color:var(--cv-text-faint);border-top:1px solid var(--cv-line);padding:var(--cv-space-5) 0 var(--cv-space-8)}
+.count{font-size:var(--cv-text-xs);color:var(--cv-text-on-paper-muted)}
+.hidden{display:none!important}
+.print-meta{display:none}
+.pair.empty p{color:var(--cv-text-on-paper-muted)}
+.checkline{display:flex;gap:9px;align-items:flex-start;margin:18px 0}
+.checkline input{margin-top:7px;accent-color:var(--cv-cinnabar-500);width:18px;height:18px}
+.checkline label{font-size:14px;color:var(--cv-text-on-paper)}
+footer a{color:inherit}
+.full-width{width:100%;min-height:48px}
+
+/* 纸面内次要按钮颜色 */
+.panel button.subtle{color:var(--cv-text-on-paper-muted)}
+.panel button.subtle:hover{background:rgb(42 38 32 / 0.06);color:var(--cv-text-on-paper)}
+.panel button.danger{color:var(--cv-cinnabar-600)}
+.panel .nextrow .count{color:var(--cv-text-on-paper-muted)}
+
+@media(prefers-reduced-motion:reduce){
+  :root{--cv-dur-fast:0ms;--cv-dur-base:120ms;--cv-dur-instant:0ms}
+  .panel.active{animation:none}
+  .toast{transition:none}
+  button{transition:none}
+  button:active:not(:disabled){transform:none}
+  .material,.step .n{transition:none}
+}
+@media(prefers-contrast:more){
+  :root{--cv-text-muted:#ddd3c2;--cv-text-faint:#b9b0a0;--cv-line:rgb(232 220 198 / 0.4)}
+}
+@media(max-width:900px){
+  .shell{padding:0 var(--cv-space-5)}
+  .layout{grid-template-columns:1fr;gap:var(--cv-space-4);padding-top:var(--cv-space-5);padding-bottom:var(--cv-space-6)}
+  .sidebar{position:static;padding:var(--cv-space-4)}
+  .steps{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .steps::before{display:none}
+  .step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 4px;font-size:12px;min-height:56px;gap:4px}
+  .step .n{margin:0}
+  .step small{display:none}
+  .mission{display:none}
+  .sidebar .saveinfo{margin:10px 0 0}
+  .sidebar .danger{display:none}
+  .panel{padding:var(--cv-space-6) var(--cv-space-5)}
+  .headrow{align-items:flex-start}
+  .brand{font-size:10px}
+  .headrow button{font-size:12px;padding:8px 10px;min-height:40px}
+  .columns{grid-template-columns:1fr}
+  .panel h2{font-size:var(--cv-text-xl)}
+  h1{font-size:32px}
+}
+@media(max-width:520px){
+  .shell{padding:0 14px}
+  header{padding:18px 0 22px}
+  h1{font-size:28px;letter-spacing:.04em}
+  .headrow{gap:8px}
+  .panel{padding:18px 16px}
+  .panel h2{font-size:23px}
+  .material-head{padding:14px 12px;gap:9px}
+  .preview{padding:16px}
+  .step .n{width:24px;height:24px}
+  .step{font-size:11px;min-height:52px}
+  .nextrow{align-items:stretch;flex-wrap:wrap}
+  .nextrow button{font-size:13px;padding:11px 12px;min-height:44px}
+  .nextrow .count{max-width:100%}
+  .notice{font-size:12px}
+  .actions button{flex:1;font-size:13px;min-height:44px}
+  .row.spaced{gap:8px}
+  .classification{padding:14px}
+  .brand{letter-spacing:.08em}
+  .crew button{min-width:calc(50% - 4px)}
+}
+@media print{
+  body{background:white;font-size:10pt;color:#182c30}
+  header,.sidebar,.panel:not(#panel-4),.no-print,.footer,.toast{display:none!important}
+  .shell{padding:0;max-width:none}
+  .layout{display:block;margin:0;padding:0}
+  .panel#panel-4{display:block!important;padding:0;border:0;box-shadow:none;animation:none}
+  .panel#panel-4::before{display:none}
+  .panel#panel-4>.eyebrow,.panel#panel-4>h2,.panel#panel-4>.lede{display:none}
+  .preview{border:0;padding:0;box-shadow:none}
+  .preview h3{font-size:20pt}
+  .preview .pair,.preview-source{break-inside:avoid}
+  .print-meta{display:block;font-size:9pt;color:#536164}
+  .statusbox{padding:8px;border:1px solid #bbc3bc;background:none!important}
+  .preview-source a{color:#182c30;text-decoration:none}
+  .preview-source a:after{content:' (' attr(href) ')';font-size:8pt}
+  .pair b{font-size:9pt}
+  .pair p{font-size:10pt}
+  .preview-source{font-size:9pt}
+  @page{size:A4;margin:17mm}
+}
+
+/* 罗盘四态轨 · CV-20261104-01 */
+.compass-rail{margin-top:var(--cv-space-4);padding-top:var(--cv-space-4);border-top:1px dashed var(--cv-line);}
+.compass-rail h3{margin:0 0 var(--cv-space-2);font-size:var(--cv-text-xs);letter-spacing:var(--cv-tracking-label);color:var(--cv-brass-400);font-family:var(--cv-font-mono);font-weight:600;}
+.compass-list{display:grid;gap:6px;margin:0;padding:0;list-style:none;}
+.compass-list li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start;padding:8px;border:1px solid var(--cv-line);border-radius:var(--cv-radius-sm);background:rgb(11 20 24 / 0.35);font-size:12px;color:var(--cv-text-muted);line-height:1.4;}
+.compass-list .dot{width:10px;height:10px;margin-top:4px;border-radius:999px;border:1px solid var(--cv-brass-500);background:var(--cv-ink-950);}
+.compass-list li[data-leg="agriculture"] .dot{background:var(--cv-brass-600);}
+.compass-list li[data-leg="industry"] .dot{background:var(--cv-amber-400);}
+.compass-list li[data-leg="information"] .dot{background:var(--cv-sea-400);}
+.compass-list li[data-leg="ai"] .dot{background:var(--cv-cinnabar-400);}
+.compass-list strong{display:block;color:var(--cv-text);font-weight:600;font-size:12px;}
+.compass-pass{margin-top:8px;font-size:11px;color:var(--cv-text-faint);line-height:1.45;}
+.material .leg-chip{display:inline-block;margin-left:6px;padding:2px 8px;border:1px solid var(--cv-brass-600);border-radius:999px;font-size:11px;color:var(--cv-brass-300);font-family:var(--cv-font-mono);letter-spacing:.04em;vertical-align:middle;}
+.disclosure-banner{margin-top:var(--cv-space-4);padding:10px 12px;border:1px solid rgb(217 151 63 / 0.45);border-radius:var(--cv-radius-sm);background:rgb(217 151 63 / 0.08);color:var(--cv-amber-400);font-size:var(--cv-text-sm);line-height:1.5;}
+</style></head>
+<body><header><div class="shell"><div class="headrow"><div class="brand">HARBOURMIND / CULTURAL JOURNEY</div><button id="load-demo" type="button">载入完整演示</button></div><h1>文化驾驶舱 · 四航段罗盘</h1><p>玄览玄通 · 同一条航程：靠天漂流 → 造岸 → 造动力 → 造信息 → 造智能。</p><div class="notice">交互提案 · CV-20261104-01 · 2026.11.04 · <strong>预设台词 / 非实时模型</strong> · <strong>本页≠3D 航程 Demo</strong> · 未接入真实 AI · 输入仅保存在当前浏览器</div><div class="disclosure-banner" role="note">诚实披露：船员席位为大副/二副<strong>示例预设台词</strong>，不是直播模型；本页是 A 岗离线表单原型，不是同学侧 3D 游戏引擎或关卡。</div></div></header>
+<main class="shell layout"><aside class="sidebar no-print"><p class="route-title">A · 四航段罗盘传代</p><nav class="steps" aria-label="驾驶舱流程"><button class="step active" data-step="1"><span class="n">01</span><span>我的起点<small>原先以为进步是……</small></span></button><button class="step" data-step="2"><span class="n">02</span><span>四航段材料<small>看见证据边界</small></span></button><button class="step" data-step="3"><span class="n">03</span><span>修订判断<small>指出罗盘传代</small></span></button><button class="step" data-step="4"><span class="n">04</span><span>问题卡<small>交给下一岗</small></span></button></nav><div class="mission"><h3>共同确认的航程任务</h3><p>在四航段材料边界内，形成可交给 B/D 的问题卡：什么算「造出下一段能力」、依据哪张罗盘、把什么未知传下去。</p><p>机制：材料证明范围 / 判断贴签（事实依据·我的解释·尚不能断）/ 罗盘传代记录。</p><p>本页只做文化理解与驾驶舱讲解。不实现 3D Demo、真 API 或扣费。</p></div><div class="compass-rail" aria-label="罗盘四态"><h3>海图 / 罗盘四态</h3><ul class="compass-list"><li data-leg="agriculture"><span class="dot" aria-hidden="true"></span><span><strong>① 泥板河岸</strong>农业：定居与储存 · 传给蒸汽海图</span></li><li data-leg="industry"><span class="dot" aria-hidden="true"></span><span><strong>② 蒸汽海图</strong>工业：自造动力 · 传给网络航图</span></li><li data-leg="information"><span class="dot" aria-hidden="true"></span><span><strong>③ 网络航图</strong>信息：实时协作 · 传给模型星图</span></li><li data-leg="ai"><span class="dot" aria-hidden="true"></span><span><strong>④ 模型星图</strong>AI：人定方向 · 未知交 B/D</span></li></ul><p class="compass-pass">每段结束可「传给下一段」：共同任务 + 文化碎片 + 选择记录；资源字段 pending。</p></div><p class="saveinfo" id="save-state" role="status">草稿保存在本机浏览器</p><button class="subtle danger" id="reset-draft">重置本机草稿</button></aside>
+<section class="panel active" id="panel-1" aria-labelledby="title-1"><p class="eyebrow">01 / DEPARTURE</p><h2 id="title-1" tabindex="-1">你原先以为人类进步是什么？</h2><p class="lede">先留下自己的理解。稍后回看，你会更容易说清哪一条材料、哪一张罗盘形态改变了哪个判断。</p><div class="field"><div class="row spaced"><label for="initial-view">我的初始理解 <span class="smalltag">个人经验</span></label><button class="subtle" id="fill-initial">使用示例</button></div><textarea id="initial-view" maxlength="1600" placeholder="例如：我原先以为人类进步就是技术越来越新，终点是某个更先进的港口。"></textarea><p class="help">可写观察或经历。不必填写姓名或私人故事。</p></div><div class="field"><label for="confidence">我对这个理解的把握</label><select id="confidence"><option value="unsure">还不确定</option><option value="partly">有些把握</option><option value="sure">比较确信</option></select><p class="help">这只是自我记录，不是正确性分数或学习成绩。</p></div><div class="field"><label for="shared-mission">共同确认的航程任务 <span class="smalltag">可修订</span></label><textarea id="shared-mission" maxlength="1200" placeholder="示例：弄清在四段航程里什么算造出下一段能力，并写出依据的罗盘与未知。"></textarea><p class="help">对齐 PPT·A 岗：讨论后形成共同任务；导出时写入问题卡，可携带至下一段。</p></div><div class="callout"><strong>本次主问题</strong>在四段航程里，什么算「自己造出下一段能力」？你依据哪张「海图/罗盘」做出判断，又把什么未知交给下一岗？终点不是某个港口，而是能力扩展能走多远。</div><details><summary>为什么叫“玄览玄通”？与 3D Demo 的边界</summary><div class="body"><p>“玄览玄通”是 A 岗组合名称：省察自己的理解、仔细看材料。本页是离线驾驶舱讲解原型。</p><p><strong>本页≠3D 航程 Demo</strong>：引擎、传送门、关卡在同学侧 D 岗；本队只交付场景正文、材料边界与问题卡。文案可互文，代码不耦合。</p></div></details><div class="nextrow"><span class="count">保留起点，才看得见修订</span><button class="primary" data-go="2">带着理解看四航段 →</button></div></section>
+<section class="panel" id="panel-2" aria-labelledby="title-2"><p class="eyebrow">02 / SOURCE ROOM</p><h2 id="title-2" tabindex="-1">四航段材料：能支持什么，也不能推出什么</h2><p class="lede">四张材料对应泥板河岸 → 蒸汽海图 → 网络航图 → 模型星图。请至少选用一张（建议读完四段）作为问题卡依据。</p><p class="help">建议先读“可支持/不能推出”再勾选。AI 段材料禁止被读成“已证实课堂学习效果”。</p><div id="materials"></div><div class="classification"><h3 style="margin:0 0 12px;font-size:18px">给一个判断贴签</h3><div class="field"><label for="statement">我正在判断的这句话</label><textarea id="statement" maxlength="1000" placeholder="例如：蒸汽相对风力的独立性，说明人类开始自己造动力，而不只是更会读风。"></textarea></div><div class="columns"><div class="field" style="margin-top:0"><label for="statement-tag">这句话属于</label><select id="statement-tag"><option value="interpretation">我的解释</option><option value="direct_text">事实依据</option><option value="unverified">尚不能断</option></select></div><div class="field" style="margin-top:0"><label for="statement-reason">为什么这样分类？</label><input type="text" id="statement-reason" maxlength="700" placeholder="说明所依据的词句或证据缺口"></div></div><p class="help">贴签语义：事实依据 / 我的解释 / 尚不能断。原型不自动裁判对错。</p></div><div class="nextrow"><button data-go="1">← 回看起点</button><button class="primary" data-go="3">请船员帮我追问 →</button></div></section>
+<section class="panel" id="panel-3" aria-labelledby="title-3"><p class="eyebrow">03 / REFRAME</p><h2 id="title-3" tabindex="-1">修订理解：指出哪张罗盘改变了判断</h2><p class="lede">船员席位为大副/二副<strong>示例预设台词</strong>（非实时模型）。你来决定是否采纳，并写明材料与罗盘形态怎样影响了判断。</p><div class="crew" role="group" aria-label="预设船员提示"><button data-crew="source" class="active" aria-pressed="true">大副（示例）</button><button data-crew="question" aria-pressed="false">二副（示例）</button><button data-crew="boundary" aria-pressed="false">边界提醒</button></div><div class="crew-prompt" aria-live="polite"><p class="meta">预设台词 · 非实时模型 · 当前提示不由模型生成</p><p id="crew-prompt"></p></div><details><summary>记录我对这条提示的回应（可选）</summary><div class="body"><div class="columns"><select id="crew-adoption" aria-label="提示采纳状态"><option value="modified">改写后采纳</option><option value="accepted">采纳</option><option value="deferred">暂不采纳</option></select><input id="crew-response" type="text" maxlength="700" aria-label="回应与理由" placeholder="写下你的回应或保留理由"></div><p><button class="subtle" id="record-crew">记录这条回应</button></p><div id="crew-log"></div></div></details><hr class="sectionline"><div class="field"><label for="revised-view"><span class="numlabel">①</span>我现在的理解</label><textarea id="revised-view" maxlength="1600" placeholder="保留哪些原先的理解？对“造岸/造动力/造信息/造智能”增加了什么限定？"></textarea></div><div class="field"><label for="unknown"><span class="numlabel">②</span>我仍不知道的事情</label><textarea id="unknown" maxlength="1200" placeholder="例如：下一岗如何把共同任务与文化碎片接住？资源线路仍是 pending。"></textarea></div><div class="field"><label for="revised-question"><span class="numlabel">③</span>交给下一岗共同探索的问题</label><textarea id="revised-question" maxlength="1600" placeholder="对齐主问题：什么算造出下一段能力？依据哪张罗盘？把什么未知传下去？"></textarea></div><div class="field"><label for="compass-shift"><span class="numlabel">④</span>哪张罗盘形态改变了判断？</label><select id="compass-shift"><option value="">请选择</option><option value="mud_tablet">泥板河岸（农业）</option><option value="steam_chart">蒸汽海图（工业）</option><option value="network_chart">网络航图（信息）</option><option value="model_star_map">模型星图（AI）</option></select><p class="help">须能指认传代：该形态如何让你修订了“人类进步”的理解。</p></div><div class="field"><label for="revision-reason"><span class="numlabel">⑤</span>哪条材料改变了哪个判断？</label><textarea id="revision-reason" maxlength="1800" placeholder="请引用已勾选材料编号，如：M2 中蒸汽‘independence of wind’让我把“进步=更快的船”修订为“自造动力、可预期航程”；并把燃料代价列为未知……"></textarea><p class="help">请至少写出一个已选材料编号（M1–M4），并呼应上方罗盘形态。编号只检查关联，解释仍需人来核对。</p></div><div class="field"><label for="participation-boundaries">讲解 / 参与边界（可选）</label><textarea id="participation-boundaries" maxlength="1000" placeholder="例如：不声称接通过真实模型；不把本页演示说成 3D 引擎已实现；材料 limit 必须读出。" style="min-height:75px"></textarea></div><div class="nextrow"><button data-go="2">← 回看材料</button><button class="primary" data-go="4">查看我的问题卡 →</button></div></section>
+<section class="panel" id="panel-4" aria-labelledby="title-4"><p class="eyebrow">04 / QUESTION CARD</p><h2 id="title-4" tabindex="-1">一张可传代的问题卡</h2><p class="lede">保留原先理解、罗盘传代理由与未知。个人确认后交给 B/D；<code>group_status</code> 恒为 pending。</p><div class="validation no-print" id="validation" role="alert"></div><div class="preview" id="card-preview"><p class="eyebrow">文化航程 · 玄览玄通 · four_legs_compass</p><h3>四航段罗盘 / 文化问题卡</h3><div class="statusbox" id="card-status"></div><p class="print-meta">交互提案 · 预设台词 / 非实时模型 · 本页≠3D 航程 Demo · 未接入真实 AI</p><div id="preview-body"></div><div class="pair"><b>所选材料及其使用边界</b><div id="preview-sources"></div></div><div class="pair"><b>下一站交接（携带）</b><p>交给 B 比较观点与异议；交给 D 保留来源、选择记录与罗盘传代说明。资源字段 pending。个人确认 ≠ 全组共识。</p></div><p class="meta">本卡为本地交互原型输出，不是真实访谈、全组共识、学习效果证明，也不是 3D 引擎已实现的声明。</p></div><div class="no-print"><div class="checkline"><input type="checkbox" id="confirm-check"><label for="confirm-check">我已核对这张卡表达了我的理解，知道它只代表个人确认；成员协商与资源线路仍为待确认 / pending。</label></div><button class="primary full-width" id="confirm-card">确认我的问题卡</button><div class="actions"><button id="export-json">导出 JSON</button><button id="export-text">导出文字卡</button><button id="print-card">打印 / 保存 PDF</button></div><p class="help">JSON 可交给 D；文字卡适合组内讲解。真正发群须体验 PASS + 用户批 + 调度信封。</p><div class="nextrow"><button data-go="3">← 继续修订</button><button class="subtle danger" id="reset-bottom">重置本机草稿</button></div></div></section>
+</main><footer class="shell footer"><div class="row spaced"><span>A 岗交互提案 · CV-20261104-01 · 2026.11.04 · 预设台词/非实时模型 · 本页≠3D Demo · file:// 打开</span><span>内容离线可读，点击出处链接需要联网</span></div></footer><div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script id="compass-meta" type="application/json">{"M1":{"leg":"agriculture","compass":"泥板河岸","pass":"传给蒸汽海图"},"M2":{"leg":"industry","compass":"蒸汽海图","pass":"传给网络航图"},"M3":{"leg":"information","compass":"网络航图","pass":"传给模型星图"},"M4":{"leg":"ai","compass":"模型星图","pass":"未知交 B/D"}}</script>
+<script id="source-data" type="application/json">[{"id":"M1","title":"新石器时代革命：定居、耕作与余粮储存","kind":"公开教材概述","context":"OpenStax《World History Volume 1》§2.3 The Neolithic Revolution；概述农业如何支持更大定居社群与可储存余粮。航段：农业革命·泥板河岸。","quote":"When functioning well, agriculture created a constant supply of food and even a surplus that could be stored.","support":"可支持：从采集漂流到主动耕作/定居后，出现可储存的食物余粮，并支撑更大规模的定居人口。","limit":"不能推出：所有地区同步发生同一场“革命”；也不能把余粮储存直接等同于现代港口粮仓或商业港口制度。教材是通史概述，非单一考古点报告。","question":"在“泥板河岸”航段里，什么算人类自己造出的下一段能力——定居本身，还是把余粮变成可交接的储存与分工？","url":"https://openstax.org/books/world-history-volume-1/pages/2-3-the-neolithic-revolution"},{"id":"M2","title":"从风帆到蒸汽：航运日程可预期","kind":"公开海事史叙述","context":"英国皇家博物馆格林威治（RMG）故事文《Sail to steam》；描述蒸汽船相对风力的独立性与定期航线。航段：工业革命·蒸汽海图。","quote":"the more fundamental advantage for both passengers and owners was steam’s independence of wind – and thus the capacity to set a regular and reliable schedule.","support":"可支持：蒸汽动力使船舶不再完全依赖风向，航运可建立更规律的时刻与路线规划。","limit":"不能推出：早期蒸汽船已全面取代帆船，或蒸汽必然带来公平与繁荣；文中亦提到早期蒸汽昂贵、耗煤、舱容被燃料占用等代价。","question":"“蒸汽海图”上，自造动力是否等于造出下一段能力？还要把哪些未知（燃料、成本、航线选择）交给下一岗？","url":"https://www.rmg.co.uk/stories/ocean/sailing-ships-steam-power-how-industrial-revolution-changed-life-sea-forever"},{"id":"M3","title":"互联网简史：跨越地理的协作介质","kind":"公开技术史文稿","context":"Internet Society《A Brief History of the Internet》（Leiner 等）；概括互联网作为广播、信息传播与跨地理协作介质。航段：信息革命·网络航图。","quote":"The Internet is at once a world-wide broadcasting capability, a mechanism for information dissemination, and a medium for collaboration and interaction between individuals and their computers without regard for geographic location.","support":"可支持：信息基础设施使协作与信息流通可以不再绑定同一物理地点，形成“实时航图/网络”式能力扩展。","limit":"不能推出：互联网天然平等、无摩擦，或技术史叙述等于某一课堂产品已经落地；文稿是参与者视角的历史概述，不是效果评估。","question":"在“网络航图”上，什么算造出下一段能力——协议与连接本身，还是把共同任务与选择记录稳定带向下一段？","url":"https://www.internetsociety.org/internet/history-internet/brief-history-internet/"},{"id":"M4","title":"OECD AI 原则：人定方向与机器辅助","kind":"政府间原则文本（公开讨论材料）","context":"OECD AI Principles（2019 通过，后续更新）；强调以人为本的价值与人类能动/监督。航段：AI·模型星图。禁止当作课堂学习效果证明。","quote":"AI systems should be designed in a way that respects the rule of law, human rights, democratic values and diversity, and they should include appropriate safeguards–for example, enabling human intervention where necessary–to ensure a fair and just society.","support":"可支持：公开原则讨论把“人类干预/监督”写成可信 AI 的设计要求之一，对应“人定方向、机器航行”的分工隐喻。","limit":"不能推出：本驾驶舱或任何课堂接通过真实模型、证实了学习效果，或原则文本等于产品已落地；原则是规范讨论，不是实验报告。","question":"在“模型星图”上，怎样判断我们是在设定目的地，而不是把判断完全交给黑箱？还要把什么未知交给 B/D？","url":"https://www.oecd.org/en/topics/sub-issues/ai-principles.html"}]</script>
+<script>
+'use strict';
+const SOURCES=JSON.parse(document.getElementById('source-data').textContent);
+const STORE='harbourmind-a-cockpit-four-legs-v1';
+const DISCLOSURE='交互提案；预设台词/非实时模型；本页≠3D航程Demo；未接入真实AI；不代表真实访谈、全组共识、学习效果证明或引擎已落地。';
+const fields=['initial-view','confidence','shared-mission','statement','statement-tag','statement-reason','revised-view','unknown','revised-question','compass-shift','revision-reason','participation-boundaries'];
+const COMPASS=JSON.parse(document.getElementById('compass-meta').textContent);
+const compassNames={mud_tablet:'泥板河岸',steam_chart:'蒸汽海图',network_chart:'网络航图',model_star_map:'模型星图'};
+const prompts={source:'大副（示例·预设台词）：你准备引用哪条材料？它直接写了什么？请把“事实依据”与“我的解释”分开，并指出对应哪张罗盘形态。',question:'二副（示例·预设台词）：在四段航程里，什么算“自己造出下一段能力”？你的判据能交给下一岗复核吗？还要把什么未知写进问题卡？',boundary:'边界提醒（预设台词）：通史概述或原则文本能代表所有时代与课堂效果吗？请写出 support/limit，并禁止把本页说成接通过真实模型或落地了 3D 引擎。'};
+const crewNames={source:'大副（示例）',question:'二副（示例）',boundary:'边界提醒'};
+const adoptionNames={accepted:'采纳',modified:'改写后采纳',deferred:'暂不采纳'};
+const tagNames={direct_text:'事实依据',interpretation:'我的解释',unverified:'尚不能断'};
+const confidenceNames={unsure:'还不确定',partly:'有些把握',sure:'比较确信'};
+const blank=()=>({schema_version:'1.0',created_at:new Date().toISOString(),updated_at:new Date().toISOString(),step:1,values:{confidence:'unsure','statement-tag':'interpretation'},selected:[],notes:{},crew_records:[],personal_confirmation:{status:'draft',confirmed_at:null},group_status:'pending'});
+let state=blank(),storageOK=true,currentCrew='source',toastTimer;
+try{const raw=localStorage.getItem(STORE);if(raw){const saved=JSON.parse(raw);if(saved.schema_version==='1.0'&&saved.values&&Array.isArray(saved.selected)){state={...blank(),...saved};state.selected=state.selected.filter(id=>SOURCES.some(s=>s.id===id));state.notes=state.notes||{};state.crew_records=Array.isArray(state.crew_records)?state.crew_records:[];state.personal_confirmation=state.personal_confirmation||{status:'draft',confirmed_at:null};state.step=[1,2,3,4].includes(state.step)?state.step:1;state.group_status='pending';}}}catch(e){storageOK=false;}
+const $=id=>document.getElementById(id);
+const el=(tag,txt,cls)=>{const x=document.createElement(tag);if(txt!==undefined)x.textContent=txt;if(cls)x.className=cls;return x;};
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),4200);}
+function save(){state.updated_at=new Date().toISOString();try{localStorage.setItem(STORE,JSON.stringify(state));storageOK=true;}catch(e){storageOK=false;}$('save-state').textContent=storageOK?'草稿已保存在当前浏览器 · 刷新可恢复':'当前浏览器无法保存草稿，请及时导出文件';}
+function changed(){if(state.personal_confirmation.status==='confirmed'){state.personal_confirmation={status:'draft',confirmed_at:null};$('confirm-check').checked=false;toast('内容已修改，个人确认已撤销，请重新核对。');}save();if(state.step===4)renderPreview();}
+function goStep(n,focus=true){state.step=n;document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+n));document.querySelectorAll('.step').forEach(b=>{b.classList.toggle('active',Number(b.dataset.step)===n);b.setAttribute('aria-current',Number(b.dataset.step)===n?'step':'false');});if(n===4)renderPreview();save();if(focus){$('title-'+n).focus({preventScroll:true});window.scrollTo({top:document.querySelector('.layout').offsetTop-12,behavior:(window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth')});}}
+function renderSources(){const wrap=$('materials');wrap.replaceChildren();for(const source of SOURCES){const card=el('article',undefined,'material'+(state.selected.includes(source.id)?' selected':''));card.dataset.source=source.id;const head=el('div',undefined,'material-head');const check=el('input');check.type='checkbox';check.id='select-'+source.id;check.checked=state.selected.includes(source.id);check.setAttribute('aria-label','选用 '+source.id+' '+source.title);check.addEventListener('change',()=>{state.selected=check.checked?[...new Set([...state.selected,source.id])]:state.selected.filter(x=>x!==source.id);card.classList.toggle('selected',check.checked);changed();});const main=el('div',undefined,'material-main');const title=el('h3');const label=el('label',source.id+' · '+source.title);label.htmlFor=check.id;title.append(label);const chip=COMPASS[source.id];if(chip){const c=el('span',chip.compass+' · '+chip.pass,'leg-chip');title.append(c);}main.append(title,el('div',source.kind+' / '+source.context,'meta'));main.append(el('blockquote',source.quote));const details=el('details');details.append(el('summary','展开来源、使用边界与我的记录'));const body=el('div',undefined,'body');const support=el('div',undefined,'support');support.append(el('b','可支持的判断'),el('p',source.support),el('b','不能直接推出'),el('p',source.limit),el('b','仍可追问'),el('p',source.question));const link=el('a','打开材料出处','source-link');link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';support.append(link);body.append(support);const notesLabel=el('label','我的材料记录（可选）','label');notesLabel.htmlFor='note-'+source.id;notesLabel.style.marginTop='14px';const notes=el('textarea',undefined,'material-notes');notes.id='note-'+source.id;notes.maxLength=1200;notes.value=state.notes[source.id]||'';notes.placeholder='哪句值得记下？它支持什么，还不能说明什么？';notes.addEventListener('input',()=>{state.notes[source.id]=notes.value;changed();});body.append(notesLabel,notes);details.append(body);main.append(details);head.append(check,main);card.append(head);wrap.append(card);}}
+function renderCrew(){document.querySelectorAll('[data-crew]').forEach(b=>{const on=b.dataset.crew===currentCrew;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});$('crew-prompt').textContent=prompts[currentCrew];const existing=state.crew_records.find(r=>r.role===currentCrew);$('crew-adoption').value=existing?existing.adoption:'modified';$('crew-response').value=existing?existing.response:'';const log=$('crew-log');log.replaceChildren();for(const r of state.crew_records){log.append(el('div',crewNames[r.role]+' · '+adoptionNames[r.adoption]+'\n'+r.response,'logitem'));}}
+function pair(label,value){const d=el('div',undefined,'pair'+(!value?' empty':''));d.append(el('b',label),el('p',value||'尚未填写'));return d;}
+function pack(){const compassKey=state.values['compass-shift']||'';return{schema_version:'1.0',product:'文化航程',module:'A_玄览玄通_文化驾驶舱',deliverable_version:'CV-20261104-01',scenario_id:'four_legs_compass',scenario:{name:'四航段文明航程·罗盘传代',duration_minutes:30,note:'场景为设计示例；非3D Demo；非真API'},created_at:state.created_at,updated_at:state.updated_at,initial_view:state.values['initial-view']||'',shared_mission:state.values['shared-mission']||'',confidence:{value:state.values.confidence,label:confidenceNames[state.values.confidence],meaning:'自评，不是正确性或学习成绩'},classification:{statement:state.values.statement||'',tag:state.values['statement-tag'],tag_label:tagNames[state.values['statement-tag']],reason:state.values['statement-reason']||''},revised_view:state.values['revised-view']||'',unknown:state.values.unknown||'',revised_question:state.values['revised-question']||'',compass_shift:{value:compassKey,label:compassNames[compassKey]||'',meaning:'指出哪张罗盘形态改变了判断，并可传给下一段'},revision_reason:state.values['revision-reason']||'',participation_boundaries:state.values['participation-boundaries']||'',sources:SOURCES.filter(s=>state.selected.includes(s.id)).map(s=>({...s,compass:(COMPASS[s.id]||{}).compass||'',student_note:state.notes[s.id]||''})),crew_records:state.crew_records.map(r=>({...r,crew_name:crewNames[r.role],prompt:prompts[r.role],origin:'preset_script'})),carry:{common_task:state.values['shared-mission']||'',cultural_fragments:state.selected.slice(),choice_records:{classification_tag:state.values['statement-tag']||'',compass_shift:compassKey,revision_reason:state.values['revision-reason']||''},resources:'pending'},personal_confirmation:{...state.personal_confirmation},group_status:'pending',handoff:'B负责成员观点与异议确认；D负责页面整合与罗盘传代状态；资源线路 pending。',prototype_disclosure:DISCLOSURE};}
+function renderPreview(){const data=pack();const confirmed=data.personal_confirmation.status==='confirmed';$('card-status').className='statusbox'+(confirmed?' confirmed':'');$('card-status').textContent=confirmed?'个人已确认 · 小组仍待确认 · 修改内容将撤销个人确认':'个人草稿 · 尚未确认 · 小组仍待确认';$('confirm-card').textContent=confirmed?'已个人确认；修改后需重新确认':'确认我的问题卡';$('confirm-card').disabled=confirmed;const body=$('preview-body');body.replaceChildren(pair('原先的理解',data.initial_view),pair('共同确认的航程任务',data.shared_mission),pair('起点的把握（仅自评）',data.confidence.label),pair('判断贴签',data.classification.statement?(data.classification.tag_label+'：'+data.classification.statement+'\n分类理由：'+(data.classification.reason||'尚未填写')):''),pair('我现在的理解',data.revised_view),pair('仍然未知',data.unknown),pair('共同探索的问题',data.revised_question),pair('改变判断的罗盘形态',data.compass_shift.label||''),pair('变化及材料依据',data.revision_reason),pair('携带·资源',data.carry.resources));if(data.participation_boundaries)body.append(pair('参与边界',data.participation_boundaries));if(data.crew_records.length)body.append(pair('我对船员预设提示的回应',data.crew_records.map(r=>crewNames[r.role]+' / '+adoptionNames[r.adoption]+'：'+r.response).join('\n')));const sw=$('preview-sources');sw.replaceChildren();if(!data.sources.length)sw.append(el('p','尚未选用材料'));for(const s of data.sources){const node=el('div',undefined,'preview-source');node.append(el('h4',s.id+' · '+s.title),el('p',s.kind+' / '+s.context),el('p','原文片段：'+s.quote),el('p','可支持：'+s.support),el('p','使用边界：'+s.limit),el('p','尚未知：'+s.question));if(s.student_note)node.append(el('p','我的记录：'+s.student_note));const a=el('a','材料出处');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';node.append(a);sw.append(node);}}
+function validate(){const errors=[];const required=[['initial-view','初始理解'],['shared-mission','共同确认的航程任务'],['statement','用于贴签的判断'],['statement-reason','判断分类的理由'],['revised-view','修订后的理解'],['unknown','仍未知的问题'],['revised-question','共同探索的问题'],['compass-shift','改变判断的罗盘形态'],['revision-reason','变化及材料依据']];for(const [key,label]of required)if(!(state.values[key]||'').trim())errors.push('请填写'+label+'。');if(!state.selected.length)errors.push('请至少选用一张材料。');const reason=state.values['revision-reason']||'';const referenced=[...new Set([...reason.matchAll(/(?:^|[^A-Za-z0-9])(M[0-9]+)(?![A-Za-z0-9])/gi)].map(m=>m[1].toUpperCase()))];if(state.selected.length&&!referenced.some(id=>state.selected.includes(id)))errors.push('请在变化理由中引用至少一个已选材料编号（如 M1–M4），并与所选罗盘对应。');for(const id of referenced){if(!SOURCES.some(s=>s.id===id))errors.push('材料编号 '+id+' 不存在，请核对编号。');else if(!state.selected.includes(id))errors.push('变化理由引用了 '+id+'，请先在材料页选用该材料，让导出包含其来源。');}return errors;}
+function showErrors(errors){const box=$('validation');box.replaceChildren();if(errors.length){box.append(el('strong','还有这些内容需要补齐：'));const ul=el('ul');errors.forEach(e=>ul.append(el('li',e)));box.append(ul);box.classList.add('visible');box.scrollIntoView({behavior:'smooth',block:'center'});}else box.classList.remove('visible');}
+function download(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);toast('文件已交给浏览器下载。');}
+function exportText(){const p=pack();const lines=['文化航程 / A 文化问题卡','场景：四航段文明航程·罗盘传代','scenario_id：four_legs_compass','个人状态：'+(p.personal_confirmation.status==='confirmed'?'已确认':'草稿'),'小组状态：待确认','', '原先的理解：'+p.initial_view,'共同确认的航程任务：'+p.shared_mission,'自评把握：'+p.confidence.label+'（非正确性分数）','','判断贴签：'+p.classification.tag_label,'判断：'+p.classification.statement,'分类理由：'+p.classification.reason,'','我现在的理解：'+p.revised_view,'仍未知：'+p.unknown,'共同探索的问题：'+p.revised_question,'改变判断的罗盘：'+(p.compass_shift.label||'未填'),'变化及依据：'+p.revision_reason,'参与边界：'+(p.participation_boundaries||'未填写'),'携带资源：'+p.carry.resources,'','材料来源：'];for(const s of p.sources)lines.push(s.id+' / '+s.title,s.kind+' / '+s.context,'片段：'+s.quote,'可支持：'+s.support,'使用边界：'+s.limit,'尚未知：'+s.question,'记录：'+s.student_note,'出处：'+s.url,'');for(const r of p.crew_records)lines.push('船员预设提示：'+crewNames[r.role]+' / '+prompts[r.role],'回应：'+adoptionNames[r.adoption]+' / '+r.response,'');lines.push(p.handoff,'个人确认时间：'+(p.personal_confirmation.confirmed_at||'尚未确认'),p.prototype_disclosure);return lines.join('\n');}
+function reset(){if(!window.confirm('重置会删除此浏览器里的当前草稿。已下载的文件不会改变。确定重置吗？'))return;state=blank();try{localStorage.removeItem(STORE);}catch(e){}fillForm();renderSources();renderCrew();$('confirm-check').checked=false;showErrors([]);goStep(1);toast('本机草稿已重置。');}
+function fillForm(){for(const id of fields)$(id).value=state.values[id]||((id==='confidence')?'unsure':(id==='statement-tag')?'interpretation':'');}
+for(const id of fields)$(id).addEventListener('input',()=>{state.values[id]=$(id).value;changed();});
+document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>goStep(Number(b.dataset.step))));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>goStep(Number(b.dataset.go))));document.querySelectorAll('[data-crew]').forEach(b=>b.addEventListener('click',()=>{currentCrew=b.dataset.crew;renderCrew();}));
+$('record-crew').addEventListener('click',()=>{const response=$('crew-response').value.trim();if(!response){toast('先写一句回应或保留理由。');return;}state.crew_records=state.crew_records.filter(r=>r.role!==currentCrew);state.crew_records.push({role:currentCrew,adoption:$('crew-adoption').value,response,recorded_at:new Date().toISOString()});changed();renderCrew();toast('已记录你的回应。');});
+$('fill-initial').addEventListener('click',()=>{if((state.values['initial-view']||'').trim()&&!confirm('用示例替换目前的初始理解？'))return;state.values['initial-view']='我原先以为人类进步就是技术越来越新，终点是某个更先进的港口。';$('initial-view').value=state.values['initial-view'];changed();});
+$('confirm-card').addEventListener('click',()=>{const errors=validate();if(!$('confirm-check').checked)errors.push('请勾选个人核对声明。');showErrors(errors);if(errors.length)return;state.personal_confirmation={status:'confirmed',confirmed_at:new Date().toISOString()};save();renderPreview();toast('已确认你的问题卡。其他成员仍为待确认。');});
+$('export-json').addEventListener('click',()=>download('文化航程_A_问题卡.json',JSON.stringify(pack(),null,2),'application/json;charset=utf-8'));$('export-text').addEventListener('click',()=>download('文化航程_A_问题卡.txt',exportText(),'text/plain;charset=utf-8'));$('print-card').addEventListener('click',()=>{renderPreview();window.print();});$('reset-draft').addEventListener('click',reset);$('reset-bottom').addEventListener('click',reset);
+$('load-demo').addEventListener('click',()=>{if((Object.values(state.values).some(v=>typeof v==='string'&&v.trim()&&!['unsure','partly','sure','interpretation','direct_text','unverified','mud_tablet','steam_chart','network_chart','model_star_map'].includes(v))||state.selected.length)&&!confirm('载入完整演示会替换本机当前草稿。要继续吗？'))return;state=blank();state.values={'initial-view':'我原先以为人类进步就是技术越来越新，终点是某个更先进的港口。',confidence:'sure','shared-mission':'弄清四段航程里什么算造出下一段能力，并写出依据的罗盘与未知。',statement:'蒸汽相对风力的独立性，说明人类开始自己造动力，而不只是更会读风。','statement-tag':'interpretation','statement-reason':'M2 原文写到 steam’s independence of wind 与 regular schedule；“自己造动力”是我的解释，不是材料替所有时代下的定义。','revised-view':'进步更像同一条航程上的能力扩展：造岸、造动力、造信息、造智能；终点不是港口名称，而是我们能把能力扩展多远。',unknown:'下一岗如何接住共同任务与文化碎片？资源线路仍是 pending；AI 段也不能被说成已证实课堂效果。','revised-question':'在四段航程里，什么算“自己造出下一段能力”？依据哪张海图/罗盘判断，又把什么未知交给下一岗？','compass-shift':'steam_chart','revision-reason':'M2 蒸汽海图改变了我的判断：从“更快的船”修订为“自造动力、可预期航程”；M1 泥板河岸提醒定居与储存是更早的造岸；M4 只支持“需要人类干预”的原则讨论，不能证明学习效果。','participation-boundaries':'讲解时声明：预设台词/非实时模型；本页≠3D Demo；不声称接通过真实模型。'};state.selected=['M1','M2','M4'];state.notes={M1:'余粮可储存≠现代港口制度。',M2:'独立于风是能力跃迁，但有燃料与成本代价。',M4:'原则文本≠课堂效果证明。'};fillForm();renderSources();renderCrew();$('confirm-check').checked=false;showErrors([]);goStep(1);toast('已载入四航段教学示例，当前仍为草稿。');});
+fillForm();renderSources();renderCrew();goStep(state.step,false);
+</script></body></html>
