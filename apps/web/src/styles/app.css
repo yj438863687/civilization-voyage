@@ -2578,3 +2578,109 @@ html[data-cine='finale'] .interact-prompt { opacity: 0; pointer-events: none; }
 
 .page.is-history { align-items: start; }
 .page-paper:focus, .shipyard-panel:focus { outline: none; }
+
+/* 同一本手记连接三章；实际操作先留下成果，再讨论怎样共同使用。 */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.story-thread { border-block: 1px solid var(--cv-line-on-paper); padding-block: 12px; margin-block: 24px; }
+.story-thread h3 { margin-top: 4px; font-size: 20px; }
+.technology-civilization { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-block: 24px; }
+.technology-civilization p { margin: 0; font-size: 14px; }
+.technology-civilization strong { display: block; margin-bottom: 6px; color: #71501f; }
+.voyage-thread-hud { margin-top: 12px; border-top: 1px solid var(--cv-line); padding-top: 10px; font-size: 13px; }
+.voyage-thread-hud summary { cursor: pointer; }
+.voyage-thread-hud p { font-size: 12px; line-height: 1.7; font-weight: 400; }
+.challenge-controls { border: 0; margin: 0; padding: 0; min-width: 0; }
+.challenge-controls:disabled { opacity: 0.6; }
+.voyage-challenge h3 { margin-top: 0; }
+.voyage-challenge button, .shipyard-tabs button, .shipyard-catalog button { font: inherit; color: inherit; cursor: pointer; border: 1px solid #a18b67; background: transparent; }
+.voyage-challenge button:disabled, .shipyard button:disabled { cursor: default; opacity: 0.55; }
+.voyage-challenge button:hover:not(:disabled), .shipyard-catalog button:hover { border-color: #9e3a26; }
+.voyage-challenge button[aria-pressed="true"], .shipyard button[aria-pressed="true"] { background: #344f48; color: #fff4df; border-color: #344f48; }
+.voyage-challenge :is(button,input):focus-visible, .shipyard :is(button,input):focus-visible { outline: 2px solid #9e3a26; outline-offset: 3px; }
+.voyage-challenge p, .technical-result p { font-size: 14px; }
+.challenge-reference { background: var(--cv-surface-paper-2); padding: 12px; border: 1px solid var(--cv-line-on-paper); }
+.challenge-trial, .technical-result { border-block: 1px solid var(--cv-line-on-paper); padding-block: 16px; margin-block: 22px; }
+.challenge-trial h4 { margin: 0; font-size: 18px; }
+.history-decision strong, .history-decision small { display: block; }
+.history-decision small { margin-top: 6px; line-height: 1.7; }
+.canal-legend { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; margin-bottom: 8px; }
+.canal-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 3px; background: #cdb994; padding: 6px; }
+.canal-grid button { aspect-ratio: 1; position: relative; background: #e8dcc6; padding: 0; }
+.canal-grid button:disabled { opacity: 1; background: #ad9b78; border-color: transparent; }
+.canal-grid svg { display: block; width: 100%; height: 100%; fill: #75654c; stroke: #75654c; stroke-width: 6; }
+.canal-grid button.has-water svg { fill: #1f747e; stroke: #1f747e; }
+.canal-grid button.is-field { background: #c5d0a7; }
+.canal-grid small { position: absolute; bottom: 0; right: 3px; font-size: 11px; }
+.cargo-pieces, .type-pieces, .probe-prompts { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 12px; }
+.cargo-pieces button, .type-pieces button, .probe-prompts button { padding: 9px 12px; min-height: 44px; }
+.cargo-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 3px; margin-top: 14px; }
+.cargo-grid button { min-height: 58px; background: #e8dcc6; }
+.cargo-grid button[data-cargo="0"] { background: #d6bb83; }
+.cargo-grid button[data-cargo="1"] { background: #bd9c73; }
+.cargo-grid button[data-cargo="2"] { background: #a6bb91; }
+.cargo-grid button[data-cargo="3"] { background: #d6a888; }
+.cargo-grid button[data-cargo="4"] { background: #abc2c1; }
+.print-slots { padding-left: 24px; }
+.print-slots li { margin-block: 8px; }
+.print-slots button { width: 100%; min-height: 44px; padding: 8px 12px; text-align: left; }
+.route-board { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 3px; background: #cdb994; padding: 6px; }
+.route-board button { min-height: 48px; padding: 4px; background: #e8dcc6; }
+.route-board button:disabled { background: #6e6250; color: #f3ebdd; opacity: 1; }
+.engine-gauges { padding: 16px; background: #34423f; color: #fff4df; }
+.engine-gauges > div { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.engine-gauges > div + div { margin-top: 16px; }
+.engine-gauges meter { width: 100%; height: 22px; accent-color: #c9a15a; }
+.engine-gauges strong { font-size: 14px; }
+.engine-levers { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.shift-grid { display: grid; grid-template-columns: 70px repeat(6,minmax(0,1fr)); gap: 3px; font-size: 12px; align-items: center; }
+.shift-grid > span { text-align: center; }
+.shift-row { display: contents; }
+.shift-row button { min-height: 44px; padding: 2px; font-size: 12px; }
+.shift-row > span { font-size: 12px; }
+.morse-word { display: flex; gap: 12px; font-size: 28px; font-family: var(--cv-font-mono); }
+.morse-word .is-sent { color: #315d42; text-decoration: underline; text-underline-offset: 6px; }
+.morse-tape { display: block; min-height: 54px; padding: 12px; font: 24px/1.4 var(--cv-font-mono); letter-spacing: 0.2em; background: #e8dcc6; }
+.signal-copies { font-variant-numeric: tabular-nums; background: #e8dcc6; padding: 4px 16px; }
+.signal-copies code { letter-spacing: 0.5em; font: 22px/1.5 var(--cv-font-mono); }
+.bit-controls { display: flex; gap: 10px; margin-top: 18px; }
+.bit-controls button { min-width: 54px; min-height: 54px; font-size: 24px; }
+.permission-list label { display: grid; grid-template-columns: 24px 1fr; gap: 6px 10px; padding: 12px 0; border-bottom: 1px solid var(--cv-line-on-paper); }
+.permission-list small { grid-column: 2; color: var(--cv-text-on-paper-muted); }
+.permission-list input { accent-color: #344f48; width: 20px; height: 20px; }
+.dialogue-log { max-height: 230px; overflow: auto; background: #e8dcc6; padding-inline: 14px; margin-block: 14px; }
+.dialogue-log > div { border-bottom: 1px solid var(--cv-line-on-paper); }
+.voyage-challenge input[type="text"], .voyage-challenge label > input:not([type]) { display: block; width: 100%; min-height: 44px; margin-block: 8px; border: 1px solid #a18b67; background: transparent; padding: 8px 10px; font: inherit; color: inherit; box-sizing: border-box; }
+.go-board { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); background: #cfa976; border: 1px solid #705537; padding: 10px; }
+.go-board button { aspect-ratio: 1; position: relative; background: linear-gradient(transparent 48%,#705537 48%,#705537 51%,transparent 51%),linear-gradient(90deg,transparent 48%,#705537 48%,#705537 51%,transparent 51%); border: 0; display: grid; place-items: center; padding: 8px; }
+.go-board button:disabled { opacity: 1; }
+.go-board span { width: 80%; aspect-ratio: 1; border-radius: 50%; }
+.go-board .stone-black { background: #25241e; border: 1px solid #141410; }
+.go-board .stone-white { background: #fff8e9; border: 1px solid #9c8b6e; }
+.audit-records article { padding-block: 12px; border-bottom: 1px solid var(--cv-line-on-paper); }
+.audit-records h4 { margin: 0; }
+.audit-records article > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.audit-records button { padding: 8px; min-height: 44px; font-size: 12px; }
+.shipyard-panel { width: min(1160px,100%); }
+.shipyard > .shipyard-workbench { grid-template-columns: minmax(0,1.25fr) minmax(0,0.75fr); align-items: start; gap: 24px; }
+.shipyard-preview { height: 340px; background: #11242b; position: relative; overflow: hidden; }
+.shipyard-preview > div { height: 100%; }
+.shipyard-preview > p { position: absolute; bottom: 0; left: 12px; right: 12px; background: #11242b; color: #e8dcc6; padding: 6px; font-size: 11px; pointer-events: none; }
+.shipyard-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.shipyard-tabs button { min-height: 44px; padding: 8px 16px; }
+.shipyard-catalog ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.shipyard-catalog button { width: 100%; padding: 12px; text-align: left; }
+.shipyard-catalog :is(strong,span,small) { display: block; }
+.shipyard-catalog span { font-size: 13px; margin-block: 5px; line-height: 1.5; }
+.shipyard-catalog small { font-size: 11px; }
+.shipyard-purchase h4 { font-size: 17px; }
+@media (max-width:700px) {
+  .technology-civilization { grid-template-columns: 1fr; gap: 12px; }
+  .shipyard > .shipyard-workbench { grid-template-columns: 1fr; }
+  .shipyard-preview { height: 260px; }
+  .shift-grid { grid-template-columns: 56px repeat(6,minmax(0,1fr)); gap: 2px; }
+  .shift-row button { font-size: 11px; }
+  .history-reading .voyage-challenge h3 { font-size: 22px; }
+}
+
+.shipyard-view-tools { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.shipyard-view-tools button { min-height:44px; border:1px solid #a18b67; background:transparent; padding:8px 12px; color:inherit; font:inherit; cursor:pointer; }

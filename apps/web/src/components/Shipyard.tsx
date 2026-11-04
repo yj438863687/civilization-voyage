@@ -1,15 +1,23 @@
-import { useRef } from 'react';
+import { ShipyardPreview } from './ShipyardPreview';
+import { useRef, useState } from 'react';
 import { useModalFocus } from './useModalFocus';
 import type { VoyageStats } from '../world/encounters';
 import { CREW_UPGRADES, SHIP_UPGRADES, shipUpgradeReason, upgradeCrew, upgradeShip } from '../world/progression';
-export function Shipyard({ stats, onUpdate }: { stats: VoyageStats; onUpdate: (update: (stats: VoyageStats) => VoyageStats) => void }) {
-  const ship = SHIP_UPGRADES[stats.shipLevel], crew = CREW_UPGRADES[stats.crewLevel];
-  const shipReason = shipUpgradeReason(stats);
-  return <section className="shipyard" aria-label="船坞与船员换装"><h3>船坞与船员</h3><p>补给能让船走下去，也能用来整修。人心来自沿途的相处，足够时船员愿意换上共同的行装。</p><div><article><h4>船体外观 · {stats.shipLevel}/3</h4><p>{ship?.detail ?? '舷板、航灯与船旗均已整修'}</p><p>现有补给 {stats.supply} · {ship ? `整修用去 ${ship.cost} 份` : '已完成'}</p><button className="btn" type="button" disabled={!!shipReason} onClick={() => onUpdate(upgradeShip)}>{ship ? ship.name : '整修完成'}</button>{shipReason && <p>{shipReason}</p>}</article><article><h4>船员外貌 · {stats.crewLevel}/3</h4><p>{crew?.detail ?? '船员已穿上完整的船队行装'}</p><p>现有人心 {stats.trust}{crew ? ` · 需要 ${crew.trust}` : ''} · 换装不扣人心</p><button className="btn" type="button" disabled={!crew || stats.trust < crew.trust} onClick={() => onUpdate(upgradeCrew)}>{crew ? crew.name : '换装完成'}</button></article></div><p>外观不增加航速或小游戏得分；跨时代保留整修与换装进度。</p></section>;
+export function Shipyard({ stats, onUpdate, sceneId = 'A', allowPurchase = true }: { stats: VoyageStats; sceneId?: string; allowPurchase?: boolean; onUpdate: (update: (stats: VoyageStats) => VoyageStats) => void }) {
+  const [tab,setTab]=useState<'ship'|'crew'>('ship');
+  const [previewShip,setPreviewShip]=useState(stats.shipLevel),[previewCrew,setPreviewCrew]=useState(stats.crewLevel);
+  const ship=SHIP_UPGRADES[stats.shipLevel],crew=CREW_UPGRADES[stats.crewLevel];
+  const shipReason=allowPurchase?shipUpgradeReason(stats):'先选一个时代启航，之后可随时按B回来整修；现在可以先看外形。';
+  const previews=tab==='ship'?[{name:'尚未整修',detail:'这条船现在的基础外形'},...SHIP_UPGRADES]:[{name:'原来的行装',detail:'船员初次登船时的衣服'},...CREW_UPGRADES];
+  const shown=tab==='ship'?previewShip:previewCrew;
+  return <section className="shipyard" aria-label="船坞与船员换装"><h3>船坞与船员</h3><p>先转动实物看一看，再决定把物资花在哪里。船舷、航灯和船旗会真正出现在海上的船上；常服、护帽和船徽会穿到船员身上。</p>
+    <div className="shipyard-workbench"><div><div className="shipyard-tabs" role="group" aria-label="选择预览对象"><button type="button" aria-pressed={tab==='ship'} onClick={()=>setTab('ship')}>船体整修</button><button type="button" aria-pressed={tab==='crew'} onClick={()=>setTab('crew')}>船员行装</button></div><ShipyardPreview sceneId={sceneId} shipLevel={previewShip} crewLevel={previewCrew} closeUp={tab==='crew'}/></div>
+    <div className="shipyard-catalog"><h4>{tab==='ship'?'船体外观':'船员外貌'} · {tab==='ship'?stats.shipLevel:stats.crewLevel}/3</h4><ol>{previews.map((item,index)=><li key={item.name}><button type="button" aria-pressed={shown===index} onClick={()=>tab==='ship'?setPreviewShip(index):setPreviewCrew(index)}><strong>{item.name}</strong><span>{item.detail}</span><small>{index<=(tab==='ship'?stats.shipLevel:stats.crewLevel)?'已拥有 · 点按预览':'未解锁 · 也可先试试看'}</small></button></li>)}</ol></div></div>
+    <div className="shipyard-purchase"><article><h4>下一次船体整修</h4><p>补给 {stats.supply}{ship?` · 用去 ${ship.cost} 份，还要留下15份口粮`: ' · 已完成全部整修'}</p><button className="btn" type="button" disabled={!!shipReason} onClick={()=>{const next=stats.shipLevel+1;onUpdate(upgradeShip);setPreviewShip(next);setTab('ship');}}>{ship?ship.name:'整修完成'}</button>{shipReason&&<p>{shipReason}</p>}</article><article><h4>下一套船员行装</h4><p>人心 {stats.trust}{crew?` · 需要 ${crew.trust}`:''} · 换装不扣人心</p><button className="btn" type="button" disabled={!allowPurchase||!crew||stats.trust<crew.trust} onClick={()=>{const next=stats.crewLevel+1;onUpdate(upgradeCrew);setPreviewCrew(next);setTab('crew');}}>{crew?crew.name:'换装完成'}</button></article></div><p>整修与行装跨时代保留。外观不替代故事里的本领；渠图、工班表、线路和试验记录会决定下一章能做什么。</p></section>;
 }
 
-export function ShipyardDialog({ stats, onUpdate, onClose }: { stats: VoyageStats; onUpdate: (update: (stats: VoyageStats) => VoyageStats) => void; onClose: () => void }) {
+export function ShipyardDialog({ stats, onUpdate, onClose, sceneId = 'A', allowPurchase = true }: { stats: VoyageStats; sceneId?: string; allowPurchase?: boolean; onUpdate: (update: (stats: VoyageStats) => VoyageStats) => void; onClose: () => void }) {
   const panel = useRef<HTMLDivElement>(null);
   useModalFocus(panel);
-  return <div className="history-overlay" role="dialog" aria-modal="true" aria-label="船坞与换装" onKeyDown={event => { event.stopPropagation(); if (event.key === 'Escape') onClose(); }}><div ref={panel} tabIndex={-1} className="shipyard-panel"><button className="btn" type="button" onClick={onClose}>回到航程</button><Shipyard stats={stats} onUpdate={onUpdate} /></div></div>;
+  return <div className="history-overlay" role="dialog" aria-modal="true" aria-label="船坞与换装" onKeyDown={event => { event.stopPropagation(); if (event.key === 'Escape') onClose(); }}><div ref={panel} tabIndex={-1} className="shipyard-panel"><button className="btn" type="button" onClick={onClose}>回到航程</button><Shipyard stats={stats} allowPurchase={allowPurchase} sceneId={sceneId} onUpdate={onUpdate} /></div></div>;
 }

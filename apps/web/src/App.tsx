@@ -1,3 +1,5 @@
+import { STORY_ARCS } from './world/storyArcs';
+import { CHALLENGES } from './world/challenges';
 import { historyFor } from './world/history';
 import { HistoryArrival, RouteTimeline } from './components/History';
 import { ShipyardDialog } from './components/Shipyard';
@@ -410,6 +412,16 @@ export function App() {
   const nestedEncounter = !!(enc && encounterFor(enc)?.history) || !!(crisis && historyFor(voyage?.scene_id, laneId));
   encRef.current = yardOpen ? 'shipyard' : nestedEncounter ? (enc ?? crisis) : encPhase === 'play' ? null : (enc ?? crisis ?? secret);
   const shipRef = useRef<ShipSnapshot | null>(null);
+
+  useEffect(() => {
+    const openShipyard = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== 'b' || event.repeat || (event.target instanceof HTMLElement && event.target.closest('input,textarea,select,[contenteditable="true"]'))) return;
+      if (enc || crisis || secret || shoreOpen || storyPage || sealBeat || intro || !player) return;
+      event.preventDefault(); setYardOpen(previous => !previous);
+    };
+    window.addEventListener('keydown', openShipyard);
+    return () => window.removeEventListener('keydown', openShipyard);
+  }, [enc, crisis, secret, shoreOpen, storyPage, sealBeat, intro, player]);
 
   const connected = models.length > 0;
   const sea = useMemo(
@@ -1114,6 +1126,8 @@ export function App() {
    * 航道上还没收的东西 → 港口 → 落印后指向门。
    */
   const story = storyFor(voyage?.scene_id, laneId);
+  const storyArc=STORY_ARCS[`${voyage?.scene_id}-${laneId}`];
+  const nextChapter=storyArc?.chapters.find(chapter=>!progress.state[`history:${chapter.scene}`]);
 
   // 换了航程：读回这一程已经看过的戏
   useEffect(() => {
@@ -1414,7 +1428,7 @@ export function App() {
           <div className={`hud hud-tl${view === 'world' ? ' hud-world' : ' scrim'}`}>
             {view === 'world' ? (
               <div className="hud-world-card">
-                <div className="hud-quest">{story?.logline ?? voyage?.question ?? ''}</div>
+                <div className="hud-quest">{story?.logline ?? voyage?.question ?? ''}</div>{storyArc&&<details className="voyage-thread-hud"><summary>{storyArc.artifact} · {nextChapter?`第${storyArc.chapters.indexOf(nextChapter)+1}/3章`: '到港回顾'}</summary><p>{storyArc.promise}</p>{nextChapter&&<><strong>{CHALLENGES[nextChapter.scene].title}</strong><p>{nextChapter.objective}</p></>}</details>}
                 {/* 靠近一件实物时，先告诉眼睛"那是什么"，文字后补 */}
                 {nearFrag ? (
                   <div className="hud-relic" key={nearFrag.id}>
@@ -1548,7 +1562,7 @@ export function App() {
               出海
             </button>
             <button className="btn btn-icon hud-action" type="button" disabled={!voyage} onClick={() => void goReflect()}>日志</button>
-            <button className="btn btn-icon hud-action" type="button" disabled={!['port', 'route', 'embark'].includes(view) || shoreOpen || storyPage || !!sealBeat} onClick={() => setYardOpen(true)}>船坞与换装</button>
+            <button className="btn btn-icon hud-action" type="button" disabled={!!enc || !!crisis || !!secret || shoreOpen || storyPage || !!sealBeat || !!intro} title="按 B 打开，航行会暂停" onClick={() => setYardOpen(true)}>船坞与换装 · B</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setComms(true)}>通讯台</button>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setReduceMotion((v) => !v)}>
               {reduceMotion ? '减少动态开' : '减少动态'}
@@ -1691,7 +1705,7 @@ export function App() {
         />
       )}
 
-      {yardOpen && <ShipyardDialog stats={stats} onUpdate={updateStats} onClose={() => setYardOpen(false)} />}
+      {yardOpen && <ShipyardDialog stats={stats} sceneId={(view==='embark'?scenePick?.id:voyage?.scene_id) ?? 'A'} allowPurchase={view!=='embark'} onUpdate={updateStats} onClose={() => setYardOpen(false)} />}
       {/* 合：岸上的人 */}
       {view === 'port' && shoreOpen && story && historyFor(voyage?.scene_id, laneId) && <HistoryArrival route={historyFor(voyage?.scene_id, laneId)!} state={progress.state} onDone={() => { setShoreOpen(false); if (voyage) markProgress(previous => ({ ...previous, shore: [...previous.shore, voyage.id] })); }} />}
       {view === 'port' && shoreOpen && story && !historyFor(voyage?.scene_id, laneId) && (
@@ -1789,6 +1803,7 @@ export function App() {
 
             <div className="cine-embark-actions">
               <SealButton label="启航" disabled={busy} hint="" onSeal={() => void createVoyage()} />
+              <button className="btn" type="button" onClick={()=>setYardOpen(true)}>船坞与换装 · 先看看外形</button>
               <button className="cine-link" type="button" onClick={() => setReduceMotion((v) => !v)}>
                 {reduceMotion ? '已减少动态' : '减少动态效果'}
               </button>
