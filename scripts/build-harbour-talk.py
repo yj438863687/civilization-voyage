@@ -182,7 +182,10 @@ for index,row in enumerate(DATA):
   three(p,[('MONTH 1','Prepare the pilot','Recruit classrooms, review sources and prepare facilitators.'),('MONTHS 2–3','Run and revise','Collect explanations, completion data and observed delivery costs.'),('MONTHS 4–6','Test repeat use','Consider route packs or licences when facilitators ask to return.')])
   p.band('Expand after comprehension, manageable delivery effort and repeat demand become visible.')
  elif kind=='ask':
-  p.picture(OUT/'temple-cover-composed.png',0,0,W,H)
+  p.line(96,618,1824,618,LINE,3)
+  for x,label in [(96,'REVIEW THE STORY'),(740,'PLAY THE ROUTE'),(1384,'REFLECT TOGETHER')]:
+   p.rect(x,607,22,22,GREEN);p.text(label,x,675,435,64,27,GREEN,True,kind='mono',minsize=24)
+  p.note('A route people can question, use and improve together.',96,769,1728,40)
   p.rect(0,0,W,440,INK);p.text(row['label'],96,67,1500,45,23,GREEN,kind='mono');p.text('Three classrooms.',96,151,1728,140,109,WHITE,kind='serif',minsize=88);p.text('A chance to test what we have built.',96,312,1728,90,56,GREEN,minsize=46)
   p.rect(96,845,1728,139,PANEL,LINE);p.text('Facilitators · Historical reviewers · A route people can use together',126,881,1668,70,38,WHITE,minsize=31)
  if kind not in ['cover','ask','video']:
