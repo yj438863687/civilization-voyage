@@ -1,4 +1,5 @@
 import { HISTORY_ROUTES, historyChoices, type HistoryScene } from './history';
+import { historyDialogue } from './historyDialogue';
 /**
  * 海上的人与事。
  *
@@ -545,14 +546,20 @@ export const ENCOUNTERS: Record<string, Encounter> = {
 };
 
 // 保留岛屿位置与造景，把人物、叙事与玩法接到同一份历史内容。
+const historyLooks: Record<string, Look> = {
+  'A-water': CL.gun, 'A-stake': CL.yu,
+  'A-bone': CL.elder, 'A-granary': {...CL.elder,prop:'ledger'},
+  'B-coal': CL.lin, 'B-gauge': CL.wei,
+};
 for (const route of Object.values(HISTORY_ROUTES)) {
   for (const island of route.islands) {
     const encounter = ENCOUNTERS[island.id];
     encounter.history = island;
     encounter.who = island.who;
+    if(historyLooks[island.id])encounter.look=historyLooks[island.id];
     encounter.role = island.date;
     encounter.line = island.paragraphs[1];
-    encounter.dialog = [];
+    encounter.dialog = historyDialogue(island);
     encounter.game = historyChoices(island);
   }
 }

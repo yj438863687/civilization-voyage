@@ -14,6 +14,7 @@
 import type { Encounter, Look } from './encounters';
 import type { FableState } from './fable';
 import { HISTORY_ROUTES, historyChoices, routeRecap } from './history';
+import { historyDialogue } from './historyDialogue';
 
 export type PropKind =
   | 'huts'
@@ -599,7 +600,7 @@ for (const [key, route] of Object.entries(HISTORY_ROUTES)) {
   story.crisis.stage = ({ A: lane === 'near' ? 'flood' : 'famine', B: 'strike', C: 'wire', D: 'proposal' } as const)[era as 'A' | 'B' | 'C' | 'D'];
   story.crisis.enc = { ...story.crisis.enc, history: route.crisis,
     who: route.crisis.who, role: route.crisis.date, line: route.crisis.paragraphs[1],
-    dialog: [], game: historyChoices(route.crisis),
+    dialog: historyDialogue(route.crisis), game: historyChoices(route.crisis),
   };
   story.arrival = `${route.ending.date}。这一程的问题，带到岸上继续谈。`;
   story.figure = { ...story.figure, name: route.ending.name, years: route.ending.date,

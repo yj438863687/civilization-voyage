@@ -1,9 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { ChallengeSound, type ChallengeCue } from '../world/challengeSound';
-import { CHALLENGES, type ChallengeKind, type ChallengeReport } from '../world/challenges';
+import { CHALLENGES, type ChallengeReport } from '../world/challenges';
 import type { HistoryScene } from '../world/history';
 import './story-theatre.css';
-import { crewArt } from '../crew';
 
 export type StoryProgress = { value: number; total: number; label: string; secondary?: number; alert?: boolean };
 export type StoryAction = { cue: ChallengeCue; text: string; sequence: number; delay: number; duration: number; progress?: StoryProgress };
@@ -23,25 +22,9 @@ const PLACES: Record<string, Place[]> = {
   audit: [{label:'拆开方案',line:'复核者把结果和前提分开：能核对的计算可以保留，过期的资料要再查。'},{label:'读小港来信',line:'求援信放在“没有需求”的旁边。两者已经矛盾，改的应当是前提。'},{label:'问船长',line:'船长仍要签自己的名字。把计算委托出去，没有把取舍和责任一并交出去。'}],
 };
 
-const CREW_QUESTIONS: Record<ChallengeKind, [string, string]> = {
-  canal: ['水真的能从这里流到田里吗？我们沿渠口看一遍。', '上游先用水以后，下游的人怎么办？'],
-  granary: ['种子和口粮怎样装，才能撑到下一季？', '粮装进我们的船，岸上等粮的人还剩多少？'],
-  printing: ['图样和文字经过试印校核了吗？', '学徒拿到这页，能自己学会、自己修吗？'],
-  route: ['这条线需要多少工料，有没有走不通的地方？', '线路经过这里，村里的人就一定用得上吗？'],
-  engine: ['压力稳不稳，出了故障谁会修？', '节下来的煤，能不能给工人换来学习和休息的时间？'],
-  shifts: ['这张班表真的有人接班吗？', '谁连续在干活，谁还没有机会休息和上学？'],
-  signal: ['对面收到的字，和我们发出的一样吗？', '商单和求援都在等，先发哪一封？'],
-  correction: ['三个副本不一样，我们怎样复核原文？', '通信容量有限，谁的消息不能一直等？'],
-  privacy: ['完成这次调度，实际需要哪几项资料？', '资料里的人知道自己的信息会怎样被使用吗？'],
-  dialogue: ['它核实过这些话吗，还是只换了一种问法？', '来访者会不会把流畅回应当成真正的理解？'],
-  go: ['棋盘上的结果，能证明海上的可靠性吗？', '如果把这项本领用于航行，谁来承担试验的风险？'],
-  audit: ['计算所用的资料，有没有过期或漏项？', '被路线略过的人，还有没有提出异议的机会？'],
-};
-
-export function StoryTheatre({ scene, action, work, phase, choice, supply, trust, onConsult }: { scene: HistoryScene; action: StoryAction | null; work: ChallengeReport | null; phase: string; choice: string; supply: number; trust: number; onConsult?: (note: string) => void }) {
+export function StoryTheatre({ scene, action, work, phase, choice, supply, trust }: { scene: HistoryScene; action: StoryAction | null; work: ChallengeReport | null; phase: string; choice: string; supply: number; trust: number }) {
   const kind=CHALLENGES[scene.id].kind, places=PLACES[kind];
   const [inspected,setInspected]=useState(-1),[visited,setVisited]=useState<number[]>([]);
-  const [companion,setCompanion]=useState<0|1>(0);
   const sound=useRef<ChallengeSound>(), panel=useRef<HTMLElement>(null);
   useEffect(()=>{const engine=new ChallengeSound();sound.current=engine;return()=>engine.close();},[]);
   useLayoutEffect(()=>{panel.current?.getAnimations({subtree:true}).forEach(animation=>{animation.cancel();animation.play();});},[action]);
@@ -49,7 +32,6 @@ export function StoryTheatre({ scene, action, work, phase, choice, supply, trust
   const decision=!!work&&(phase==='result'||phase==='play');
   const inspect=(index:number)=>{
     setInspected(index);setVisited(old=>old.includes(index)?old:[...old,index]);
-    onConsult?.(`${companion===0?'大副':'二副'}陪同 · ${places[index].label}：${places[index].line}`);
     let volume=.45;try{const raw=localStorage.getItem('cvChallengeVolume');if(raw!==null)volume=Number(raw);}catch{/* Browser storage boundary. */}
     if(volume>0){window.dispatchEvent(new CustomEvent('cv-story-sound',{detail:220}));void sound.current?.play('message',volume);}
   };
@@ -89,9 +71,8 @@ export function StoryTheatre({ scene, action, work, phase, choice, supply, trust
       {[171,365].map((x,index)=><g key={x} className="theatre-person" transform={`translate(${x} ${index?174:162})`}><circle cy="-24" r="7" fill={index?'#d4b483':'#d5a57a'}/><path d="M-10 2-7-15h14l5 17Z" fill={index?'#b79a63':'#98b4a1'}/><path d="M-5 2v15m11-15v15M-8-10l-10 9m27-9 10 7" stroke={index?'#b79a63':'#98b4a1'} strokeWidth="4" fill="none"/></g>)}
       {decision&&<g className="theatre-delivery"><path d={trust>0?'M80 204Q218 155 360 190':'M80 204Q132 167 80 122'} fill="none" stroke="#e0c183" strokeWidth="3" strokeDasharray="6 7"/><path d="M59 203h44l-8 12H67Z" fill="#d8b77b"/></g>}
     </svg>
-    <div className="story-companions" role="group" aria-label="选择同行船员">{(['大副','二副'] as const).map((name,index)=><button key={name} type="button" aria-pressed={companion===index} onClick={()=>{setCompanion(index as 0|1);setInspected(-1);}}><img src={crewArt(name).bust} alt=""/><span>请{name}同行<small>{index===0?'一起查办法与依据':'一起问人的处境'}</small></span></button>)}</div>
     <div className="story-stage-spots" role="group" aria-label="查看现场与人物">{places.map((place,index)=><button type="button" key={place.label} aria-pressed={inspected===index} onClick={()=>inspect(index)}>{place.label}</button>)}</div>
-    <div className="story-stage-voice" aria-live="polite">{inspected<0?<p>选一位船员，再点现场或人物，听他们一起把问题问清楚。</p>:<><p><strong>{companion===0?'大副':'二副'}</strong>：{CREW_QUESTIONS[kind][companion]}</p><p><strong>现场回应 · {places[inspected].label}</strong>：{places[inspected].line}</p><p><strong>你来作主</strong>：{work?`我们已经试过了。接下来选“${scene.options[0].label}”，还是“${scene.options[1].label}”？`:'带着这番话试一次，再决定怎样安排。'}</p></>}</div>
+    <p className="story-stage-voice" aria-live="polite">{inspected<0?'点一处现场，看看正在等你决定的人。':places[inspected].line}</p>
     <div className="story-stage-consequence" aria-live="polite">{decision?<><strong>{choice}</strong><p>这一安排：补给 {supply>0?'+':''}{supply} · 人心 {trust>0?'+':''}{trust}</p><p>{trust>0?'图中的航线转向需要帮助的人。真正结算要等你记下这一站。':'图中的物资先进入货仓。真正结算要等你记下这一站。'}</p></>:<><strong>{action?.progress?`${action.progress.label} ${action.progress.value}/${action.progress.total}`:'现场会随你的操作改变'}</strong><p>{action?.text??'先看清这里的难处，再亲手试一次。'}</p></>}</div>
     <small>场景与人物话语为互动创作，历史背景见配图与来源。</small>
   </section>;

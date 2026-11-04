@@ -52,7 +52,7 @@ def main():
         if (backup / 'webdist').exists():
             (backup / 'webdist').rename(installed)
         raise
-    (installed / 'release.json').write_text(json.dumps({'release': 'voyage-story-crew-7', 'installed_at': stamp, 'story_mechanics': 12, 'story_entries': 24, 'port_summaries': 8, 'synchronized_feedback': True, 'music_tracks': 4, 'ship_refit_stages': 16, 'interactive_story_scenes': 24, 'voyage_workspace': True, 'story_first': True, 'crew_story_consultations': True, 'presentation_gateway_port': 8016}, ensure_ascii=False))
+    (installed / 'release.json').write_text(json.dumps({'release': 'voyage-history-dialogue-8', 'installed_at': stamp, 'story_mechanics': 12, 'story_entries': 24, 'port_summaries': 8, 'synchronized_feedback': True, 'music_tracks': 4, 'ship_refit_stages': 16, 'interactive_story_scenes': 24, 'voyage_workspace': True, 'story_first': True, 'direct_character_dialogue': True, 'interaction_baseline': 'c1a8fe8', 'presentation_gateway_port': 8016}, ensure_ascii=False))
     print('桌面前端已更新；原包及安装前快照位于 ' + str(backup))
 
 

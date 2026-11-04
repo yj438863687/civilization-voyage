@@ -1,6 +1,6 @@
-> 当前版本：v07 故事与船员融合初版。Demo运行和录制已暂停，以 [本版脚本](v07-demo-script.md) 为准。下方旧工作台实测描述属于v06，不证明v07已经通过实机验收。
+> 当前版本：v08 旧版人物互动与历史航程合并初版，以 [本版脚本](v08-demo-script.md) 为准。大副二副方案已撤销；v07保留作历史版本。Demo运行和录制继续暂停，下方早期工作台描述不证明v08已通过实机验收。
 >
-> 生成本版：`python3 scripts/build-presentation.py --draft --without-video --output ~/Desktop/文明航程演讲包/v07-故事与船员融合初版`
+> 生成：`python3 scripts/build-presentation.py --draft --without-video --output ~/Desktop/文明航程演讲包/v08-旧版人物与历史航程合并初版`
 
 # 文明航程：五人演讲与原游戏集成
 

@@ -6,7 +6,7 @@ export type DemoAgent = 'research' | 'verify' | 'build';
 export type DemoPriority = 'production' | 'community';
 export const DEMO_MISSION = '技术让一座港城更强之后，怎样让更多人过得更好？';
 export const DEMO_TEAM = [
-  { id:'A', role:'玄览玄通 · 文化理解', topic:'驾驶舱、文化问题与船员对话', time:'2分30秒' },
+  { id:'A', role:'玄览玄通 · 文化理解', topic:'航海、文化问题与人物对话', time:'2分30秒' },
   { id:'B', role:'和而不同 · 路径比较', topic:'轻装线、考察线与不同观点', time:'2分30秒' },
   { id:'C', role:'知行合一 · 文明重现', topic:'文化碎片、共同建城与反思', time:'2分30秒' },
   { id:'D', role:'产品与现场 Demo', topic:'操作四阶段，展示真实产物', time:'3分钟' },
@@ -39,8 +39,8 @@ export function bookDemoRoute(state:DemoState):DemoState {
   return {...state,step:2,paid:true,ledger:route.costs.map(([to,amount],index)=>({id:`route-${index}`,to,amount}))};
 }
 export const DEMO_CREW:Record<DemoRole,{name:string;model:string;duty:string;script:string}>={
-  first:{name:'大副',model:'Claude',duty:'追问依据',script:'先别急着把港城造大。我们先查：技术解决了什么，哪些只是传说或推演？把出处带上，最后由船长决定要信到哪一步。'},
-  second:{name:'二副',model:'GPT',duty:'追问谁受影响',script:'我想多问一句：省下来的粮、时间和工钱，最后到了谁手里？先做一个能运行的方案，再比较工坊、学堂和普通人的生活怎样改变。'},
+  first:{name:'资料核对',model:'Claude',duty:'追问依据',script:'先别急着把港城造大。我们先查：技术解决了什么，哪些只是传说或推演？把出处带上，最后由船长决定要信到哪一步。'},
+  second:{name:'方案比较',model:'GPT',duty:'追问谁受影响',script:'我想多问一句：省下来的粮、时间和工钱，最后到了谁手里？先做一个能运行的方案，再比较工坊、学堂和普通人的生活怎样改变。'},
 };
 export function runDemoAgent(state:DemoState,id:DemoAgent,available?:CultureChunk[]):DemoState {
   const refreshing=id==='research'&&!!available?.slice(0,DEMO_ROUTES[state.route].materialCount).some(item=>!state.fragments.some(fragment=>fragment.id===item.id));
@@ -62,4 +62,4 @@ export function runDemoAgent(state:DemoState,id:DemoAgent,available?:CultureChun
 }
 export function cityPlan(priority:DemoPriority){return priority==='community'?{canals:2,warehouses:2,workshops:1,schools:2,homes:5,label:'共同生活优先'}:{canals:1,warehouses:4,workshops:3,schools:1,homes:3,label:'产能优先'};}
 export function demoReflection(state:DemoState){const plan=cityPlan(state.priority);return `本次选择${DEMO_ROUTES[state.route].name}，使用${DEMO_ROUTES[state.route].cost}份准备补给，核对${state.fragments.length}份材料；最终采用“${plan.label}”。港城表达这段航程的技术与共同生活安排，不再次结算。下一轮应继续追问：谁能使用技术，谁承担代价，哪些依据还不足？`;}
-export function publicDemoSnapshot(state:DemoState,style:'ancient'|'modern'|'future'='ancient'){return {version:1,mode:'game-workspace',...state,city_style:style,preparation_supply:DEMO_ROUTES[state.route].cost,city:state.approved?cityPlan(state.priority):null,notice:'船员预设台词与建城方案为创作；准备补给来自游戏，真实API费用另账，不再次发放建城奖励。'};}
+export function publicDemoSnapshot(state:DemoState,style:'ancient'|'modern'|'future'='ancient'){return {version:1,mode:'game-workspace',...state,city_style:style,preparation_supply:DEMO_ROUTES[state.route].cost,city:state.approved?cityPlan(state.priority):null,notice:'核对示例与建城方案为创作；准备补给来自游戏，真实API费用另账，不再次发放建城奖励。'};}

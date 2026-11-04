@@ -1,12 +1,12 @@
 .story-theatre { margin-block: 22px 0; color: #302d25; }
-.story-companions { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 12px; }
-.story-companions button { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 130px; min-height: 56px; padding: 8px; border: 1px solid currentColor; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
-.story-companions button[aria-pressed="true"] { outline: 2px solid #b99b62; outline-offset: 2px; }
-.story-companions img { width: 42px; height: 48px; object-fit: cover; object-position: top; }
-.story-companions small { display: block; font-size: 11px; line-height: 1.5; }
-.story-council { max-width: 620px; text-align: left; margin: 16px auto; font-size: 14px; line-height: 1.75; }
-.story-council > small { opacity: .8; font-size: 11px; }
-.story-stage-voice p { margin-block: 8px; }
+.history-conversation { border-block: 1px solid #b6a382; margin-block: 16px; padding-block: 12px; }
+.history-conversation .is-you, .history-conversation .is-them { padding: 10px 12px; border-left: 3px solid #8d7859; background: #cdbb9220; }
+.history-conversation .is-you { margin-right: 18px; }
+.history-conversation .is-them { margin-left: 18px; border-color: #426e63; }
+.history-conversation strong, .history-conversation span { display: block; }
+.history-conversation strong { font-size: 12px; color: #65573f; }
+.history-conversation small { display: block; margin-top: 12px; font-size: 11px; line-height: 1.7; }
+.history-background { margin-block: 12px; }
 .story-stage-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .story-stage-heading h3 { font: 600 20px/1.5 var(--cv-font-display); margin: 0; }
 .story-stage-heading span { font-size: 12px; }

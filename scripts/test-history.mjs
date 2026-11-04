@@ -10,13 +10,18 @@ const requireWeb = createRequire(join(root, 'apps/web/package.json'));
 const { build } = requireWeb('esbuild');
 const temp = mkdtempSync(join(tmpdir(), 'voyage-history-'));
 const outfile = join(temp, 'history.cjs');
-await build({ absWorkingDir: join(root, 'apps/web'), stdin: { contents: ['history', 'encounters', 'stories', 'world.config', 'progression', 'challenges', 'storyArcs', 'challengeOutcomes', 'storyAccess'].map(name => `export * from './src/world/${name}';`).join('\n'), resolveDir: join(root, 'apps/web') }, outfile, bundle: true, platform: 'node', format: 'cjs', logLevel: 'silent' });
+await build({ absWorkingDir: join(root, 'apps/web'), stdin: { contents: ['history', 'historyDialogue', 'encounters', 'stories', 'world.config', 'progression', 'challenges', 'storyArcs', 'challengeOutcomes', 'storyAccess'].map(name => `export * from './src/world/${name}';`).join('\n'), resolveDir: join(root, 'apps/web') }, outfile, bundle: true, platform: 'node', format: 'cjs', logLevel: 'silent' });
 const require = createRequire(import.meta.url);
 const game = require(outfile);
 const media = JSON.parse(readFileSync(join(root, 'apps/web/src/world/historyMedia.json'), 'utf8'));
 const memory = new Map();
 global.localStorage = { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value) };
 assert.equal(Object.keys(game.HISTORY_ROUTES).length, 8);
+assert.equal(game.HISTORY_ROUTES['A-near'].islands[0].who,'鲧');
+assert.equal(game.HISTORY_ROUTES['A-near'].islands[1].who,'禹');
+assert.equal(game.HISTORY_ROUTES['B-near'].islands[0].who,'林则徐');
+assert.equal(game.HISTORY_ROUTES['B-near'].islands[1].who,'魏源');
+assert.notEqual(game.encounterFor('A-bone').look.eyes,4,'两河流域人物不应沿用仓颉的四目造型');
 for (const [id, route] of Object.entries(game.HISTORY_ROUTES)) {
   const [era, lane] = id.split('-');
   const moments = [...route.islands, route.crisis];
@@ -27,6 +32,10 @@ for (const [id, route] of Object.entries(game.HISTORY_ROUTES)) {
   const world = game.worldFor(era);
   assert.equal(world.lanes.find(item => item.id === lane).name, lane === 'near' ? '内海 · 中国' : '外海 · 世界');
   for (const scene of moments) {
+    const dialogue=game.historyDialogue(scene);
+    assert.equal(dialogue.length,4,`${scene.id}: 人物交谈须完整`);
+    dialogue.forEach((line,index)=>assert.equal(Object.keys(line)[0],index%2?'them':'you',`${scene.id}: 应由玩家与岛上人物直接交谈`));
+    assert(!JSON.stringify(dialogue).match(/大副|二副|API Key|Agents/),`${scene.id}: 技术工具不能代替故事人物`);
     assert(scene.paragraphs.length >= 2);
     assert(media[scene.image], `${scene.id}: 没有图片资料`);
     assert(existsSync(join(root, 'apps/web/public', media[scene.image].src)), `${scene.id}: 缺失本地图片`);
@@ -35,6 +44,7 @@ for (const [id, route] of Object.entries(game.HISTORY_ROUTES)) {
     assert.equal(scene.options.length, 2);
     if (route.islands.includes(scene)) {
       assert.equal(game.encounterFor(scene.id).history, scene);
+      assert.deepEqual(game.encounterFor(scene.id).dialog,dialogue);
       assert.equal(world.fragments.find(item => item.id === scene.id).title, scene.title);
     }
   }

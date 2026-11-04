@@ -2,7 +2,7 @@ import { crisisAnchor, fragmentAnchor, inStoryReach } from './world/storyAccess'
 import { STORY_ARCS } from './world/storyArcs';
 import { CHALLENGES } from './world/challenges';
 import { historyFor } from './world/history';
-import { HistoryArrival, RouteTimeline, StoryCouncil } from './components/History';
+import { HistoryArrival, RouteTimeline } from './components/History';
 import { PresentationDemo } from './components/PresentationDemo';
 import { CULTURE_CORPUS, DEMO_ROUTES, type DemoRoute, type publicDemoSnapshot } from './world/presentationDemo';
 import { ShipyardDialog } from './components/Shipyard';
@@ -191,8 +191,8 @@ const ROUTES: Route[] = [
 const DEFAULT_REASON = '我想先看清两头，再决定站哪边。';
 
 const DEFAULT_CREW: Crew[] = [
-  { id: 'first-mate', role: '大副', model_id: null, confirmation: 'pending' },
-  { id: 'second-mate', role: '二副', model_id: null, confirmation: 'pending' },
+  { id: 'first-mate', role: '资料助手', model_id: null, confirmation: 'pending' },
+  { id: 'second-mate', role: '比较助手', model_id: null, confirmation: 'pending' },
 ];
 
 type View = 'embark' | Stage | 'port' | 'collaborate';
@@ -222,7 +222,7 @@ function guide(view: View, ctx: GuideCtx) {
       step: '问 · 想弄清什么',
       title: '先选海域，再开一条航程',
       body: ctx.connected
-        ? '右边每张卡片只问一件事。启航港是练习的第一程；泉州、集装箱、漂浮港仍待组员确认。起个名字，开一条。大副和二副已在席。'
+        ? '右边每张卡片只问一件事。启航港是练习的第一程；泉州、集装箱、漂浮港仍待组员确认。起个名字，开一条。资料助手和比较助手已在席。'
         : '右边每张卡片只问一件事。启航港是练习的第一程。模型没接也能走完，船员不会假装回话。',
       next: ctx.hasVoyages ? '点「新航程」，或点右边一张旧航程卡片' : '先起个名字，开一条。',
     };
@@ -231,7 +231,7 @@ function guide(view: View, ctx: GuideCtx) {
     return {
       step: ctx.crewReplies > 0 ? '查 · 先看依据' : '问 · 想弄清什么',
       title: '你想弄清什么？',
-      body: '左边是大副与二副。中间问一件你想理解的事。大副查依据，二副问谁还没开口。他们只对照，不替你下结论。问题和一句理由齐了，按住落印。',
+      body: '左边是资料助手与比较助手。中间问一件你想理解的事。资料助手查依据，比较助手问谁还没开口。他们只对照，不替你下结论。问题和一句理由齐了，按住落印。',
       next: !ctx.hasQuestion ? '先写下你想弄清的一件事。' : !ctx.hasReason ? '写下问题和一句理由，才能落印。' : '按住落印，确认此行的问题。',
     };
   }
@@ -275,7 +275,7 @@ function guide(view: View, ctx: GuideCtx) {
       step: '查 · 先看依据',
       title: '过程要看得见，选择由你来定',
       body: ctx.connected
-        ? '船员查阅时只列出可观察事件。大副问依据，二副问谁被看见。你可以都不采纳。'
+        ? '船员查阅时只列出可观察事件。资料助手问依据，比较助手问谁被看见。你可以都不采纳。'
         : '模型尚未接入，不会编造船员发言。你可以自己写解释，按住落印。',
       next: ctx.crewReplies >= 2 ? '先看来源，再听他们各自的理由。' : '写下理由，由你落印。',
     };
@@ -1938,6 +1938,7 @@ export function App() {
             </div>
             <p className="cine-line cine-q cine-depart-q">{question || voyage.question || ''}</p>
             <p className="cine-line cine-prompt">内海看中国，外海看世界。沿着故事，想一想技术怎样改变共同生活。</p>
+            <p className="cine-line cine-prompt">船要口粮才能走远，岸上的人也在等你守约。补给可用于改船；人心达到要求，就能为船员换上新行装。</p>
             <div className="cine-costs">
               {(sea.lanes ?? []).map((lane) => {
                 const on = laneId === lane.id;
@@ -1958,7 +1959,6 @@ export function App() {
                 );
               })}
             </div>
-            {historyFor(voyage.scene_id,laneId)&&<StoryCouncil key={`${voyage.id}-${laneId}`} route={historyFor(voyage.scene_id,laneId)!}/>}
             <div className="cine-actions">
               <button className="cine-link" type="button" onClick={()=>setWorkspaceOpen(true)}>船上书房 · 可选资料与模型设置</button>
               <SealButton label="出海" disabled={busy} hint="" onSeal={() => void departNow()} />
@@ -2136,7 +2136,7 @@ export function App() {
       {/* 航海日志：同样没有卡片。图、印、材料都浮在画面上 */}
       {view === 'reflection' && voyage && (
         <div className="cine-scroll">
-          <div className="cine-inner cine-journal"><button className="btn" type="button" onClick={()=>setWorkspaceOpen(true)}>和船员整理见闻 · 共建港城</button>
+          <div className="cine-inner cine-journal"><button className="btn" type="button" onClick={()=>setWorkspaceOpen(true)}>整理这一程的故事与资料</button>
             <div className="cine-kicker">
               {voyage.title}
               <span className="cine-tag">省 · 回头看这一程</span>
