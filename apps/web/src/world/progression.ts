@@ -1,9 +1,9 @@
 import type { Look, VoyageStats } from './encounters';
 
 export const SHIP_UPGRADES = [
-  { name: '修整舷板', cost: 18, detail: '船舷加装铜色护条' },
-  { name: '添置航灯', cost: 26, detail: '两侧加装成对的暖色航灯' },
-  { name: '挂起船队旗', cost: 34, detail: '船尾升起靛蓝船旗与铜色饰条' },
+  { name: '修整舷板', cost: 18, detail: '加设封闭货舱与高舷护板，船身换装时代涂色' },
+  { name: '添置航灯', cost: 26, detail: '加高航楼，扩展帆组、烟囱、天线或双体结构' },
+  { name: '挂起船队旗', cost: 34, detail: '形成远行船型：双体支撑、甲板起重架或太阳能设备，升起船队旗' },
 ];
 export const CREW_UPGRADES = [
   { name: '整齐的常服', trust: 55, detail: '船员换上靛蓝常服，保留各自的工具' },

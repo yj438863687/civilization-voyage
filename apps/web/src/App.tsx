@@ -4,6 +4,7 @@ import { CHALLENGES } from './world/challenges';
 import { historyFor } from './world/history';
 import { HistoryArrival, RouteTimeline } from './components/History';
 import { ShipyardDialog } from './components/Shipyard';
+import { MusicDirector, MusicControls } from './components/VoyageMusic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from './api/client';
 import { ApiError, type Crew, type Health, type ModelInfo, type Port, type Route, type Scene, type Stage, type Usage, type Voyage, type VoyageRecord } from './api/types';
@@ -1382,6 +1383,7 @@ export function App() {
 
   return (
     <>
+      <MusicDirector era={view==='embark'?scenePick?.id??'A':voyage?.scene_id??'A'} story={!!enc||!!crisis||!!secret||shoreOpen||yardOpen}/>
       {webgl ? (
         <VoyageCanvas
           key={voyage?.id ?? 'dock'}
@@ -1581,7 +1583,7 @@ export function App() {
               </div>
             )}
           </div>
-          <div className="hud hud-br">
+          <div className="hud hud-br"><MusicControls/>
             <button className="btn btn-icon hud-action" type="button" onClick={() => setView('embark')}>启航</button>
             <button
               className="btn btn-icon hud-action"
@@ -1842,7 +1844,7 @@ export function App() {
               <button className="btn" type="button" onClick={()=>setYardOpen(true)}>船坞与换装 · 先看看外形</button>
               <button className="cine-link" type="button" onClick={() => setReduceMotion((v) => !v)}>
                 {reduceMotion ? '已减少动态' : '减少动态效果'}
-              </button>
+              </button><MusicControls/>
             </div>
             {loadBoard().length > 0 && (
               <ol className="cine-board" aria-label="本机排行">

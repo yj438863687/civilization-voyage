@@ -1,13 +1,14 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { ChallengeSound, CUE_DURATION, type ChallengeCue } from '../world/challengeSound';
 import './challenge-feedback.css';
+import type { StoryAction, StoryProgress } from './StoryTheatre';
 
 type Feedback = { cue: ChallengeCue; text: string; sequence: number; delay: number; audible: boolean };
-const FeedbackContext = createContext({ emit: (_cue: ChallengeCue, _text: string) => {}, signalBusy: false });
+const FeedbackContext = createContext<{emit:(cue:ChallengeCue,text:string,progress?:StoryProgress)=>void;signalBusy:boolean}>({ emit: () => {}, signalBusy: false });
 export const useChallengeFeedback = () => useContext(FeedbackContext);
 const storedVolume = () => { try { const value = localStorage.getItem('cvChallengeVolume'); return value === null ? .45 : Math.max(0, Math.min(1, Number(value) || 0)); } catch { return .45; } };
 
-export function ChallengeFeedback({ children, kind }: { children: ReactNode; kind: string }) {
+export function ChallengeFeedback({ children, kind, onAction }: { children: ReactNode; kind: string; onAction?:(action:StoryAction)=>void }) {
   const [volume, setVolume] = useState(storedVolume);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [signalBusy, setSignalBusy] = useState(false);
@@ -25,7 +26,7 @@ export function ChallengeFeedback({ children, kind }: { children: ReactNode; kin
     document.addEventListener('visibilitychange', hide);
     return () => { active.current = false; sequence.current++; clearTimeout(timer.current); sound.close(); document.removeEventListener('visibilitychange', hide); };
   }, []);
-  const emit = (cue: ChallengeCue, text: string) => {
+  const emit = (cue: ChallengeCue, text: string, progress?: StoryProgress) => {
     const id = ++sequence.current;
     clearTimeout(timer.current);
     const signal = cue === 'dot' || cue === 'dash';
@@ -33,6 +34,8 @@ export function ChallengeFeedback({ children, kind }: { children: ReactNode; kin
     const target = surface.current?.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
     const begin = ({ delay, audible }: { delay: number; audible: boolean }) => {
       if (!active.current || id !== sequence.current) return;
+      window.dispatchEvent(new CustomEvent('cv-story-sound',{detail:CUE_DURATION[cue]}));
+      onAction?.({cue,text,sequence:id,delay,duration:CUE_DURATION[cue],progress});
       setPlaying(true); setFeedback({ cue, text, sequence: id, delay, audible });
       if (target && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
         target.getAnimations().forEach(animation => animation.cancel());

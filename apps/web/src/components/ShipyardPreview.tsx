@@ -12,7 +12,7 @@ export function ShipyardPreview({ sceneId, shipLevel, crewLevel, closeUp }: { sc
   const preview=useRef<HTMLDivElement>(null);
   const style=HULL_STYLES[STYLE_BY_SCENE[sceneId]??'junk'];
   const crew=crewAppearance(DECK_CREW[sceneId]??DECK_CREW.test,crewLevel);
-  return <><div className="shipyard-preview" ref={preview} role="img" aria-label={`实物预览：船体整修${shipLevel}级，船员行装${crewLevel}级。可拖动旋转。`}>
+  return <><div className="shipyard-preview" data-ship-level={shipLevel} data-era={sceneId} ref={preview} role="img" aria-label={`实物预览：船体整修${shipLevel}级，船员行装${crewLevel}级。可拖动旋转。`}>
     <Canvas dpr={[1,1.3]} camera={{position:[24,16,26],fov:40}}>
       <color attach="background" args={['#11242b']} />
       <ambientLight intensity={1.5}/><directionalLight position={[12,20,10]} intensity={2.8} color="#ffe2af"/><directionalLight position={[-10,8,-10]} intensity={1.3} color="#a9c5d2"/>

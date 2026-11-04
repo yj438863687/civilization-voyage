@@ -59,4 +59,6 @@ API 默认 http://127.0.0.1:8010（本机 8000 常被占用）。无密钥也可
 
 船坞在首页可预览，启航后可随时按B打开并暂停航行；可看真实船体和船员近景，预览不扣资源。桌面安装更新工具为 `scripts/install-desktop-build.py`，只更新现有安装的构建包及候选场景，更新前备份原包与场景；可用 `--database` 指定原存档数据库做一致性快照。
 
+船型、配乐与现场互动回归为 `node scripts/test-immersion-browser.mjs`：验证四段持续配乐的真实音频、16个船型阶段、24章现场，以及装仓、排字、铺线的拖拽与故事联动。
+
 全部海上入口的回归脚本为 `scripts/test-story-entries-browser.mjs`：覆盖24个故事入口、8个港口总结、顺序锁定提示与重读。使用独立测试API（`VOYAGE_TEST_API`，默认8015）及 `VOYAGE_TEST_URL` 指定的前端，以免把测试航程混进实际存档。

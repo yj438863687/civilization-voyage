@@ -1,6 +1,7 @@
 import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { ShipRefit } from './ShipRefit';
 import * as THREE from 'three';
 import { EraDeckCrew } from './Figure';
 import type { Look } from './encounters';
@@ -152,6 +153,7 @@ function Mast({
   hull,
   reduceMotion,
   phase,
+  deck = DECK_Y,
 }: {
   z: number;
   h: number;
@@ -163,10 +165,11 @@ function Mast({
   hull: THREE.Material;
   reduceMotion: boolean;
   phase: number;
+  deck?: number;
 }) {
   const cloth = useRef<THREE.Group>(null);
   const rows = useRef<(THREE.Group | null)[]>([]);
-  const sailY = DECK_Y + h * 0.5;
+  const sailY = deck + h * 0.5;
 
   // 帆按行分段，鼓风是逐段位移（不是整面弯曲）
   useFrame(({ clock }) => {
@@ -183,10 +186,10 @@ function Mast({
 
   return (
     <group position={[0, 0, z]}>
-      <mesh position={[0, DECK_Y + h / 2, 0]} material={hull} castShadow>
+      <mesh position={[0, deck + h / 2, 0]} material={hull} castShadow>
         <cylinderGeometry args={[0.075, 0.14, h, 10]} />
       </mesh>
-      <mesh position={[0, DECK_Y + h + 0.1, 0]} material={trim}>
+      <mesh position={[0, deck + h + 0.1, 0]} material={trim}>
         <sphereGeometry args={[0.1, 10, 10]} />
       </mesh>
       {sailW > 0 && (
@@ -219,7 +222,7 @@ function Mast({
   );
 }
 
-function Rigging({ masts }: { masts: { z: number; h: number }[] }) {
+function Rigging({ masts, style }: { masts: { z: number; h: number }[]; style: HullStyle }) {
   const geo = useMemo(() => {
     const pts: number[] = [];
     const add = (a: number[], b: number[]) => pts.push(...a, ...b);
@@ -228,18 +231,18 @@ function Rigging({ masts }: { masts: { z: number; h: number }[] }) {
       g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([]), 3));
       return g;
     }
-    const tops = masts.map((m) => [0, DECK_Y + m.h * 0.94, m.z] as number[]);
+    const tops = masts.map((m) => [0, style.deckY + m.h * 0.94, m.z] as number[]);
     for (let i = 0; i < tops.length - 1; i++) add(tops[i], tops[i + 1]);
-    add([0, DECK_Y + 1.0, -SHIP_L / 2 + 0.4], tops[0]);
-    add([0, DECK_Y + 2.0, SHIP_L / 2 - 2.2], tops[tops.length - 1]);
+    add([0, style.deckY + 1.0, -style.length / 2 + 0.4], tops[0]);
+    add([0, style.deckY + 2.0, style.length / 2 - 2.2], tops[tops.length - 1]);
     for (const t of tops) {
-      add([SHIP_B * 0.46, DECK_Y + 0.2, t[2] + 0.5], [t[0], t[1] - 0.1, t[2]]);
-      add([-SHIP_B * 0.46, DECK_Y + 0.2, t[2] + 0.5], [t[0], t[1] - 0.1, t[2]]);
+      add([style.beam * 0.46, style.deckY + 0.2, t[2] + 0.5], [t[0], t[1] - 0.1, t[2]]);
+      add([-style.beam * 0.46, style.deckY + 0.2, t[2] + 0.5], [t[0], t[1] - 0.1, t[2]]);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pts), 3));
     return g;
-  }, [masts]);
+  }, [masts, style]);
   return (
     <lineSegments geometry={geo}>
       <lineBasicMaterial color="#150f0c" transparent opacity={0.8} />
@@ -260,6 +263,7 @@ function Lantern({
 }) {
   return (
     <group position={position} scale={scale}>
+      <mesh position={[0,-.39,0]} material={trim}><cylinderGeometry args={[.035,.045,.55,6]}/></mesh>
       <mesh material={glow}>
         <sphereGeometry args={[0.115, 10, 10]} />
       </mesh>
@@ -307,13 +311,13 @@ export function TreasureShip({
   }, [sailMap]);
 
   const M = useMemo(() => {
-    const hull = mat(cssColor('--cv-ship-hull', '#2a211c'), { roughness: 0.84 });
+    const hull = mat(shipLevel>0?style.id==='steamer'?'#263c46':style.id==='sailnet'?'#254e58':style.id==='selfnav'?'#a9c3bd':'#4b543b':cssColor('--cv-ship-hull', '#2a211c'), { roughness: 0.84 });
     const deck = mat(cssColor('--cv-ship-hull-light', '#3b2f26'), { roughness: 0.9 });
     const lacquer = mat(cssColor('--cv-ship-lacquer', '#b6452c'), { roughness: 0.46, metalness: 0.12 });
     const trim = mat(cssColor('--cv-ship-trim', '#c9a15a'), { roughness: 0.3, metalness: 0.72 });
     const sail = new THREE.MeshStandardMaterial({
       map: sailMap,
-      color: '#cbb894',
+      color: shipLevel>=2?'#9d583c':shipLevel>=1?'#d7c591':'#cbb894',
       roughness: 0.96,
       metalness: 0,
       side: THREE.DoubleSide,
@@ -330,7 +334,8 @@ export function TreasureShip({
       toneMapped: false,
     });
     return { hull, deck, lacquer, trim, sail, shade, eye, pupil, banner, glow };
-  }, [sailMap]);
+  }, [sailMap, shipLevel, style.id]);
+  useEffect(()=>()=>Object.values(M).forEach(material=>material.dispose()),[M]);
 
   const hullGeo = useMemo(() => buildHullGeometry(style), [style]);
   const deckGeo = useMemo(() => buildDeckGeometry(style), [style]);
@@ -562,40 +567,22 @@ export function TreasureShip({
           trim={M.trim}
           hull={M.hull}
           reduceMotion={reduceMotion}
+          deck={style.deckY}
           phase={i * 0.7}
         />
       ))}
-      <Rigging masts={masts} />
+      <Rigging masts={masts} style={style} />
+      <ShipRefit style={style} level={shipLevel} reduceMotion={reduceMotion}/>
       {shipLevel >= 1 && [-1, 1].map(side => <mesh key={side} position={[side * style.beam * 0.48, style.deckY + 0.15, 0]} material={M.trim}><boxGeometry args={[0.09, 0.12, span * 0.7]} /></mesh>)}
       {shipLevel >= 2 && [-1, 1].map(side => <Lantern key={side} position={[side * style.beam * 0.39, style.deckY + 0.65, -span * 0.2]} trim={M.trim} glow={M.glow} scale={1.5} />)}
       {shipLevel >= 3 && <group position={[0, style.deckY + 1, span * 0.38]}><mesh material={M.trim}><cylinderGeometry args={[0.07, 0.07, 3.6, 8]} /></mesh><mesh position={[0.65, 1.2, 0]}><boxGeometry args={[1.3, 0.75, 0.04]} /><meshStandardMaterial color="#2c3e50" roughness={0.8} /></mesh><mesh position={[0.65, 1.2, 0.03]} material={M.trim}><torusGeometry args={[0.19, 0.035, 6, 20]} /></mesh></group>}
       <EraDeckCrew crew={crew} crewLevel={crewLevel} player={player} deckY={style.deckY} reduceMotion={reduceMotion} />
 
-      {/* 主帆旁的旗：场景唯一可换的点缀 */}
-      <mesh position={[0.9, DECK_Y + mainH * 0.99 - 0.6, 0.5]} material={M.banner}>
-        <planeGeometry args={[0.95, 1.8]} />
-      </mesh>
-
-      <Lantern position={[SHIP_B * 0.4, DECK_Y + 0.85, half - 2.2]} trim={M.trim} glow={M.glow} />
-      <Lantern position={[-SHIP_B * 0.4, DECK_Y + 0.85, half - 2.2]} trim={M.trim} glow={M.glow} />
-      <Lantern position={[0, DECK_Y + 4.55, half - 2.6]} trim={M.trim} glow={M.glow} scale={1.25} />
-      <Lantern position={[SHIP_B * 0.26, DECK_Y + 0.5, -half + 2.2]} trim={M.trim} glow={M.glow} scale={0.85} />
-
-      {/* 舷灯：一排小 emissive，节奏参考概念图 */}
-      {Array.from({ length: 7 }, (_, i) => {
-        const z = -half + 3 + (i * SHIP_L * 0.7) / 6;
-        return (
-          <mesh key={`l${i}`} position={[SHIP_B * 0.47, DECK_Y - 0.34, z]}>
-            <sphereGeometry args={[0.055, 8, 8]} />
-            <meshStandardMaterial
-              color={cssColor('--cv-ship-lamp-core', '#ffd9a0')}
-              emissive={cssColor('--cv-ship-lamp-warm', '#f0b46a')}
-              emissiveIntensity={1.0}
-              toneMapped={false}
-            />
-          </mesh>
-        );
-      })}
+      {/* 旗与灯按实际甲板、桅顶定位，不能悬在船型之外。 */}
+      {masts.length>0&&<mesh position={[.45,style.deckY+Math.max(...masts.map(m=>m.h))-.7,masts.reduce((best,m)=>m.h>best.h?m:best,masts[0]).z]} material={M.banner}><planeGeometry args={[.9,1.3]}/></mesh>}
+      {[-1,1].map(side=><Lantern key={side} position={[side*style.beam*.4,style.deckY+.65,half-span*.1]} trim={M.trim} glow={M.glow}/>)}
+      <Lantern position={[style.beam*.26,style.deckY+.65,-half+span*.1]} trim={M.trim} glow={M.glow} scale={.85}/>
+      {Array.from({length:7},(_,i)=><mesh key={`l${i}`} position={[style.beam*.47,style.deckY-.25,-half+span*.12+i*span*.7/6]}><sphereGeometry args={[.055,8,8]}/><meshStandardMaterial color="#ffd9a0" emissive="#f0b46a" emissiveIntensity={1} toneMapped={false}/></mesh>)}
 
       {/* 接触阴影：径向柔边，船身压在水上，避免「浮在空气里」 */}
       <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={-1}>

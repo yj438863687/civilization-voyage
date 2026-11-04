@@ -1,3 +1,5 @@
+import { StoryTheatre, type StoryAction } from './StoryTheatre';
+import { MusicControls } from './VoyageMusic';
 import { VoyageChallenge } from './VoyageChallenges';
 import { CHALLENGES, type ChallengeReport } from '../world/challenges';
 import { arcEnding, arcForScene, STORY_ARCS, workSummary } from '../world/storyArcs';
@@ -34,6 +36,9 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
   const [selected, setSelected] = useState<number[]>([]);
   const [work, setWork] = useState<ChallengeReport | null>(null);
   const [decision, setDecision] = useState(0);
+  const [action,setAction]=useState<StoryAction|null>(null);
+  const [fieldOpen,setFieldOpen]=useState(()=>window.matchMedia('(min-width:701px)').matches);
+  useEffect(()=>{const media=window.matchMedia('(min-width:701px)');const change=()=>setFieldOpen(media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
   const done = useRef(false);
   const panel = useRef<HTMLDivElement>(null);
   useModalFocus(panel);
@@ -47,8 +52,8 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
   const chosenLabel = mixed ? '一封商单，一封急用消息' : scene.options[option].label;
   return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={scene.title} onKeyDown={event => {event.stopPropagation();if(event.key==='Escape'&&onCancel){event.preventDefault();onCancel();}}}>
     <div className="history-island" ref={panel} tabIndex={-1}>
-      <div className="history-session-bar"><span>{phase==='read'?'读故事 → 动手试验 → 作出安排 → 记入航程':phase==='play'?work?'试验已完成 · 现在决定怎样使用技术':'正在试验 · 先操作，再记录结果':'确认这一站 · 点下方按钮后才结算'}</span>{onCancel&&<button className="btn" type="button" onClick={onCancel}>{replay?'结束重读，回到船上':'暂时返回船上'}</button>}</div>
-      <div className="history-visual"><HistoryImage name={scene.image} /><p>{scene.nature} · 互动人物、对话与选择为创作</p></div>
+      <div className="history-session-bar"><span>{phase==='read'?'读故事 → 动手试验 → 作出安排 → 记入航程':phase==='play'?work?'试验已完成 · 现在决定怎样使用技术':'正在试验 · 先操作，再记录结果':'确认这一站 · 点下方按钮后才结算'}</span><MusicControls below/>{onCancel&&<button className="btn" type="button" onClick={onCancel}>{replay?'结束重读，回到船上':'暂时返回船上'}</button>}</div>
+      <div className={`history-visual${phase!=='read'?' is-live':''}`}><details className="history-photo" open={phase==='read'}><summary>历史配图与来源</summary><HistoryImage name={scene.image} /></details><details className="story-field-wrap" open={fieldOpen} onToggle={event=>setFieldOpen(event.currentTarget.open)}><summary>故事现场 · 三处可查看{action?.progress?` · ${action.progress.label} ${action.progress.value}/${action.progress.total}`:''}</summary><StoryTheatre scene={scene} action={action} work={work} phase={phase} choice={chosenLabel} supply={outcome.supply} trust={outcome.trust}/></details><p>{scene.nature} · 互动人物、对话与选择为创作</p></div>
       <div className="history-reading">
         <h2>{scene.title}</h2>{replay&&<p className="replay-note" role="status">重读与练习：不改变补给、人心、升级或本次航程的原记录。</p>}<p className="history-date">{scene.date} · {scene.who}</p>
         {phase === 'read' && <>
@@ -59,9 +64,9 @@ export function HistoryEncounter({ enc, state = {}, supply = Infinity, cause, on
           <p className="history-source">背景来源：<a href={scene.source.url} target="_blank" rel="noreferrer">{scene.source.title}</a></p>
           <button className="btn btn-primary" type="button" onClick={() => setPhase('play')}>进入故事 · {mechanism.title}</button>
         </>}
-        {phase === 'play' && !work && <VoyageChallenge sceneId={scene.id} state={state} onComplete={setWork} />}
+        {phase === 'play' && !work && <VoyageChallenge sceneId={scene.id} state={state} onComplete={setWork} onAction={next=>setAction(previous=>({...next,progress:next.progress?{...previous?.progress,...next.progress}:previous?.progress}))} />}
         {phase === 'play' && work && <>
-          <div className="technical-result"><h3>你做出的技术成果</h3><p>{work.summary}</p><button className="cine-link" type="button" onClick={()=>setWork(null)}>重做这一章的操作</button></div>
+          <div className="technical-result"><h3>你做出的技术成果</h3><p>{work.summary}</p><button className="cine-link" type="button" onClick={()=>{setWork(null);setAction(null);}}>重做这一章的操作</button></div>
           <h3>这个本领，怎样用下去？</h3><p>{mechanism.society}</p>
           {scene.activity === 'dispatch' ? <HistoryActivity scene={scene} selected={selected} onToggle={toggle} /> : <div className="history-decision" role="group" aria-label="对共同生活的安排">{scene.options.map((choice,index)=><button type="button" key={choice.label} aria-pressed={decision===index} onClick={()=>setDecision(index)}><strong>{choice.label}</strong><small>{choice.note}</small></button>)}</div>}
           <div className="history-consequence" aria-live="polite"><strong>{chosenLabel}</strong><p>{mixed ? '保留一笔商单收入，同时让一封普通人的急用消息先发。另一封继续等待。' : scene.options[option].note}</p><p>{replay?'练习的理论变化（不结算）':'操作与安排合计'}：补给 {signed(outcome.supply)} · 人心 {signed(outcome.trust)}</p>{!replay&&Number.isFinite(supply)&&<p>船上现有 {supply} 份补给{affordable?`，做完后剩 ${Math.min(100,supply+outcome.supply)} 份`:'，不足以承担这个安排，可以改选节省物资的办法'}</p>}{cooperationBonus(scene,state)>0&&<p>上一章留下的合作省回 3 份补给，已计入。</p>}</div>
@@ -92,7 +97,7 @@ export function HistoryArrival({ route, state, onDone }: { route: HistoryRoute; 
   useEffect(() => { panel.current?.focus(); }, []);
   const arc=Object.values(STORY_ARCS).find(arc=>arc.chapters[0].scene===route.islands[0].id);
   return <div className="history-overlay" role="dialog" aria-modal="true" aria-label={`${route.ending.name}回顾这一程`} onKeyDown={event => {event.stopPropagation();if(event.key==='Escape'){event.preventDefault();onDone();}}}><div className="history-island" tabIndex={-1} ref={panel}>
-    <div className="history-session-bar"><span>三章回顾 · 技术成果与共同生活</span><button className="btn" type="button" onClick={onDone}>继续，到港口写下看法</button></div><div className="history-visual"><HistoryImage name={route.ending.image} /><p>{route.ending.fictional ? '回顾者为虚构人物' : '历史人物；回顾台词为创作'}</p></div>
+    <div className="history-session-bar"><span>三章回顾 · 技术成果与共同生活</span><MusicControls below/><button className="btn" type="button" onClick={onDone}>继续，到港口写下看法</button></div><div className="history-visual"><HistoryImage name={route.ending.image} /><p>{route.ending.fictional ? '回顾者为虚构人物' : '历史人物；回顾台词为创作'}</p></div>
     <div className="history-reading"><h2>{route.ending.name}</h2><p className="history-date">{route.ending.date}</p><p>{route.ending.deed}</p>{arc&&<div className="story-thread"><h3>{arc.artifact}的最后一页</h3><p>{arcEnding(arc,state)}</p>{arc.chapters.map(chapter=><p key={chapter.scene}><strong>{CHALLENGES[chapter.scene].title}：</strong>{workSummary(chapter.scene,state)||'旧记录未保留操作过程'}</p>)}</div>}<RouteTimeline route={route} state={state} />{routeRecap(route, state).map(line => <p key={line}>{line}</p>)}<h3>技术与文明</h3><p>{route.ending.reflection}</p><button className="btn btn-primary" type="button" onClick={onDone}>写下这一程的看法</button></div>
   </div></div>;
 }

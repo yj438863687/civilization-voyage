@@ -1,3 +1,4 @@
+import { MusicDirector, MusicControls } from '../src/components/VoyageMusic';
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HistoryEncounter, HistoryArrival } from '../src/components/History';
@@ -7,6 +8,10 @@ import { encounterFor, freshStats, applyOutcome } from '../src/world/encounters'
 import type { FableState } from '../src/world/fable';
 import '../src/styles/app.css';
 
+function MusicFixture() {
+  const [era,setEra]=useState('A');
+  return <main style={{padding:40,color:'#eee',minHeight:'90vh'}}><MusicDirector era={era} story={false}/><MusicControls below/>{['A','B','C','D'].map(value=><button key={value} onClick={()=>setEra(value)}>切换时代 {value}</button>)}<button onClick={()=>window.dispatchEvent(new CustomEvent('cv-story-sound',{detail:900}))}>操作音效避让</button></main>;
+}
 function Fixture() {
   const query = new URLSearchParams(location.search);
   const route = HISTORY_ROUTES[query.get('route') ?? 'A-near'];
@@ -14,7 +19,8 @@ function Fixture() {
   const [step, setStep] = useState(Number(query.get('step') ?? 0));
   const [state, setState] = useState<FableState>(query.has('care') ? Object.fromEntries(route.islands.map(island => [`history:${island.id}`, 'care'])) : {});
   const [stats, setStats] = useState({ ...freshStats(), trust: 80, supply: query.has('empty') ? 0 : 80 });
-  if (query.has('yard')) return <><button id="outside" onClick={() => setYardOpen(true)}>打开船坞</button>{yardOpen && <ShipyardDialog stats={stats} onUpdate={fn => setStats(fn)} onClose={() => setYardOpen(false)} />}</>;
+  if (query.has('music')) return <MusicFixture/>;
+  if (query.has('yard')) return <><button id="outside" onClick={() => setYardOpen(true)}>打开船坞</button>{yardOpen && <ShipyardDialog sceneId={query.get('era')??'A'} stats={stats} onUpdate={fn => setStats(fn)} onClose={() => setYardOpen(false)} />}</>;
   if (step === 3) return <HistoryArrival route={route} state={state} onDone={() => setStep(4)} />;
   if (step > 3) return <p role="status">这一程已完成 · 补给 {stats.supply} · 人心 {stats.trust}</p>;
   const scene = [...route.islands, route.crisis][step];
