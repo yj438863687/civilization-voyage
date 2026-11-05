@@ -32,12 +32,16 @@ for lang in ['en','zh']:
     y=384+j*180;text(p,a,96,y,780,60,34,GREEN);text(p,b,96,y+72,780,95,32)
    text(p,t('AI辅助制作；历史与体验的责任由人承担。','AI assists production. People own the history and experience.'),96,925,1728,60,30,GREEN)
   elif i==1:
-   p.picture(ROOT/'.impeccable/demo-v3/raw-sync/interaction-poster.png',96,350,830,467)
-   for j,(name,desc) in enumerate(t([('Discovery Tour','历史世界与专家导览'),('Minecraft Education','跨学科课程与教学工具'),('文明航程','中外历史中的决定与后果')],[('Discovery Tour','Historical worlds and expert curation'),('Minecraft Education','Broad curricula and teaching tools'),('Civilization Voyage','Decisions and consequences across cultures')])):
-    y=365+j*145;text(p,name,1010,y,810,62,34,GREEN);text(p,desc,1010,y+66,810,95,31)
-   for j,word in enumerate(t(['作出选择','改变下一站支援','回港重新理解'],['MAKE A CHOICE','CHANGE LATER SUPPORT','REFLECT AT SHORE'])):
-    x=96+j*588;p.line(x,858,x+500,858,GREEN,3);text(p,word,x,883,500,65,29,GREEN)
-   text(p,t('4时代 / 8航线 / 24场景；游戏实录，学习与付费价值待验证。','4 eras / 8 routes / 24 scenes. Actual gameplay; learning and payment need validation.'),96,959,1728,44,23,p.muted)
+   names=['Discovery Tour','Minecraft Education',t('文明航程','Civilization Voyage')]
+   strength=t(['历史世界的深度与专家导览','现成课程、跨学科与教师工具','4时代、8航线、24场景'],['Historical depth and expert-guided worlds','Ready-made lessons, many subjects, teaching tools','4 eras, 8 routes, 24 scenes'])
+   fit=t(['围绕特定地区与时代；中外技术文明的连贯比较仍需编排。','适用主题广；我们的跨时代故事需要另行选材与串联。','预先组织中外故事；选择改变后续支援，回港读取实际决定。'],['Focused on particular places and periods; our China/world theme needs an added structure.','Broad scope; our connected historical journey still needs selection and sequencing.','China/world stories already connected; choices affect support and are recalled at shore.'])
+   for j in range(3):
+    x=96+j*588
+    if j==2:p.rect(x-18,343,550,519,'103F43')
+    text(p,names[j],x,370,510,100,37,GREEN);text(p,t('长处','STRENGTH'),x,493,500,45,24,p.muted);text(p,strength[j],x,548,500,118,32)
+    text(p,t('与本项目目标的关系','FIT FOR OUR PURPOSE'),x,682,500,45,23,p.muted);text(p,fit[j],x,735,500,123,28)
+   text(p,t('我们的区别：一段航程，连贯选择，持续的后果。','Our difference: one journey, connected choices, consequences that follow you.'),96,897,1728,78,35,GREEN)
+   text(p,t('已有结构；学习效果与备课节省仍需验证。','Structure implemented; learning gains and preparation savings still need testing.'),96,970,1728,35,22,p.muted)
   elif i==2:
    # Let the shared visual renderer draw the entire page on a fresh slide.
    slideid=prs.slides._sldIdLst[-1];prs.part.drop_rel(slideid.rId);prs.slides._sldIdLst.remove(slideid)
@@ -69,6 +73,9 @@ for lang in ['en','zh']:
  pdf.save(OUT/f'Civilization-Voyage-My-Part-{tag}.pdf')
  textfile=t('个人结尾演讲稿｜约8分钟｜按1:20 / 1:40 / 1:50 / 1:40 / 1:30排练\n\n','PERSONAL CLOSING | About 8 minutes | Rehearse: 1:20 / 1:40 / 1:50 / 1:40 / 1:30\n\n')+'\n\n'.join(f"SLIDE {i+1} — {r[lang]}\n\n{r[lang+'_script']}" for i,r in enumerate(rows))
  (OUT/f'Speech-{tag}.txt').write_text(textfile,encoding='utf-8')
+ if lang=='en':
+  rehearsal='排练版｜方括号是看图提示，不朗读。五页合计约8分钟。\n\n'+'\n\n'.join(f"第{i+1}页｜{r['seconds']//60}:{r['seconds']%60:02d}\n"+'\n\n'.join('【'+part['cue_zh']+'】\n'+part['en'] for part in r['rehearsal']) for i,r in enumerate(rows))
+  (OUT/'Speech-Rehearsal-看图提示.txt').write_text(rehearsal,encoding='utf-8')
  assert len(Presentation(ppt).slides)==5
  print(ppt)
 print('English words:',sum(len(re.findall(r'\b[\w’-]+\b',r['en_script'])) for r in rows))
