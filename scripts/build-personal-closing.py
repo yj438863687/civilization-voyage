@@ -1,4 +1,4 @@
-"""Five-slide personal closing: AI production, product thesis and commercial discipline."""
+"""Six-slide personal closing: AI production, product thesis and commercial discipline."""
 import json,re
 from pathlib import Path
 from pptx import Presentation
@@ -7,7 +7,7 @@ import fitz
 import presentation_core as core
 from presentation_core import Page,GREEN,WHITE,INK
 from presentation_business import render as business
-ROOT=Path(__file__).resolve().parents[1];OUT=Path.home()/'Desktop/文明航程-个人结尾-5页';OUT.mkdir(exist_ok=True)
+ROOT=Path(__file__).resolve().parents[1];OUT=Path.home()/'Desktop/文明航程-个人结尾-6页';OUT.mkdir(exist_ok=True)
 BASE=ROOT/'.impeccable/personal-closing';BASE.mkdir(exist_ok=True)
 FULL=json.loads((ROOT/'docs/humanities-introduction.json').read_text());M=json.loads((ROOT/'docs/business-assumptions.json').read_text())
 rows=json.loads((ROOT/'docs/personal-closing.json').read_text())
@@ -25,7 +25,8 @@ for lang in ['en','zh']:
    media=json.loads((ROOT/'apps/web/src/world/backgroundMedia.json').read_text())
    note+='\n'+'\n'.join(f"{k}: {media[k]['author']} | {media[k]['license']} | {media[k]['url']} | {media[k]['licenseUrl']}" for k in ['watt','cable'])
   if i in [3,4]:note+='\n'+FULL[19 if i==3 else 21]['note_'+lang]
-  p=Page(prs,{'note_en':note},i,i==3,True);label(p,r['label_'+lang]);title(p,r[lang])
+  p=Page(prs,{'note_en':note},i,i==3,True)
+  if i!=5:label(p,r['label_'+lang]);title(p,r[lang])
   if i==0:
    p.picture(ROOT/'.impeccable/demo-v3/raw-sync/opening-poster.png',950,370,874,491)
    for j,(a,b) in enumerate(t([('设计与接口','先确定世界，再约定连接方式'),('本机实现与测试','把3D、故事与存档接起来'),('内容判断','核对历史，设计选择与后果')],[('DESIGN / APIs','Define the world and how its parts connect.'),('BUILD / TEST','Connect 3D, stories and saved progress locally.'),('EDITORIAL JUDGMENT','Check history and design meaningful consequences.')])):
@@ -65,17 +66,21 @@ for lang in ['en','zh']:
     y=648+j*65;text(p,word,96,y,290,43,25,p.muted);p.rect(395,y+7,v/240000*300,16,c);text(p,f'¥{v:,}',725,y,260,45,28,c)
 
    p.line(96,862,1824,862,GREEN,2);text(p,t('技术让我们能够创造；值得留下什么，由我们决定。','Technology gives us the ability to create. We decide what is worth keeping.'),96,904,1728,94,38,GREEN)
-  if i!=2:end(p,i+1)
+  elif i==5:
+   p.picture(ROOT/'.impeccable/harbour-talk/temple-cover-composed.png',0,0,1920,1080,fill=True)
+   p.text(r[lang],96,72,1728,120,88,WHITE,kind='serif',minsize=72)
+   p.text(t('让历史成为可以参与的文化。','History to explore. Choices to live with.'),100,217,1720,76,40,WHITE,minsize=32)
+  if i not in [2,5]:end(p,i+1)
   pics.append(p.finish())
  tag=lang.upper();ppt=OUT/f'Civilization-Voyage-My-Part-{tag}.pptx';prs.save(ppt)
  pdf=fitz.open()
  for pic in pics:page=pdf.new_page(width=960,height=540);page.insert_image(page.rect,filename=str(pic))
  pdf.save(OUT/f'Civilization-Voyage-My-Part-{tag}.pdf')
- textfile=t('个人结尾演讲稿｜约8分钟｜按1:20 / 1:40 / 1:50 / 1:40 / 1:30排练\n\n','PERSONAL CLOSING | About 8 minutes | Rehearse: 1:20 / 1:40 / 1:50 / 1:40 / 1:30\n\n')+'\n\n'.join(f"SLIDE {i+1} — {r[lang]}\n\n{r[lang+'_script']}" for i,r in enumerate(rows))
+ textfile=t('个人结尾演讲稿｜约8分钟｜按1:20 / 1:40 / 1:50 / 1:40 / 1:00 / 0:30排练\n\n','PERSONAL CLOSING | About 8 minutes | Rehearse: 1:20 / 1:40 / 1:50 / 1:40 / 1:00 / 0:30\n\n')+'\n\n'.join(f"SLIDE {i+1} — {r[lang]}\n\n{r[lang+'_script']}" for i,r in enumerate(rows))
  (OUT/f'Speech-{tag}.txt').write_text(textfile,encoding='utf-8')
  if lang=='en':
-  rehearsal='排练版｜方括号是看图提示，不朗读。五页合计约8分钟。\n\n'+'\n\n'.join(f"第{i+1}页｜{r['seconds']//60}:{r['seconds']%60:02d}\n"+'\n\n'.join('【'+part['cue_zh']+'】\n'+part['en'] for part in r['rehearsal']) for i,r in enumerate(rows))
+  rehearsal='排练版｜方括号是看图提示，不朗读。六页合计约8分钟。\n\n'+'\n\n'.join(f"第{i+1}页｜{r['seconds']//60}:{r['seconds']%60:02d}\n"+'\n\n'.join('【'+part['cue_zh']+'】\n'+part['en'] for part in r['rehearsal']) for i,r in enumerate(rows))
   (OUT/'Speech-Rehearsal-看图提示.txt').write_text(rehearsal,encoding='utf-8')
- assert len(Presentation(ppt).slides)==5
+ assert len(Presentation(ppt).slides)==6
  print(ppt)
 print('English words:',sum(len(re.findall(r'\b[\w’-]+\b',r['en_script'])) for r in rows))

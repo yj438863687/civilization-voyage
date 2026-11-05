@@ -104,22 +104,34 @@
     "zh": "让人愿意再来，让故事能够继续。",
     "label_en": "05 / THE NEXT COMMITMENT",
     "label_zh": "05 / 下一步投入",
-    "en_script": "The last slide brings the plan together.\nOn the left is a proposed budget of three hundred and sixty thousand yuan. The bars below show where it goes: fixed work, delivery float and a reserve.\nDelivery float means cash to cover the wait between doing the work and getting paid. We do not count it again as an extra expense.\n\nWe would start with one hundred and twenty thousand yuan. Then we would follow the three steps on the right.\nFirst, see whether people finish the game and choose to return. Next, test real payments and delivery costs. Then, add new stories and work with cultural partners.\nWe want each release to give people a reason to come back, and give us something useful to build on.\n\nLet me end with the question behind the whole voyage: as our tools become more powerful, how do we choose to live together?\nAI gives us the ability to build. We must decide what is worth building, and how to keep it alive.\nThat is what we want Civilization Voyage to become. Thank you.",
-    "zh_script": "最后把计划合起来。左侧36万元预算，下方条形图分固定工作、交付周转、储备；周转是做完到收到钱之间的现金，不重复计费。先投12万元，再按右侧三步：看用户是否玩完且主动再来，验证支付与交付成本，再增加故事与文化伙伴。每次更新应让用户愿意回来，也为下一次制作留下积累。最后看向观众：当工具越来越强大，我们选择怎样共同生活？AI给了制作能力，值得做什么、怎样持续，由我们决定。这就是文明航程想走向的方向。谢谢。",
+    "en_script": "This brings our business plan together.\nOn the left is a proposed budget of three hundred and sixty thousand yuan. The bars below show where it goes: fixed work, delivery float and a reserve.\nDelivery float means cash to cover the wait between doing the work and getting paid. We do not count it again as an extra expense.\n\nWe would start with one hundred and twenty thousand yuan. Then we would follow the three steps on the right.\nFirst, see whether people finish the game and choose to return. Next, test real payments and delivery costs. Then, add new stories and work with cultural partners.\nWe want each release to give people a reason to come back, and give us something useful to build on.",
+    "zh_script": "左侧是36万元资金规划，下方分为固定工作、交付周转与储备；周转是做完工作到收到款项之间的现金，不重复计费。先投12万元，再按右侧三步：看用户是否玩完且主动再来，验证支付与交付成本，再增加故事与文化伙伴。每次更新应让用户愿意回来，也为下一次制作留下积累。",
     "role": "Personal closing",
-    "seconds": 90,
+    "seconds": 60,
     "rehearsal": [
       {
         "cue_zh": "指左上预算与下面三根分配条。",
-        "en": "The last slide brings the plan together.\nOn the left is a proposed budget of three hundred and sixty thousand yuan. The bars below show where it goes: fixed work, delivery float and a reserve.\nDelivery float means cash to cover the wait between doing the work and getting paid. We do not count it again as an extra expense."
+        "en": "This brings our business plan together.\nOn the left is a proposed budget of three hundred and sixty thousand yuan. The bars below show where it goes: fixed work, delivery float and a reserve.\nDelivery float means cash to cover the wait between doing the work and getting paid. We do not count it again as an extra expense."
       },
       {
         "cue_zh": "指首期¥120,000，再沿右侧三个步骤往下讲。",
         "en": "We would start with one hundred and twenty thousand yuan. Then we would follow the three steps on the right.\nFirst, see whether people finish the game and choose to return. Next, test real payments and delivery costs. Then, add new stories and work with cultural partners.\nWe want each release to give people a reason to come back, and give us something useful to build on."
-      },
+      }
+    ]
+  },
+  {
+    "en": "Civilization Voyage",
+    "zh": "文明航程",
+    "label_en": "",
+    "label_zh": "",
+    "en_script": "Civilization Voyage begins with Chinese civilization and opens onto the world.\nThrough its stories and choices, we bring technological change back to the people who live through it.\nWe want to make history something people can take part in—and build a business that keeps those stories alive.\nThank you.",
+    "zh_script": "文明航程从中华文明出发，走向世界。通过故事与选择，我们把技术变迁带回身处其中的人。我们希望让历史成为人们可以参与的文化，也让持续的经营支持这些故事继续讲下去。谢谢。",
+    "role": "Personal closing",
+    "seconds": 30,
+    "rehearsal": [
       {
-        "cue_zh": "看向观众，放慢最后的问题；最后一句后停顿，再说Thank you。",
-        "en": "Let me end with the question behind the whole voyage: as our tools become more powerful, how do we choose to live together?\nAI gives us the ability to build. We must decide what is worth building, and how to keep it alive.\nThat is what we want Civilization Voyage to become. Thank you."
+        "cue_zh": "切到神殿与船的全屏画面，放慢语速。最后面向观众说Thank you，画面停留。",
+        "en": "Civilization Voyage begins with Chinese civilization and opens onto the world.\nThrough its stories and choices, we bring technological change back to the people who live through it.\nWe want to make history something people can take part in—and build a business that keeps those stories alive.\nThank you."
       }
     ]
   }
