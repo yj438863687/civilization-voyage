@@ -4,22 +4,18 @@
     "zh": "AI让想法落地，判断让作品成立。",
     "label_en": "01 / FROM IDEA TO PRODUCT",
     "label_zh": "01 / 从想法到作品",
-    "en_script": "Alright, you've seen what Civilization Voyage feels like to play.\nI'll now talk about how we built it, and how we plan to turn it into a business.\n\nWe used Lovable to talk through ideas. Claude helped with design, Codex with APIs, and Grok with the frontend and 3D scenes.\nThen we put the pieces together on our own computer, tested them, and updated the desktop app.\nYou can see the result on the right.\n\nAI helped us get there faster.\nWe still had to decide which stories belonged together, put them in the right order, and make the choices easy to understand.\nThat's the work behind the game.\nNow we need to give people a reason to choose it.\nLet's start with how we compare.",
-    "zh_script": "好，大家已经看到文明航程玩起来是什么样子了。接下来我讲怎么把它做出来，以及怎么把它发展成一门生意。我们用Lovable交流想法，Claude帮忙做设计，Codex处理API，Grok负责前端和3D。然后在本机把这些部分接起来，做测试，更新桌面应用。右侧就是成果。AI让我们做得更快，但哪些故事放一起、按什么顺序讲、怎样让玩家看懂选择，还是我们来决定。这是游戏背后的工作。现在还要给用户一个选择它的理由，先看我们和竞品的比较。",
+    "en_script": "You've seen the game. I'll focus on the business plan: how we earn money and how we keep the project going.\nWe used Lovable to share ideas, Claude for design, Codex for APIs, and Grok for the frontend and 3D scenes.\n\nOur plan starts with customers.\nPlayers pay for a good adventure. Schools pay for help using it in class. Museums pay for a local story their visitors can take part in.\nEach needs a different product, a clear price, and a clear amount of work from us.\nWe need to leave enough money after that work to pay for the next story.\nFirst, let's look at why these customers would choose us.",
+    "zh_script": "大家已经看到了游戏。我的部分聚焦商业计划：怎样赚钱，怎样让项目持续。工具方面，我们用Lovable交流想法，Claude做设计，Codex处理API，Grok完成前端与3D。商业计划从客户开始：玩家为好玩的冒险付费，学校为课堂应用支持付费，博物馆为观众可以参与的本地故事付费。每类客户需要不同的产品、明确价格和明确工作量。完成工作后，还要留下足够资金做下一个故事。首先看这些客户为什么选择我们。",
     "role": "Personal closing",
     "seconds": 65,
     "rehearsal": [
       {
-        "cue_zh": "接过前面同学的游戏展示，像对观众自然接话。",
-        "en": "Alright, you've seen what Civilization Voyage feels like to play.\nI'll now talk about how we built it, and how we plan to turn it into a business."
+        "cue_zh": "接过游戏展示，直接说明自己负责BP。",
+        "en": "You've seen the game. I'll focus on the business plan: how we earn money and how we keep the project going.\nWe used Lovable to share ideas, Claude for design, Codex for APIs, and Grok for the frontend and 3D scenes."
       },
       {
-        "cue_zh": "指左边制作流程，再指右侧游戏实录；工具名称之间略停。",
-        "en": "We used Lovable to talk through ideas. Claude helped with design, Codex with APIs, and Grok with the frontend and 3D scenes.\nThen we put the pieces together on our own computer, tested them, and updated the desktop app.\nYou can see the result on the right."
-      },
-      {
-        "cue_zh": "视线回到观众，把制作自然带到竞争关系。",
-        "en": "AI helped us get there faster.\nWe still had to decide which stories belonged together, put them in the right order, and make the choices easy to understand.\nThat's the work behind the game.\nNow we need to give people a reason to choose it.\nLet's start with how we compare."
+        "cue_zh": "看向观众，进入客户、收入和成本；无需讲右侧截图或制作细节。",
+        "en": "Our plan starts with customers.\nPlayers pay for a good adventure. Schools pay for help using it in class. Museums pay for a local story their visitors can take part in.\nEach needs a different product, a clear price, and a clear amount of work from us.\nWe need to leave enough money after that work to pay for the next story.\nFirst, let's look at why these customers would choose us."
       }
     ]
   },
@@ -28,22 +24,22 @@
     "zh": "对标竞品，明确我们的优势",
     "label_en": "02 / COMPETITIVE POSITION",
     "label_zh": "02 / 竞品与定位",
-    "en_script": "Discovery Tour is strong on historical detail.\nMinecraft Education is strong on classroom tools.\nWhat we bring is a story that stays with you as you play.\n\nOur game covers four eras, eight routes, and twenty-four scenes, across Chinese and world histories.\nThe stories follow a clear order. A choice in one chapter can affect what happens in the next.\nSay you share supplies with a village.\nYour ship now has less. You feel that cost straight away.\nLater, the village may help you. You remember why.\nBy the end of the voyage, you can look back and see how your choices shaped it.\n\nThat's what the line at the bottom means:\nOne journey. Connected choices. Consequences that follow you.\nWe want people to care about the story because they've played a part in it.\nFrom there, we can build something for players, teachers, and museums.",
-    "zh_script": "Discovery Tour擅长历史细节，Minecraft Education擅长课堂工具。我们带来的是一路跟着玩家走的故事。游戏有四个时代、八条航线、二十四个场景，横跨中国与世界历史。故事顺序清楚，上一章的决定会影响下一章。例如你把补给分给村庄，船上马上就少了资源，代价立刻能感受到。后来村庄可能帮助你，你也记得为什么。航程结束时，可以回头看自己的选择怎样改变了过程。底部那句话就是这个意思：一段航程，连贯选择，持续后果。希望玩家因为参与其中而关心这个故事。由此再为玩家、教师和博物馆设计产品。",
+    "en_script": "Discovery Tour offers detailed historical worlds.\nMinecraft Education offers flexible tools for classroom learning.\nOur focus is a ready-to-play journey through Chinese and world histories.\n\nWe already have four eras, eight routes, and twenty-four scenes built around connected stories and choices.\nFor players, that means a full adventure with a reason to keep playing.\nFor teachers, it gives them a set of stories to build a lesson around.\nFor museums, the same game systems give us a starting point for a local theme.\nThat is the position we want to build: a cultural game we can sell to players and adapt for schools and museums.\n\nWe compete by making this particular experience useful to each customer.\nOur next step is to turn that position into clear products and prices.\nThe next slide shows exactly what each customer gets.",
+    "zh_script": "Discovery Tour提供细致的历史世界，Minecraft Education提供灵活的课堂工具。我们聚焦已经可以玩的中外历史航程。四个时代、八条航线、二十四个场景，以连贯故事与选择组织起来。对玩家，是值得继续玩的完整冒险；对教师，是可以用来组织课程的一组故事；对博物馆，同一套游戏系统提供了本地主题的制作基础。我们要建立的定位是：面向玩家销售，并能适配学校和博物馆的文化游戏。竞争重点是让这个具体体验对每类客户都有用，下一步便是把定位落实为清晰的商品和价格。下一页具体讲每类客户得到什么。",
     "role": "Personal closing",
     "seconds": 80,
     "rehearsal": [
       {
-        "cue_zh": "左、中两栏各讲一句，然后转向右侧文明航程。",
-        "en": "Discovery Tour is strong on historical detail.\nMinecraft Education is strong on classroom tools.\nWhat we bring is a story that stays with you as you play."
+        "cue_zh": "指左、中两栏，竞品各用一句；立即转右栏。",
+        "en": "Discovery Tour offers detailed historical worlds.\nMinecraft Education offers flexible tools for classroom learning.\nOur focus is a ready-to-play journey through Chinese and world histories."
       },
       {
-        "cue_zh": "指右栏四时代、八航线；村庄例子像讲故事一样展开。",
-        "en": "Our game covers four eras, eight routes, and twenty-four scenes, across Chinese and world histories.\nThe stories follow a clear order. A choice in one chapter can affect what happens in the next.\nSay you share supplies with a village.\nYour ship now has less. You feel that cost straight away.\nLater, the village may help you. You remember why.\nBy the end of the voyage, you can look back and see how your choices shaped it."
+        "cue_zh": "指右侧四时代、八航线、24场景，讲它对购买者的价值。",
+        "en": "We already have four eras, eight routes, and twenty-four scenes built around connected stories and choices.\nFor players, that means a full adventure with a reason to keep playing.\nFor teachers, it gives them a set of stories to build a lesson around.\nFor museums, the same game systems give us a starting point for a local theme.\nThat is the position we want to build: a cultural game we can sell to players and adapt for schools and museums."
       },
       {
-        "cue_zh": "指底部总结，最后一句切到第三页。",
-        "en": "That's what the line at the bottom means:\nOne journey. Connected choices. Consequences that follow you.\nWe want people to care about the story because they've played a part in it.\nFrom there, we can build something for players, teachers, and museums."
+        "cue_zh": "视线回到观众，明确竞争重点，再切产品与价格。",
+        "en": "We compete by making this particular experience useful to each customer.\nOur next step is to turn that position into clear products and prices.\nThe next slide shows exactly what each customer gets."
       }
     ]
   },
@@ -52,22 +48,22 @@
     "zh": "共同的内容基础，三种付费理由。",
     "label_en": "03 / THE BUSINESS MODEL",
     "label_zh": "03 / 商业模式",
-    "en_script": "For players, the plan is simple: sixty-eight yuan for the full game.\nThey buy it because it looks fun. They keep playing because they want to see what happens next.\nIf they enjoy that first voyage, we can offer new story packs at twenty-eight yuan.\nSo we have to make the first game good enough that people want another one.\n\nA teacher needs something different.\nImagine bringing this game into a history lesson. The students have played a story about a new machine. Now the teacher wants them to talk about who it helped and who paid the price.\nThe teacher needs a guide, a clear lesson, and help getting started.\nThat's our education offer: twelve thousand yuan a year per institution, with guides, two training sessions, and an agreed amount of support.\nIf teachers keep using it, the school has a reason to renew.\n\nFor a museum, we start with a local story.\nVisitors step into that story, make a choice, and see what happens.\nOur plan is sixty thousand yuan for one theme, three scenes, and two review rounds.\nWe can use the same game tools and research across these offers. We charge for the extra work each customer needs.\nThat way, each project helps us build the next one.\nBut we also need to know how much money is left when the work is done.",
-    "zh_script": "玩家这边很简单：68元买完整游戏。看起来有趣才会买，想知道后面怎样才会继续玩。第一段航程玩得好，再提供28元故事包。所以第一款要做到让人想玩下一款。教师的需要不同。想象把游戏带进历史课，学生已经玩过新机器的故事，接下来老师希望讨论它帮助了谁、代价由谁承担。老师需要指南、清楚的课堂安排，以及入门帮助。因此机构年费1.2万元，含指南、两次培训和约定数量的支持。老师持续使用，学校才有理由续费。博物馆则从一个本地故事开始，让观众进入故事、作选择、看后果。计划6万元做一个主题、三个场景、两轮审读。几类业务共用工具和研究，对每个客户需要的额外工作收费。这样一个项目就能帮着做下一个。但还要看工作结束以后，到底留下多少资金。",
+    "en_script": "For players, the plan is simple: sixty-eight yuan for the full game.\nThey buy it because it looks fun. They keep playing because they want to see what happens next.\nIf they enjoy that first voyage, we can offer new story packs at twenty-eight yuan.\nSo the first purchase pays for the game, and later purchases help fund new content.\n\nA school buys help using the game in class.\nThe middle picture shows the teaching guide that goes with the experience.\nOur plan is twelve thousand yuan a year per institution, including guides, two training sessions, and an agreed amount of support.\nThe school pays for something teachers can put to use. If they keep using it, the school has a reason to renew.\nThat gives us a way to earn annual income from the same customer.\n\nFor a museum, we build an experience around a local theme.\nThe price is sixty thousand yuan for one theme, three scenes, and two review rounds.\nWe agree on the work before we start, and charge separately for additions.\nAcross all three offers, we reuse the research and game tools. Each customer pays for the extra work they need.\nThat helps us earn more from what we've built, without starting again for every sale.\nNow let's look at how much money is left after we deliver.",
+    "zh_script": "玩家以68元买完整游戏，玩得好再买28元故事包。首次购买支付游戏，后续购买帮助支持新内容。学校购买课堂应用支持：机构年费1.2万元，包括指南、两次培训和约定数量的支持。教师真正用得起来，持续使用就给学校续费理由，也为我们带来同一客户的年度收入。博物馆购买本地主题互动项目，6万元包括一主题、三场景、两轮审读。开始前约定工作量，增加部分另行收费。三类业务共用研究和工具，客户为各自需要的额外工作付费，提高已有成果带来的收入，无须每次销售重新制作。接着看完成交付后还能留下多少钱。",
     "role": "Personal closing",
     "seconds": 125,
     "rehearsal": [
       {
-        "cue_zh": "指左侧游戏实录和¥68、¥28。",
-        "en": "For players, the plan is simple: sixty-eight yuan for the full game.\nThey buy it because it looks fun. They keep playing because they want to see what happens next.\nIf they enjoy that first voyage, we can offer new story packs at twenty-eight yuan.\nSo we have to make the first game good enough that people want another one."
+        "cue_zh": "指左侧游戏与¥68、¥28，讲首次购买和复购。",
+        "en": "For players, the plan is simple: sixty-eight yuan for the full game.\nThey buy it because it looks fun. They keep playing because they want to see what happens next.\nIf they enjoy that first voyage, we can offer new story packs at twenty-eight yuan.\nSo the first purchase pays for the game, and later purchases help fund new content."
       },
       {
-        "cue_zh": "指中间指南图片和¥12,000；用教师备课的具体处境来讲。",
-        "en": "A teacher needs something different.\nImagine bringing this game into a history lesson. The students have played a story about a new machine. Now the teacher wants them to talk about who it helped and who paid the price.\nThe teacher needs a guide, a clear lesson, and help getting started.\nThat's our education offer: twelve thousand yuan a year per institution, with guides, two training sessions, and an agreed amount of support.\nIf teachers keep using it, the school has a reason to renew."
+        "cue_zh": "指中间教学指南概念图、¥12,000与交付范围。",
+        "en": "A school buys help using the game in class.\nThe middle picture shows the teaching guide that goes with the experience.\nOur plan is twelve thousand yuan a year per institution, including guides, two training sessions, and an agreed amount of support.\nThe school pays for something teachers can put to use. If they keep using it, the school has a reason to renew.\nThat gives us a way to earn annual income from the same customer."
       },
       {
-        "cue_zh": "指右侧展陈图与¥60,000，再看向观众。",
-        "en": "For a museum, we start with a local story.\nVisitors step into that story, make a choice, and see what happens.\nOur plan is sixty thousand yuan for one theme, three scenes, and two review rounds.\nWe can use the same game tools and research across these offers. We charge for the extra work each customer needs.\nThat way, each project helps us build the next one.\nBut we also need to know how much money is left when the work is done."
+        "cue_zh": "指右侧展陈概念图、¥60,000及项目范围。",
+        "en": "For a museum, we build an experience around a local theme.\nThe price is sixty thousand yuan for one theme, three scenes, and two review rounds.\nWe agree on the work before we start, and charge separately for additions.\nAcross all three offers, we reuse the research and game tools. Each customer pays for the extra work they need.\nThat helps us earn more from what we've built, without starting again for every sale.\nNow let's look at how much money is left after we deliver."
       }
     ]
   },
