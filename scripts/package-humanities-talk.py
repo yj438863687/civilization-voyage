@@ -5,7 +5,7 @@ from pathlib import Path
 from pptx import Presentation
 import fitz
 ROOT=Path(__file__).resolve().parents[1];BASE=ROOT/'.impeccable/humanities-talk';DATA=json.loads((ROOT/'docs/humanities-introduction.json').read_text())
-assert len(DATA)==20
+assert len(DATA)==24
 for lang in ['en','zh']:
  work=BASE/lang;tag=lang.upper();name='Civilization-Voyage-Project-'+tag
  source=work/'Presentation'/('Civilization-Voyage-中文理解.pptx' if lang=='zh' else 'Civilization-Voyage-Presentation-EN.pptx')
@@ -29,4 +29,4 @@ for lang in ['en','zh']:
   subprocess.run(['/usr/bin/ditto','-x','-k',str(target),tmp],check=True)
   unpacked=[p for p in Path(tmp).rglob('*') if p.is_file()];assert len(unpacked)==2
   for p in unpacked:assert hashlib.sha256(p.read_bytes()).digest()==hashlib.sha256((folder/p.name).read_bytes()).digest()
- print('Verified',lang,'20 pages, aligned speaker notes, correct-language movie, two-file archive and actual extraction:',target,flush=True)
+ print('Verified',lang,'24 pages, aligned speaker notes, correct-language movie, two-file archive and actual extraction:',target,flush=True)

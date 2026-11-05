@@ -11,7 +11,7 @@ import presentation_core as core
 from presentation_core import Page,INK,PANEL,GREEN,PAPER,WHITE,MUTED,LINE
 ROOT=Path(__file__).resolve().parents[1];BASE=ROOT/'.impeccable/humanities-talk';BASE.mkdir(parents=True,exist_ok=True)
 ROWS=json.loads((ROOT/'docs/humanities-introduction.json').read_text());MEDIA=json.loads((ROOT/'apps/web/src/world/backgroundMedia.json').read_text());HALL=ROOT/'.impeccable/harbour-talk/temple-cover-composed.png';RAW=ROOT/'.impeccable/demo-v3/raw-sync'
-assert len(ROWS)==20
+assert len(ROWS)==24
 for record in MEDIA.values():
  if record['author'].strip().lower().startswith('unknown'):record['author']='Unknown author'
 VIDEO_SOURCE={'en':ROOT/'.impeccable/course-talk/Video/Civilization-Voyage-Demo-EN.mp4','zh':Path.home()/'Desktop/文明航程演讲包/资源后果与实录Demo-深海信号版/Video/Civilization-Voyage-Demo-ZH.mp4'}
@@ -35,13 +35,64 @@ for lang in ['en','zh']:
   licence=t('公有领域','Public domain') if m['license']=='Public domain' else m['license']
   p.text(caption+' '+author+' · '+licence,x,y,w,64,21,p.muted,minsize=18)
  def end(p,n,business=False):
-  p.line(96,1009,1824,1009,'CCD9D4' if p.light else LINE,1);p.text(t('文明航程｜'+('应用与价格为待验证的试点设想。' if business else '中华文明与世界文化中的技术和生活。'),'Civilization Voyage | '+('Proposed offer and illustrative assumptions.' if business else 'Technology and life in Chinese and world stories.')),96,1031,1570,35,20,p.muted,minsize=18);p.text(f'{n:02d}',1754,1030,70,35,22,p.muted)
+  p.line(96,1009,1824,1009,'CCD9D4' if p.light else LINE,1);p.text(t('文明航程｜'+('商业模式与发展路径为待验证规划。' if business else '中华文明与世界文化中的技术和生活。'),'Civilization Voyage | '+('Business proposals; validation remains ahead.' if business else 'Technology and life in Chinese and world stories.')),96,1031,1570,35,20,p.muted,minsize=18);p.text(f'{n:02d}',1754,1030,70,35,22,p.muted)
  for i,item in enumerate(ROWS):
-  row=dict(item);row['note_en']=item['note_zh' if zh else 'note_en'];k=row['kind'];light=k in ['seas','water','industry','play','making','offer','economics'];p=Page(prs,row,i,light,True);h=row[lang];body=row[lang+'_body'];keys=list(row.get('media',[]))
+  row=dict(item);row['note_en']=item['note_zh' if zh else 'note_en'];k=row['kind'];light=k in ['seas','water','industry','play','making','offer','economics','routes','position','finance','market','capital'];p=Page(prs,row,i,light,True);h=row[lang];body=row[lang+'_body'];keys=list(row.get('media',[]))
   if k=='industry':keys=['zhan','watt']
   if keys:
    row['note_en']+='\n\n'+t('图片资料与授权：','Image credits and licences:')+'\n'+'\n'.join(f"{key}: "+(MEDIA[key]['caption']+' | ' if zh else '')+f"{MEDIA[key]['author']} | {MEDIA[key]['license']} | {MEDIA[key]['url']} | {MEDIA[key]['licenseUrl']}" for key in keys)
-  if k=='cover':
+  if k=='routes':
+   label(p,t('全景 · 中国与世界','OVERVIEW · CHINA AND THE WORLD'));title(p,h,size=76)
+   xs=[96,340,930,1510];widths=[210,550,540,310]
+   for x,w,v in zip(xs,widths,[t('时代','ERA'),t('内海 · 中国','INNER SEA · CHINA'),t('外海 · 世界','OUTER SEA · WORLD'),t('共同议题','QUESTION')]):p.text(v,x,361,w,64,27,p.accent,minsize=22)
+   for j,cells in enumerate(row[lang+'_cells']):
+    y=456+j*125;p.line(96,y-25,1824,y-25,'ADCCC0',1)
+    for x,w,v in zip(xs,widths,cells):p.text(v,x,y,w,94,30,p.fg,minsize=23)
+   p.text(t('传说与未来推演均有标注；每条航线内部依时间推进。','Legends and imagined futures are labelled; each route moves forward in time.'),96,940,1728,55,26,p.muted,minsize=22);end(p,i+1)
+  elif k=='comparison':
+   label(p,t('文化意义 · 相互参照','CULTURAL PURPOSE · RECIPROCAL PERSPECTIVES'));title(p,h,size=73)
+   for j,key in enumerate(['water','tablet']):
+    x=96+j*882;p.picture(ROOT/'apps/web/public'/MEDIA[key]['src'].lstrip('/'),x,354,790,275);credit(p,key,x,650,790)
+   paragraphs(p,body,96,738,1728,32,82);end(p,i+1)
+  elif k=='thesis':
+   label(p,t('产品定位','THE APP'));title(p,h,size=79)
+   paragraphs(p,body[:2],96,426,1560,43,164)
+   p.line(96,803,1824,803,GREEN,2);p.text(body[2],96,855,1728,116,48,GREEN,kind='serif',minsize=34);end(p,i+1)
+  elif k=='finance':
+   label(p,row['section_'+lang]);title(p,h,size=76)
+   xs=[96,380,990,1500];ws=[245,560,460,320]
+   headers=t(['单位','收入来自','主要扣除','持续观察'],['UNIT','REVENUE','DIRECT COSTS','WATCH'])
+   cells=t([['玩家','游戏购买 / 新故事包','渠道、退款、服务','复购与获客'],['机构','年度内容与教学服务','实施、支持、更新','续约与工时'],['合同','内容制作 / 使用与维护','制作、权利、维护','回款与复用']],[['Player','Game / story expansions','Distribution, refunds, service','Repeat purchase / CAC'],['Institution','Annual content and services','Setup, support, updates','Renewal / hours'],['Contract','Production / usage / maintenance','Production, rights, upkeep','Cash / reuse']])
+   for x,w,v in zip(xs,ws,headers):p.text(v,x,377,w,65,28,p.accent,minsize=22)
+   for j,c in enumerate(cells):
+    y=491+j*134;p.line(96,y-24,1824,y-24,'ADCCC0',1)
+    for x,w,v in zip(xs,ws,c):p.text(v,x,y,w,102,32,p.fg,minsize=24)
+   p.text(t('三类收入分别核算；贡献还需覆盖内容开发、团队与获客投入。','Track each line separately; contribution must still fund content, the team and acquisition.'),96,927,1728,70,29,p.accent,minsize=23);end(p,i+1,True)
+  elif k=='roadmap':
+   label(p,row['section_'+lang]);title(p,h,size=76)
+   for j,(word,value) in enumerate(zip(row[lang+'_labels'],body)):
+    x=96+j*588;p.text(word,x,395,505,90,43,GREEN,kind='serif',minsize=31)
+    p.rect(x,527,16,16,GREEN)
+    if j<2:arrow(p,x+27,535,x+550,535)
+    p.text(value,x,590,500,223,35,WHITE,minsize=27)
+    gate=t(['完成与主动回访','实际支付与再次使用','伙伴续约与内容复用'],['Completion and voluntary return','Payment and repeated use','Renewal and content reuse'])[j]
+    p.text(gate,x,869,500,90,29,GREEN,minsize=23)
+   end(p,i+1,True)
+  elif k in ['strategy','position','businessmodel','asset','finance','roadmap','capital','risk','market']:
+   label(p,row['section_'+lang]);title(p,h,size=76)
+   words=row[lang+'_labels'];horizontal=k in ['businessmodel','asset','roadmap','capital']
+   for j,(word,value) in enumerate(zip(words,body)):
+    if horizontal:
+     x=96+j*588;p.text(f'{j+1:02d}',x,378,130,79,51,p.accent,kind='serif');p.line(x,486,x+498,486,p.accent,2)
+     p.text(word,x,532,500,101,39,p.fg,kind='serif',minsize=29);p.text(value,x,675,500,272,33,p.fg,minsize=26)
+    else:
+     y=407+j*179;p.text(word,96,y,440,110,40,p.accent,kind='serif',minsize=29);p.text(value,620,y,1204,137,36,p.fg,minsize=27);p.line(96,y+151,1824,y+151,'ADCCC0' if p.light else LINE,1)
+   end(p,i+1,True)
+  elif k=='closingwide':
+   label(p,t('文明航程 · 长期方向','CIVILIZATION VOYAGE · THE AMBITION'));title(p,h,h=240,size=85)
+   for j,value in enumerate(body):p.text(value,96,475+j*159,1700,128,48 if j==0 else 40,GREEN if j==0 else WHITE,kind='serif' if j==0 else 'sans',minsize=31)
+   end(p,i+1)
+  elif k=='cover':
    p.picture(HALL,0,0,1920,1080);label(p,t('文明航程 · 项目介绍','CIVILIZATION VOYAGE · PROJECT PRESENTATION'))
    p.text(h,96,161,1728,220,174 if zh else 112,WHITE,kind='serif',minsize=120 if zh else 88)
    p.text(body[0],100,410,1050,195,56 if zh else 57,GREEN,minsize=45)
