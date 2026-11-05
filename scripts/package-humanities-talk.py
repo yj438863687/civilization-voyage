@@ -20,10 +20,13 @@ for lang in ['en','zh']:
   assert hashlib.sha256(archive.read(media[0])).digest()==hashlib.sha256(movie.read_bytes()).digest()
  folder=Path.home()/'Desktop'/name;folder.mkdir(exist_ok=True)
  expected={'Civilization-Voyage-Presentation-'+tag+'.pptx','Civilization-Voyage-Demo-'+tag+'.mp4'}
- assert {p.name for p in folder.iterdir()}<=expected,'Unexpected files: preserve the existing folder'
+ assert {p.name for p in folder.iterdir() if not (p.name.startswith('.~lock.') and p.name.endswith('#'))}<=expected,'Unexpected files: preserve the existing folder'
  shutil.copy2(source,folder/('Civilization-Voyage-Presentation-'+tag+'.pptx'));shutil.copy2(movie,folder/('Civilization-Voyage-Demo-'+tag+'.mp4'))
  shutil.copy2(pdf,Path.home()/'Desktop'/(name+'.pdf'));target=folder.with_suffix('.zip')
- subprocess.run(['/usr/bin/ditto','-c','-k','--keepParent','--norsrc',str(folder),str(target)],check=True)
+ with tempfile.TemporaryDirectory(prefix='voyage-clean-package-') as staging:
+  clean=Path(staging)/name;clean.mkdir()
+  for filename in expected:shutil.copy2(folder/filename,clean/filename)
+  subprocess.run(['/usr/bin/ditto','-c','-k','--keepParent','--norsrc',str(clean),str(target)],check=True)
  with zipfile.ZipFile(target) as archive:assert len([n for n in archive.namelist() if not n.endswith('/')])==2 and archive.testzip() is None
  with tempfile.TemporaryDirectory(prefix='voyage-project-unpack-') as tmp:
   subprocess.run(['/usr/bin/ditto','-x','-k',str(target),tmp],check=True)

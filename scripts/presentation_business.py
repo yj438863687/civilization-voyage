@@ -54,7 +54,7 @@ def render(p,row,index,lang,raw,label,title,end):
     p.picture(ROOT/'apps/web/public/background/cable.jpg',x+16,359,468,155)
     txt(t('跨洋通信 · 主题展陈','OCEAN CABLE / EXHIBIT'),x+20,531,460,42,26,WHITE)
     txt(t('史料解说 / 三幕互动故事','Interpretation / three story scenes'),x+20,578,460,42,23,GREEN)
-   txt(name,x,657,500,62,29,GREEN);txt(money(m['price'][key]),x,735,500,103,67);txt(unit,x,856,500,79,27,p.muted)
+   txt(name,x,657,500,62,29,GREEN);txt(money(m['price'][key]),x,735,500,103,67,GREEN);txt(unit,x,856,500,79,27,p.muted)
   foot(t('拟议价格；左为游戏实录，中、右为教育与文博交付示意，尚未上线。','Proposed CNY prices. Left: actual game. Centre/right: proposed service concepts.'))
  elif k=='bp_funnel':
   for j,(v,name,w) in enumerate(zip(['100,000','10,000','2,000'],t(['合格访问','进入体验','购买游戏'],['QUALIFIED VISITS','TRY THE GAME','PURCHASE']),[950,710,470])):
