@@ -38,6 +38,7 @@ for lang in ['en','zh']:
   if i==2:
    media=json.loads((ROOT/'apps/web/src/world/backgroundMedia.json').read_text())
    note+='\n'+'\n'.join(f"{k}: {media[k]['author']} | {media[k]['license']} | {media[k]['url']} | {media[k]['licenseUrl']}" for k in ['watt','cable'])
+  if i==5:note+='\n\nVisual: original concept illustration, Civilizations along one river.'
   p=Page(prs,{'note_en':note},i,i==3,True)
   if i!=5:label(p,r['label_'+lang]);title(p,r[lang])
   if i==0:
@@ -92,9 +93,10 @@ for lang in ['en','zh']:
 
    p.line(96,862,1824,862,GREEN,2);text(p,t('每个项目，都应为下一个故事留下积累。','Each project should help fund the next story.'),96,904,1728,94,38,GREEN)
   elif i==5:
-   p.picture(WORKFLOW/'closing-industry.png',0,0,1920,1080,fill=True)
-   p.text(r[lang],96,72,1728,120,88,WHITE,kind='serif',minsize=72)
-   p.text(t('愿我们驶向的未来，值得抵达。','Choose a future worth arriving in.'),100,217,1720,76,40,WHITE,minsize=32)
+   p.picture(ROOT/'docs/presentation-assets/civilization-river-closing.png',0,0,1920,1080,fill=True)
+   p.text(r[lang],96,68,1728,60,32,WHITE,minsize=30)
+   p.text(t('谢谢','Thank you'),96,164,1728,235,178,WHITE,kind='serif',minsize=155)
+   p.text(t('愿我们驶向的未来，值得抵达。','Choose a future worth arriving in.'),100,427,1720,76,39,WHITE,minsize=32)
   if i!=5:end(p,i+1)
   pics.append(p.finish())
  tag=lang.upper();ppt=OUT/f'Civilization-Voyage-My-Part-{tag}.pptx';prs.save(ppt)
