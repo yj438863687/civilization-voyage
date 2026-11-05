@@ -72,14 +72,14 @@
     "zh": "收入要能支持下一个故事",
     "label_en": "04 / REVENUE AND COSTS",
     "label_zh": "04 / 收入与成本",
-    "en_script": "Let's follow the money.\nOur first-year plan is based on two thousand paying players, ten institutions, and two museum projects.\nThat gives us three hundred and seventy-six thousand yuan in sales—the blue bar on the left.\n\nWe then pay for finding customers and doing the work.\nThe green bar shows what's left: about a hundred and sixty thousand yuan.\nBuilding the game, creating the content, and running the business takes another two hundred and forty thousand.\nSo we finish the year almost eighty thousand yuan short.\n\nThat tells us what to work on.\nWe need cheaper ways to reach players. Teachers need materials they can use again. Museum projects need a clear limit on the work we agree to do.\nA big order can look exciting. If it takes twice as long to finish, it can use up the money we need for the next story.\nI want each sale to leave us enough to keep going.\nThat's why we'll start small and put more money in as the business proves itself.",
+    "en_script": "Let's follow the money.\nOur first-year sales model is based on two thousand paying players, ten institutions, and two museum projects.\nThat gives us three hundred and seventy-six thousand yuan in sales—the blue bar on the left.\n\nWe then pay for finding customers and doing the work.\nThe green bar shows what's left: about a hundred and sixty thousand yuan.\nBuilding the game, creating the content, and running the business takes another two hundred and forty thousand.\nSo we finish the year almost eighty thousand yuan short.\n\nThat tells us what to work on.\nWe need cheaper ways to reach players. Teachers need materials they can use again. Museum projects need a clear limit on the work we agree to do.\nA big order can look exciting. If it takes twice as long to finish, it can use up the money we need for the next story.\nI want each sale to leave us enough to keep going.\nThat's why we'll start small and put more money in as the business proves itself.",
     "zh_script": "顺着钱看一遍。第一年计划基于两千名付费玩家、十家机构、两个文博项目，收入37.6万元，就是左侧蓝柱。然后支付找客户和完成交付的成本，绿色剩下约16万元。游戏开发、内容制作和经营还需要24万元，因此一年下来差接近8万元。这告诉我们该改哪里：以更低成本触达玩家，让教师材料可以再用，让文博项目约定好工作量。大订单看起来令人兴奋，但如果要花两倍时间完成，就可能耗掉下个故事的钱。我希望每次销售都能留够继续做的资金，所以先小规模开始，随着业务跑通再增加投入。",
     "role": "Personal closing",
     "seconds": 105,
     "rehearsal": [
       {
         "cue_zh": "指顶部客户数，再指左侧蓝柱；数字之间停半拍。",
-        "en": "Let's follow the money.\nOur first-year plan is based on two thousand paying players, ten institutions, and two museum projects.\nThat gives us three hundred and seventy-six thousand yuan in sales—the blue bar on the left."
+        "en": "Let's follow the money.\nOur first-year sales model is based on two thousand paying players, ten institutions, and two museum projects.\nThat gives us three hundred and seventy-six thousand yuan in sales—the blue bar on the left."
       },
       {
         "cue_zh": "手势顺着图往右移动。绿色约16万元，红色接近8万元，都与图上精确数字对应。",
@@ -96,8 +96,8 @@
     "zh": "先投12万元，让需求带动增长",
     "label_en": "05 / FUNDING AND GROWTH",
     "label_zh": "05 / 投入与增长",
-    "en_script": "Our total funding plan is three hundred and sixty thousand yuan.\nMost pays for the game and its stories. Some covers the wait between doing the work and getting paid. We also keep a reserve.\nWe'll start with one hundred and twenty thousand yuan.\n\nFirst, improve the game so players finish a voyage and come back.\nThen, work with paying schools and museums. Track the time, cost, and repeat use.\nAs customers return and payments come in, put more money into new stories.\nEach project should leave something we can use again: research, teaching material, or a better game tool.\nThat's how this grows into a collection of cultural experiences, with less work repeated from scratch.",
-    "zh_script": "资金规划36万元，大部分用于游戏与故事，一部分用于做完工作到收到款之间的周转，同时保留储备。先投入12万元。先改善游戏，让玩家完成航程并回来；再与付费学校和博物馆合作，记录时间、成本和重复使用；随着客户回来、款项收回，再投入新故事。每个项目都留下可复用的研究、教学材料或更好的游戏工具，逐步形成丰富的文化体验，减少重复从头做的工作。",
+    "en_script": "Our total funding plan is three hundred and sixty thousand yuan.\nMost pays for the game and its stories. Some covers the wait between doing the work and getting paid. We also keep a reserve.\nWe'll start with one hundred and twenty thousand yuan.\n\nFirst, improve the game so players finish a voyage and come back.\nThen, work with paying schools and museums. Track the time, cost, and repeat use.\nRelease the remaining funds as repeat use and paid projects show we can grow.\nEach project should leave something we can use again: research, teaching material, or a better game tool.\nThat's how this grows into a collection of cultural experiences, with less work repeated from scratch.",
+    "zh_script": "资金规划36万元，大部分用于游戏与故事，一部分用于做完工作到收到款之间的周转，同时保留储备。先投入12万元。先改善游戏，让玩家完成航程并回来；再与付费学校和博物馆合作，记录时间、成本和重复使用；依据重复使用和付费项目的成果，分阶段释放剩余资金。每个项目都留下可复用的研究、教学材料或更好的游戏工具，逐步形成丰富的文化体验，减少重复从头做的工作。",
     "role": "Personal closing",
     "seconds": 60,
     "rehearsal": [
@@ -107,7 +107,7 @@
       },
       {
         "cue_zh": "沿右侧三个步骤往下讲，最后抬头看向观众。",
-        "en": "First, improve the game so players finish a voyage and come back.\nThen, work with paying schools and museums. Track the time, cost, and repeat use.\nAs customers return and payments come in, put more money into new stories.\nEach project should leave something we can use again: research, teaching material, or a better game tool.\nThat's how this grows into a collection of cultural experiences, with less work repeated from scratch."
+        "en": "First, improve the game so players finish a voyage and come back.\nThen, work with paying schools and museums. Track the time, cost, and repeat use.\nRelease the remaining funds as repeat use and paid projects show we can grow.\nEach project should leave something we can use again: research, teaching material, or a better game tool.\nThat's how this grows into a collection of cultural experiences, with less work repeated from scratch."
       }
     ]
   },

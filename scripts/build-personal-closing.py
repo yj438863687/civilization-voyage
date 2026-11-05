@@ -6,9 +6,11 @@ from pptx.util import Inches
 import fitz
 import presentation_core as core
 from presentation_core import Page,GREEN,WHITE,INK
+from presentation_plan import calculate_plan
 ROOT=Path(__file__).resolve().parents[1];OUT=Path.home()/'Desktop/文明航程-个人结尾-6页';OUT.mkdir(exist_ok=True)
 BASE=ROOT/'.impeccable/personal-closing';BASE.mkdir(exist_ok=True)
 M=json.loads((ROOT/'docs/business-assumptions.json').read_text())
+PLAN=calculate_plan(M)
 rows=json.loads((ROOT/'docs/personal-closing.json').read_text())
 for lang in ['en','zh']:
  core.LANG=lang;core.font.cache_clear();core.OUT=BASE/lang;core.OUT.mkdir(exist_ok=True);zh=lang=='zh';t=lambda a,b:a if zh else b
@@ -59,20 +61,21 @@ for lang in ['en','zh']:
     text(p,names[j],x,657,500,62,29,GREEN);text(p,f"¥{M['price'][key]:,}",x,735,500,103,67,GREEN);text(p,units[j],x,856,500,79,27,p.muted)
    text(p,t('产品与定价规划｜左：当前游戏；中、右：服务设计。','Product and pricing plan | Left: current game. Centre/right: service designs.'),96,954,1728,43,24,p.muted)
   elif i==3:
-   text(p,t('基准：2,000名玩家 + 10家机构 + 2个文博项目','BASE: 2,000 players + 10 institutions + 2 museum projects'),96,347,1728,76,34)
-   bars=[(0,376000,'¥376,000',t('收入','Sales'),'377DAD'),(160800,376000,'-¥215,200',t('交付与获客','Delivery + sales costs'),'B58549'),(0,160800,'¥160,800',t('扣除直接成本后','Left after direct costs'),'087F69'),(-79200,160800,'-¥240,000',t('开发、内容、运营','Build + content + operations'),'B58549'),(-79200,0,'-¥79,200',t('首年资金缺口','Year-one shortfall'),'B9694F')]
-   base=765;scale=.00075;p.line(96,base,1824,base,'9BB4BC',1)
+   s=PLAN['base'];revenue=s['revenue'];contribution=s['contribution'];balance=s['balance'];money=lambda v:f'¥{v:,.0f}'
+   text(p,t(f"基准：{s['player']:,}名玩家 + {s['institution']}家机构 + {s['museum']}个文博项目",f"BASE: {s['player']:,} players + {s['institution']} institutions + {s['museum']} museum projects"),96,347,1728,76,34)
+   bars=[(0,revenue,money(revenue),t('收入','Sales'),'377DAD'),(contribution,revenue,'-'+money(s['direct_cost']),t('交付与获客','Delivery + sales costs'),'B58549'),(0,contribution,money(contribution),t('扣除直接成本后','Left after direct costs'),'087F69'),(balance,contribution,'-'+money(PLAN['fixed_cost']),t('开发、内容、运营','Build + content + operations'),'B58549'),(min(balance,0),max(balance,0),('-' if balance<0 else '')+money(abs(balance)),t('首年经营余额','Year-one balance'),'B9694F' if balance<0 else '087F69')]
+   base=765;scale=282/revenue;p.line(96,base,1824,base,'9BB4BC',1)
    for j,(lo,hi,value,word,color) in enumerate(bars):
     x=96+j*350;top=base-hi*scale;p.rect(x,top,238,(hi-lo)*scale,color);text(p,value,x,top-55,330,50,33,color);text(p,word,x,853,320,78,28,p.muted)
     if j<4:
-     endval=[376000,160800,160800,-79200][j];y=base-endval*scale;p.line(x+238,y,x+350,y,'9BB4BC',1)
-   text(p,t('首年测算 · 人民币 · 税前｜重点：获客成本、内容复用、交付范围。','Year-one plan · CNY · Pre-tax | Focus: acquisition cost, content reuse, delivery scope.'),96,954,1728,48,24,p.muted)
+     endval=[revenue,contribution,contribution,balance][j];y=base-endval*scale;p.line(x+238,y,x+350,y,'9BB4BC',1)
+   text(p,t('首年税前测算｜收入不含新增故事包与次年续费；周转和储备另列资金规划。','Year-one, pre-tax | Excludes story packs and later renewals. Cash buffers appear on the next slide.'),96,954,1728,48,24,p.muted)
   elif i==4:
-   text(p,'¥360,000',96,374,740,133,93,GREEN);text(p,t('资金规划：先投入 ¥120,000','CASH PLAN: release CNY120,000 first'),96,525,810,91,34)
+   text(p,f"¥{PLAN['funding_total']:,}",96,374,740,133,93,GREEN);text(p,t(f"全年资金规划：首期 ¥{PLAN['initial_release']:,}",f"12-MONTH CASH PLAN: CNY{PLAN['initial_release']:,} first"),96,525,810,91,34)
    for j,(a,b) in enumerate(t([('让玩家回来','完成航程，再买新故事'),('让伙伴持续使用','学校续费、文博项目交付'),('积累文化内容','复用研究、故事与游戏系统')],[('BRING PLAYERS BACK','Finish a voyage. Return for new stories.'),('BUILD REPEAT BUSINESS','School renewals. Museum delivery.'),('GROW THE STORY LIBRARY','Reuse research, content and game systems.')])):
     y=370+j*153;text(p,a,1040,y,780,65,33,GREEN);text(p,b,1040,y+65,780,70,29)
-   for j,(v,word,c) in enumerate([(240000,t('固定工作','Fixed work'),'35C5A5'),(90000,t('交付周转','Delivery float'),'377DAD'),(30000,t('风险储备','Reserve'),'B58549')]):
-    y=648+j*65;text(p,word,96,y,290,43,25,p.muted);p.rect(395,y+7,v/240000*300,16,c);text(p,f'¥{v:,}',725,y,260,45,28,c)
+   for j,(v,word,c) in enumerate([(PLAN['fixed_cost'],t('固定工作','Fixed work'),'35C5A5'),(PLAN['delivery_float'],t('交付周转','Delivery float'),'377DAD'),(PLAN['reserve'],t('风险储备','Reserve'),'B58549')]):
+    y=648+j*65;text(p,word,96,y,290,43,25,p.muted);p.rect(395,y+7,v/PLAN['fixed_cost']*300,16,c);text(p,f'¥{v:,}',725,y,260,45,28,c)
 
    p.line(96,862,1824,862,GREEN,2);text(p,t('每个项目，都应为下一个故事留下积累。','Each project should help fund the next story.'),96,904,1728,94,38,GREEN)
   elif i==5:

@@ -63,13 +63,18 @@ def test_trade_atomic_idempotent_and_failures(client):
     assert client.post(p+'/trades',json=dict(body,request_id='empty',quantity=1)).status_code==409
 
 def test_candidates_require_explicit_confirmation(client):
-    assert len(client.get('/scenes').json())==4
-    b={'title':'candidate','scene_id':'A','scene_track':'confirmed'}
+    before=client.get('/scenes').json()
+    assert {s['id'] for s in before}=={'neutral-test','A','B','C','D'}
+    assert all(s['status']=='pending' for s in before if s['id']!='neutral-test')
+    version=next(s['version'] for s in before if s['id']=='A')
+    b={'title':'candidate','scene_id':'A','scene_version':version,'scene_track':'confirmed'}
     assert client.post('/voyages',json=b).status_code==422
-    assert client.post('/scenes/A/1/confirm',json={'reviewer':'test reviewer','decision_note':'test only'}).status_code==200
+    assert client.post(f'/scenes/A/{version}/confirm',json={'reviewer':'test reviewer','decision_note':'test only'}).status_code==200
     assert client.post('/voyages',json=b).status_code==201
-    assert len(client.get('/scenes').json())==5
-    assert client.post('/scenes/A/1/confirm',json={'reviewer':'again','decision_note':'no'}).status_code==409
+    after=client.get('/scenes').json()
+    assert len(after)==len(before)+1
+    assert {s['status'] for s in after if s['id']=='A'}=={'pending','confirmed'}
+    assert client.post(f'/scenes/A/{version}/confirm',json={'reviewer':'again','decision_note':'no'}).status_code==409
 
 def test_unconfigured_model(client):
     p=new(client)
