@@ -1,0 +1,52 @@
+[
+  {
+    "en": "AI helped us build. We chose what mattered.",
+    "zh": "AI让想法落地，判断让作品成立。",
+    "label_en": "01 / FROM IDEA TO PRODUCT",
+    "label_zh": "01 / 从想法到作品",
+    "en_script": "Alright, you have seen what Civilization Voyage feels like to play. I will now explain how we built it, and how it could become a sustainable cultural product.\nOur project documents assign design to Claude, API work to Codex, and frontend and 3D work to Grok. We connected those pieces locally, tested the interactions, and updated the desktop app. The important part was getting the pieces to work together: a conversation had to lead to an action, the action had to produce a consequence, and that consequence had to survive when the player returned.\nAI helped us develop and revise the game. But we still had to choose which histories belonged together, check their order, and make the choices understandable.\nThat distinction matters commercially. Producing more content is only useful if people find it credible, enjoyable and worth their time. So our business starts with the quality of the experience we have created.",
+    "zh_script": "大家已经看到了文明航程的体验。我的部分解释它怎样被做出来，又怎样成为可持续的文化产品。项目文档记录了Claude负责设计、Codex负责接口、Grok负责前端与3D。我们在本机连接、测试并更新桌面App。关键是让这些部分真正协同：对白引出行动，行动产生后果，玩家回来时后果仍然存在。AI帮助开发和修改，但历史选材、年代核对和选择的清晰表达仍需人判断。商业上，内容产量只有在人们觉得可信、有趣、值得投入时间时才有意义。所以商业价值从体验质量开始。",
+    "role": "Personal closing",
+    "seconds": 80
+  },
+  {
+    "en": "A choice that stays with you",
+    "zh": "让一次选择，留下值得回想的经历。",
+    "label_en": "02 / WHY THIS PRODUCT",
+    "label_zh": "02 / 为什么值得做",
+    "en_script": "The heart of that experience is a decision that stays with you.\nIn the water-management story, protecting your own village gives the ship more supplies, but leaves the neighbouring village exposed. Helping to build a shared channel costs resources now, but can bring cooperation at the next stop. At the end, the game recalls what you actually chose.\nThat is how we connect a historical setting to a living question: who benefits from progress, and who bears the cost?\nWe chose Discovery Tour and Minecraft Education as competitive benchmarks. Discovery Tour is strong at bringing particular historical worlds to life. Minecraft Education provides broad curricula and teaching tools. For our specific theme, connecting Chinese and world histories around technology and civilization would still require additional curation.\nOur game already organizes that journey into four eras and eight routes. This connected structure is our point of difference. Whether it improves learning or saves preparation time still needs testing.\nThe next question is who would pay for that experience, and what exactly they would receive.",
+    "zh_script": "体验的核心是一次会留下后果的决定。治水故事中，保护本村增加船的补给，却让邻村承担水患；合修渠道消耗眼前资源，却可能换来下一站的合作；回港时再回看自己的选择。这把历史连接到今天仍然存在的问题：进步惠及谁，代价由谁承担？Discovery Tour擅长具体历史世界，Minecraft Education有广泛课程和工具；针对我们的中外技术文明主题，仍需另行选材串联。我们已经组织好四时代、八条航线。连贯结构是差异，学习效果和备课节省仍待验证。接下来问：谁会付费，具体得到什么？",
+    "role": "Personal closing",
+    "seconds": 100
+  },
+  {
+    "en": "One core experience. Three reasons to pay.",
+    "zh": "共同的内容基础，三种付费理由。",
+    "label_en": "03 / THE BUSINESS MODEL",
+    "label_zh": "03 / 商业模式",
+    "en_script": "We see three potential customer groups, with three different reasons to pay.\nFirst, individual players. They want an enjoyable cultural adventure. We propose testing sixty-eight yuan for the full game, with future story expansions offered separately.\nSecond, educators. They need a way to turn the experience into a useful session. The middle image shows how an industrial-era story could become a discussion guide. Our proposed annual service is twelve thousand yuan, including guides, two training sessions and limited support.\nThird, museums. They may want a story built around their collections or local history. The image on the right shows a communication-history exhibit concept. A proposed sixty-thousand-yuan project would have a defined theme, three scenes and two review rounds.\nThe educational and museum packages are proposals, not existing contracts. Their prices need testing.\nThe commercial logic is reuse. A carefully reviewed story can support several experiences, while each customer pays for a clear delivery. We must still price the extra work properly, or customization will consume the benefit of reuse.",
+    "zh_script": "三类潜在客户有三种付费理由。玩家购买文化冒险，完整游戏拟价68元，未来故事包另售。教师需要可以组织的课程体验，中间图片展示工业时代故事如何成为讨论指南；年度服务拟价1.2万元，包括指南、两次培训和限定支持。博物馆需要围绕藏品与地方记忆的故事，右图是通信史展陈概念；拟价6万元的项目限定一个主题、三个场景、两轮审读。教育与文博仍是方案，并非已有合同。商业逻辑是复用：审读过的故事支持不同体验，客户为清楚的交付结果付费。但额外工作也必须计价，否则定制会吃掉复用带来的收益。",
+    "role": "Personal closing",
+    "seconds": 110
+  },
+  {
+    "en": "Growth must pay for the work behind it",
+    "zh": "增长，要能承担持续创作的成本。",
+    "label_en": "04 / THE ECONOMICS",
+    "label_zh": "04 / 经营测算",
+    "en_script": "Now let us put that model into numbers. These are twelve-month planning assumptions, not achieved sales.\nOur base case combines two thousand paying players, ten institutions and two museum projects. At the proposed prices, that produces three hundred and seventy-six thousand yuan in revenue.\nBut revenue alone does not tell us whether the business works. Delivery and acquisition cost two hundred and fifteen thousand two hundred yuan in this scenario. That leaves a contribution of one hundred and sixty thousand eight hundred. After fixed investment of two hundred and forty thousand, the model shows a gap of seventy-nine thousand two hundred yuan.\nWe should take that gap seriously. It tells us to test the assumptions before committing to expansion.\nCan we attract paying players at an affordable cost? Can institutions use the material again without needing extensive support? Can a new project reuse enough existing work to protect its margin?\nThose are the practical tests of this business. The story gives customers a reason to care; disciplined delivery gives us a chance to keep creating.",
+    "zh_script": "把模式放进数字里。这是十二个月的规划假设，不是实际销售。基准为2000名玩家、10家机构、2个文博项目，收入37.6万元。扣除21.52万元交付与获客成本，贡献为16.08万元；再扣24万元固定投入，缺口7.92万元。应认真对待缺口，扩大投入前先验证假设：能否以合理成本获得付费玩家？机构能否在不依赖大量支持的情况下复用材料？新项目能否复用足够多的已有内容，保住利润空间？这些才是经营测试。故事让客户在意，严谨的交付让我们有机会持续创作。",
+    "role": "Personal closing",
+    "seconds": 100
+  },
+  {
+    "en": "Build something worth returning to",
+    "zh": "让人愿意再来，让故事能够继续。",
+    "label_en": "05 / THE NEXT COMMITMENT",
+    "label_zh": "05 / 下一步投入",
+    "en_script": "That leads to our next commitment.\nWe propose a cash envelope of three hundred and sixty thousand yuan: two hundred and forty thousand for fixed work, ninety thousand for delivery float, and thirty thousand as a reserve. The float helps cover the time between doing the work and receiving payment. It is not another expense to deduct twice.\nWe would release one hundred and twenty thousand first. Further spending would depend on evidence: people completing the experience and returning voluntarily, customers actually paying, and delivery costs staying manageable.\nOver time, new stories and trusted cultural partnerships could turn this first game into a lasting catalogue. Each release should add content we can reuse and give people a reason to come back.\nI want to finish with the question running through the whole voyage: as our tools become more powerful, how do we choose to live together?\nAI gives us the ability to build. Our responsibility is to create something people value, and a business that allows us to keep doing that.\nThank you.",
+    "zh_script": "下一步提出36万元资金规划：24万元固定工作、9万元交付周转、3万元储备。周转金覆盖做完工作到收到付款之间的时间，不重复算成费用。先释放12万元，再依据完成与主动回访、真实支付、可控交付成本投入后续资金。长期，新故事和可信的文化合作可以让第一款游戏长成持续的内容系列；每次发布都应积累可复用内容，让人愿意再来。最后回到全场的问题：当工具更强大，我们选择怎样共同生活？AI给了我们制作能力，我们的责任是创造人们珍视的东西，并建立能让这件事持续下去的事业。谢谢。",
+    "role": "Personal closing",
+    "seconds": 90
+  }
+]
