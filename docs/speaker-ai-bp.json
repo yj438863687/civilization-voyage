@@ -1,0 +1,140 @@
+{
+  "slides": "12–24",
+  "word_count": 646,
+  "duration": "About 6–7 minutes at 115–125 English words/minute including slide changes",
+  "script": [
+    {
+      "slide": 12,
+      "title_en": "AI tools and our workflow",
+      "title_zh": "AI工具与实际工作流",
+      "en": "You have seen what Civilization Voyage feels like to play. I will now explain how we built it, and how it could become a sustainable cultural product.\nOur project documents assign design to Claude, API work to Codex, and frontend and 3D work to Grok. We connected those pieces locally, tested the interactions, and updated the desktop app. Lovable offers a useful comparison for this kind of natural-language development. Our repository, however, does not establish a Lovable origin.",
+      "zh": "前面大家已经看到了文明航程的游玩体验。接下来我介绍它怎样被做出来，以及如何成为可以持续经营的文化产品。项目文档记录了Claude负责设计、Codex负责接口、Grok负责前端与3D的分工。我们在本机连接这些部分，测试互动，再更新桌面App。Lovable可以帮助理解自然语言开发这类工作方式，但不能说本项目由Lovable导出。"
+    },
+    {
+      "slide": 13,
+      "title_en": "Human judgment",
+      "title_zh": "人的判断",
+      "en": "AI helped us build faster. We still had to decide which stories belonged together, check their historical order, and make the choices understandable.\nAnthropic’s emphasis on honesty and human agency is relevant here. A system should make its limits visible and leave room for human judgment. That principle also belongs inside our game: when technology becomes more capable, who remains responsible?",
+      "zh": "AI让制作更快，但故事怎样组合、年代是否正确、选择能否看懂，仍需要人判断。Anthropic关于诚实与人的自主判断的讨论，对我们有启发：系统应当说明自己的局限，让人保留判断的空间。这也呼应游戏的问题——技术更强大之后，谁继续承担责任？"
+    },
+    {
+      "slide": 14,
+      "title_en": "Who might pay?",
+      "title_zh": "谁为什么付费",
+      "en": "That brings us to the business. We see three possible audiences: players who want a good cultural adventure, educators who need usable teaching material, and museums seeking new ways to share local stories. They can share a content foundation, but each needs a different offer.",
+      "zh": "由此进入商业部分。三类潜在使用场景分别是：玩家寻找有吸引力的文化冒险，教师需要可以组织使用的教学材料，博物馆希望以新的方式讲述地方故事。它们共享内容基础，但购买的东西并不相同。"
+    },
+    {
+      "slide": 15,
+      "title_en": "Twelve-month scenarios",
+      "title_zh": "十二个月情景",
+      "en": "These figures are planning assumptions, not sales we have achieved. Our base case combines two thousand paying players, ten institutions and two museum projects, producing three hundred and seventy-six thousand yuan in revenue. The other scenarios show how much that result depends on demand. Costs come next.",
+      "zh": "这里的数字都是规划假设，不是已经取得的销售。基准情景是2000名付费玩家、10家机构、2个文博项目，对应37.6万元收入。谨慎和扩展情景说明结果会怎样随需求变化。后面还要扣成本。"
+    },
+    {
+      "slide": 16,
+      "title_en": "Pricing references",
+      "title_zh": "价格参照",
+      "en": "Discovery Tour and Minecraft Education show that cultural and educational experiences can use different payment models. One is a game purchase; another is an annual licence. These references help frame our offer, but they do not tell us what customers will pay for Civilization Voyage.",
+      "zh": "Discovery Tour与Minecraft Education说明文化和教育体验可以采用不同付费形式，包括游戏买断和年度许可。这些是组织商品的参照，不足以证明用户愿意为文明航程付多少钱。"
+    },
+    {
+      "slide": 17,
+      "title_en": "Our proposed offers",
+      "title_zh": "拟议商品与价格",
+      "en": "We propose testing sixty-eight yuan for the full game, twelve thousand yuan per year for an education service, and sixty thousand yuan for a bounded museum project. Each price needs a clear scope. Training, support and custom production all take time, and that time must be paid for.",
+      "zh": "建议测试的价格是：完整游戏68元，机构年度教育服务1.2万元，有明确范围的文博项目6万元。每个价格都要对应清楚的交付范围。培训、支持和定制制作会占用时间，这些时间必须进入成本。"
+    },
+    {
+      "slide": 18,
+      "title_en": "Acquisition",
+      "title_zh": "怎样获得客户",
+      "en": "The funnel makes our growth assumptions visible: one hundred thousand qualified visits, ten thousand trials, and two thousand purchases. Every step needs testing. If people leave before enjoying the game, more advertising simply brings more people to the same problem.",
+      "zh": "漏斗把增长假设拆开：10万次合格访问、1万次体验、2000次购买。每一步都需要验证。如果用户还没感受到乐趣就离开，增加广告只会让更多人遇见同一个问题。"
+    },
+    {
+      "slide": 19,
+      "title_en": "What compounds over time?",
+      "title_zh": "长期积累是什么",
+      "en": "Our longer-term advantage would come from the work behind each story: reviewed sources, clear image rights, strong characters, and a production process we can reuse. Over time, a trusted catalogue and lasting partnerships could make each new release easier to create and distribute.",
+      "zh": "长期优势来自每个故事背后的工作：审读过的来源、清楚的图片权利、有感染力的人物，以及可以复用的制作流程。持续积累的内容和合作关系，可能让下一部作品更容易制作、也更容易被找到。"
+    },
+    {
+      "slide": 20,
+      "title_en": "The economics",
+      "title_zh": "收入与成本",
+      "en": "The base case is still loss-making. After delivery and acquisition costs, it leaves one hundred and sixty thousand eight hundred yuan. Against fixed investment of two hundred and forty thousand yuan, the gap is seventy-nine thousand two hundred.\nThat gap matters. We need stronger demand, lower delivery costs, or a smaller initial commitment before expansion makes sense.",
+      "zh": "基准情景依然亏损。收入扣除交付与获客后剩下16.08万元；面对24万元固定投入，缺口为7.92万元。这个缺口意味着，在扩大投入前，我们需要更强的需求、更低的交付成本，或者缩小初期承诺。"
+    },
+    {
+      "slide": 21,
+      "title_en": "Growth in stages",
+      "title_zh": "分阶段发展",
+      "en": "So our sequence is clear: first make the existing game worth finishing and returning to; then test paid story packs and educational use; then expand through cultural partnerships. Each stage should earn the next through evidence of repeat use and payment.",
+      "zh": "因此先把现有游戏做到值得玩完、值得再来；再测试付费故事包和教育使用；之后通过文化伙伴扩展内容和传播。进入下一阶段，要有重复使用和真实支付作为依据。"
+    },
+    {
+      "slide": 22,
+      "title_en": "The cash plan",
+      "title_zh": "资金怎么使用",
+      "en": "Our illustrative cash envelope is three hundred and sixty thousand yuan. It includes product development, content review, operations, delivery float and a reserve. We would release one hundred and twenty thousand first, then stage the rest against results. The delivery float covers payment timing; it is not another expense to deduct twice.",
+      "zh": "示例资金规划为36万元，包括开发、内容审读、运营、交付周转和储备。先释放12万元，再根据验证结果分阶段使用其余资金。周转金用于等待回款，不能在费用中再重复扣一次。"
+    },
+    {
+      "slide": 23,
+      "title_en": "The risks",
+      "title_zh": "主要风险",
+      "en": "The hardest risks are practical: meaningful stories that are not enjoyable, interested institutions without budgets, and custom projects that exhaust the team. We will need player testing, real purchasing conversations, and firm limits on bespoke work.",
+      "zh": "最困难的风险很具体：内容有意义却不好玩；机构感兴趣却没有预算；定制订单不断消耗团队。应对方式是实际试玩、与采购人核实预算，以及明确限制定制范围。"
+    },
+    {
+      "slide": 24,
+      "title_en": "Closing",
+      "title_zh": "结尾",
+      "en": "Civilization Voyage begins with Chinese civilization and opens a conversation with world cultures. Across its four eras, the question remains: as our tools become more powerful, how do we choose to live together?\nWe want to build stories people enjoy returning to, and a business that lets us keep telling them.\nThank you.",
+      "zh": "文明航程从中华文明出发，与世界文化展开对话。穿过四个时代，同一个问题始终存在：当我们的工具越来越强大，我们选择怎样共同生活？我们希望创作出人们愿意再次走进的故事，也建立能够支持持续创作的事业。谢谢。"
+    }
+  ],
+  "qa": [
+    {
+      "question": "Are these actual revenues? / 这些收入已经实现了吗？",
+      "en": "No. The game is playable, but the commercial figures are scenarios. We still need to test willingness to pay, conversion and delivery cost.",
+      "zh": "没有。游戏可以运行，但商业数字是情景假设。付费意愿、转化率、交付成本仍待验证。"
+    },
+    {
+      "question": "Why these prices? / 为什么这样定价？",
+      "en": "They are starting points for tests, tied to different delivery scopes. External products help us understand payment models; customer research and measured costs must determine our own prices.",
+      "zh": "它们是不同交付范围下的测试起点。竞品帮助理解付费形式，最终定价需要用户研究和实际成本支持。"
+    },
+    {
+      "question": "Why pursue it if the base case loses money? / 基准亏损为什么还要做？",
+      "en": "The model identifies the conditions we must improve before expanding. We would limit the initial commitment and use real purchases and delivery hours to decide whether to continue.",
+      "zh": "模型说明扩大投入前必须改善什么。先限制初期支出，再根据真实购买和交付工时决定是否继续。"
+    },
+    {
+      "question": "What would break even? / 怎样达到收支平衡？",
+      "en": "Under the same assumptions, with ten education contracts and two museum projects, about 4,445 paying players would cover the fixed cost. That still requires checking capacity and acquisition costs.",
+      "zh": "维持10家机构、2个文博项目和单位成本不变时，约4445名付费玩家可覆盖固定投入；仍要检验团队产能及获客成本是否上升。"
+    },
+    {
+      "question": "Is the game powered by live AI? / 游戏是实时AI生成的吗？",
+      "en": "The current stories and rules are authored. AI tools supported development. Source-grounded retrieval is a possible next step, not a completed feature.",
+      "zh": "当前剧情和规则经过编写，AI工具用于辅助开发。带来源的检索是后续方向，不是已完成功能。"
+    },
+    {
+      "question": "Was it built in Lovable? / 是用Lovable搭建的吗？",
+      "en": "We use Lovable as a comparison for the workflow. Our repository documents local development and model handoffs; it does not establish that the project was exported from Lovable.",
+      "zh": "Lovable是工作流参照。仓库记录的是本机开发和模型分工，没有证据说明项目从Lovable导出。"
+    },
+    {
+      "question": "Why can open-source software be a business? / 开源怎么商业化？",
+      "en": "Customers would pay for a reliable experience, reviewed content, updates and clearly defined services. We cannot claim exclusive ownership of MIT-licensed code.",
+      "zh": "付费价值在稳定体验、经过审读的内容、更新与清楚的服务范围。不能把MIT开源代码说成排他资产。"
+    },
+    {
+      "question": "Why is the budget larger than fixed cost? / 36万元与24万元是什么关系？",
+      "en": "The 240,000 covers planned fixed work. Another 90,000 is delivery float and 30,000 is contingency. They are cash buffers, not extra expenses already incurred.",
+      "zh": "24万元是固定工作投入，另有9万元交付周转、3万元风险储备；后两项是现金缓冲，不是已发生费用。"
+    }
+  ]
+}
