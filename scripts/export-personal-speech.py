@@ -1,5 +1,5 @@
 """Export the current six-slide speaking script with rehearsal cues."""
-import html,json,re
+import html,json,re,sys
 from pathlib import Path
 from reportlab.platypus import SimpleDocTemplate,Paragraph,PageBreak
 from reportlab.lib.styles import ParagraphStyle
@@ -10,8 +10,9 @@ from reportlab.lib.pagesizes import A4
 import fitz
 from pptx import Presentation
 ROOT=Path(__file__).resolve().parents[1]
-rows=json.loads((ROOT/'docs/personal-closing.json').read_text())
-OUT=Path.home()/'Desktop/文明航程-个人结尾-6页'
+five='--five' in sys.argv
+rows=json.loads((ROOT/('docs/personal-closing-five.json' if five else 'docs/personal-closing.json')).read_text())
+OUT=Path.home()/('Desktop/文明航程-个人结尾-5页' if five else 'Desktop/文明航程-个人结尾-6页')
 pdfmetrics.registerFont(TTFont('Speech','/System/Library/Fonts/Supplemental/Arial Unicode.ttf'))
 pdfmetrics.registerFont(TTFont('Heading','/System/Library/Fonts/Supplemental/Arial Bold.ttf'))
 styles={
@@ -24,7 +25,7 @@ flow=[]
 for i,r in enumerate(rows):
  if i:flow.append(PageBreak())
  flow.append(Paragraph(html.escape(r['en']),styles['title']))
- flow.append(Paragraph(f"第 {i+1} 页 / 6 · 预计 {r['seconds']//60}:{r['seconds']%60:02d} · 全稿约8分钟（含停顿）",styles['meta']))
+ flow.append(Paragraph(f"第 {i+1} 页 / {len(rows)} · 预计 {r['seconds']//60}:{r['seconds']%60:02d} · 全稿约8分钟（含停顿）",styles['meta']))
  for part in r['rehearsal']:
   flow.append(Paragraph('【'+html.escape(part['cue_zh'])+'】',styles['cue']))
   for para in part['en'].split('\n\n'):
@@ -51,4 +52,4 @@ for lang in ['en','zh']:
 assert sum(r['seconds'] for r in rows)==480
 assert not re.search(r'\b(?:there|here) are\b',' '.join(r['en_script'] for r in rows),re.I)
 print(out)
-print('Verified: six PDF pages, complete script, matching bilingual PPT notes and TXT.')
+print('Verified: complete PDF script matches bilingual PPT notes and TXT.')
