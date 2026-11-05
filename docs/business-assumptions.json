@@ -1,0 +1,86 @@
+{
+  "status": "Illustrative planning assumptions, not actual sales or quotations",
+  "period_months": 12,
+  "currency": "CNY",
+  "price": {
+    "player": 68,
+    "expansion": 28,
+    "institution": 12000,
+    "museum": 60000
+  },
+  "unit_cost": {
+    "player": {
+      "channel_refunds": 13.6,
+      "service": 4,
+      "acquisition": 18
+    },
+    "institution": {
+      "delivery": 4000,
+      "acquisition": 2000
+    },
+    "museum": {
+      "delivery_rights": 36000,
+      "acquisition": 6000
+    }
+  },
+  "scenarios": [
+    {
+      "name_zh": "谨慎",
+      "name_en": "Cautious",
+      "player": 500,
+      "institution": 3,
+      "museum": 0,
+      "revenue": 70000,
+      "contribution": 34200.0,
+      "balance": -205800.0
+    },
+    {
+      "name_zh": "基准",
+      "name_en": "Base",
+      "player": 2000,
+      "institution": 10,
+      "museum": 2,
+      "revenue": 376000,
+      "contribution": 160800.0,
+      "balance": -79200.0
+    },
+    {
+      "name_zh": "扩展",
+      "name_en": "Expansion",
+      "player": 5000,
+      "institution": 25,
+      "museum": 4,
+      "revenue": 880000,
+      "contribution": 384000.0,
+      "balance": 144000.0
+    }
+  ],
+  "fixed_cost": 240000,
+  "budget": [
+    {
+      "zh": "产品开发",
+      "en": "Engineering",
+      "amount": 120000
+    },
+    {
+      "zh": "内容与审读",
+      "en": "Content / review",
+      "amount": 90000
+    },
+    {
+      "zh": "固定运营",
+      "en": "Core operations",
+      "amount": 30000
+    },
+    {
+      "zh": "交付周转",
+      "en": "Delivery float",
+      "amount": 90000
+    },
+    {
+      "zh": "风险储备",
+      "en": "Contingency",
+      "amount": 30000
+    }
+  ]
+}

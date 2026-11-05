@@ -8,6 +8,7 @@ from pptx.util import Inches
 from pptx.enum.shapes import MSO_SHAPE
 import fitz
 import presentation_core as core
+from presentation_business import render as render_business
 from presentation_core import Page,INK,PANEL,GREEN,PAPER,WHITE,MUTED,LINE
 ROOT=Path(__file__).resolve().parents[1];BASE=ROOT/'.impeccable/humanities-talk';BASE.mkdir(parents=True,exist_ok=True)
 ROWS=json.loads((ROOT/'docs/humanities-introduction.json').read_text());MEDIA=json.loads((ROOT/'apps/web/src/world/backgroundMedia.json').read_text());HALL=ROOT/'.impeccable/harbour-talk/temple-cover-composed.png';RAW=ROOT/'.impeccable/demo-v3/raw-sync'
@@ -37,11 +38,13 @@ for lang in ['en','zh']:
  def end(p,n,business=False):
   p.line(96,1009,1824,1009,'CCD9D4' if p.light else LINE,1);p.text(t('文明航程｜'+('商业模式与发展路径为待验证规划。' if business else '中华文明与世界文化中的技术和生活。'),'Civilization Voyage | '+('Business proposals; validation remains ahead.' if business else 'Technology and life in Chinese and world stories.')),96,1031,1570,35,20,p.muted,minsize=18);p.text(f'{n:02d}',1754,1030,70,35,22,p.muted)
  for i,item in enumerate(ROWS):
-  row=dict(item);row['note_en']=item['note_zh' if zh else 'note_en'];k=row['kind'];light=k in ['seas','water','industry','play','making','offer','economics','routes','position','finance','market','capital'];p=Page(prs,row,i,light,True);h=row[lang];body=row[lang+'_body'];keys=list(row.get('media',[]))
+  row=dict(item);row['note_en']=item['note_zh' if zh else 'note_en'];k=row['kind'];light=k in ['seas','water','industry','play','making','offer','economics','routes','position','finance','market','capital','bp_scenarios','bp_benchmarks','bp_economics','bp_budget'];p=Page(prs,row,i,light,True);h=row[lang];body=row[lang+'_body'];keys=list(row.get('media',[]))
   if k=='industry':keys=['zhan','watt']
   if keys:
    row['note_en']+='\n\n'+t('图片资料与授权：','Image credits and licences:')+'\n'+'\n'.join(f"{key}: "+(MEDIA[key]['caption']+' | ' if zh else '')+f"{MEDIA[key]['author']} | {MEDIA[key]['license']} | {MEDIA[key]['url']} | {MEDIA[key]['licenseUrl']}" for key in keys)
-  if k=='routes':
+  if k.startswith('bp_'):
+   render_business(p,row,i,lang,RAW,label,title,end)
+  elif k=='routes':
    label(p,t('全景 · 中国与世界','OVERVIEW · CHINA AND THE WORLD'));title(p,h,size=76)
    xs=[96,340,930,1510];widths=[210,550,540,310]
    for x,w,v in zip(xs,widths,[t('时代','ERA'),t('内海 · 中国','INNER SEA · CHINA'),t('外海 · 世界','OUTER SEA · WORLD'),t('共同议题','QUESTION')]):p.text(v,x,361,w,64,27,p.accent,minsize=22)

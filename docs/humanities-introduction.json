@@ -273,9 +273,9 @@
     ]
   },
   {
-    "kind": "strategy",
-    "zh": "文化内容的价值，在于让人愿意回来",
-    "en": "Cultural content earns value when people return",
+    "kind": "bp_audience",
+    "zh": "同一段文化体验，可以走进不同的生活",
+    "en": "One cultural experience, several places in life",
     "zh_body": [
       "个人玩家：为好故事、探索与有分量的选择投入时间。",
       "教育机构：需要可信内容、可组织的体验，以及讨论与回顾材料。",
@@ -286,8 +286,8 @@
       "Educators need credible content, manageable sessions and material for reflection.",
       "Museums can connect collections and local memory to participatory stories."
     ],
-    "note_zh": "D｜三个场景有不同的购买理由。个人端先验证玩下去和再来的动机；教育端核实课程适配、准备成本和采购预算；文博端核实传播目标、内容授权和维护责任。学校是可接触的初期验证场景，不能因此把公司定义成按班授课的服务商。三个市场不同时重投入。",
-    "note_en": "D | These audiences have different reasons to purchase. Test voluntary engagement with players, curriculum fit and preparation costs with educators, and interpretation goals, rights and maintenance with museums. Classroom access can provide early evidence without defining the entire business as a class-delivery service. Do not invest heavily in all three channels at once.",
+    "note_zh": "D｜个人玩家为完整游戏和新故事付费；教育机构为可组织的内容与服务付费；文博伙伴为有权使用的文化内容制作与持续传播付费。页面使用现有游戏画面说明共同内容基础，并不是已经上线的机构版或真实客户照片。三种商业包装均待验证。先验证玩家参与，再逐步扩大机构使用。",
+    "note_en": "D | Players pay for the game and new stories; educators pay for usable content and services; museums pay for rights-cleared production and interpretation. The image is from the current game, not a delivered institutional edition or a customer deployment. All three commercial packages remain proposals. Establish engagement before widening distribution.",
     "zh_labels": [
       "个人文化体验",
       "教育应用",
@@ -303,9 +303,9 @@
     "role": "D"
   },
   {
-    "kind": "market",
-    "zh": "机会从可触达的人群开始",
-    "en": "Build the opportunity from reachable audiences",
+    "kind": "bp_scenarios",
+    "zh": "把未来十二个月，放进三种情景",
+    "en": "Three scenarios for the next twelve months",
     "zh_body": [
       "起点：对历史与技术议题有兴趣、愿意主动体验的玩家，以及能参与试用的教师。",
       "扩展：经过验证的文化主题与双语内容，进入更多课程、社群和文化空间。",
@@ -316,8 +316,8 @@
       "Expand proven themes and bilingual content into more communities, courses and cultural spaces.",
       "Size each opportunity through paying players, paying institutions and contracts, using observed conversion."
     ],
-    "note_zh": "D｜先形成可执行的客户清单和访谈样本：玩家来自哪些社群，教师教授什么课程，机构谁掌握预算。可服务市场受语言、设备、内容适配和团队支持能力约束。消费收入按合格触达乘购买转化乘净客单，机构收入按可触达账户乘成交率乘合同额估算，各参数需实测。不能把学生人口视作客户，也不能混加客流与付费账户。国际扩展依赖本地化与文化审读，双语功能只是起点。",
-    "note_en": "D | Build a reachable audience and account list: communities, teaching contexts and budget owners. Language, devices, relevance and support capacity constrain the serviceable market. Consumer revenue can be modelled as qualified reach times conversion times net spend; institutional revenue as reachable accounts times close rate times contract value. Each input needs evidence. Student populations and visitor counts are not customers. International growth requires localization and editorial review beyond bilingual menus.",
+    "note_zh": "D｜情景测算，不是市场统计或销售预测。统一假设游戏68元、机构年度服务12000元、文博合同60000元。谨慎为500名付费玩家、3家机构、0个合同，收入7万元；基准为2000、10、2，收入37.6万元；扩展为5000、25、4，收入88万元。单价与销量均需验证。年度合同按完整服务周期口径，无续约、无故事包收入，避免重复计算。基准获客逻辑可由10万次合格访问、10%体验、20%购买，以及100个机构账户10%成交和20个文博接洽10%成交推导；这些是待测试的转化假设。收入不是利润，成本见第20页。",
+    "note_en": "D | These are scenarios, not market statistics or forecasts. Assumed prices are CNY68 per game, 12000 per annual education service and 60000 per museum contract. Cautious volumes of 500 players, 3 institutions and no contracts yield CNY70000. Base volumes of 2000, 10 and 2 yield 376000; expansion volumes of 5000, 25 and 4 yield 880000. Annual services cover full delivery periods. No renewals or expansion sales are added. A base acquisition hypothesis is 100000 qualified visits, 10% trying and 20% buying, plus 100 institution accounts at 10% and 20 museum conversations at 10%. Every input requires testing. Revenue is not profit; see page20.",
     "zh_labels": [
       "可触达的起点",
       "可复制的扩展",
@@ -328,14 +328,14 @@
       "EXPANSION",
       "SIZING"
     ],
-    "section_zh": "BP · 市场边界",
-    "section_en": "BP · MARKET SCOPE",
+    "section_zh": "BP · 数字均为规划假设",
+    "section_en": "BP · ILLUSTRATIVE PLANNING ASSUMPTIONS",
     "role": "D"
   },
   {
-    "kind": "position",
-    "zh": "在文化游戏与教育应用之间，建立自己的特色",
-    "en": "A distinct voice in cultural play and learning",
+    "kind": "bp_benchmarks",
+    "zh": "文化体验，已有怎样的付费参照",
+    "en": "How comparable cultural experiences are priced",
     "zh_body": [
       "以历史世界的探索与讲解见长，并提供教师使用材料。",
       "以广泛的学习活动与机构许可，支持学校组织使用。",
@@ -346,8 +346,8 @@
       "Broad learning activities with institutional licensing for school use.",
       "Four eras and China/world comparison, connecting characters, consequences and reflection."
     ],
-    "note_zh": "D｜参考而非简单宣称优于竞品：Ubisoft Discovery Tour已经提供历史探索与教师材料；Minecraft Education提供机构许可路径。这证明产品形式与机构销售方式已有可参照案例，不证明本项目的市场规模或优势。文明航程的差异化假设是四时代、中外并置、叙事选择与回港反思的组合，必须与用户当前的游戏、视频和课程比较。资料：https://www.ubisoft.com/en-ca/game/assassins-creed/discovery-tour ；https://education.minecraft.net/en-us/licensing 。",
-    "note_en": "D | Ubisoft Discovery Tour offers historical exploration and teaching resources; Minecraft Education offers institutional licensing. They are references for product and distribution design, not evidence of our market size or superiority. Our differentiation hypothesis combines four eras, China/world comparison, narrative decisions and reflection. Compare it against the games, videos and lessons users already choose. Sources: https://www.ubisoft.com/en-ca/game/assassins-creed/discovery-tour ; https://education.minecraft.net/en-us/licensing .",
+    "note_zh": "D｜截至2026年11月5日查询，Ubisoft美国商店Discovery Tour Ancient Greece标价19.99美元；Minecraft Education官网合格教育机构直接购买为5.04美元每用户每年，商业组织为36美元每用户每年，年度承诺。页面保留美元和计费单位，不混用汇率，也不说两者可以直接比较。这些参照说明买断与年度许可都存在，不证明本项目68元或机构年费可行。本项目教育方案包含拟议服务，不等同于席位软件许可。来源：https://store.ubisoft.com/us/assassins-creed-discovery-tour?lang=default ；https://education.minecraft.net/en-us/licensing 。",
+    "note_en": "D | Checked 2026-11-05: Ubisoft US lists Discovery Tour Ancient Greece at USD19.99. Minecraft Education lists USD5.04 per user/year for eligible educational organizations and USD36 per user/year for commercial organizations, with annual commitment. Keep currencies and billing units visible. These illustrate purchase and annual-license models, not directly comparable products or evidence of willingness to pay for our proposal. Our proposed institutional package includes services rather than a comparable seat licence. Sources: https://store.ubisoft.com/us/assassins-creed-discovery-tour?lang=default ; https://education.minecraft.net/en-us/licensing .",
     "zh_labels": [
       "Discovery Tour",
       "Minecraft Education",
@@ -363,9 +363,9 @@
     "role": "D"
   },
   {
-    "kind": "businessmodel",
-    "zh": "一套内容基础，三种付费理由",
-    "en": "One content foundation, three reasons to pay",
+    "kind": "bp_pricing",
+    "zh": "先给出可测试的价格与交付边界",
+    "en": "Prices to test, with clear delivery boundaries",
     "zh_body": [
       "个人版：完整游戏与新增故事包，为持续的游玩体验付费。",
       "教育版：年度内容与教学服务，为组织使用、更新与支持付费。",
@@ -376,8 +376,8 @@
       "Education edition: annual content and teaching services, with updates and support.",
       "Museum partnerships: production and usage agreements with defined rights and maintenance."
     ],
-    "note_zh": "D｜这是产品商业化的分层设想，尚未收费验证。个人端优先考虑买断与内容包，只有持续更新与复访成立才考虑订阅。教育端不能将当前MIT代码包装成排他软件许可，收费应对应有权提供的内容集合、托管、管理功能和支持。文博订单分别约定制作、使用、维护与可复用权利；不允许一个客户的定制需求吞掉通用产品路线。三条线共享故事组织与运行能力，但销售周期、成本和毛利必须分别核算。",
-    "note_en": "D | These are proposed offers, not validated revenue lines. Begin consumer testing with purchase and expansions; subscription requires a demonstrated update cadence and return habit. MIT-licensed code cannot be sold as exclusive proprietary access. Education fees must correspond to rights-cleared content, hosting, administration or support. Museum agreements separate production, usage, maintenance and reuse rights. Shared technology does not eliminate distinct sales cycles and margins.",
+    "note_zh": "D｜全部为建议测试价格，人民币。个人完整游戏68元，未来新增故事包28元；模型只算基础游戏。教育服务12000元每机构每年，拟含现有内容、使用指南、2次远程培训和限定支持；不含新课程定制。文博基础合作60000元每项目，假设1个主题3个场景、2轮审读及约定期维护，不含现场硬件、复杂集成与第三方高价授权。实际范围和报价需访谈与成本核验。图像全部来自当前游戏，展示内容基础，不是已交付的新版本。MIT代码不能作为排他版权收费。",
+    "note_en": "D | All are proposed test prices in CNY. Full game68; future expansion28, excluded from the model. Education service12000 per institution/year: existing content, guides, two remote training sessions and bounded support, excluding custom curricula. Museum starting scope60000 per project: one theme with three scenes, two review rounds and contracted maintenance, excluding hardware, complex integration and expensive third-party rights. Validate scope and costs before quoting. Images show the present game, not delivered new editions. MIT code is not exclusive intellectual property.",
     "zh_labels": [
       "游戏与内容包",
       "年度教育服务",
@@ -388,14 +388,14 @@
       "EDUCATION SERVICES",
       "PARTNERSHIPS"
     ],
-    "section_zh": "BP · 收入结构",
-    "section_en": "BP · REVENUE DESIGN",
+    "section_zh": "BP · 数字均为规划假设",
+    "section_en": "BP · ILLUSTRATIVE PLANNING ASSUMPTIONS",
     "role": "D"
   },
   {
-    "kind": "strategy",
-    "zh": "先赢得玩家，再扩大使用场景",
-    "en": "Earn engagement, then expand distribution",
+    "kind": "bp_funnel",
+    "zh": "增长假设，要落实到每一步转化",
+    "en": "Make the acquisition hypothesis measurable",
     "zh_body": [
       "以现有游戏触达历史与独立游戏社群，观察首次体验和主动回访。",
       "与愿意共同改进的教师试用，形成可重复使用的课程材料与案例。",
@@ -406,8 +406,8 @@
       "Work with willing educators to develop reusable materials and documented cases.",
       "Bring proven content to museum partners and extend reach through joint distribution."
     ],
-    "note_zh": "D｜增长顺序是产品吸引力、可重复使用、可信渠道，而不是先投放买流量。个人端看开始、完成、回访和愿付价格；教育端看教师独立使用和预算批准；文博端看内容适配与合同。合作带来的曝光应追踪到实际体验和再次使用。不要把总展览客流当作下载，也不要把学生参与人次当作付费客户。",
-    "note_en": "D | The sequence is product appeal, repeatable use and trusted distribution, before broad paid acquisition. Track activation, completion, return and willingness to pay for players; independent use and budget approval for educators; rights and contracts for museums. Attribute partner exposure to actual use and return. Exhibition attendance is not downloads, and participating students are not paying institutions.",
+    "note_zh": "D｜基准个人端假设：10万次合格访问，10%进入体验为1万次体验，20%体验者购买为2000名付费玩家。不是现实流量或实际转化。按每名付费玩家18元获客成本，预算36000元，相当于每次合格访问0.36元的现金成本；合格访问须去重，创作者和团队工作时间仍计入固定成本。目标漏斗不代表可以用这个成本买到流量。机构另算100个合格账户取得10个年度合同；文博20个接洽取得2个合同。高低情景同比调整获客投入，并检验成本随规模上升的可能。",
+    "note_en": "D | Base consumer hypothesis:100000 qualified visits,10% trying gives10000 trials,20% of trials buying gives2000 paying players. None is observed traction. At CNY18 acquisition per buyer, cash spend is36000, or0.36 per qualified visit. Deduplicate visits; team effort remains in fixed costs. This does not establish that traffic is purchasable at that cost. Separately assume100 qualified institutions produce10 contracts and20 museum conversations produce2. Scale acquisition costs with volumes and test whether they worsen with reach.",
     "zh_labels": [
       "直接触达",
       "共同验证",
@@ -418,8 +418,8 @@
       "VALIDATE",
       "DISTRIBUTE"
     ],
-    "section_zh": "BP · 获客路径",
-    "section_en": "BP · DISTRIBUTION",
+    "section_zh": "BP · 数字均为规划假设",
+    "section_en": "BP · ILLUSTRATIVE PLANNING ASSUMPTIONS",
     "role": "D"
   },
   {
@@ -453,9 +453,9 @@
     "role": "E"
   },
   {
-    "kind": "finance",
-    "zh": "增长是否值得，要分开算清三本账",
-    "en": "Three businesses require three sets of economics",
+    "kind": "bp_economics",
+    "zh": "收入增长，还要跨过成本这一关",
+    "en": "Revenue must still clear the cost base",
     "zh_body": [
       "游戏：净收入减去渠道、退款与服务成本；用贡献覆盖内容制作和获客。",
       "教育：合同收入减去实施、支持与内容更新；重点看续约和服务工时。",
@@ -466,8 +466,8 @@
       "Education: contract revenue less onboarding, support and updates; track renewal and service hours.",
       "Museums: revenue less production, rights and maintenance; track cash collection and reusable work."
     ],
-    "note_zh": "E｜先定义单位再预测规模。消费端按付费玩家及内容包复购分组；教育按付费机构；文博按合同。LTV只有留存与复购数据可靠时才估算。游戏内容开发是前置投入，收入可放大但回本不确定；机构年费可能续约却增加支持负担；文博合同可能带来现金同时挤占团队。共享成本按一致规则分摊，不能在三个业务里重复算利润。暂不展示无证据的定价、营收或估值。",
-    "note_en": "E | Define units before forecasting: paying players and expansion purchases, paying institutions and museum contracts. Estimate lifetime value only after retention and repeat purchase are observable. Games have upfront content costs and uncertain recovery; institutional services can renew but add support; commissions generate cash while consuming capacity. Allocate shared costs consistently. No unsupported prices, revenue or valuation are claimed.",
+    "note_zh": "E｜全部为12个月同口径假设。游戏68元减渠道和退款合计13.6元、服务4元、获客18元，单位贡献32.4元；机构12000减交付4000减销售2000，贡献6000；文博60000减制作权利交付36000减销售6000，贡献18000。基准贡献=2000×32.4+10×6000+2×18000=160800元。扣除独立固定投入240000元，税前经营测算余额为-79200元。谨慎-205800，扩展+144000。固定投入包括产品开发120000、通用内容90000、固定运营30000，均按本期现金费用处理，交付中的人力不得再重复计入固定成本。若机构10家、文博2项保持不变，约4445名付费玩家可覆盖固定投入；需重新检验支持能力。获客每人增加10元会令基准余额再减少20000元。该简化测算未计税与融资，不等同于审计利润或现金流。",
+    "note_en": "E | All are twelve-month assumptions. A game nets68-13.6 channel/refunds-4 service-18 acquisition=32.4 contribution. An institution nets12000-4000 delivery-2000 sales=6000. A museum project nets60000-36000 delivery/rights-6000 sales=18000. Base contribution is160800. Less240000 separate fixed investment gives a pre-tax model balance of-79200. Cautious balance is-205800 and expansion+144000. Fixed investment comprises engineering120000, reusable content90000 and operations30000, expensed in this model; avoid counting delivery labour twice. With10 institutions and2 museum contracts, about4445 paying players cover fixed costs, subject to capacity. A CNY10 CAC increase reduces the base result by20000. This simplified model excludes tax and financing and is not audited profit or cash flow.",
     "zh_labels": [
       "付费玩家",
       "付费机构",
@@ -478,8 +478,8 @@
       "INSTITUTION",
       "CONTRACT"
     ],
-    "section_zh": "BP · 单位经济",
-    "section_en": "BP · UNIT ECONOMICS",
+    "section_zh": "BP · 数字均为规划假设",
+    "section_en": "BP · ILLUSTRATIVE PLANNING ASSUMPTIONS",
     "role": "E"
   },
   {
@@ -513,9 +513,9 @@
     "role": "E"
   },
   {
-    "kind": "capital",
-    "zh": "把资源投向下一项关键证据",
-    "en": "Fund the next decisive piece of evidence",
+    "kind": "bp_budget",
+    "zh": "36万元，支持一年的验证与制作",
+    "en": "CNY360k for a year of production and validation",
     "zh_body": [
       "产品与内容：补齐可读性、可玩性、史料审读和内容权利。",
       "市场验证：小规模测试玩家付费与机构采购，记录获客和交付成本。",
@@ -526,8 +526,8 @@
       "Market evidence: test player purchases and institutional procurement with measured costs.",
       "Operations: establish release cadence, cash needs and responsibilities before expanding."
     ],
-    "note_zh": "E｜融资需求应从团队全成本、外部制作审读、渠道试验和回款时间推导。资金需求等于里程碑前现金支出加必要缓冲减已确认回款；目前缺少工资、合同和报价，不能编造精确融资额或估值。可用阶段预算管理内容、工程和验证工作，资金释放对应证据。评估市场用可触达且有预算的账户及合格玩家群体自下而上计算，不拿全球游戏规模乘随意份额。",
-    "note_en": "E | Derive funding from fully loaded team costs, editorial and production work, channel experiments and payment timing. Required cash equals spending to the milestone plus a buffer less confirmed receipts. Without quotes, staffing costs or contracts, a precise ask or valuation would be invented. Release budgets against evidence. Size reachable opportunity from qualified player cohorts and budget-owning accounts, not an arbitrary share of the global games market.",
+    "note_zh": "E｜这是12个月资金规划示例，不是已获投资或正式融资要约。产品开发12万元、通用内容审读9万元、固定运营3万元，固定投入合计24万元。交付周转9万元、风险储备3万元，资金上限合计36万元。周转金是等待回款时使用的现金缓冲，不在第20页再扣为一笔费用；储备也不是已花费成本。团队薪酬与外部服务均需包含在对应成本，不假定五名全职员工可以靠此预算运行。建议先释放12万元，剩余24万元依据真实完成率、付费和交付工时再分阶段释放。工资报价与回款计划不充分，故这是可调整的规划规模，不承诺精确现金续航期。",
+    "note_en": "E | This is an illustrative twelve-month cash envelope, not raised funding or a formal offering. Engineering120k, reusable content/review90k and core operations30k total240k fixed investment. Delivery float90k and contingency30k bring the envelope to360k. Float bridges cash timing and is not another expense in page20; contingency is not spent cost. Include labour and external fees in the appropriate lines; this does not fund five full-time salaries by assumption. Release120k first, then stage the remaining240k against completion, payment and delivery effort. Staffing quotes and collection schedules are incomplete, so exact runway is not promised.",
     "zh_labels": [
       "做出品质",
       "验证交易",
@@ -538,8 +538,8 @@
       "TRANSACTIONS",
       "DISCIPLINE"
     ],
-    "section_zh": "BP · 资金与里程碑",
-    "section_en": "BP · CAPITAL ALLOCATION",
+    "section_zh": "BP · 数字均为规划假设",
+    "section_en": "BP · ILLUSTRATIVE PLANNING ASSUMPTIONS",
     "role": "E"
   },
   {
