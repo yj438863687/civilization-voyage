@@ -31,11 +31,16 @@ def render(p,row,index,lang,raw,label,title,end):
    txt(t(f"{s['player']:,}名玩家 / {s['institution']}家机构 / {s['museum']}个项目",f"{s['player']:,} players / {s['institution']} institutions / {s['museum']} projects"),340,y+66,1100,49,25,p.muted)
   foot(t('12个月收入情景；统一单价与完整交付口径；未计续约与新增故事包。','12-month revenue scenarios at constant prices; no renewals or expansion sales.'))
  elif k=='bp_benchmarks':
-  vals=[('$19.99','Discovery Tour',t('Ancient Greece · 美国商店买断','Ancient Greece · US store purchase')),('$5.04','Minecraft Education',t('合格教育机构 · 每用户每年','Eligible education · per user/year')),('$36','Minecraft Education',t('商业组织 · 每用户每年','Commercial · per user/year'))]
-  for j,(price,name,unit) in enumerate(vals):
-   x=96+j*588;txt(price,x,404,500,130,85,p.accent);txt(name,x,565,500,100,35);txt(unit,x,685,500,120,30)
-  txt(t('我们的定位：中外文化探索 + 选择与后果；延伸为游玩、教学与文博叙事。','Our position: Chinese and world cultures, explored through choices and consequences.\nA foundation for play, teaching and museum storytelling.'),96,839,1728,85,31,p.accent)
-  foot(t('来源：Ubisoft Store / Minecraft Education官网，2026-11-05；不同产品与计费单位。','Sources: Ubisoft Store / Minecraft Education, 2026-11-05; different products and units.'))
+  names=['Discovery Tour','Minecraft Education',t('文明航程','Civilization Voyage')]
+  strengths=t(['专家参与的历史世界与导览','跨学科课程、协作与教学工具','4时代、8航线、24场景；中外并置'],['Expert-curated historical worlds and tours','Broad curricula, collaboration and teaching tools','4 eras, 8 routes, 24 scenes; China and world routes'])
+  limits=t(['现有地区与时代的深度探索；我们的中外主题比较需另行组织。','通用学习平台；围绕技术与文明的连贯故事需要选材与编排。','已有选择记录、合作支援和回港回顾；学习成效与备课节省仍待验证。'],['Depth within selected places and periods; our China/world comparison needs an added structure.','A broad learning platform; our continuous technology-and-civilization story needs curation.','Choices, later support and recaps are implemented; learning gains and preparation savings remain untested.'])
+  prices=t(['古希腊买断 $19.99','教育 $5.04 / 商业 $36 每用户每年','个人版拟价 ¥68'],['Ancient Greece purchase: USD19.99','USD5.04 education / USD36 commercial per user/year','Proposed game price: CNY68'])
+  for j in range(3):
+   x=96+j*588;txt(names[j],x,352,510,95,36,p.accent)
+   txt(t('已有长处','STRENGTH'),x,468,500,40,23,p.muted);txt(strengths[j],x,520,500,116,32)
+   txt(t('针对我们的目标','FIT FOR OUR PURPOSE'),x,652,500,40,23,p.muted);txt(limits[j],x,700,500,153,29)
+   txt(prices[j],x,870,500,58,23,p.accent)
+  foot(t('比较目标：中外技术与文明的连贯体验；依据官网与项目代码，优势仍需用户验证。','Focus: a connected China/world technology-and-civilization journey. User advantage needs testing.'))
  elif k=='bp_pricing':
   photos=['opening-poster.png','interaction-poster.png','routes-poster.png']
   titles=t(['个人完整游戏','机构年度服务','文博主题合作'],['FULL GAME','EDUCATION / YEAR','MUSEUM PROJECT'])
