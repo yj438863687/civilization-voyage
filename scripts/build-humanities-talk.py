@@ -54,7 +54,7 @@ for lang in ['en','zh']:
    p.text(t('传说与未来推演均有标注；每条航线内部依时间推进。','Legends and imagined futures are labelled; each route moves forward in time.'),96,940,1728,55,26,p.muted,minsize=22);end(p,i+1)
   elif k=='comparison':
    label(p,t('文化意义 · 相互参照','CULTURAL PURPOSE · RECIPROCAL PERSPECTIVES'));title(p,h,size=73)
-   for j,key in enumerate(['water','tablet']):
+   for j,key in enumerate(['watt','cable']):
     x=96+j*882;p.picture(ROOT/'apps/web/public'/MEDIA[key]['src'].lstrip('/'),x,354,790,275);credit(p,key,x,650,790)
    paragraphs(p,body,96,738,1728,32,82);end(p,i+1)
   elif k=='thesis':

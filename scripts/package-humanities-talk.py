@@ -7,7 +7,7 @@ import fitz
 ROOT=Path(__file__).resolve().parents[1];BASE=ROOT/'.impeccable/humanities-talk';DATA=json.loads((ROOT/'docs/humanities-introduction.json').read_text())
 assert len(DATA)==24
 for lang in ['en','zh']:
- work=BASE/lang;tag=lang.upper();name='Civilization-Voyage-Project-'+tag
+ work=BASE/lang;tag=lang.upper();name='Civilization-Voyage-Visual-'+tag
  source=work/'Presentation'/('Civilization-Voyage-中文理解.pptx' if lang=='zh' else 'Civilization-Voyage-Presentation-EN.pptx')
  pdf=source.with_suffix('.pdf');movie=work/'Civilization-Voyage-Demo.mp4';deck=Presentation(source);assert len(deck.slides)==len(DATA)
  for index,slide in enumerate(deck.slides):

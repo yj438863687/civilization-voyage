@@ -40,8 +40,22 @@ def render(p,row,index,lang,raw,label,title,end):
   titles=t(['个人完整游戏','机构年度服务','文博主题合作'],['FULL GAME','EDUCATION / YEAR','MUSEUM PROJECT'])
   units=t(['新增故事包拟价 ¥28','指南、2次培训、限定支持','1个主题 / 3个场景 / 2轮审读'],['Expansion test price: CNY28','Guides, 2 sessions, bounded support','1 theme / 3 scenes / 2 reviews'])
   for j,(key,photo,name,unit) in enumerate(zip(['player','institution','museum'],photos,titles,units)):
-   x=96+j*588;p.picture(raw/photo,x,345,500,281);txt(name,x,657,500,62,29,GREEN);txt(money(m['price'][key]),x,735,500,103,67);txt(unit,x,856,500,79,27,p.muted)
-  foot(t('拟议价格，人民币；当前游戏实录作内容示意。具体服务范围见备注。','Proposed CNY prices; current-game imagery. Delivery boundaries are in speaker notes.'))
+   x=96+j*588
+   if j==0:
+    p.picture(raw/photo,x,345,500,281)
+   elif j==1:
+    p.rect(x,345,500,281,'F1F5F4')
+    p.picture(ROOT/'apps/web/public/background/watt.jpg',x+18,367,145,198)
+    txt(t('工业时代 · 讨论指南','INDUSTRY / DISCUSSION'),x+184,367,292,54,25,INK)
+    txt(t('效率提高以后，\n谁获得更多休息？','Who gains time\nwhen work gets faster?'),x+184,435,292,90,28,INK)
+    txt(t('资料 / 讨论 / 回顾','Sources / discuss / reflect'),x+184,557,292,48,23,'087F69')
+   else:
+    p.rect(x,345,500,281,'163748')
+    p.picture(ROOT/'apps/web/public/background/cable.jpg',x+16,359,468,155)
+    txt(t('跨洋通信 · 主题展陈','OCEAN CABLE / EXHIBIT'),x+20,531,460,42,26,WHITE)
+    txt(t('史料解说 / 三幕互动故事','Interpretation / three story scenes'),x+20,578,460,42,23,GREEN)
+   txt(name,x,657,500,62,29,GREEN);txt(money(m['price'][key]),x,735,500,103,67);txt(unit,x,856,500,79,27,p.muted)
+  foot(t('拟议价格；左为游戏实录，中、右为教育与文博交付示意，尚未上线。','Proposed CNY prices. Left: actual game. Centre/right: proposed service concepts.'))
  elif k=='bp_funnel':
   for j,(v,name,w) in enumerate(zip(['100,000','10,000','2,000'],t(['合格访问','进入体验','购买游戏'],['QUALIFIED VISITS','TRY THE GAME','PURCHASE']),[950,710,470])):
    y=363+j*172;x=96+(950-w)/2;p.rect(x,y,w,129,['16475B','176C75','087F69'][j]);txt(v,x+25,y+16,w-50,68,49,WHITE);txt(name,x+25,y+86,w-50,40,25,WHITE)

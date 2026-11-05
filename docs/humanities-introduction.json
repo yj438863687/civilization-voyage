@@ -125,11 +125,11 @@
       "World routes widen the view through records, factory work, communication and machine judgment.",
       "Players return with a way to understand different situations and explain their own choices."
     ],
-    "note_zh": "B｜中华文明是理解自身经验的起点，世界文化提供相互参照。比较具体处境、人物和制度，不用一个抽象价值裁判所有文明。技术效率不能独自解释共同生活的好坏。希望形成的文化理解需要用户研究验证，不能把设计意图说成已经证明的教学效果。",
-    "note_en": "B | Chinese civilization grounds the experience, while world cultures provide reciprocal perspectives. Compare concrete situations and arrangements without treating one society as a universal standard. Technical efficiency alone does not explain the quality of shared life. Cultural understanding is an intended outcome that still needs evaluation.",
+    "note_zh": "B｜中华文明是理解自身经验的起点，世界文化提供相互参照。比较具体处境、人物和制度，不用一个抽象价值裁判所有文明。技术效率不能独自解释共同生活的好坏。希望形成的文化理解需要用户研究验证，不能把设计意图说成已经证明的教学效果。 配图分别为瓦特肖像与1866年大东方号，说明工业与信息时代的背景，并非游戏实时截图。",
+    "note_en": "B | Chinese civilization grounds the experience, while world cultures provide reciprocal perspectives. Compare concrete situations and arrangements without treating one society as a universal standard. Technical efficiency alone does not explain the quality of shared life. Cultural understanding is an intended outcome that still needs evaluation. Images show a contextual portrait of Watt and the Great Eastern in 1866, representing industrial and information-era material rather than live game screenshots.",
     "media": [
-      "water",
-      "tablet"
+      "watt",
+      "cable"
     ],
     "role": "B"
   },
@@ -376,8 +376,8 @@
       "Education edition: annual content and teaching services, with updates and support.",
       "Museum partnerships: production and usage agreements with defined rights and maintenance."
     ],
-    "note_zh": "D｜全部为建议测试价格，人民币。个人完整游戏68元，未来新增故事包28元；模型只算基础游戏。教育服务12000元每机构每年，拟含现有内容、使用指南、2次远程培训和限定支持；不含新课程定制。文博基础合作60000元每项目，假设1个主题3个场景、2轮审读及约定期维护，不含现场硬件、复杂集成与第三方高价授权。实际范围和报价需访谈与成本核验。图像全部来自当前游戏，展示内容基础，不是已交付的新版本。MIT代码不能作为排他版权收费。",
-    "note_en": "D | All are proposed test prices in CNY. Full game68; future expansion28, excluded from the model. Education service12000 per institution/year: existing content, guides, two remote training sessions and bounded support, excluding custom curricula. Museum starting scope60000 per project: one theme with three scenes, two review rounds and contracted maintenance, excluding hardware, complex integration and expensive third-party rights. Validate scope and costs before quoting. Images show the present game, not delivered new editions. MIT code is not exclusive intellectual property.",
+    "note_zh": "D｜全部为建议测试价格，人民币。个人完整游戏68元，未来新增故事包28元；模型只算基础游戏。教育服务12000元每机构每年，拟含现有内容、使用指南、2次远程培训和限定支持；不含新课程定制。文博基础合作60000元每项目，假设1个主题3个场景、2轮审读及约定期维护，不含现场硬件、复杂集成与第三方高价授权。实际范围和报价需访谈与成本核验。左图为当前农业线实录；中图以工业线瓦特资料制作课堂讨论页示意；右图以信息线跨洋电缆资料制作展陈示意。教育与文博交付尚属规划。MIT代码不能作为排他版权收费。",
+    "note_en": "D | All are proposed test prices in CNY. Full game68; future expansion28, excluded from the model. Education service12000 per institution/year: existing content, guides, two remote training sessions and bounded support, excluding custom curricula. Museum starting scope60000 per project: one theme with three scenes, two review rounds and contracted maintenance, excluding hardware, complex integration and expensive third-party rights. Validate scope and costs before quoting. The left image is actual agriculture-route gameplay. The centre is a proposed discussion guide using the industrial route’s Watt material. The right is a proposed museum exhibit using the information route’s cable material. These service concepts are not delivered editions. MIT code is not exclusive intellectual property.",
     "zh_labels": [
       "游戏与内容包",
       "年度教育服务",
@@ -390,7 +390,11 @@
     ],
     "section_zh": "BP · 数字均为规划假设",
     "section_en": "BP · ILLUSTRATIVE PLANNING ASSUMPTIONS",
-    "role": "D"
+    "role": "D",
+    "media": [
+      "watt",
+      "cable"
+    ]
   },
   {
     "kind": "bp_funnel",
