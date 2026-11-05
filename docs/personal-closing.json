@@ -4,22 +4,22 @@
     "zh": "AI让想法落地，判断让作品成立。",
     "label_en": "01 / FROM IDEA TO PRODUCT",
     "label_zh": "01 / 从想法到作品",
-    "en_script": "You have seen Civilization Voyage in action.\nI will now explain how we built it, where it fits in the market, and how it could support a lasting business.\n\nWe used Lovable to exchange ideas, Claude for design, Codex for API work, and Grok for the frontend and 3D scenes.\nWe integrated the work locally, tested the interactions, and updated the desktop app.\nAI accelerated production. Our team remained responsible for the experience: selecting stories, checking historical order, and making choices understandable.\n\nThe image on the right shows the result: a playable product.\nThe next task is to earn the player's time, then their purchase.\nThat takes a clear reason to choose us and an experience worth returning to.\nOur business plan starts with that reason to choose us.",
-    "zh_script": "大家已经看到了文明航程的实际体验。接下来介绍我们如何制作、如何定位，以及如何支撑持续经营。我们用Lovable交流想法，Claude做设计，Codex处理API，Grok完成前端与3D；在本机整合、测试并更新桌面应用。AI加快了制作，团队仍负责选故事、核对历史顺序、让玩家理解选择。右侧是已经可以玩的产品。下一步是争取玩家的时间，再赢得购买；这需要明确的选择理由和值得回来的体验。商业计划就从这个理由开始。",
+    "en_script": "You have seen what Civilization Voyage feels like to play.\nI will now explain how we built it, and how we could turn it into a sustainable cultural product.\n\nWe used Lovable to exchange ideas, Claude for design, Codex for API work, and Grok for the frontend and 3D scenes.\nWe brought the work together locally, tested the interactions, and updated the desktop app.\nThe game on the right grew out of that process.\n\nThe tools helped us build faster. We still had to choose the stories, check their historical order, and make each decision clear.\nThat work shapes what players take away from the game.\nOur business plan begins with the same responsibility: give people an experience worth their time.\nThat is where our competitive position starts.",
+    "zh_script": "大家已经看到了文明航程玩起来是什么样子。接下来介绍我们如何把它做出来，以及如何让它成为可以持续发展的文化产品。我们用Lovable交流想法，Claude做设计，Codex处理API，Grok完成前端和3D场景；在本机整合、测试互动并更新桌面应用。右侧游戏就是这个过程的成果。工具让制作更快，但故事怎样选、历史顺序怎样核对、选择怎样让玩家看懂，仍由我们负责。这些工作决定玩家能从游戏中带走什么。商业计划也从同一个责任开始：提供值得人们花时间的体验。我们的竞争定位由此出发。",
     "role": "Personal closing",
-    "seconds": 80,
+    "seconds": 65,
     "rehearsal": [
       {
-        "cue_zh": "承接前面的游戏演示，面向观众。",
-        "en": "You have seen Civilization Voyage in action.\nI will now explain how we built it, where it fits in the market, and how it could support a lasting business."
+        "cue_zh": "面向观众，承接前面的游戏演示。开场平稳，不急着读流程。",
+        "en": "You have seen what Civilization Voyage feels like to play.\nI will now explain how we built it, and how we could turn it into a sustainable cultural product."
       },
       {
-        "cue_zh": "指左侧制作流程，再看右侧游戏实录。",
-        "en": "We used Lovable to exchange ideas, Claude for design, Codex for API work, and Grok for the frontend and 3D scenes.\nWe integrated the work locally, tested the interactions, and updated the desktop app.\nAI accelerated production. Our team remained responsible for the experience: selecting stories, checking historical order, and making choices understandable."
+        "cue_zh": "指左侧制作流程；说完工具分工，再指右侧游戏画面。",
+        "en": "We used Lovable to exchange ideas, Claude for design, Codex for API work, and Grok for the frontend and 3D scenes.\nWe brought the work together locally, tested the interactions, and updated the desktop app.\nThe game on the right grew out of that process."
       },
       {
-        "cue_zh": "指右图，然后看向观众；最后一句引出竞品。",
-        "en": "The image on the right shows the result: a playable product.\nThe next task is to earn the player's time, then their purchase.\nThat takes a clear reason to choose us and an experience worth returning to.\nOur business plan starts with that reason to choose us."
+        "cue_zh": "稍停顿，语气从制作转向自己的判断；最后一句切第二页。",
+        "en": "The tools helped us build faster. We still had to choose the stories, check their historical order, and make each decision clear.\nThat work shapes what players take away from the game.\nOur business plan begins with the same responsibility: give people an experience worth their time.\nThat is where our competitive position starts."
       }
     ]
   },
@@ -28,22 +28,22 @@
     "zh": "对标竞品，明确我们的优势",
     "label_en": "02 / COMPETITIVE POSITION",
     "label_zh": "02 / 竞品与定位",
-    "en_script": "Discovery Tour competes through historical depth.\nMinecraft Education competes through classroom flexibility.\nCivilization Voyage focuses on connected stories and choices that carry forward.\n\nFour eras, eight routes, and twenty-four scenes connect Chinese and world histories around technology and human life.\nEach route follows a historical sequence. Players make decisions, face the consequences, and review their choices at the end.\nSharing supplies with a village costs resources now, but can bring support later.\nThat gives the next chapter a personal stake. Players carry their earlier decisions into it.\n\nThe line at the bottom captures our position:\nOne journey. Connected choices. Consequences that follow you.\nThis is the experience we would build our brand around.\nIts classroom value still needs testing. Our immediate advantage is a game already organised around this specific cultural journey.\nThe business model adapts that experience to three customers, each paying for a different outcome.",
-    "zh_script": "Discovery Tour以历史深度竞争，Minecraft Education以课堂灵活性竞争。文明航程聚焦连贯故事和持续影响后续的选择。四时代、八航线、二十四场景，以技术与人的生活串联中国和世界历史。航线遵循历史顺序，玩家作决定、面对后果、回顾自己的选择。分享补给消耗眼前资源，却可能换来后续支持，让下一章与玩家自己的决定产生关系。底部概括了定位：一段航程、连贯选择、持续后果。这是品牌要围绕的体验。课堂效果仍需测试；目前的优势是已围绕这个具体文化主题组织好的游戏。商业模式将其适配给三类客户，各自为不同结果付费。",
+    "en_script": "Discovery Tour offers detailed historical worlds.\nMinecraft Education offers flexible tools for classroom learning.\nBoth set strong benchmarks. Our focus is a connected cultural journey.\n\nAcross four eras, eight routes, and twenty-four scenes, we connect Chinese and world histories through technology and everyday life.\nEach route follows a historical sequence. Players make choices whose effects continue into the next chapter.\nImagine sharing supplies with a village. Your ship has less to carry on with, but that village may help you later.\nThe player now has a personal reason to care about what happens next.\n\nThat is our position:\nOne journey. Connected choices. Consequences that follow you.\nIt gives us a clear experience to build on, while its learning value still needs testing.\nThe next step is to turn that experience into something customers have a reason to buy.",
+    "zh_script": "Discovery Tour提供细致的历史世界，Minecraft Education提供灵活的课堂工具，两者都是很好的对标。我们聚焦一段连贯的文化航程：四个时代、八条航线、二十四个场景，以技术和日常生活连接中国与世界历史。每条航线遵循历史顺序，选择的影响延续到下一章。想象玩家把补给分享给村庄，自己的船可用的资源少了，但村庄可能在后面给予帮助。这让玩家有了亲自关心后续故事的理由。定位就是：一段航程、连贯选择、持续后果。这是可以继续建设的体验，学习价值仍需测试。下一步，是让这种体验成为客户有理由购买的产品。",
     "role": "Personal closing",
-    "seconds": 90,
+    "seconds": 75,
     "rehearsal": [
       {
-        "cue_zh": "指左、中两栏，竞品长处各用一句；重心移到右侧。",
-        "en": "Discovery Tour competes through historical depth.\nMinecraft Education competes through classroom flexibility.\nCivilization Voyage focuses on connected stories and choices that carry forward."
+        "cue_zh": "指左栏与中栏，各用一句说明竞品长处；随后把重心转向右栏。",
+        "en": "Discovery Tour offers detailed historical worlds.\nMinecraft Education offers flexible tools for classroom learning.\nBoth set strong benchmarks. Our focus is a connected cultural journey."
       },
       {
-        "cue_zh": "指右栏的四时代、八航线；例子放慢。",
-        "en": "Four eras, eight routes, and twenty-four scenes connect Chinese and world histories around technology and human life.\nEach route follows a historical sequence. Players make decisions, face the consequences, and review their choices at the end.\nSharing supplies with a village costs resources now, but can bring support later.\nThat gives the next chapter a personal stake. Players carry their earlier decisions into it."
+        "cue_zh": "指右栏四时代、八航线、24场景；讲村庄例子时看向观众。",
+        "en": "Across four eras, eight routes, and twenty-four scenes, we connect Chinese and world histories through technology and everyday life.\nEach route follows a historical sequence. Players make choices whose effects continue into the next chapter.\nImagine sharing supplies with a village. Your ship has less to carry on with, but that village may help you later.\nThe player now has a personal reason to care about what happens next."
       },
       {
-        "cue_zh": "指底部一句话，停顿后衔接三种产品。",
-        "en": "The line at the bottom captures our position:\nOne journey. Connected choices. Consequences that follow you.\nThis is the experience we would build our brand around.\nIts classroom value still needs testing. Our immediate advantage is a game already organised around this specific cultural journey.\nThe business model adapts that experience to three customers, each paying for a different outcome."
+        "cue_zh": "指底部总结，三句话之间停半拍；结尾接第三页。",
+        "en": "That is our position:\nOne journey. Connected choices. Consequences that follow you.\nIt gives us a clear experience to build on, while its learning value still needs testing.\nThe next step is to turn that experience into something customers have a reason to buy."
       }
     ]
   },
@@ -52,22 +52,22 @@
     "zh": "共同的内容基础，三种付费理由。",
     "label_en": "03 / THE BUSINESS MODEL",
     "label_zh": "03 / 商业模式",
-    "en_script": "For players, we sell the adventure.\nThe proposed price is sixty-eight yuan for the full game.\nA clear offer makes the first purchase simple. Additional story packs could generate repeat purchases once the game has earned an audience.\nThat puts enjoyment and return visits at the centre of the consumer business.\n\nFor educators, we sell help using the game in class.\nThe middle image turns an industrial story into a discussion guide. It connects the experience to a lesson the teacher can lead.\nOur proposed annual fee is twelve thousand yuan per institution, covering guides, two training sessions, and defined support.\nRenewal depends on repeated use. We would test that before expanding the service.\n\nFor museums, we sell a local story visitors can take part in.\nThe proposed project fee is sixty thousand yuan: one theme, three scenes, and two review rounds.\nEducation and museum services remain proposals. All prices need validation.\nAcross the three offers, the goal is to reuse research and game systems while charging for adaptation and support.\nWe would price extra work separately, so custom projects do not consume the margin.\nThat delivery discipline is essential to the numbers on the next slide.",
-    "zh_script": "玩家买冒险：完整游戏拟价68元，明确的商品便于首次购买，积累受众后再通过故事包争取复购。乐趣和回访是消费者业务的核心。教育者买课堂应用支持：中图把工业故事变成教师可以带领的讨论，机构拟议年费1.2万元，含指南、两次培训及限定支持。续费依赖反复使用，扩张前先验证。博物馆买观众可以参与的本地故事：拟议项目费6万元，限定一个主题、三个场景、两轮审读。教育和文博仍是规划，所有价格有待验证。三类业务共同复用研究与系统，同时对适配和支持收费。额外工作单独计价，防止定制吞掉利润。下一页的数字说明交付纪律为何关键。",
+    "en_script": "Start with the player on the left.\nFor a proposed sixty-eight yuan, they buy the full adventure: a world to explore, people to meet, and decisions that matter.\nThey will judge us by the experience. Enjoying that first voyage gives them a reason to buy a future story pack.\nOur consumer business would grow by earning that next purchase.\n\nThe teacher in the middle has a different need.\nA good game still takes work to use in class. The teacher needs a lesson they can lead.\nOur proposed service costs twelve thousand yuan per institution each year, including discussion guides, two training sessions, and support within an agreed scope.\nAn industrial story could become a discussion about who benefits from a machine and who bears its costs.\nRepeated classroom use would give the institution a reason to renew.\n\nThe museum on the right wants visitors to connect with a local story.\nOur proposed sixty-thousand-yuan project covers one theme, three scenes, and two review rounds.\nThese are test prices; the education and museum offers are still proposals.\nAcross all three, we would reuse the research and game systems, then charge for the adaptation each customer needs.\nThat helps each project contribute to the next one.\nTo see whether it can work, we have to follow the money beyond the sale.",
+    "zh_script": "先看左侧玩家。拟价68元，购买的是完整冒险：可以探索的世界、可以遇见的人，以及有影响的决定。玩家会用体验判断我们。第一段航程玩得好，才有理由买未来故事包；消费者业务靠赢得下一次购买来发展。中间教师的需要不同：好游戏要进课堂，仍需要准备，教师需要自己可以带领的课程。拟议机构年费1.2万元，含讨论指南、两次培训和约定范围的支持。工业故事可转成讨论：机器进步让谁受益、谁承担成本。反复课堂使用才是续费理由。右侧博物馆希望观众与本地故事产生联系，拟议6万元项目费包括一主题、三场景、两轮审读。价格仍需测试，教育和文博仍是提案。三类业务共同复用研究和游戏系统，再对各客户需要的适配收费，让一个项目为下一个项目留下积累。要判断这能否成立，还要继续看销售之后的钱去了哪里。",
     "role": "Personal closing",
     "seconds": 115,
     "rehearsal": [
       {
-        "cue_zh": "指左侧游戏实录与薄荷绿价格。",
-        "en": "For players, we sell the adventure.\nThe proposed price is sixty-eight yuan for the full game.\nA clear offer makes the first purchase simple. Additional story packs could generate repeat purchases once the game has earned an audience.\nThat puts enjoyment and return visits at the centre of the consumer business."
+        "cue_zh": "指左侧游戏画面与薄荷绿¥68；像介绍真实顾客的需要一样讲。",
+        "en": "Start with the player on the left.\nFor a proposed sixty-eight yuan, they buy the full adventure: a world to explore, people to meet, and decisions that matter.\nThey will judge us by the experience. Enjoying that first voyage gives them a reason to buy a future story pack.\nOur consumer business would grow by earning that next purchase."
       },
       {
-        "cue_zh": "指中间课堂讨论概念图及年费。",
-        "en": "For educators, we sell help using the game in class.\nThe middle image turns an industrial story into a discussion guide. It connects the experience to a lesson the teacher can lead.\nOur proposed annual fee is twelve thousand yuan per institution, covering guides, two training sessions, and defined support.\nRenewal depends on repeated use. We would test that before expanding the service."
+        "cue_zh": "指中间教学概念图与¥12,000；把自己放在教师的处境。",
+        "en": "The teacher in the middle has a different need.\nA good game still takes work to use in class. The teacher needs a lesson they can lead.\nOur proposed service costs twelve thousand yuan per institution each year, including discussion guides, two training sessions, and support within an agreed scope.\nAn industrial story could become a discussion about who benefits from a machine and who bears its costs.\nRepeated classroom use would give the institution a reason to renew."
       },
       {
-        "cue_zh": "指右侧文博展陈概念图，最后回到三栏整体。",
-        "en": "For museums, we sell a local story visitors can take part in.\nThe proposed project fee is sixty thousand yuan: one theme, three scenes, and two review rounds.\nEducation and museum services remain proposals. All prices need validation.\nAcross the three offers, the goal is to reuse research and game systems while charging for adaptation and support.\nWe would price extra work separately, so custom projects do not consume the margin.\nThat delivery discipline is essential to the numbers on the next slide."
+        "cue_zh": "指右侧文博概念图与¥60,000；介绍完后手势涵盖三栏。",
+        "en": "The museum on the right wants visitors to connect with a local story.\nOur proposed sixty-thousand-yuan project covers one theme, three scenes, and two review rounds.\nThese are test prices; the education and museum offers are still proposals.\nAcross all three, we would reuse the research and game systems, then charge for the adaptation each customer needs.\nThat helps each project contribute to the next one.\nTo see whether it can work, we have to follow the money beyond the sale."
       }
     ]
   },
@@ -76,22 +76,22 @@
     "zh": "增长，要能承担持续创作的成本。",
     "label_en": "04 / THE ECONOMICS",
     "label_zh": "04 / 经营测算",
-    "en_script": "Our base case models one year: two thousand paying players, ten institutions, and two museum projects.\nThat produces three hundred and seventy-six thousand yuan in revenue.\nThese figures are planning assumptions, not recorded sales.\n\nFollow the chart from left to right.\nDelivery and customer acquisition reduce revenue to a contribution of one hundred and sixty thousand eight hundred yuan.\nFixed investment of two hundred and forty thousand yuan then leaves a loss of seventy-nine thousand two hundred yuan.\nThe base case does not yet cover the cost of building the business.\n\nOur priorities follow directly from that gap: control acquisition costs, reuse teaching content, and keep museum delivery within scope.\nLarger orders help only if they leave enough money after delivery.\nWe would track contribution per customer alongside repeat purchases and renewals.\nExpansion should follow evidence that those measures are improving.\nThat is why we propose releasing funds in stages.",
-    "zh_script": "基准情况测算一年：两千名付费玩家、十家机构、两个文博项目，收入37.6万元。这是规划假设，并非已实现销售。沿图从左向右，扣除交付和获客成本，贡献为16.08万元；再扣24万元固定投入，亏损7.92万元。基准尚未覆盖建设业务的成本。因此重点是控制获客成本、复用教学内容、限制文博交付范围。大订单只有在扣除交付后留下足够收益才有帮助。我们会同时看每类客户的贡献、复购和续费，依据这些指标改善的证据决定扩张，所以资金要分阶段释放。",
+    "en_script": "Our base case assumes two thousand paying players, ten institutions, and two museum projects in one year.\nThat brings in three hundred and seventy-six thousand yuan—the blue bar on the left.\nThis is a planning scenario. We have not yet made these sales.\n\nNow follow the chart.\nAfter delivery and customer acquisition costs, the green bar leaves one hundred and sixty thousand eight hundred yuan.\nFixed investment then takes another two hundred and forty thousand yuan.\nThe final red bar is a loss of seventy-nine thousand two hundred yuan.\n\nWe included that loss because it changes our decisions.\nEvery museum project needs a clear scope. Every teaching package needs to be usable again. Every new player must cost us a reasonable amount to reach.\nA larger order creates value only when we can deliver it and keep enough to fund the next story.\nSo we would measure what each sale leaves behind, together with repeat purchases and renewals.\nThat leads directly to how we would invest.",
+    "zh_script": "基准情况假设一年有两千名付费玩家、十家机构、两个文博项目，带来37.6万元收入，对应左侧蓝柱。这是规划情景，销售尚未实现。沿图往下，扣除交付和获客成本，绿色剩16.08万元；固定投入再扣24万元，红柱最终亏损7.92万元。我们把亏损放进来，是因为它会改变决策：每个文博项目需要明确范围，每套教学材料需要可以反复使用，每位玩家的触达成本要在可承担范围。大订单只有在能够交付、并留下足够资金支持下个故事时才创造价值。所以我们会同时测量每笔销售留下多少、复购和续费如何。这直接决定资金怎样投。",
     "role": "Personal closing",
-    "seconds": 95,
+    "seconds": 100,
     "rehearsal": [
       {
-        "cue_zh": "指顶部销量假设，然后指蓝柱。",
-        "en": "Our base case models one year: two thousand paying players, ten institutions, and two museum projects.\nThat produces three hundred and seventy-six thousand yuan in revenue.\nThese figures are planning assumptions, not recorded sales."
+        "cue_zh": "指顶部客户数量和左侧蓝柱。数字放慢，只突出关键金额。",
+        "en": "Our base case assumes two thousand paying players, ten institutions, and two museum projects in one year.\nThat brings in three hundred and seventy-six thousand yuan—the blue bar on the left.\nThis is a planning scenario. We have not yet made these sales."
       },
       {
-        "cue_zh": "从蓝柱沿图向右，红色亏损处停顿。",
-        "en": "Follow the chart from left to right.\nDelivery and customer acquisition reduce revenue to a contribution of one hundred and sixty thousand eight hundred yuan.\nFixed investment of two hundred and forty thousand yuan then leaves a loss of seventy-nine thousand two hundred yuan.\nThe base case does not yet cover the cost of building the business."
+        "cue_zh": "沿图从左向右指橙色、绿色、橙色、红色；红柱处停一秒。",
+        "en": "Now follow the chart.\nAfter delivery and customer acquisition costs, the green bar leaves one hundred and sixty thousand eight hundred yuan.\nFixed investment then takes another two hundred and forty thousand yuan.\nThe final red bar is a loss of seventy-nine thousand two hundred yuan."
       },
       {
-        "cue_zh": "面向观众，说清楚经营结论；最后引出资金计划。",
-        "en": "Our priorities follow directly from that gap: control acquisition costs, reuse teaching content, and keep museum delivery within scope.\nLarger orders help only if they leave enough money after delivery.\nWe would track contribution per customer alongside repeat purchases and renewals.\nExpansion should follow evidence that those measures are improving.\nThat is why we propose releasing funds in stages."
+        "cue_zh": "从图表转向观众；语气坚定，说明数字怎样改变行动。",
+        "en": "We included that loss because it changes our decisions.\nEvery museum project needs a clear scope. Every teaching package needs to be usable again. Every new player must cost us a reasonable amount to reach.\nA larger order creates value only when we can deliver it and keep enough to fund the next story.\nSo we would measure what each sale leaves behind, together with repeat purchases and renewals.\nThat leads directly to how we would invest."
       }
     ]
   },
@@ -100,18 +100,22 @@
     "zh": "让人愿意再来，让故事能够继续。",
     "label_en": "05 / THE NEXT COMMITMENT",
     "label_zh": "05 / 下一步投入",
-    "en_script": "The proposed funding envelope is three hundred and sixty thousand yuan.\nIt covers fixed work, delivery cash flow, and a reserve.\nDelivery cash flow bridges the wait for customer payment; it is not an additional expense in the previous chart.\nWe would commit one hundred and twenty thousand yuan first.\n\nThe sequence on the right guides that investment.\nFirst, improve completion and voluntary return.\nNext, test paid offers and measure delivery costs.\nThen, release further funds when the evidence supports expansion.\nEach project should add reusable content, customer knowledge, and stronger partnerships.\nOver time, that gives us a growing collection of cultural experiences, with less work repeated from scratch.\nThe aim is a business that can fund the next story—and keep improving the game.",
-    "zh_script": "拟议资金总额36万元，覆盖固定工作、交付现金周转和储备。周转用于弥补等待客户付款的时间，不是上一页额外增加的费用。先投入12万元，按右侧顺序：改善完成率与主动回访；测试付费方案、测量交付成本；证据支持时再释放后续资金。每个项目都应积累可复用内容、客户认知和伙伴关系，逐步形成更丰富的文化体验，减少从头再做的工作。目标是让业务能够支持下一个故事，并不断改善游戏。",
+    "en_script": "Our proposed funding plan totals three hundred and sixty thousand yuan.\nThe bars on the left cover fixed work, cash for delivery while we wait for payment, and a reserve.\nThat delivery cash is a timing buffer; it is separate from the operating loss we just discussed.\nWe would start with one hundred and twenty thousand yuan.\n\nThe steps on the right put that money to work.\nFirst, see whether players finish a voyage and choose to return.\nNext, test paid offers with educators and museums, and measure the cost of serving them.\nThen, use those results to decide whether to release more funding and add new stories.\n\nOver time, each project should leave reusable content, better knowledge of our customers, and stronger partnerships.\nA business built that way gives the team room to keep creating.\nAnd that brings us back to the purpose of the voyage.",
+    "zh_script": "拟议资金规划共36万元。左侧分为固定工作、等待客户付款期间的交付现金和储备。交付现金是周转缓冲，和上一页经营亏损是两回事。先投入12万元。右侧顺序决定如何使用：先看玩家是否完成航程并主动回来；再向教育者和博物馆测试付费方案，测量服务成本；然后依据结果决定是否释放更多资金、增加故事。每个项目都应该留下可复用内容、更好的客户认知和更稳固的伙伴关系。这样经营，才给团队持续创作的空间。最后回到文明航程为什么出发。",
     "role": "Personal closing",
-    "seconds": 70,
+    "seconds": 75,
     "rehearsal": [
       {
-        "cue_zh": "指左侧36万元资金规划与三根条。",
-        "en": "The proposed funding envelope is three hundred and sixty thousand yuan.\nIt covers fixed work, delivery cash flow, and a reserve.\nDelivery cash flow bridges the wait for customer payment; it is not an additional expense in the previous chart.\nWe would commit one hundred and twenty thousand yuan first."
+        "cue_zh": "指左侧36万元，再指三根资金分配条和首期12万元。",
+        "en": "Our proposed funding plan totals three hundred and sixty thousand yuan.\nThe bars on the left cover fixed work, cash for delivery while we wait for payment, and a reserve.\nThat delivery cash is a timing buffer; it is separate from the operating loss we just discussed.\nWe would start with one hundred and twenty thousand yuan."
       },
       {
-        "cue_zh": "沿右侧三个阶段向下讲。",
-        "en": "The sequence on the right guides that investment.\nFirst, improve completion and voluntary return.\nNext, test paid offers and measure delivery costs.\nThen, release further funds when the evidence supports expansion.\nEach project should add reusable content, customer knowledge, and stronger partnerships.\nOver time, that gives us a growing collection of cultural experiences, with less work repeated from scratch.\nThe aim is a business that can fund the next story—and keep improving the game."
+        "cue_zh": "沿右侧三个阶段往下，讲清每一步对后续投入的作用。",
+        "en": "The steps on the right put that money to work.\nFirst, see whether players finish a voyage and choose to return.\nNext, test paid offers with educators and museums, and measure the cost of serving them.\nThen, use those results to decide whether to release more funding and add new stories."
+      },
+      {
+        "cue_zh": "面向观众，语气温和收回整场主题；最后一句切到神殿画面。",
+        "en": "Over time, each project should leave reusable content, better knowledge of our customers, and stronger partnerships.\nA business built that way gives the team room to keep creating.\nAnd that brings us back to the purpose of the voyage."
       }
     ]
   },
@@ -120,14 +124,14 @@
     "zh": "文明航程",
     "label_en": "",
     "label_zh": "",
-    "en_script": "Civilization Voyage begins with Chinese civilization and opens onto the world.\nTechnology changes what people can do. Our stories explore what they choose to do with that power.\nWe want players to remember the people behind the history—and their own choices along the way.\nA lasting business lets us keep those stories alive.\nThank you.",
-    "zh_script": "文明航程从中华文明出发，走向世界。技术改变人们能够做什么，我们的故事关注人们选择怎样使用这种能力。我们希望玩家记住历史中的人，也记住自己一路作出的选择。持续的经营，让这些故事继续生长。谢谢。",
+    "en_script": "Look at the ship one last time.\nIt carries us from Chinese civilization into the wider world, through centuries of invention and change.\nAlong the way, every new tool changes what people can do. Every choice reveals what they value.\nThat is the heart of Civilization Voyage.\nOur business plan has a purpose too: to give these stories a future, one that people choose to support.\nWe can build faster ships.\nWe still have to choose where they take us.\nLet us choose a future worth arriving in.\nThank you.",
+    "zh_script": "最后再看一眼这艘船。它从中华文明驶向更广阔的世界，穿过几个世纪的发明与变迁。一路上，每种新工具都改变人们能够做什么，每次选择都表明人们珍视什么。这就是文明航程的核心。商业计划也有它的目的：让这些故事拥有一个人们愿意支持的未来。我们可以造出更快的船。驶向何方，仍由我们选择。愿我们驶向的未来，值得抵达。谢谢。",
     "role": "Personal closing",
-    "seconds": 30,
+    "seconds": 50,
     "rehearsal": [
       {
-        "cue_zh": "切到全屏神殿与航船，放慢语速，面向观众结束。",
-        "en": "Civilization Voyage begins with Chinese civilization and opens onto the world.\nTechnology changes what people can do. Our stories explore what they choose to do with that power.\nWe want players to remember the people behind the history—and their own choices along the way.\nA lasting business lets us keep those stories alive.\nThank you."
+        "cue_zh": "切到神殿与航船全屏画面，先停一秒。后半段抬头看观众，不再指图。",
+        "en": "Look at the ship one last time.\nIt carries us from Chinese civilization into the wider world, through centuries of invention and change.\nAlong the way, every new tool changes what people can do. Every choice reveals what they value.\nThat is the heart of Civilization Voyage.\nOur business plan has a purpose too: to give these stories a future, one that people choose to support.\nWe can build faster ships.\nWe still have to choose where they take us.\nLet us choose a future worth arriving in.\nThank you."
       }
     ]
   }
