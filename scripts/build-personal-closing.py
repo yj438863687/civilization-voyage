@@ -4,6 +4,7 @@ from pathlib import Path
 from pptx import Presentation
 from pptx.util import Inches
 import fitz
+from PIL import Image
 import presentation_core as core
 from presentation_core import Page,GREEN,WHITE,INK
 from presentation_plan import calculate_plan
@@ -12,6 +13,18 @@ BASE=ROOT/'.impeccable/personal-closing';BASE.mkdir(exist_ok=True)
 M=json.loads((ROOT/'docs/business-assumptions.json').read_text())
 PLAN=calculate_plan(M)
 rows=json.loads((ROOT/'docs/personal-closing.json').read_text())
+WORKFLOW=ROOT/'.impeccable/presentation-workflow'
+def crop_picture(p,path,x,y,w,h,box):
+ im=Image.open(path).convert('RGB');iw,ih=im.size;l,top,right,bottom=box
+ if (right-l)/(bottom-top)>w/h:
+  trim=((right-l)-(bottom-top)*w/h)/2;l+=trim;right-=trim
+ else:
+  trim=((bottom-top)-(right-l)*h/w)/2;top+=trim;bottom-=trim
+ preview=im.crop((l,top,right,bottom)).resize((int(w),int(h)),Image.Resampling.LANCZOS)
+ p.image.paste(preview,(int(x),int(y)))
+ shape=p.slide.shapes.add_picture(str(path),Inches(x/144),Inches(y/144),width=Inches(w/144),height=Inches(h/144))
+ shape.crop_left=l/iw;shape.crop_top=top/ih;shape.crop_right=1-right/iw;shape.crop_bottom=1-bottom/ih
+ return shape
 for lang in ['en','zh']:
  core.LANG=lang;core.font.cache_clear();core.OUT=BASE/lang;core.OUT.mkdir(exist_ok=True);zh=lang=='zh';t=lambda a,b:a if zh else b
  prs=Presentation();prs.slide_width=Inches(13.333333);prs.slide_height=Inches(7.5);pics=[]
@@ -28,10 +41,10 @@ for lang in ['en','zh']:
   p=Page(prs,{'note_en':note},i,i==3,True)
   if i!=5:label(p,r['label_'+lang]);title(p,r[lang])
   if i==0:
-   p.picture(ROOT/'.impeccable/demo-v3/raw-sync/opening-poster.png',950,370,874,491)
-   for j,(a,b) in enumerate(t([('AI工具','Lovable · Claude · Codex · Grok'),('现有产品','4个时代 · 8条航线 · 24个场景'),('商业方向','游戏销售 · 学校年费 · 文博项目')],[('AI TOOLS','Lovable · Claude · Codex · Grok'),('PLAYABLE APP','4 eras · 8 routes · 24 scenes'),('BUSINESS PLAN','Game sales · School fees · Museum projects')])):
-    y=384+j*180;text(p,a,96,y,780,60,34,GREEN);text(p,b,96,y+72,780,95,32)
-   text(p,t('复用研究与系统，对适配和服务明确收费。','Reuse the core. Charge for the extra work.'),96,925,1728,60,32,GREEN)
+   crop_picture(p,WORKFLOW/'workflow-review.jpg',96,335,1110,560,(20,145,1955,1125))
+   crop_picture(p,WORKFLOW/'workflow-contracts.jpg',1260,335,564,560,(18,135,1260,1340))
+   text(p,t('真实本机协作记录｜设计审读、接口约定与3D实现','ACTUAL LOCAL WORKFLOW · Design review, API contracts and 3D development'),96,906,1728,42,25,p.muted)
+   text(p,t('Lovable：想法 · Claude：设计 · Codex：接口 · Grok：前端与3D','Lovable: ideas · Claude: design · Codex: APIs · Grok: frontend + 3D'),96,961,1728,40,27,GREEN)
   elif i==1:
    names=['Discovery Tour','Minecraft Education',t('文明航程','Civilization Voyage')]
    strength=t(['历史探索','课堂平台','连贯的文化航程'],['Historical exploration','Classroom platform','Connected cultural journeys'])
@@ -79,7 +92,7 @@ for lang in ['en','zh']:
 
    p.line(96,862,1824,862,GREEN,2);text(p,t('每个项目，都应为下一个故事留下积累。','Each project should help fund the next story.'),96,904,1728,94,38,GREEN)
   elif i==5:
-   p.picture(ROOT/'.impeccable/harbour-talk/temple-cover-composed.png',0,0,1920,1080,fill=True)
+   p.picture(WORKFLOW/'closing-industry.png',0,0,1920,1080,fill=True)
    p.text(r[lang],96,72,1728,120,88,WHITE,kind='serif',minsize=72)
    p.text(t('愿我们驶向的未来，值得抵达。','Choose a future worth arriving in.'),100,217,1720,76,40,WHITE,minsize=32)
   if i!=5:end(p,i+1)

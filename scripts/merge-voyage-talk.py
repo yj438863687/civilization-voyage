@@ -1,7 +1,7 @@
 """Keep Part A and replace the later sections with the three supplied decks."""
 from copy import deepcopy
 from pathlib import Path
-import io,json,re,zipfile
+import io,json,re,zipfile,hashlib
 from lxml import etree
 from pptx import Presentation
 from pptx.opc.package import Part
@@ -38,6 +38,8 @@ for source_path in SOURCES:
  source=Presentation(source_path);memo={}
  def clone_part(part):
   if part in memo:return memo[part]
+  if part.content_type=='application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml':
+   return deck.notes_master.part
   clone=Part(unique_name(part.partname),part.content_type,deck.part.package,part.blob)
   memo[part]=clone
   mapping={}
@@ -65,6 +67,16 @@ for source_path in SOURCES:
   slide.part._element=element;slide._element=element
   slide.__dict__.pop('shapes',None)
   expected.append(source_slide)
+
+# Layout identifiers must be unique across the imported slide masters.
+layout_id=2147484000
+for part in deck.part.package.iter_parts():
+ if part.content_type!='application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml':continue
+ element=part._element if hasattr(part,'_element') else etree.fromstring(part.blob)
+ for item in element.iter(qn('p:sldLayoutId')):
+  item.set('id',str(layout_id));layout_id+=1
+ if not hasattr(part,'_element'):
+  part._blob=etree.tostring(element,xml_declaration=True,encoding='UTF-8',standalone=True)
 
 # Keep the individual sections' layouts and typography; only normalize footer numbers.
 for i,slide in enumerate(deck.slides):
@@ -96,6 +108,13 @@ for i,(a,b) in enumerate(zip(expected,merged.slides)):
  for shape in b.shapes:
   if shape.has_text_frame and shape.top/deck.slide_height>.91 and shape.left/deck.slide_width>.85 and re.fullmatch(r'\d{1,2}',shape.text.strip()):
    assert shape.text.strip()==f'{i+1:02d}',(i,'footer number')
+# The personal section must open and close with images not used earlier in the talk.
+def image_hashes(slide):
+ return {hashlib.sha256(shape.image.blob).hexdigest() for shape in slide.shapes if shape.shape_type==13}
+for index in [16,21]:
+ photos=image_hashes(merged.slides[index])
+ earlier=set().union(*(image_hashes(s) for s in list(merged.slides)[:index]))
+ assert photos and not photos.intersection(earlier),(index+1,'repeated opening/closing image')
 # Part A has no changes, including its XML and all four original page numbers.
 original=Presentation(BASE)
 for i in range(4):assert etree.tostring(original.slides[i]._element)==etree.tostring(merged.slides[i]._element)
