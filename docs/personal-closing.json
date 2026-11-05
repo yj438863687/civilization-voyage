@@ -4,8 +4,8 @@
     "zh": "AI让想法落地，判断让作品成立。",
     "label_en": "01 / FROM IDEA TO PRODUCT",
     "label_zh": "01 / 从想法到作品",
-    "en_script": "Alright, you have seen what Civilization Voyage feels like to play.\nI will now explain how we built it, and how we could turn it into a sustainable cultural product.\n\nWe used Lovable to share ideas and explore what the game could look like.\nThen we used Claude for design, Codex for API work, and Grok for the frontend and 3D scenes.\n\nWe brought these parts together locally, tested the interactions, and updated the desktop app.\n\nBut building the game was only part of the work.\n\nWe still had to choose which stories belonged together, check their historical order, and make each choice clear to the player.\n\nLook at the game on the right.\nBehind this scene, the real question is:\nWhat does the player understand—and what will they remember?\n\nAI helped us turn ideas into something people could play.\nOur job was to give that experience a clear purpose.\n\nAnd that brings us to the business.\nBefore people spend money on our game, they spend time with it.\nWe need to make that time worthwhile.",
-    "zh_script": "大家已经看到了文明航程玩起来是什么样子。\n接下来，我会介绍我们如何制作它，以及如何让它成为一个能够持续发展的文化产品。\n\n我们用Lovable交流想法，探索游戏可能呈现的样子。\n然后用Claude做设计、Codex处理API，以及Grok完成前端和3D场景。\n\n我们在本机把这些部分整合起来，测试互动，并更新了桌面应用。\n\n但把游戏做出来，只是其中一部分。\n\n我们还要决定哪些故事应该放在一起，核对历史顺序，并让玩家看懂每一个选择。\n\n请看右边的游戏画面。\n在这幅场景背后，真正的问题是：\n玩家理解了什么，又会记住什么？\n\nAI帮助我们把想法变成了可以玩的作品。\n我们的工作，是让这段体验有一个明确的目的。\n\n这也引出了商业部分。\n在为游戏花钱之前，人们先为它花时间。\n我们需要让这段时间值得。",
+    "en_script": "Alright, you have seen what Civilization Voyage feels like to play.\nI will now explain how we built it, and how we could turn it into a sustainable cultural product.\n\nWe used Lovable to share ideas and explore what the game could look like.\nThen we used Claude for design, Codex for API work, and Grok for the frontend and 3D scenes.\n\nWe brought these parts together locally, tested the interactions, and updated the desktop app.\n\nBut building the game was only part of the work.\n\nWe still had to choose which stories belonged together, check their historical order, and make each choice clear to the player.\n\nLook at the game on the right.\nBehind this scene, the real question is:\nWhat does the player understand—and what will they remember?\n\nIf players remember the stories and understand the choices,\nthen we are offering more than a game—we are offering a way to explore culture.\n\nBut where does Civilization Voyage fit in the market?\nLet’s look at two products we chose as competitive benchmarks.",
+    "zh_script": "大家已经看到了文明航程玩起来是什么样子。\n接下来，我会介绍我们如何制作它，以及如何让它成为一个能够持续发展的文化产品。\n\n我们用Lovable交流想法，探索游戏可能呈现的样子。\n然后用Claude做设计、Codex处理API，以及Grok完成前端和3D场景。\n\n我们在本机把这些部分整合起来，测试互动，并更新了桌面应用。\n\n但把游戏做出来，只是其中一部分。\n\n我们还要决定哪些故事应该放在一起，核对历史顺序，并让玩家看懂每一个选择。\n\n请看右边的游戏画面。\n在这幅场景背后，真正的问题是：\n玩家理解了什么，又会记住什么？\n\n如果玩家能记住故事、理解选择，\n那么我们提供的就不仅是一款游戏，也是一种探索文化的方式。\n\n但文明航程在市场中处于什么位置？\n接下来看看我们选择的两款对标产品。",
     "role": "Personal closing",
     "seconds": 80,
     "rehearsal": [
@@ -26,8 +26,8 @@
         "en": "Look at the game on the right.\nBehind this scene, the real question is:\nWhat does the player understand—and what will they remember?"
       },
       {
-        "cue_zh": "看向观众，从制作过渡到商业。",
-        "en": "AI helped us turn ideas into something people could play.\nOur job was to give that experience a clear purpose.\n\nAnd that brings us to the business.\nBefore people spend money on our game, they spend time with it.\nWe need to make that time worthwhile."
+        "cue_zh": "看向观众，回应上一段的问题；最后一句切换到第二页竞品比较。",
+        "en": "If players remember the stories and understand the choices,\nthen we are offering more than a game—we are offering a way to explore culture.\n\nBut where does Civilization Voyage fit in the market?\nLet’s look at two products we chose as competitive benchmarks."
       }
     ]
   },
