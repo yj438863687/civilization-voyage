@@ -33,7 +33,8 @@ def render(p,row,index,lang,raw,label,title,end):
  elif k=='bp_benchmarks':
   vals=[('$19.99','Discovery Tour',t('Ancient Greece · 美国商店买断','Ancient Greece · US store purchase')),('$5.04','Minecraft Education',t('合格教育机构 · 每用户每年','Eligible education · per user/year')),('$36','Minecraft Education',t('商业组织 · 每用户每年','Commercial · per user/year'))]
   for j,(price,name,unit) in enumerate(vals):
-   x=96+j*588;txt(price,x,404,500,130,85,p.accent);txt(name,x,565,500,100,35);txt(unit,x,705,500,133,30)
+   x=96+j*588;txt(price,x,404,500,130,85,p.accent);txt(name,x,565,500,100,35);txt(unit,x,685,500,120,30)
+  txt(t('我们的定位：中外文化探索 + 选择与后果；延伸为游玩、教学与文博叙事。','Our position: Chinese and world cultures, explored through choices and consequences.\nA foundation for play, teaching and museum storytelling.'),96,839,1728,85,31,p.accent)
   foot(t('来源：Ubisoft Store / Minecraft Education官网，2026-11-05；不同产品与计费单位。','Sources: Ubisoft Store / Minecraft Education, 2026-11-05; different products and units.'))
  elif k=='bp_pricing':
   photos=['opening-poster.png','interaction-poster.png','routes-poster.png']
