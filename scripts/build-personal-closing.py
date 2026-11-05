@@ -76,7 +76,7 @@ for lang in ['en','zh']:
  pdf=fitz.open()
  for pic in pics:page=pdf.new_page(width=960,height=540);page.insert_image(page.rect,filename=str(pic))
  pdf.save(OUT/f'Civilization-Voyage-My-Part-{tag}.pdf')
- textfile=t('个人结尾演讲稿｜约8分钟｜按1:20 / 1:40 / 1:50 / 1:40 / 1:00 / 0:30排练\n\n','PERSONAL CLOSING | About 8 minutes | Rehearse: 1:20 / 1:40 / 1:50 / 1:40 / 1:00 / 0:30\n\n')+'\n\n'.join(f"SLIDE {i+1} — {r[lang]}\n\n{r[lang+'_script']}" for i,r in enumerate(rows))
+ textfile=t('个人结尾演讲稿｜约8分钟｜按1:30 / 1:25 / 1:55 / 1:35 / 1:05 / 0:30排练\n\n','PERSONAL CLOSING | About 8 minutes | Rehearse: 1:30 / 1:25 / 1:55 / 1:35 / 1:05 / 0:30\n\n')+'\n\n'.join(f"SLIDE {i+1} — {r[lang]}\n\n{r[lang+'_script']}" for i,r in enumerate(rows))
  (OUT/f'Speech-{tag}.txt').write_text(textfile,encoding='utf-8')
  if lang=='en':
   rehearsal='排练版｜方括号是看图提示，不朗读。六页合计约8分钟。\n\n'+'\n\n'.join(f"第{i+1}页｜{r['seconds']//60}:{r['seconds']%60:02d}\n"+'\n\n'.join('【'+part['cue_zh']+'】\n'+part['en'] for part in r['rehearsal']) for i,r in enumerate(rows))
