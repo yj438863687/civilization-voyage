@@ -44,8 +44,8 @@ for lang in ['en','zh']:
   if i==0:
    crop_picture(p,WORKFLOW/'workflow-review.jpg',96,335,1110,560,(20,145,1955,1125))
    crop_picture(p,WORKFLOW/'workflow-contracts.jpg',1260,335,564,560,(18,135,1260,1340))
-   text(p,t('真实本机协作记录｜设计审读、接口约定与3D实现','ACTUAL LOCAL WORKFLOW · Design review, API contracts and 3D development'),96,906,1728,42,25,p.muted)
-   text(p,t('Lovable：想法 · Claude：设计 · Codex：接口 · Grok：前端与3D','Lovable: ideas · Claude: design · Codex: APIs · Grok: frontend + 3D'),96,961,1728,40,27,GREEN)
+   text(p,t('真实本机协作记录｜设计审读、后端与3D开发','ACTUAL LOCAL WORKFLOW · Design review, backend and 3D development'),96,906,1728,42,25,p.muted)
+   text(p,t('Lovable：想法 · Claude：设计 · Codex：后端 · Grok：前端与3D','Lovable: ideas · Claude: design · Codex: backend · Grok: frontend + 3D'),96,961,1728,40,27,GREEN)
   elif i==1:
    names=['Discovery Tour','Minecraft Education',t('文明航程','Civilization Voyage')]
    strength=t(['历史探索','课堂平台','连贯的文化航程'],['Historical exploration','Classroom platform','Connected cultural journeys'])

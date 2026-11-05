@@ -50,4 +50,5 @@ for lang,tag in [('en','英文'),('zh','中文理解')]:
     text=re.sub(r'\s+','',page.get_text())
     assert re.sub(r'\s+','',rows[i]['zh_script']) in text,i
  print(path)
-print('Verified: 905-word English speech, six pages, matching merged PPT 17–22 and final Thank you.')
+words=sum(len(re.findall(r"\b[\w’-]+\b",row['en_script'])) for row in rows)
+print(f'Verified: {words}-word English speech, six pages, matching merged PPT 17–22 and final Thank you.')

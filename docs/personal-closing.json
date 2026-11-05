@@ -4,14 +4,14 @@
     "zh": "从AI协作，到第一款可玩的产品",
     "label_en": "01 / AI TOOLS AND LOCAL WORKFLOW",
     "label_zh": "01 / AI工具与本机协作",
-    "en_script": "You've seen what Civilization Voyage feels like to play.\nI'll now explain how we plan to make it a business that can keep growing.\nWe used Lovable to share ideas, Claude for design, Codex for APIs, and Grok for the frontend and 3D scenes.\n\nBut a working game is only the beginning.\nFor this project to go further, people need a reason to choose it, pay for it, and use it again.\nThat's what our business plan is built around.\nWe plan to sell the game to players, offer teaching support to schools, and build local story experiences for museums.\nIt all starts with what makes Civilization Voyage worth choosing.",
-    "zh_script": "大家已经体验了文明航程。接下来我讲怎么把它发展成能够继续成长的业务。我们用Lovable交流想法，Claude做设计，Codex处理API，Grok负责前端和3D。但做出游戏只是开始。项目要走下去，用户需要有理由选择、付费、再回来，商业计划就围绕这点展开：向玩家卖游戏，向学校提供教学支持，为博物馆制作本地故事体验。先从文明航程为什么值得选择讲起。",
+    "en_script": "You've seen what Civilization Voyage feels like to play.\nI'll now explain how we plan to make it a business that can keep growing.\nWe used Lovable to share ideas, Claude for design, Codex for the backend, and Grok for the frontend and 3D scenes.\n\nBut a working game is only the beginning.\nFor this project to go further, people need a reason to choose it, pay for it, and use it again.\nThat's what our business plan is built around.\nWe plan to sell the game to players, offer teaching support to schools, and build local story experiences for museums.\nIt all starts with what makes Civilization Voyage worth choosing.",
+    "zh_script": "大家已经体验了文明航程。接下来我讲怎么把它发展成能够继续成长的业务。我们用Lovable交流想法，Claude做设计，Codex负责后端，Grok负责前端和3D。但做出游戏只是开始。项目要走下去，用户需要有理由选择、付费、再回来，商业计划就围绕这点展开：向玩家卖游戏，向学校提供教学支持，为博物馆制作本地故事体验。先从文明航程为什么值得选择讲起。",
     "role": "Personal closing",
     "seconds": 60,
     "rehearsal": [
       {
         "cue_zh": "对应本机工作流截图，简短介绍工具分工，然后进入商业计划。",
-        "en": "You've seen what Civilization Voyage feels like to play.\nI'll now explain how we plan to make it a business that can keep growing.\nWe used Lovable to share ideas, Claude for design, Codex for APIs, and Grok for the frontend and 3D scenes."
+        "en": "You've seen what Civilization Voyage feels like to play.\nI'll now explain how we plan to make it a business that can keep growing.\nWe used Lovable to share ideas, Claude for design, Codex for the backend, and Grok for the frontend and 3D scenes."
       },
       {
         "cue_zh": "进入BP主线，最后一句切到第二页。",
