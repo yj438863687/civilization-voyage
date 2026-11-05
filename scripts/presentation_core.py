@@ -1,6 +1,9 @@
 """Editable presentation primitives shared by the speaker-led deck."""
 from pathlib import Path
 from functools import lru_cache
+import re
+from pptx.oxml.xmlchemy import OxmlElement
+from pptx.oxml.ns import qn
 from PIL import Image,ImageDraw,ImageFont,ImageOps
 from pptx.util import Inches,Pt
 from pptx.dml.color import RGBColor
@@ -8,8 +11,11 @@ from pptx.enum.shapes import MSO_SHAPE,MSO_CONNECTOR
 W,H=1920,1080
 INK='071B29';PANEL='0B3046';GREEN='35C5A5';PAPER='F1F5F4';WHITE='EDF6F5';MUTED='9BB4BC';LINE='264454'
 OUT=None
+LANG="en"
 @lru_cache(maxsize=128)
 def font(size,bold=False,kind='sans'):
+ if LANG=='zh':
+  return ImageFont.truetype('/System/Library/Fonts/Supplemental/Songti.ttc',int(size),index=1 if bold else 6) if kind=='serif' else ImageFont.truetype('/System/Library/Fonts/Hiragino Sans GB.ttc',int(size),index=1 if bold else 0)
  if kind=='serif':return ImageFont.truetype('/System/Library/Fonts/Supplemental/Georgia.ttf',int(size))
  if kind=='mono':return ImageFont.truetype('/System/Library/Fonts/Menlo.ttc',int(size))
  return ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc',int(size),index=0 if bold else 7)
@@ -17,8 +23,9 @@ def wrap(value,size,width,bold=False,kind='sans'):
  lines=[];f=font(size,bold,kind)
  for paragraph in str(value).split('\n'):
   line=''
-  for word in paragraph.split():
-   trial=(line+' '+word).strip()
+  tokens=re.findall(r'[A-Za-z0-9]+(?:[./+-][A-Za-z0-9]+)*|.',paragraph) if LANG=='zh' else paragraph.split()
+  for word in tokens:
+   trial=(line+word) if LANG=='zh' else (line+' '+word).strip()
    if line and f.getlength(trial)>width:lines.append(line);line=word
    else:line=trial
   lines.append(line)
@@ -50,7 +57,11 @@ class Page:
   for i,line in enumerate(lines):self.draw.text((x,y+i*size*1.17),line,font=font(size,bold,kind),fill='#'+color,anchor='lt')
   shape=self.slide.shapes.add_textbox(Inches(x/144),Inches(y/144),Inches(w/144),Inches(h/144));f=shape.text_frame;f.clear();f.margin_left=f.margin_right=f.margin_top=f.margin_bottom=0;f.word_wrap=False
   for i,line in enumerate(lines):
-   p=f.paragraphs[0] if i==0 else f.add_paragraph();p.text=line;p.font.name='Georgia' if kind=='serif' else 'Menlo' if kind=='mono' else 'Avenir Next';p.font.size=Pt(size/2);p.font.bold=bold;p.font.color.rgb=RGBColor.from_string(color);p.line_spacing=Pt(size*1.17/2);p.space_before=p.space_after=Pt(0)
+   p=f.paragraphs[0] if i==0 else f.add_paragraph();p.text=line;p.font.name=('Songti SC' if kind=='serif' else 'Hiragino Sans GB') if LANG=='zh' else ('Georgia' if kind=='serif' else 'Menlo' if kind=='mono' else 'Avenir Next');p.font.size=Pt(size/2);p.font.bold=bold;p.font.color.rgb=RGBColor.from_string(color);p.line_spacing=Pt(size*1.17/2);p.space_before=p.space_after=Pt(0)
+   if LANG=='zh':
+    ea=p.font._rPr.find(qn('a:ea'))
+    if ea is None:ea=OxmlElement('a:ea');p.font._rPr.append(ea)
+    ea.set('typeface',p.font.name)
   return shape
  def picture(self,path,x,y,w,h,fill=False):
   img=Image.open(path).convert('RGB')

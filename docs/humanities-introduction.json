@@ -1,0 +1,357 @@
+[
+  {
+    "role": "A",
+    "kind": "cover",
+    "zh": "文明航程",
+    "en": "Civilization Voyage",
+    "zh_body": [
+      "乘一条船，\n走进技术改变生活的时刻。"
+    ],
+    "en_body": [
+      "A voyage through lives\nchanged by technology."
+    ],
+    "note_zh": "A｜开场。文明航程是一款以中华文明与世界文化为内容的3D航海游戏。玩家从一座神殿出发，选择一个时代，再驶入中国或世界的航线。我们希望把历史带回人的生活：河道修通以后，谁能用上水；机器转快以后，谁得到了休息；消息传得更远以后，谁仍没有被听见。游戏让玩家在故事中作决定，再带着结果走向下一站。下面先介绍这段航程怎样开始。",
+    "note_en": "A | Civilization Voyage is a 3D sailing game built around Chinese civilization and world cultures. A player leaves a hall, chooses an era and follows a China or world route. We bring history into the scale of everyday life: who receives the water after a channel opens, who gains rest when a machine runs faster, and who remains unheard when messages travel farther? Players make arrangements within those stories and carry their consequences to the next scene. Begin with the experience of departing rather than a list of features."
+  },
+  {
+    "role": "A",
+    "kind": "departure",
+    "zh": "先把船开向一座岛",
+    "en": "Sail towards an island first",
+    "zh_body": [
+      "选择时代与航线",
+      "靠近人物，听他说完",
+      "按指引行动，再作安排"
+    ],
+    "en_body": [
+      "Choose an era and a route.",
+      "Meet a character and hear the situation.",
+      "Follow the task, then decide what to do."
+    ],
+    "note_zh": "A｜按README里的实际操作讲述。起航时有四个时代可选，每个时代都有内海与外海。开船靠近岛屿，按E进入故事，人物的对白通过字幕逐句展开。听过处境后，玩家依据指引完成水上的操作，再选择怎样使用成果。这样，岛屿先是一个人与一件事，随后才成为一道需要判断的问题。原有3D人物、场景、浮动字幕都在主线中，图片背景只是额外的阅读入口。",
+    "note_en": "A | Describe the actual sequence in the README. Choose an era and either sea, sail near an island and press E. A character speaks through manually advanced subtitles. The player then follows the water-task instructions and makes an arrangement. An island first introduces a person and a situation. The judgment follows that encounter. Original 3D characters, scenery and subtitles remain in the main game. The optional image notes give background without replacing the encounter."
+  },
+  {
+    "role": "A",
+    "kind": "seas",
+    "zh": "内海看中国，外海看世界",
+    "en": "China in the inner sea; the world beyond",
+    "zh_body": [
+      "农业、工业、信息、人工智能：四个时代，八条航线。",
+      "每条线依年代展开；切换时代，就是进入新的历史篇章。",
+      "在不同的处境中，看人怎样安排水、粮食、劳动、消息与判断。"
+    ],
+    "en_body": [
+      "Four eras and eight routes: agriculture, industry, information and AI.",
+      "Each route moves forward in time; changing eras opens another historical chapter.",
+      "Different settings reveal how people arrange water, food, work, messages and judgment."
+    ],
+    "note_zh": "A｜说明比较的范围。内海对应中国，外海对应世界。四个时代各有两条航线，共24个故事场景。我们比较的是具体情境里的安排，避免把文明排成高低顺序。时代之间有历史重叠，玩家也不是以一人的寿命亲历几千年；切换时代是进入新的篇章。小组原有“玄览玄通”的部分在这里落实为理解处境、阅读材料和形成问题，术语的正式含义仍以课程讲义为准。交给B，沿两条农业航线看具体故事。",
+    "note_en": "A | Explain the comparison without ranking civilizations. There are two routes in each era and twenty-four scenes in total. Routes have their own chronology; the eras can overlap, and the player is not literally a single historical person living across millennia. The first team responsibility, Xuanlan Xuantong, is expressed here through understanding a setting, reading its evidence and forming a question. Formal philosophical definitions should follow the course materials. Hand over to B for two agricultural stories."
+  },
+  {
+    "role": "B",
+    "kind": "water",
+    "zh": "在堤岸边，\n决定水的去向",
+    "en": "At the dike, decide where the water goes",
+    "zh_body": [
+      "鲧的村庄想先保住自己的田。",
+      "禹的故事里，两岸要商量怎样轮流用水。",
+      "到了都江堰，问题又变成：谁来共同维护？"
+    ],
+    "en_body": [
+      "Gun’s village wants to protect its fields.",
+      "Yu’s story asks how the two banks share water.",
+      "At Dujiangyan, the question becomes who will maintain the arrangement."
+    ],
+    "note_zh": "B｜中国农业线从鲧与禹的治水传说，走到战国都江堰的历史背景。第一站加高堤坝能保住本村，却可能让邻村承受水患；第二站主渠通了，仍要安排上下游的开闸时辰；最后，春汛以前需要有人留下疏浚。回港由李冰回顾实际选择。这里关于人物的对话是游戏创作，传说没有虚构的公元年份。图像是都江堰的现代照片，只解释分水结构，不能当作传说现场。",
+    "note_en": "B | The China agriculture route moves from the legends of Gun and Yu to a historical Dujiangyan setting. Protecting one village can leave a neighbouring field exposed. A working channel still needs an agreement about turns, and the agreement needs work before the spring flood. Li Bing closes this route by recalling the player’s choices in dialogue written for the game. Legends are not given invented calendar years. The photograph is modern Dujiangyan, used to explain the structure rather than depict the legendary scene.",
+    "media": [
+      "water"
+    ]
+  },
+  {
+    "role": "B",
+    "kind": "tablet",
+    "zh": "在粮仓前，\n谁的名字被记下",
+    "en": "At the granary,\nwhose claim is recorded?",
+    "zh_body": [
+      "外海驶向两河流域：收成进了仓，也被记在泥板上。",
+      "有了记录，分粮是否就更公平？遇到欠收，仓门先为谁打开？"
+    ],
+    "en_body": [
+      "In Mesopotamia, harvests enter a storehouse and become marks on a tablet.",
+      "Do records make distribution fairer? When the harvest fails, who receives grain first?"
+    ],
+    "note_zh": "B｜世界农业线以两河流域的粮仓与早期记账为背景。储存和记录让更多人能够在城市生活，但账上写谁、谁的凭据有效、荒年先分给谁，仍需要人作决定。把它与中国治水线放在一起，我们能看见不同的文化背景，也能比较相近的生活难题。这里不把两段历史说成同一套制度。泥板图像为晚乌鲁克时期的数字实物，来源与许可写在备注；故事人物和情境中的对话属于创作。",
+    "note_en": "B | The world agriculture route uses grain storage and early records in Mesopotamia. Storing and counting can support a larger city, but people still decide which claims to recognize and whom to help when grain runs short. Beside the China route, this provides a concrete cultural comparison rather than an assertion that both societies had the same institutions. The pictured numerical tablet is a Late Uruk object with its credit in these notes. Characters’ conversations and decisions are reconstructed for the game.",
+    "media": [
+      "tablet"
+    ]
+  },
+  {
+    "role": "B",
+    "kind": "industry",
+    "zh": "机器转快了，人的日子怎样变化",
+    "en": "The machine runs faster. What changes for people?",
+    "zh_body": [
+      "中国线：从林则徐、魏源读懂世界，到詹天佑把铁路修上山岭。",
+      "世界线：蒸汽机省下煤，工厂里的劳动者还在争取休息与学习的机会。"
+    ],
+    "en_body": [
+      "In China, reading and translating the world leads towards Zhan Tianyou’s railway.",
+      "Elsewhere, steam saves coal while workers face questions of rest, work and learning."
+    ],
+    "note_zh": "B｜工业时代的两条线不是机器发明的名录。中国线从林则徐搜集、翻译外国资料，到魏源编纂背景，再到1909年京张铁路通车背景，讨论知识怎样成为更多人的机会。世界线从1769年的瓦特作坊走到工厂的工时与交货安排，由罗伯特·欧文回顾。工厂中的具体人物对话与交班情境是创作。图片为1812年瓦特肖像，晚于作坊场景，用作人物背景，不冒充现场记录。此处体现和而不同：比较处境和安排，保留差异。",
+    "note_en": "B | These routes concern how industrial changes enter people’s lives. The China story moves from Lin Zexu’s gathering of foreign information and Wei Yuan’s compilation context towards the 1909 Beijing–Zhangjiakou railway setting. The world route moves from Watt’s workshop to factory hours and delivery pressures, with Robert Owen as the closing voice. The conversations and shift decisions are authored scenarios. The portrait dates from 1812 and is contextual, later than the workshop scene. Cultural comparison keeps these differences visible.",
+    "media": [
+      "watt"
+    ]
+  },
+  {
+    "role": "B",
+    "kind": "messages",
+    "zh": "把消息送到，还要有人听见",
+    "en": "A message arrives. Someone still has to be heard.",
+    "zh_body": [
+      "上海海缆、津沪电报、跨大洋的电缆，把原本遥远的地方连在一起。",
+      "线路有限，费用有限，先传谁的消息？又由谁学习、值守和维护？"
+    ],
+    "en_body": [
+      "Shanghai’s sea cable, the Tianjin–Shanghai telegraph and the Atlantic cable connect distant places.",
+      "Capacity and money are limited. Whose message goes first, and who learns to keep the lines working?"
+    ],
+    "note_zh": "C｜信息时代继续追问技术与共同生活的关系。中国线依次进入1871年上海海缆、1881年津沪电报和1896年办学背景，最后由盛宣怀回顾。世界线从1844年电报到1866年跨洋电缆，再到1948年信息论背景，由香农回顾。更快、更可靠的传送本领，不能独自决定什么消息该先传。有限的信道和学习机会让这些问题进入玩家的选择。图像是1866年的大东方号历史图像。",
+    "note_en": "C | The information routes continue the inquiry. China moves through the 1871 Shanghai cable, the 1881 Tianjin–Shanghai line and an 1896 education setting, with Sheng Xuanhuai closing. The world route moves from the 1844 telegraph through the 1866 Atlantic cable to a 1948 information-theory setting, with Claude Shannon closing. Faster transmission cannot itself decide which message should go first. Capacity, fees, training and maintenance become human arrangements. The image shows the Great Eastern in 1866.",
+    "media": [
+      "cable"
+    ]
+  },
+  {
+    "role": "C",
+    "kind": "resources",
+    "zh": "船上带着补给，也带着人的信任",
+    "en": "The ship carries provisions and people’s trust",
+    "zh_body": [
+      "补给用来维持航行，也用来整修船体。",
+      "人心关系到合作支援，也让船员换上新的行装。",
+      "为今天省下的粮食，可能在下一站付出别的代价。"
+    ],
+    "en_body": [
+      "Supplies sustain the voyage and pay for ship refits.",
+      "Trust affects cooperation and opens new crew outfits.",
+      "Saving provisions today can change the terms of the next encounter."
+    ],
+    "note_zh": "C｜这里讲清游戏的核心资源。补给是船上的粮与水，也是改造船体所需的物资；人心用一个简化数值表现合作关系，不能代表完整的人性或文明高低。合作可能付出眼前补给，却在下一站得到工料帮助。人心过低，支援会暂停。船坞能预览和购买实际船体改造；人心达到门槛后解锁行装，不作为货币扣除。变化会出现在海上的船和原船员身上，也写入存档。",
+    "note_en": "C | Explain the two game resources in ordinary terms. Supplies are food and water and the materials for refits. Trust is a simplified representation of cooperation, not a measure of civilization or of a person’s worth. An agreement can use provisions now and bring support later; low trust suspends that support. The shipyard previews and purchases refits that appear on the sailing ship. Trust thresholds unlock outfits without spending trust as a currency. The original crew remains recognizable, and progress is saved."
+  },
+  {
+    "role": "C",
+    "kind": "play",
+    "zh": "对话之后，轮到你掌舵",
+    "en": "After the conversation, take the helm",
+    "zh_body": [
+      "开进浮标门，作出选择。",
+      "稳住光环，或收集水面物件。",
+      "完成操作后，决定怎样安排成果。"
+    ],
+    "en_body": [
+      "Steer through a buoy gate to make a choice.",
+      "Hold inside a ring or collect objects on the water.",
+      "After the task, decide how to use its result."
+    ],
+    "note_zh": "D｜README的操作很直接：WASD航行，靠近人物按E，空格或“下一句”推进对白，Escape返回，B打开船坞。任务包含浮标门、光环停船、收集和顺序校验。操作奖励和社会选择分开结算，因此操作做得好，仍然要想清楚成果怎样分配。屏幕上的指引应使玩家知道眼前该做什么，再通过故事理解为什么这样做。我们已经针对各类入口、退出和结算作了验证，但不把局部验证说成全部路线的连续人工通关。",
+    "note_en": "D | The README gives a simple set of controls: WASD to sail, E near a character, Space or Next Line to advance speech, Escape to return and B for the shipyard. Tasks include buoy gates, holding position, collection and sequence checking. Task rewards and social choices settle separately. A successful action still leaves a decision about its use. We have checked native access, exits and settlement branches; that should not be described as a continuous manual completion of every route."
+  },
+  {
+    "role": "C",
+    "kind": "return",
+    "zh": "回港时，重新看一遍自己的选择",
+    "en": "Return to shore and look back at the choices",
+    "zh_body": [
+      "上一站留下的合作，会改变下一站得到的帮助。",
+      "船可能因缺粮停下，也可能因为无人愿意同行而停下。",
+      "回港的人，应该说起你真正走过的这一程。"
+    ],
+    "en_body": [
+      "Earlier cooperation changes the help available later.",
+      "A voyage can stop for lack of provisions or of willing companions.",
+      "The closing voice should recall the journey you actually made."
+    ],
+    "note_zh": "C｜一条航线依次经过两座岛和一场共同危机，最后回港总结。总结人物适配这段历史，回顾读取玩家的实际选择。资源归零后，游戏会停航；玩家可以承担扣分、耐久和相应外观降级的代价重整，也可以把坏结局记入日志。故事选择不会因此清空。这使反思有具体的事情可回看。我们把知行合一落实为理解、行动、遭遇后果、重新理解的学习经历；哲学术语仍以课程材料的正式解释为准。",
+    "note_en": "C | A route links two islands, a shared crisis and a return to shore. Its closing figure belongs to the period and recalls recorded choices. When a resource reaches zero, sailing stops. Players can pay the stated recovery costs or preserve a bad ending in the log; earlier story choices remain. Reflection therefore has something concrete to revisit. We connect the team’s knowledge-and-action theme to understanding, acting, meeting consequences and reconsidering an explanation. Formal philosophical definitions remain those of the course materials."
+  },
+  {
+    "role": "D",
+    "kind": "video",
+    "zh": "看一段实际航程",
+    "en": "Watch a passage through the actual game",
+    "zh_body": [],
+    "en_body": [],
+    "note_zh": "D｜播放约2分43秒的Demo。镜头来自实际游戏，使用演示专用的预置存档和真实键鼠操作，后期加入游戏原声、合成旁白、字幕与章节。内容包括岛上互动、升级、补给耗尽后的重整、人心归零后的结局和回港。演示经过剪辑，并不是从头连续通关全部路线。中文理解版配中文旁白与字幕，游戏画面使用同一份实录。播放后用一两句引导观众想起：哪一个决定影响了后来的同行者？",
+    "note_en": "D | Play the approximately 2:43 film. It records actual gameplay with prepared demonstration saves and real keyboard and mouse actions, edited with game audio, synthetic narration, captions and chapters. It includes encounters, upgrades, resource failure, recovery and a return to shore. It is edited rather than an uninterrupted completion of all routes. The Chinese understanding edition uses Chinese narration and subtitles over the same gameplay. Afterwards, invite the audience to recall a choice that affected later cooperation."
+  },
+  {
+    "role": "D",
+    "kind": "details",
+    "zh": "听人物说话，也能停下来读资料",
+    "en": "Hear the character; pause to read the context.",
+    "zh_body": [
+      "人物与字幕留在原来的场景里。",
+      "配乐随时代变化，动作和音效一起发生。",
+      "想多了解一点时，再打开岛上的图片背景。"
+    ],
+    "en_body": [
+      "Characters and subtitles stay within their scenes.",
+      "Music changes with the era; actions have synchronized effects.",
+      "Open the island’s image notes when you want more context."
+    ],
+    "note_zh": "D｜项目保留原有的人物、场景和浮动字幕，也为四时代安排原创合成配乐。接到物件、进入光环和完成操作会触发对应音效。24个故事场景都有可选的图片背景与来源说明，区分后世画像、现代照片和历史图像。阅读背景不推进章节，也不给资源奖励。中英文和大字可随时切换，当前对白、资源和航程进度继续保留。讲这些细节，是为了说明玩家怎样在一个场景里听人说话、观察、行动与停下来阅读。",
+    "note_en": "D | The project preserves its original characters, scenery and floating subtitles and provides original synthesized music for the four eras. Collection, entering a ring and task completion trigger related sound cues. Optional image notes accompany all twenty-four scenes and identify later portraits, modern photographs and historical images. Reading them neither completes a chapter nor awards resources. Language and text-size controls preserve current dialogue and progress. These details support listening, observing, acting and pausing to read within one world."
+  },
+  {
+    "role": "D",
+    "kind": "state",
+    "zh": "现在，这片海已经可以航行",
+    "en": "The voyage is already playable",
+    "zh_body": [
+      "3D场景、人物、字幕与水上任务已连在一起。",
+      "四时代配乐、图片背景、船坞与结局已经进入同一主线。",
+      "接下来要到真实课堂中，看故事能否被理解、流程能否被使用。"
+    ],
+    "en_body": [
+      "3D scenes, characters, subtitles and water tasks form one route.",
+      "Music, image notes, refits and endings are part of the same game.",
+      "A classroom pilot must now examine understanding and practical use."
+    ],
+    "note_zh": "D｜说明当前交付状态。README描述的是已经可以运行的本地游戏，并非只有概念图或PPT。现有版本有4时代、8路线、24个故事场景，支持中英双语、大字、存档恢复、原创合成配乐、实际船体和行装升级以及资源结局。浏览器与安装版验证有明确记录；它们证明部分可观察功能，不等于课堂教学效果已经成立。当前主线使用编写的故事和规则，付费模型与高级RAG没有作为已完成成果展示。交给E：怎样把这样的游戏做出来，并形成可交付的文化体验。",
+    "note_en": "D | The README describes an operating local game rather than a concept-only presentation. Its four eras, eight routes and twenty-four scenes include bilingual display, larger text, saved progress, original synthesized music, visible upgrades and resource-dependent endings. Browser and installed-build checks document observable behaviour; educational outcomes still require a classroom pilot. The present voyage uses authored stories and rules. Paid-model interaction and advanced retrieval are not presented as delivered features. Hand over to E for the documented development workflow and a deliverable cultural experience."
+  },
+  {
+    "role": "E",
+    "kind": "making",
+    "zh": "这片海是怎样做出来的",
+    "en": "How this world was put together",
+    "zh_body": [
+      "先确定场景与视觉，再约定接口。",
+      "把3D、故事、存档和规则逐层接起来。",
+      "在浏览器里验证，再更新桌面App。"
+    ],
+    "en_body": [
+      "Begin with scenes and visual direction, then agree on interfaces.",
+      "Connect the 3D world, stories, saves and rules.",
+      "Check the behaviour in a browser, then update the desktop app."
+    ],
+    "note_zh": "E｜如实介绍开发过程。GitHub记录了初始框架、设计规范、接口与React/Three.js前端的交接；文档将设计交给Claude、接口交给Codex、前端与3D交给Grok。这是交接记录，不是每次模型调用的独立审计。项目在本机用FastAPI与SQLite承载数据，用Vite、React与Three.js呈现场景，再补齐保存、浏览器验证和桌面包装。Lovable可帮助解释“自然语言构建、代码同步GitHub、继续本地开发”的工作方式，但没有证据说这个仓库由Lovable导出。文化材料选择、历史次序与用户体验仍需要人反复核对。",
+    "note_en": "E | Describe the documented workflow honestly. GitHub records the framework, design, API contracts and React/Three.js handoffs. The documents assign design to Claude, APIs to Codex and the frontend/3D work to Grok; they are not an audit of every model call. FastAPI and SQLite support data locally, while Vite, React and Three.js render the game. Saves, browser checks and the desktop wrapper made revisions usable. Lovable is a useful parallel for natural-language building, GitHub synchronization and continued local work; a Lovable origin is not established for this repository."
+  },
+  {
+    "role": "E",
+    "kind": "ai",
+    "zh": "当机器也会回答，决定交给谁",
+    "en": "When machines can answer, who decides?",
+    "zh_body": [
+      "在港口，调度表可以更快；乘员仍应知道交出了什么信息。",
+      "在棋盘上，一手好棋证明了本领；换一件事，还需要新的依据。",
+      "Anthropic关于诚实与人的判断的讨论，为这一程提供当代参照。"
+    ],
+    "en_body": [
+      "A port can schedule faster while passengers still need to know what data they give.",
+      "A strong move shows an ability on the board; another task needs other evidence.",
+      "Anthropic’s discussion of honesty and human judgment provides a contemporary reference."
+    ],
+    "note_zh": "E｜人工智能时代的两条线把责任留在故事里：中国线从2017年的港口调度背景，到2021年的个人信息保护背景，再进入标明的2035年未来推演；世界线从图灵与ELIZA的问题走向2016年AlphaGo棋局，由李世石回顾。Anthropic的Claude宪章强调诚实、人类自主判断与监督能力，我们借它提出设计问题，不把它当作所有文明的价值标准，也不声称游戏实现了Constitutional AI训练。原文：https://www.anthropic.com/constitution 。当前文化主线的故事与规则是编写好的，不依赖付费模型调用。",
+    "note_en": "E | The AI routes keep responsibility within a story. China moves from a 2017 scheduling setting through a 2021 personal-information setting into an explicitly imagined 2035 port. The world route moves from Turing and ELIZA towards the 2016 AlphaGo match, with Lee Sedol closing. Anthropic’s Claude Constitution emphasizes honesty, human agency and oversight; we use it as a contemporary source of design questions. This is neither a universal measure of cultures nor an implementation of Constitutional AI training. Source: https://www.anthropic.com/constitution . The current authored voyage does not require paid model calls.",
+    "media": [
+      "go"
+    ]
+  },
+  {
+    "role": "E",
+    "kind": "buyer",
+    "zh": "谁会把它带进课堂",
+    "en": "Who would bring it into a classroom?",
+    "zh_body": [
+      "学习者：在故事里作选择，理解它后来带来的影响。",
+      "教师：组织一堂有来源、可讨论的互动课。",
+      "学校或文化机构：判断是否值得安排时间与预算。"
+    ],
+    "en_body": [
+      "Learners make choices and explain their later effects.",
+      "Teachers organize a source-linked, discussable session.",
+      "A school or cultural institution decides whether to commit time and budget."
+    ],
+    "note_zh": "E｜BP先分清使用者、组织者和采购者。第一类待验证客户是准备技术与社会主题课堂的历史教师。学习者希望故事和操作能看懂；教师需要材料可信、准备工作可控；机构需要知道购买的具体内容和交付负担。我们尚未做出已验证的市场需求或客户规模声明。先访谈老师目前怎样准备这类课、会用什么替代材料，再判断文明航程能否带来足够的价值。它的文化意义不能直接换算成付费需求。",
+    "note_en": "E | Begin the BP by distinguishing the learner, facilitator and purchaser. The initial customer hypothesis is a history teacher preparing a technology-and-society session. Learners need a comprehensible story and controls; teachers need sources and manageable preparation; an institution needs a clear purchase and delivery obligation. Demand, customer numbers and willingness to pay are unverified. Interview teachers about their existing lesson and alternatives before claiming that the game saves enough work or improves an experience enough to be purchased."
+  },
+  {
+    "role": "E",
+    "kind": "offer",
+    "zh": "先交付一条完整的文化航线",
+    "en": "Start with one complete cultural route",
+    "zh_body": [
+      "游戏、人物与可回顾的选择，是已有的基础。",
+      "来源说明、课堂引导和回顾单，共同组成一次文化体验课。",
+      "先比较老师原来使用的PPT、讨论和知识问答，再决定怎样收费。"
+    ],
+    "en_body": [
+      "The game, characters and recorded choices already provide a foundation.",
+      "Sources, facilitation and a debrief would form one cultural-history session.",
+      "Compare the teacher’s existing slides, discussion and quizzes before setting a price."
+    ],
+    "note_zh": "E｜第一种拟议商品是一堂带引导的文化体验课，不同时铺开多种收费模式。游戏和背景来源已存在，课堂运行指南、回顾单和稳定的交付方式需要在试点前补齐。教师自制PPT具有熟悉和灵活的优势，知识问答便于检查记忆，长篇历史游戏可能更有沉浸感；这些都是需要实际比较的替代方案，而非被我们证明落后的竞品。代码采用MIT许可，价值要落实在审读过的内容、节省的准备工作、引导和支持。后续内容包或机构授权，应以复用需求为依据。",
+    "note_en": "E | Propose a single initial purchase: one facilitated cultural-history class. The game and source notes exist; the classroom guide, debrief and repeatable delivery process still need preparation and testing. Teacher-made slides offer familiarity and flexibility, quizzes can check recall, and a longer game may offer immersion. These are alternatives to investigate, not proven inferior competitors. The code is MIT-licensed. A paid offer therefore needs value in reviewed content, preparation saved, facilitation and support. Further route packs or institutional access should follow demonstrated reuse."
+  },
+  {
+    "role": "E",
+    "kind": "economics",
+    "zh": "先算清一次交付",
+    "en": "Work out the cost of one session first",
+    "zh_body": [
+      "假设每班收费3,000元，直接交付成本1,200元，首次获客600元。",
+      "留下1,200元，继续覆盖固定投入、税费与后续开发。",
+      "报价、工时和复购都需要实测；这里是测算，不是已实现的收入。"
+    ],
+    "en_body": [
+      "Assume ¥3,000 for a class, ¥1,200 direct delivery cost and ¥600 for first acquisition.",
+      "That leaves ¥1,200 before fixed costs, tax and further development.",
+      "Price, effort and repeat purchase need observation; this is a scenario, not revenue achieved."
+    ],
+    "note_zh": "E｜用一个明确单位说明商业逻辑：一次首次付费班级，而不是把60名参与者算成60个客户。示例收入3000减直接交付1200减获客600，贡献余额1200。若交付成本升到1800，只剩600；若降到600，则剩1800。示例固定启动工作18000元，在同样每笔承受600获客成本的口径下，需15笔基准首次购买覆盖；高成本时30笔，低成本时10笔。所有金额是待验证假设，不是报价、营收或融资。试点3万元预算中12000元周转储备不应再重复算作固定费用。复购会改变获客分摊，未测留存时不编造LTV。",
+    "note_en": "E | Use one first paid class as the unit, rather than counting every learner as a paying customer. The scenario is 3000 minus 1200 delivery minus 600 acquisition, leaving 1200 contribution. Delivery at 1800 leaves 600; delivery at 600 leaves 1800. Covering illustrative fixed launch work of 18000 would require fifteen baseline first purchases, thirty in the higher-cost case or ten in the lower-cost case. Each assumes the full 600 acquisition burden. These are assumptions, not quotations, revenue or funding. An operating reserve within the pilot cash budget is not counted again as fixed expense. Repeat purchase could change acquisition allocation; lifetime value is unmeasured."
+  },
+  {
+    "role": "E",
+    "kind": "pilot",
+    "zh": "先让老师带完一条航线",
+    "en": "Let a teacher run a complete route",
+    "zh_body": [
+      "从少量愿意试用的班级开始，观察准备和支持的工作量。",
+      "看学生能否说清一次选择及其后果，看老师是否愿意再用。",
+      "从试用、复用意愿，走到采购负责人真正批准付费。"
+    ],
+    "en_body": [
+      "Begin with a small classroom pilot and observe preparation and support effort.",
+      "Ask whether learners can explain a choice and its consequence, and whether the teacher wants to reuse it.",
+      "Distinguish trial, a repeat request and an approved paid purchase."
+    ],
+    "note_zh": "E｜增长路线保持与项目阶段相称。先招募愿意试用的老师，准备一条完整航线及其来源和引导资料；运行后记录理解、困难、准备时间与支持成本；再区分复用请求和真正的预算批准。可以提出3个班级的试点目标，但不能当作已实现的用户数据。示例3万元现金预算里，资料审读12000和产品完善6000属于启动工作；引导评价9000和托管支持3000作为运行储备。资金分配要随试点事实调整。若课堂运行困难，先修交付；若故事难懂，先修内容；若有兴趣而没有预算，重看采购对象和商品组合。",
+    "note_en": "E | Keep growth proportional to the stage. Recruit willing teachers, prepare one complete route with sources and facilitation, then record comprehension, obstacles, preparation time and support cost. Separate repeat interest from budget approval. Three classrooms may be a recruitment target, not achieved users. In the illustrative 30000 cash envelope, source review at 12000 and hardening at 6000 are launch work; facilitation/evaluation at 9000 and hosting/support at 3000 are operating reserves. Revise spending with observed constraints. Improve delivery if setup fails, revise content if the story is unclear, and reconsider the package or purchaser if interest does not reach a budget."
+  },
+  {
+    "role": "E",
+    "kind": "closing",
+    "zh": "把这一程带回课堂",
+    "en": "Bring the voyage back to the classroom",
+    "zh_body": [
+      "先试一条完整的航线，把来源、讨论问题和回顾交给愿意使用它的老师。",
+      "再看故事是否讲清楚、操作是否顺畅，还有没有再走一程的需要。"
+    ],
+    "en_body": [
+      "Begin with a complete route, its sources and a discussion a teacher can use.",
+      "Then examine what was understood, where play became difficult and whether another session is wanted."
+    ],
+    "note_zh": "E｜收束项目。我们想先把一条完整的文化航线交给课堂：游戏提供遭遇与选择，来源说明帮助阅读，老师组织讨论，回港回顾给反思留下具体材料。学习者、使用它的老师与可能批准支出的机构承担不同角色，交付工作和成本要在试用中核实。课程适配、付费需求和学习效果尚未得到验证，不能凭原型作出承诺。作为未来应用，这比先列一串营收预测更贴近目前项目的阶段。结束用游戏中据史实创作的李冰回港台词，明确它不是历史原话：“水利技术让人留下来，分水和维护的规矩才让两岸一起过下去。”",
+    "note_en": "E | Close with a modest application: one complete cultural route, its sources, a usable discussion and a return-to-shore reflection. Learners, the teacher running a session and an institution approving expenditure have different roles. Delivery work, costs, curriculum fit, willingness to pay and learning outcomes need observation in a pilot. They are not established by the prototype. This is the relevant business question at the present stage. End with Li Bing’s closing line written for the game, explicitly a reconstruction rather than a historical quotation: water engineering allows settlement; rules for sharing and maintenance let both banks keep living together."
+  }
+]
