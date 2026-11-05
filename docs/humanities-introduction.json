@@ -259,15 +259,15 @@
     "zh_body": [
       "在港口，调度表可以更快；乘员仍应知道交出了什么信息。",
       "在棋盘上，一手好棋证明了本领；换一件事，还需要新的依据。",
-      "Anthropic关于诚实与人的判断的讨论，为这一程提供当代参照。"
+      "AI辅助制作；历史判断、内容选择与最终责任，仍由人承担。"
     ],
     "en_body": [
       "A port can schedule faster while passengers still need to know what data they give.",
       "A strong move shows an ability on the board; another task needs other evidence.",
-      "Anthropic’s discussion of honesty and human judgment provides a contemporary reference."
+      "AI assists production; people remain responsible for historical judgment, content and final decisions."
     ],
-    "note_zh": "C｜人工智能时代的两条线把责任留在故事里：中国线从2017年的港口调度背景，到2021年的个人信息保护背景，再进入标明的2035年未来推演；世界线从图灵与ELIZA的问题走向2016年AlphaGo棋局，由李世石回顾。Anthropic的Claude宪章强调诚实、人类自主判断与监督能力，我们借它提出设计问题，不把它当作所有文明的价值标准，也不声称游戏实现了Constitutional AI训练。原文：https://www.anthropic.com/constitution 。当前文化主线的故事与规则是编写好的，不依赖付费模型调用。",
-    "note_en": "C | The AI routes keep responsibility within a story. China moves from a 2017 scheduling setting through a 2021 personal-information setting into an explicitly imagined 2035 port. The world route moves from Turing and ELIZA towards the 2016 AlphaGo match, with Lee Sedol closing. Anthropic’s Claude Constitution emphasizes honesty, human agency and oversight; we use it as a contemporary source of design questions. This is neither a universal measure of cultures nor an implementation of Constitutional AI training. Source: https://www.anthropic.com/constitution . The current authored voyage does not require paid model calls.",
+    "note_zh": "C｜人工智能时代的两条线把责任留在故事里：中国线从2017年的港口调度背景，到2021年的个人信息保护背景，再进入标明的2035年未来推演；世界线从图灵与ELIZA的问题走向2016年AlphaGo棋局，由李世石回顾。项目用这些处境讨论效率、隐私与判断的边界。AI可以辅助制作，但选材、历史核对、表达和最终责任需要由人承担。当前文化主线的故事与规则经过编写，不依赖付费模型调用。",
+    "note_en": "C | The AI routes keep responsibility within a story. China moves from a 2017 scheduling setting through a 2021 personal-information setting into an explicitly imagined 2035 port. The world route moves from Turing and ELIZA towards the 2016 AlphaGo match, with Lee Sedol closing. These situations raise questions about efficiency, privacy and the limits of judgment. AI can assist production, while people remain responsible for selection, historical review, expression and final decisions. The current authored voyage does not require paid model calls.",
     "media": [
       "go"
     ]

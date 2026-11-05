@@ -1,6 +1,6 @@
 {
   "slides": "12–24",
-  "word_count": 646,
+  "word_count": 639,
   "duration": "About 6–7 minutes at 115–125 English words/minute including slide changes",
   "script": [
     {
@@ -14,8 +14,8 @@
       "slide": 13,
       "title_en": "Human judgment",
       "title_zh": "人的判断",
-      "en": "AI helped us build faster. We still had to decide which stories belonged together, check their historical order, and make the choices understandable.\nAnthropic’s emphasis on honesty and human agency is relevant here. A system should make its limits visible and leave room for human judgment. That principle also belongs inside our game: when technology becomes more capable, who remains responsible?",
-      "zh": "AI让制作更快，但故事怎样组合、年代是否正确、选择能否看懂，仍需要人判断。Anthropic关于诚实与人的自主判断的讨论，对我们有启发：系统应当说明自己的局限，让人保留判断的空间。这也呼应游戏的问题——技术更强大之后，谁继续承担责任？"
+      "en": "AI helped us build faster. We still had to decide which stories belonged together, check their historical order, and make the choices understandable.\nFor us, responsible design means making the system’s limits visible and leaving room for human judgment. That principle also belongs inside our game: when technology becomes more capable, who remains responsible?",
+      "zh": "AI让制作更快，但故事怎样组合、年代是否正确、选择能否看懂，仍需要人判断。对我们而言，负责任的设计应当说明系统的局限，让人保留判断的空间。这也呼应游戏的问题——技术更强大之后，谁继续承担责任？"
     },
     {
       "slide": 14,
