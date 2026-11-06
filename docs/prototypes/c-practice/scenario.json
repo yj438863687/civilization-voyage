@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "moduleRole": "C",
+  "scenarioId": "c_steam_port_pilot",
+  "scenarioVersion": "1.0",
+  "rulesVersion": "1.0",
+  "title": "蒸汽港的下一班",
+  "question": "资源有限时，怎样兼顾本轮交付、原班轮休及下一阶段维护？",
+  "handoff": {
+    "origin": "demo_preset",
+    "sourceModule": null,
+    "sourceScenarioId": null,
+    "sourceRecordIds": {},
+    "groupStatus": "pending",
+    "note": "本轮问题、情境与船员意见为演示预置。本地编号仅供此原型使用。"
+  },
+  "materials": {
+    "K1": {
+      "type": "课程概念",
+      "title": "看见谁在承担",
+      "source": "Week 5  6.pdf，第 4–6 页（含封面）",
+      "content": "隐形劳动容易被交付结果遮住。课上讨论的仁与义，提醒我们把对人的关切落实到安排里，并说明利益和代价。",
+      "support": "解释为何除了到港时间，还要看谁接手工作、谁失去轮休。",
+      "limit": "课程概念提供判断的视角。具体要用哪个班组，还要查本港的情境材料。"
+    },
+    "S1": {
+      "type": "案例设定",
+      "title": "交付窗口",
+      "source": "蒸汽港演练 · 交付单",
+      "content": "本轮约定的交付窗口只有 1 格。按常规轮班，货物会迟 1 格到港。",
+      "support": "判断货主是否要多等一个时段。",
+      "limit": "格是演示时段，无法由此推算实际小时或经济损失。"
+    },
+    "S2": {
+      "type": "案例设定",
+      "title": "班组安排",
+      "source": "蒸汽港演练 · 值班表",
+      "content": "原班按常规轮休。原班加速需额外执勤 1 格，调用替班组则由替班人员接手这段工作。",
+      "support": "指出兜住交付的是哪一组人，以及谁保有原定轮休。",
+      "limit": "没有个人工时或健康资料，不能据此推断伤害或事故概率。"
+    },
+    "S3": {
+      "type": "案例设定",
+      "title": "可用储备",
+      "source": "蒸汽港演练 · 资源簿",
+      "content": "初始储备共 3 单位。有一组可调用的替班人员，调用需 2 单位。下一班也可能需要这份储备。",
+      "support": "比较调用替班后的可用资源与留给下一班的条件。",
+      "limit": "单位只用于本次教学演练，无法换算成现实货币、代币或模型费用。"
+    }
+  },
+  "upstreamViews": [
+    {
+      "id": "delivery_view",
+      "origin": "demo_preset",
+      "label": "交付视角",
+      "text": "按时到港也是一种承诺。S1 提醒我们，拖延会让等待货物的人承担时间代价。但交付成功并不能说明所有人的处境都得到了照顾。"
+    },
+    {
+      "id": "crew_view",
+      "origin": "demo_preset",
+      "label": "劳动及后续责任视角",
+      "text": "S2 和 S3 让原班船员与下一班的需要进入讨论。我们可以改变班组安排，但也要说明调整后还剩多少资源，哪些问题被留到了以后。"
+    }
+  ],
+  "courseNotes": [
+    {
+      "source": "Week 5  6.pdf，第 4–6 页",
+      "text": "隐形劳动、仁义与义利取舍。请把承担代价的人写进理由。"
+    },
+    {
+      "source": "Week 5  6.pdf，第 13、15 页",
+      "text": "用留给下一班的储备类比对后来者的责任。船员可以提供意见，分配与关怀的判断由玩家作出。"
+    },
+    {
+      "source": "Week 4  5 PPT.pdf，第 6–7 页",
+      "text": "商品的流动不自动带来理解。借课上的张骞出使问题，比较原先目标与新认识，再讨论怎样判断一次行动。"
+    },
+    {
+      "source": "week 1  2.pdf，第 28、31 页",
+      "text": "独立判断 AI 的回答，评价文明时也考虑道德影响。这里允许不同意预写意见，保留有理由的不同决定。"
+    }
+  ],
+  "rules": {
+    "initialReserve": 3,
+    "deliveryWindow": 1,
+    "maintenanceNeed": 2,
+    "maintenanceNotice": "下一班收到一项需 2 单位资源处理的维护需求。"
+  },
+  "plans": {
+    "regular": {
+      "name": "常规轮班",
+      "action": "照原班表航行，货主多等一格。",
+      "deliveryDelay": 1,
+      "originalCrewExtraDuty": 0,
+      "reliefCrewCalled": false,
+      "reserveCost": 0,
+      "mainBearer": "货主"
+    },
+    "rush": {
+      "name": "原班加速",
+      "action": "原班多值一格，赶上交付窗口。",
+      "deliveryDelay": 0,
+      "originalCrewExtraDuty": 1,
+      "reliefCrewCalled": false,
+      "reserveCost": 0,
+      "mainBearer": "原班船员"
+    },
+    "relief": {
+      "name": "增配替班",
+      "action": "拨出储备请替班组接手，原班照常轮休。",
+      "deliveryDelay": 0,
+      "originalCrewExtraDuty": 0,
+      "reliefCrewCalled": true,
+      "reserveCost": 2,
+      "mainBearer": "下一班"
+    }
+  }
+}

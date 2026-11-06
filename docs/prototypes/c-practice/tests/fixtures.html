@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>C 隔离存档测试夹具</title><link rel="icon" href="data:,"></head>
+<body><h1>C 隔离存档测试夹具</h1><p>仅用于 127.0.0.1:8766。本工具只改该测试地址的本机存档，不接触 8765。</p>
+<label>测试夹具 <select id="fixture"><option value="broken">非法 JSON</option><option value="field">错误字段类型</option><option value="schema">不兼容 schema</option><option value="null-record">空方案记录</option><option value="null-v1-v2">两版存档的 v1 为空</option><option value="numeric-time">数字时间戳</option><option value="valid">有效新草稿</option><option value="revision">等待修订的 v1</option></select></label>
+<button id="load" type="button">载入夹具</button><p><label>存档内容<br><textarea id="raw" rows="12" cols="90"></textarea></label></p>
+<button id="write" type="button">写入隔离测试存档并打开演练</button><button id="read" type="button">读取当前测试存档</button><p id="status" role="status">正在读取情境。</p><script type="module" src="./fixtures.js"></script></body></html>
